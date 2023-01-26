@@ -5,7 +5,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Oms
 class OmsorgsArbeidFactory {
     companion object {
         fun createOmsorgsArbeid(inputOmsorgsArbeid: OmsorgsArbeidModel): OmsorgsArbeid {
-            return OmsorgsArbeid(listOf())
+            return OmsorgsArbeid(Omsorgsyter(inputOmsorgsArbeid.omsorgsyter.utbetalingsperioder[0].fom,
+                inputOmsorgsArbeid.omsorgsyter.utbetalingsperioder[0].tom))
         }
     }
 }
