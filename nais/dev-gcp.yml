@@ -1,0 +1,42 @@
+kind: Application
+apiVersion: nais.io/v1alpha1
+metadata:
+  name: omsorgsopptjening-bestem-pensjonsopptjening
+  namespace: pensjonopptjening
+  labels:
+    team: pensjonopptjening
+spec:
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: dev-gcp
+    - name: OMSORGSOPPTJENING_TOPIC
+      value: pensjonopptjening.omsorgsopptjening
+  kafka:
+    pool: nav-dev
+  secureLogs:
+    enabled: true
+  image: {{ image }}
+  ingresses:
+    - https://omsorgsopptjening-bestem-pensjonsopptjening.dev.intern.nav.no
+  liveness:
+    path: /actuator/health/liveness
+    port: 8080
+    initialDelay: 40
+  readiness:
+    path: /actuator/health/readiness
+    port: 8080
+    initialDelay: 40
+  prometheus:
+    enabled: true
+    path: /actuator/prometheus
+  replicas:
+    min: 2
+    max: 4
+    cpuThresholdPercentage: 75
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4096Mi
+    requests:
+      cpu: 100m
+      memory: 1024Mi
