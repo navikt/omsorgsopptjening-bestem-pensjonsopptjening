@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
 
-import java.time.LocalDate
-
-class Omsorgsyter(val fom: LocalDate, val tom: LocalDate) {
+class Omsorgsyter(private val omsorgsArbeidPeriode: List<OmsorgsArbeidPeriode>) {
+    fun monthsOfOmsorg(): Long = omsorgsArbeidPeriode.firstOrNull()?.months() ?: 0
 }
