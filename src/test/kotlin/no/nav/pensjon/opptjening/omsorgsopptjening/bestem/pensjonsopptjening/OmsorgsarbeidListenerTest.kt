@@ -1,10 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
 import no.nav.pensjon.opptjening.omsorgsarbeid.konsument.omsorgsarbeid.common.OmsorgsopptjeningMockListener
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsarbeidListenerTest.Companion.OMSORGSARBEID_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsarbeidListenerTest.Companion.OMSORGSOPPTJENING_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -12,9 +10,8 @@ import org.springframework.context.annotation.Import
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
-import kotlin.test.assertEquals
 
-@EmbeddedKafka(partitions = 1, topics = [OMSORGSARBEID_TOPIC, OMSORGSOPPTJENING_TOPIC])
+@EmbeddedKafka(partitions = 1, topics = [OMSORGSOPPTJENING_TOPIC])
 @SpringBootTest(classes = [App::class])
 @Import(KafkaIntegrationTestConfig::class, OmsorgsopptjeningMockListener::class)
 internal class OmsorgsarbeidListenerTest {
@@ -34,7 +31,7 @@ internal class OmsorgsarbeidListenerTest {
 
     @Test
     fun `given omsorgsarbeid event then produce omsorgsopptjening event`() {
-        omsorgsarbeidProducer.send(OMSORGSARBEID_TOPIC, omsorgsMeldingKey(), omsorgsMeldingValue())
+        omsorgsarbeidProducer.send(OMSORGSOPPTJENING_TOPIC, omsorgsMeldingKey(), omsorgsMeldingValue())
 
     }
 
@@ -63,7 +60,6 @@ internal class OmsorgsarbeidListenerTest {
 
 
     companion object {
-        const val OMSORGSARBEID_TOPIC = "omsorgsarbeid"
         const val OMSORGSOPPTJENING_TOPIC = "omsorgsopptjening"
     }
 }

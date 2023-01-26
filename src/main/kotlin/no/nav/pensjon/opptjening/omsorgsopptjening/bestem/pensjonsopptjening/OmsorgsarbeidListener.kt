@@ -11,11 +11,12 @@ import org.springframework.stereotype.Component
 class OmsorgsarbeidListener(registry: MeterRegistry) {
     private val antallLesteMeldinger = registry.counter("omsorgsArbeidListener", "antall", "lest")
 
+
     @KafkaListener(
         containerFactory = "omsorgsArbeidKafkaListenerContainerFactory",
         idIsGroup = false,
-        topics = ["\${OMSORGSARBEID_TOPIC}"],
-        groupId = "\${OMSORGP_GODSKRIVING_GROUP_ID}"
+        topics = ["\${OMSORGSOPPTJENING_TOPIC}"],
+        groupId = "\${OMSORGSOPPTJENING_BESTEM_GROUP_ID}"
     )
     fun consumeOmsorgPGodskriving(
         hendelse: String,

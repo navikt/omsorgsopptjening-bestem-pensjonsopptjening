@@ -1,5 +1,4 @@
-OMSORGSARBEID_TOPIC: omsorgsarbeid
-OMSORGP_GODSKRIVING_GROUP_ID: ape
 OMSORGSOPPTJENING_TOPIC: omsorgsopptjening
+OMSORGSOPPTJENING_BESTEM_GROUP_ID: testgruppe
 kafka:
   brokers: ${spring.embedded.kafka.brokers}

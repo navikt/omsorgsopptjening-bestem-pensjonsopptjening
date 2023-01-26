@@ -11,6 +11,8 @@ spec:
       value: dev-gcp
     - name: OMSORGSOPPTJENING_TOPIC
       value: pensjonopptjening.omsorgsopptjening
+    - name: OMSORGSOPPTJENING_BESTEM_GROUP_ID
+      value: omsorgsopptjening-bestem-group
   kafka:
     pool: nav-dev
   secureLogs:
