@@ -32,7 +32,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion")
 
-    testImplementation("org.springframework.kafka:spring-kafka-test:3.0.3")
+    testImplementation("org.springframework.kafka:spring-kafka-test:3.0.2")
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
