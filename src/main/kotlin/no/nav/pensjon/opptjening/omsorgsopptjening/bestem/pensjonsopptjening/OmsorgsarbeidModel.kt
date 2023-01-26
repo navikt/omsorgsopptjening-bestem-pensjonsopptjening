@@ -3,13 +3,13 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.time.LocalDate
 
-data class OmsorgsArbeid(val omsorgsyter: Omsorgsyter, val omsorgsAr: String, val hash: String)
-data class Omsorgsyter(val fnr: String, val utbetalingsperioder: List<UtbetalingsPeriode>)
-data class UtbetalingsPeriode(val fom: LocalDate, val tom: LocalDate, val omsorgsmottaker: OmsorgsMottaker)
-data class OmsorgsMottaker(val fnr: String)
-data class OmsorgsArbeidKey(val omsorgsyterFnr: String, val omsorgsAr: String)
+data class OmsorgsArbeidModel(val omsorgsyter: OmsorgsyterModel, val omsorgsAr: String, val hash: String)
+data class OmsorgsyterModel(val fnr: String, val utbetalingsperioder: List<UtbetalingsPeriodeModel>)
+data class UtbetalingsPeriodeModel(val fom: LocalDate, val tom: LocalDate, val omsorgsmottaker: OmsorgsMottakerModel)
+data class OmsorgsMottakerModel(val fnr: String)
+data class OmsorgsArbeidKeyModel(val omsorgsyterFnr: String, val omsorgsAr: String)
 
 internal fun convertToOmsorgsArbeid(omsorgsArbeid: String) =
-    jacksonObjectMapper().readValue(omsorgsArbeid, OmsorgsArbeid::class.java)
+    jacksonObjectMapper().readValue(omsorgsArbeid, OmsorgsArbeidModel::class.java)
 internal fun convertToOmsorgsArbeidKey(omsorgsArbeid: String) =
-    jacksonObjectMapper().readValue(omsorgsArbeid, OmsorgsArbeidKey::class.java)
+    jacksonObjectMapper().readValue(omsorgsArbeid, OmsorgsArbeidKeyModel::class.java)
