@@ -9,11 +9,13 @@ class OmsorgsArbeidFactory {
     companion object {
         fun createOmsorgsArbeid(inputOmsorgsArbeid: OmsorgsArbeidModel): OmsorgsArbeid {
             return OmsorgsArbeid(
-                Omsorgsyter(
+                omsorgsAr = inputOmsorgsArbeid.omsorgsAr.toInt(),
+                omsorgsYter = Omsorgsyter(
                     inputOmsorgsArbeid.omsorgsyter.utbetalingsperioder.map {
                         OmsorgsArbeidPeriode(it.fom, it.tom)
                     }
                 )
+
             )
         }
     }
