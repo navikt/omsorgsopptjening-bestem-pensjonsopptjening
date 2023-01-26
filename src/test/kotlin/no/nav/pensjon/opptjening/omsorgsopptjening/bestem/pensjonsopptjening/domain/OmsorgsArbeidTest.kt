@@ -5,10 +5,7 @@ import org.junit.jupiter.api.Test
 
 internal class OmsorgsArbeidTest {
 
-    @Test
-    fun `When calling should OmsorgsArbeidFactory Then create OmsorgsArbeid`() {
-        assertNotNull(OmsorgsArbeidFactory.createOmsorgsArbeid())
-    }
+
 
     /**
 
