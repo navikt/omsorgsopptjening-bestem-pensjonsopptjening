@@ -9,10 +9,7 @@ import java.time.temporal.ChronoUnit
 internal class Periode(val fom: YearMonth, val tom: YearMonth) {
 
     infix fun count(unit: TimeUnit): Long {
-        return when {
-            fom == UNDEFINED_FOM || tom == UNDEFINED_TOM -> 0
-            else -> ChronoUnit.MONTHS.between(fom, tom.plusMonths(1))
-        }
+        return ChronoUnit.MONTHS.between(fom, tom.plusMonths(1)).coerceAtLeast(0)
     }
 
     infix fun restrictTo(year: Int): Periode {
@@ -40,13 +37,15 @@ internal class Periode(val fom: YearMonth, val tom: YearMonth) {
 
 enum class TimeUnit { MONTHS }
 
+internal infix fun LocalDate.periode(to: LocalDate) = Periode(YearMonth.from(this), YearMonth.from(to))
+
 private infix fun YearMonth.isBeforeFirstMonthOf(year: Int) = this.isBefore(year.firstOf())
 private infix fun YearMonth.isAfterLastMonthOf(year: Int) = this.isAfter(year.lastOf())
 
 private fun Int.firstOf() = YearMonth.of(this, Month.JANUARY)
 private fun Int.lastOf() = YearMonth.of(this, Month.DECEMBER)
 
-internal infix fun LocalDate.periode(to: LocalDate) = Periode(YearMonth.from(this), YearMonth.from(to))
+
 
 
 

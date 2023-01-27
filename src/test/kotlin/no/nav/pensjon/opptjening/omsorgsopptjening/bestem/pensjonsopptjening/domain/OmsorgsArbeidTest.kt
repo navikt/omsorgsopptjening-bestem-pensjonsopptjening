@@ -36,6 +36,7 @@ internal class OmsorgsArbeidTest {
     ) {
         val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
             creatOmsorgsArbeidModel(
+                omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
                     creatUtbetalingsPeriodeModel(
                         fom = LocalDate.parse(fom),
@@ -70,6 +71,7 @@ internal class OmsorgsArbeidTest {
     ) {
         val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
             creatOmsorgsArbeidModel(
+                omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
                     creatUtbetalingsPeriodeModel(
                         fom = LocalDate.parse(fom),
@@ -101,6 +103,7 @@ internal class OmsorgsArbeidTest {
     ) {
         val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
             creatOmsorgsArbeidModel(
+                omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
                     creatUtbetalingsPeriodeModel(
                         fom = LocalDate.parse(fom),
@@ -124,6 +127,7 @@ internal class OmsorgsArbeidTest {
     ) {
         val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
             creatOmsorgsArbeidModel(
+                omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
                     creatUtbetalingsPeriodeModel(
                         fom = LocalDate.parse(fom),
@@ -140,7 +144,7 @@ internal class OmsorgsArbeidTest {
     @Test
     fun `Given omsorgsarbeid without utbetalingsperioder When calling monthsOfOmsorg Then 0`() {
         val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
-            creatOmsorgsArbeidModel(utbetalingsPeriode = listOf())
+            creatOmsorgsArbeidModel(utbetalingsPeriode = listOf(), omsorgsAr = "2020")
         )
 
         assertEquals(0, omsorgsArbeid.monthsOfOmsorg())
@@ -148,14 +152,15 @@ internal class OmsorgsArbeidTest {
 
     // Hva betyr fom og tom for BA
 
-    private fun creatOmsorgsArbeidModel(utbetalingsPeriode: List<UtbetalingsPeriodeModel>) = OmsorgsArbeidModel(
-        omsorgsAr = "2020",
-        hash = "12345",
-        omsorgsyter = OmsorgsyterModel(
-            fnr = "1234566",
-            utbetalingsperioder = utbetalingsPeriode
+    private fun creatOmsorgsArbeidModel(omsorgsAr: String, utbetalingsPeriode: List<UtbetalingsPeriodeModel>) =
+        OmsorgsArbeidModel(
+            omsorgsAr = omsorgsAr,
+            hash = "12345",
+            omsorgsyter = OmsorgsyterModel(
+                fnr = "1234566",
+                utbetalingsperioder = utbetalingsPeriode
+            )
         )
-    )
 
     private fun creatUtbetalingsPeriodeModel(
         fom: LocalDate = LocalDate.of(2020, Month.JANUARY, 1),
