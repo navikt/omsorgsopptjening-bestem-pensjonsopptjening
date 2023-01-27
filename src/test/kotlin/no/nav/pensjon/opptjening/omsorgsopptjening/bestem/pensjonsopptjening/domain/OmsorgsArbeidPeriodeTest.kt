@@ -1,16 +1,20 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
 
+import com.google.common.collect.Range
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsArbeidModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsMottakerModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsyterModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtbetalingsPeriodeModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsArbeidFactory
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.time.LocalDate
 import java.time.Month
+import java.time.Period
+import java.time.YearMonth
+
 
 internal class OmsorgsArbeidPeriodeTest{
 
@@ -138,6 +142,33 @@ internal class OmsorgsArbeidPeriodeTest{
         )
 
         assertEquals(0, omsorgsArbeid.monthsOfOmsorg())
+    }
+
+
+    @Test
+    fun ape(){
+        println(LocalDate.of(2020, Month.JANUARY, 1).datesUntil(LocalDate.of(2020, Month.JANUARY, 1)).toList())
+        println(Period.between(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 1).plusMonths(1)))
+
+        (YearMonth.of(2020, Month.JANUARY) .. YearMonth.of(2020, Month.FEBRUARY))
+
+        val piss = ArrayList<YearMonth>()
+        var lastYearMonth = YearMonth.of(2020, Month.JANUARY)
+        while (lastYearMonth <= YearMonth.of(2020, Month.FEBRUARY)){
+            piss.add(lastYearMonth)
+            lastYearMonth = lastYearMonth.plusMonths(1)
+        }
+
+        println("sdf")
+
+        LocalDate.of(2020, Month.JANUARY, 1).datesUntil(LocalDate.of(2021, Month.JANUARY, 1)
+            .plusMonths(1))
+            .map { YearMonth.of(it.year,it.month) }
+            .toList()
+            .toSet()
+
+
+
     }
 
 
