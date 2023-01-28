@@ -36,7 +36,7 @@ internal class OmsorgsArbeidPeriodeTest{
     fun `Given fom first day of month When calling monthsOfOmsorg Then return months of omsorgsarbeid omsorgsAr`(
         fom: String,
         tom: String,
-        expectedAmountOfMoths: Long
+        expectedAmountOfMoths: Int
     ) {
         val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
             creatOmsorgsArbeidModel(
@@ -71,7 +71,7 @@ internal class OmsorgsArbeidPeriodeTest{
     fun `Given fom last day og month When calling monthsOfOmsorg Then return months of omsorgsarbeid omsorgsAr`(
         fom: String,
         tom: String,
-        expectedAmountOfMoths: Long
+        expectedAmountOfMoths: Int
     ) {
         val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
             creatOmsorgsArbeidModel(
@@ -103,7 +103,7 @@ internal class OmsorgsArbeidPeriodeTest{
     fun `Given fom or tom overlap with omsorgsAr Then return months in omsorgsAr`(
         fom: String,
         tom: String,
-        expectedAmountOfMoths: Long
+        expectedAmountOfMoths: Int
     ) {
         val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
             creatOmsorgsArbeidModel(
