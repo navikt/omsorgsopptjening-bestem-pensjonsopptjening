@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
 
-import com.google.common.collect.Range
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsArbeidModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsMottakerModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsyterModel
@@ -12,11 +11,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.time.LocalDate
 import java.time.Month
-import java.time.Period
-import java.time.YearMonth
 
 
-internal class OmsorgsArbeidPeriodeTest{
+internal class OmsorgsArbeidPeriodeTest {
 
     @ParameterizedTest
     @CsvSource(
@@ -42,15 +39,12 @@ internal class OmsorgsArbeidPeriodeTest{
             creatOmsorgsArbeidModel(
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(
-                        fom = LocalDate.parse(fom),
-                        tom = LocalDate.parse(tom)
-                    )
+                    creatUtbetalingsPeriodeModel(fom = LocalDate.parse(fom), tom = LocalDate.parse(tom))
                 )
             )
         )
 
-        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsOfOmsorg())
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg())
     }
 
     @ParameterizedTest
@@ -77,15 +71,12 @@ internal class OmsorgsArbeidPeriodeTest{
             creatOmsorgsArbeidModel(
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(
-                        fom = LocalDate.parse(fom),
-                        tom = LocalDate.parse(tom)
-                    )
+                    creatUtbetalingsPeriodeModel(fom = LocalDate.parse(fom), tom = LocalDate.parse(tom))
                 )
             )
         )
 
-        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsOfOmsorg())
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg())
     }
 
 
@@ -109,21 +100,18 @@ internal class OmsorgsArbeidPeriodeTest{
             creatOmsorgsArbeidModel(
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(
-                        fom = LocalDate.parse(fom),
-                        tom = LocalDate.parse(tom)
-                    )
+                    creatUtbetalingsPeriodeModel(fom = LocalDate.parse(fom), tom = LocalDate.parse(tom))
                 )
             )
         )
 
-        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsOfOmsorg())
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg())
     }
 
     @ParameterizedTest
     @CsvSource(
-        "2019-01-01, 2019-12-31, 0",
-        "2021-01-01, 2021-06-01, 0",
+        "2019-01-01, 2019-12-31",
+        "2021-01-01, 2021-06-01",
     )
     fun `Given fom and tom dont overlap with omsorgsAr Then return zero months`(
         fom: String,
@@ -133,42 +121,76 @@ internal class OmsorgsArbeidPeriodeTest{
             creatOmsorgsArbeidModel(
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(
-                        fom = LocalDate.parse(fom),
-                        tom = LocalDate.parse(tom)
-                    )
+                    creatUtbetalingsPeriodeModel(fom = LocalDate.parse(fom), tom = LocalDate.parse(tom))
                 )
             )
         )
 
-        assertEquals(0, omsorgsArbeid.monthsOfOmsorg())
+        assertEquals(0, omsorgsArbeid.monthsWithOmsorg())
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        "2020-01-01, 2020-12-01, 2020-01-01, 2020-12-01, 12",
+        "2020-01-01, 2020-06-01, 2020-07-01, 2020-12-01, 12",
+        "2019-01-01, 2020-06-01, 2020-07-01, 2022-12-01, 12",
+        "2020-01-01, 2020-12-01, 2021-01-01, 2019-12-31, 12",
+        "2020-01-01, 2020-06-01, 2020-08-01, 2020-12-01, 11",
+        "2019-01-01, 2020-06-01, 2020-08-01, 2021-01-01, 11",
+        "2019-01-01, 2019-12-31, 2021-01-01, 2019-12-31, 0",
+        "2019-01-01, 2019-06-01, 2021-06-01, 2019-12-31, 0",
 
-    @Test
-    fun ape(){
-        println(LocalDate.of(2020, Month.JANUARY, 1).datesUntil(LocalDate.of(2020, Month.JANUARY, 1)).toList())
-        println(Period.between(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 1).plusMonths(1)))
+        )
+    fun `Given given two utbetalings periodes Then count months overlaping with omsorgsAr`(
+        fom1: String,
+        tom1: String,
+        fom2: String,
+        tom2: String,
+        expectedAmountOfMoths: Int
+    ) {
+        val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
+            creatOmsorgsArbeidModel(
+                omsorgsAr = "2020",
+                utbetalingsPeriode = listOf(
+                    creatUtbetalingsPeriodeModel(fom = LocalDate.parse(fom1), tom = LocalDate.parse(tom1)),
+                    creatUtbetalingsPeriodeModel(fom = LocalDate.parse(fom2), tom = LocalDate.parse(tom2))
+                )
+            )
+        )
 
-        (YearMonth.of(2020, Month.JANUARY) .. YearMonth.of(2020, Month.FEBRUARY))
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg())
+    }
 
-        val piss = ArrayList<YearMonth>()
-        var lastYearMonth = YearMonth.of(2020, Month.JANUARY)
-        while (lastYearMonth <= YearMonth.of(2020, Month.FEBRUARY)){
-            piss.add(lastYearMonth)
-            lastYearMonth = lastYearMonth.plusMonths(1)
-        }
-
-        println("sdf")
-
-        LocalDate.of(2020, Month.JANUARY, 1).datesUntil(LocalDate.of(2021, Month.JANUARY, 1)
-            .plusMonths(1))
-            .map { YearMonth.of(it.year,it.month) }
-            .toList()
-            .toSet()
+    @ParameterizedTest
+    @CsvSource(
+            "2020-01-01, 2020-12-01, 2020-01-01, 2020-12-01, 2020-01-01, 2020-12-01, 12",
+            "2019-01-01, 2021-01-01, 2019-01-01, 2021-01-01, 2019-12-31, 2020-12-01, 12",
+            "2020-01-01, 2020-03-01, 2020-04-12, 2020-06-20, 2020-10-31, 2021-12-01, 9",
+            "2012-01-01, 2012-03-01, 2019-01-01, 2019-12-31, 2021-01-01, 2021-01-01, 0",
 
 
+        )
+    fun `Given given thre utbetalings periodes Then count months overlaping with omsorgsAr`(
+        fom1: String,
+        tom1: String,
+        fom2: String,
+        tom2: String,
+        fom3: String,
+        tom3: String,
+        expectedAmountOfMoths: Int
+    ) {
+        val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
+            creatOmsorgsArbeidModel(
+                omsorgsAr = "2020",
+                utbetalingsPeriode = listOf(
+                    creatUtbetalingsPeriodeModel(fom = LocalDate.parse(fom1), tom = LocalDate.parse(tom1)),
+                    creatUtbetalingsPeriodeModel(fom = LocalDate.parse(fom2), tom = LocalDate.parse(tom2)),
+                    creatUtbetalingsPeriodeModel(fom = LocalDate.parse(fom3), tom = LocalDate.parse(tom3))
+                )
+            )
+        )
 
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg())
     }
 
 
@@ -178,9 +200,8 @@ internal class OmsorgsArbeidPeriodeTest{
             creatOmsorgsArbeidModel(utbetalingsPeriode = listOf(), omsorgsAr = "2020")
         )
 
-        assertEquals(0, omsorgsArbeid.monthsOfOmsorg())
+        assertEquals(0, omsorgsArbeid.monthsWithOmsorg())
     }
-
 
 
     private fun creatOmsorgsArbeidModel(omsorgsAr: String, utbetalingsPeriode: List<UtbetalingsPeriodeModel>) =

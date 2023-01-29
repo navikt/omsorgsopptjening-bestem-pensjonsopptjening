@@ -1,5 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.Months.Companion.crateEmptyMonths
+
 class Omsorgsyter(private val omsorgsArbeidPeriode: List<OmsorgsArbeidPeriode>) {
-    fun monthsOfOmsorg(omsorgsAr: Int): Int = omsorgsArbeidPeriode.firstOrNull()?.monthsInYear(omsorgsAr) ?: 0
+    fun monthsWithOmsorgsarbeid(omsorgsAr: Int): Int = totalMonthsOfPayment().restrictToYear(omsorgsAr).countMonths()
+
+    private fun totalMonthsOfPayment() = omsorgsArbeidPeriode
+        .fold(initial = crateEmptyMonths()) { totalMonths, period -> totalMonths + period.monthsWithPayment }
 }
