@@ -2,8 +2,9 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.do
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsArbeidModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.OmsorgsArbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.OmsorgsArbeidPeriode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.OmsorgsArbeidsUtbetalinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.Omsorgsyter
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person.Person
 
 class OmsorgsArbeidFactory {
     companion object {
@@ -11,11 +12,11 @@ class OmsorgsArbeidFactory {
             return OmsorgsArbeid(
                 omsorgsAr = inputOmsorgsArbeid.omsorgsAr.toInt(),
                 omsorgsYter = Omsorgsyter(
-                    inputOmsorgsArbeid.omsorgsyter.utbetalingsperioder.map {
-                        OmsorgsArbeidPeriode(it.fom, it.tom)
+                    person = Person(),
+                    omsorgsArbeidsUtbetalinger = inputOmsorgsArbeid.omsorgsyter.utbetalingsperioder.map {
+                        OmsorgsArbeidsUtbetalinger(it.fom, it.tom)
                     }
                 )
-
             )
         }
     }

@@ -13,7 +13,7 @@ import java.time.LocalDate
 import java.time.Month
 
 
-internal class OmsorgsArbeidPeriodeTest {
+internal class OmsorgsArbeidsUtbetalingerTest {
 
     @ParameterizedTest
     @CsvSource(
