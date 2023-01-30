@@ -1,12 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsArbeidModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.OmsorgsOpptjening
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.Omsorgsyter
 
 class OmsorgsopptjeningFactory {
     companion object {
-        fun createOmsorgsopptjening(omsorgsyter: Omsorgsyter, omsorgsar: Int): OmsorgsOpptjening {
-            return OmsorgsOpptjening(omsorgsyter, omsorgsar)
+        fun createOmsorgsopptjening(omsorgsArbeidModel: OmsorgsArbeidModel): OmsorgsOpptjening {
+            return OmsorgsOpptjening(omsorgsArbeidModel.omsorgsAr.toInt(), OmsorgsArbeidFactory.createOmsorgsArbeid(omsorgsArbeidModel))
         }
     }
  }
