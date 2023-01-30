@@ -26,8 +26,11 @@ class OmsorgsarbeidListener(registry: MeterRegistry) {
         antallLesteMeldinger.increment()
         SECURE_LOG.info("Konsumerer omsorgsmelding: ${consumerRecord.key()}, ${consumerRecord.value()}")
 
-        convertToOmsorgsArbeid(consumerRecord.value())
-        convertToOmsorgsArbeidKey(consumerRecord.key())
+        val key = convertToOmsorgsArbeidKey(consumerRecord.key())
+        val value = convertToOmsorgsArbeid(consumerRecord.value())
+
+        SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $value")
+
         acknowledgment.acknowledge()
     }
 
