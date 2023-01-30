@@ -4,8 +4,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsMottakerModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsyterModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtbetalingsPeriodeModel
-import java.time.LocalDate
 import java.time.Month
+import java.time.YearMonth
 
 internal class OmsorgsArbeidTest {
 
@@ -20,8 +20,8 @@ internal class OmsorgsArbeidTest {
         )
 
     private fun creatUtbetalingsPeriodeModel(
-        fom: LocalDate = LocalDate.of(2020, Month.JANUARY, 1),
-        tom: LocalDate = LocalDate.of(2020, Month.JUNE, 1)
+        fom: YearMonth = YearMonth.of(2020, Month.JANUARY),
+        tom: YearMonth = YearMonth.of(2020, Month.JUNE)
     ) = UtbetalingsPeriodeModel(
         omsorgsmottaker = OmsorgsMottakerModel("12356574353"),
         fom = fom,

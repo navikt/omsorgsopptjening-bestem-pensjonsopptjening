@@ -1,7 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.util.yearmonth.rangeTo
-import java.time.LocalDate
 import java.time.YearMonth
 
 class UtbetalingMoneder private constructor(private val months: Set<YearMonth> = setOf()) {
@@ -13,7 +12,7 @@ class UtbetalingMoneder private constructor(private val months: Set<YearMonth> =
     operator fun plus(other: UtbetalingMoneder) = UtbetalingMoneder(this.months + other.months)
 
     companion object {
-        fun crateUtbetalingMoneder(fom: LocalDate, tom: LocalDate) = UtbetalingMoneder((YearMonth.from(fom)..YearMonth.from(tom)).toSet())
+        fun crateUtbetalingMoneder(fom: YearMonth, tom: YearMonth) = UtbetalingMoneder((fom..tom).toSet())
 
         fun crateUtbetalingMoneder() = UtbetalingMoneder()
     }
