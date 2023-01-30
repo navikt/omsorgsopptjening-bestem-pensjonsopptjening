@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsopptjeningFactory
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -30,6 +31,9 @@ class OmsorgsarbeidListener(registry: MeterRegistry) {
         val value = convertToOmsorgsArbeid(consumerRecord.value())
 
         SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $value")
+
+        val opptjening = OmsorgsopptjeningFactory.createOmsorgsopptjening(value)
+        SECURE_LOG.info("Person som fikk opptjening: ${opptjening.personMedPomsorgsopptjening().toString()}")
 
         acknowledgment.acknowledge()
     }

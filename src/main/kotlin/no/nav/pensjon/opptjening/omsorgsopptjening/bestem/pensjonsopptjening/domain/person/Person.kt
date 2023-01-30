@@ -1,8 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person
 
-class Person(
-    gjeldendeFnr: Fnr,
-    historiskeFnr: List<Fnr> = listOf()
-) {
-
-}
+data class Person(
+    private val gjeldendeFnr: Fnr,
+    private val historiskeFnr: List<Fnr> = listOf()
+)

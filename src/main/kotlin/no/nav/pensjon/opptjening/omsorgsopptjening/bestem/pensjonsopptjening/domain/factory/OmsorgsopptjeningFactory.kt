@@ -6,7 +6,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.dom
 class OmsorgsopptjeningFactory {
     companion object {
         fun createOmsorgsopptjening(omsorgsArbeidModel: OmsorgsArbeidModel): OmsorgsOpptjening {
-            return OmsorgsOpptjening(omsorgsArbeidModel.omsorgsAr.toInt(), OmsorgsArbeidFactory.createOmsorgsArbeid(omsorgsArbeidModel))
+            return OmsorgsOpptjening(
+                omsorgsAr = omsorgsArbeidModel.omsorgsAr.toInt(),
+                involvertePerson = PersonFactory.createPerson(omsorgsArbeidModel.omsorgsyter.fnr),
+                omsorgsarbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(omsorgsArbeidModel)
+            )
         }
     }
- }
+}

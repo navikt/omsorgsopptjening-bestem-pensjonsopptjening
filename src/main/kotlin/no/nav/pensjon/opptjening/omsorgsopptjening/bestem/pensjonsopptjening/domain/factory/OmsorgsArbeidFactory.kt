@@ -9,7 +9,6 @@ class OmsorgsArbeidFactory {
     companion object {
         fun createOmsorgsArbeid(inputOmsorgsArbeid: OmsorgsArbeidModel): OmsorgsArbeid {
             return OmsorgsArbeid(
-                omsorgsAr = inputOmsorgsArbeid.omsorgsAr.toInt(),
                 omsorgsYter = Omsorgsyter(
                     person = PersonFactory.createPerson(inputOmsorgsArbeid.omsorgsyter.fnr),
                     omsorgsArbeidsUtbetalinger = inputOmsorgsArbeid.omsorgsyter.utbetalingsperioder.map {
