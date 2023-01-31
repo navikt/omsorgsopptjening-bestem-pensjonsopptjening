@@ -55,4 +55,79 @@ internal class PersonTest {
 
         assertFalse(person isIdentifiedBy fnr)
     }
+
+    @Test
+    fun `Given persons have identical fnrs When calling isSamePerson Then return true`(){
+        val person1: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "11111111111",
+            historiskeFnr = listOf("2222222222", "3333333333")
+        )
+
+        val person2: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "11111111111",
+            historiskeFnr = listOf("2222222222", "3333333333")
+        )
+
+        assertTrue(person1 isSamePerson person2)
+    }
+
+    @Test
+    fun `Given gjeldendeFnr intersect with historiskeFnr of another person When calling isSamePerson Then return true`(){
+        val person1: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "11111111111",
+            historiskeFnr = listOf("2222222222", "3333333333")
+        )
+
+        val person2: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "444444444444",
+            historiskeFnr = listOf("11111111111")
+        )
+
+        assertTrue(person1 isSamePerson person2)
+    }
+
+    @Test
+    fun `Given gjeldendeFnr intersects When calling isSamePerson Then return true`(){
+        val person1: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "11111111111",
+            historiskeFnr = listOf("2222222222", "3333333333")
+        )
+
+        val person2: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "11111111111",
+            historiskeFnr = listOf("444444444444")
+        )
+
+        assertTrue(person1 isSamePerson person2)
+    }
+
+    @Test
+    fun `Given one historisk fnr intersects When calling isSamePerson Then return true`(){
+        val person1: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "11111111111",
+            historiskeFnr = listOf("2222222222", "3333333333")
+        )
+
+        val person2: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "444444444444",
+            historiskeFnr = listOf("5555555555", "3333333333")
+        )
+
+        assertTrue(person1 isSamePerson person2)
+    }
+
+    @Test
+    fun `Given no fnrs intersect When calling isSamePerson Then return false`(){
+        val person1: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "11111111111",
+            historiskeFnr = listOf("2222222222", "3333333333")
+        )
+
+        val person2: Person = PersonFactory.createPerson(
+            gjeldendeFnr = "444444444444",
+            historiskeFnr = listOf("5555555555", "66666666666")
+        )
+
+        assertFalse(person1 isSamePerson person2)
+    }
 }
