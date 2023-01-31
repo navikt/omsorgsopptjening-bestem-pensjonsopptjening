@@ -9,6 +9,8 @@ class UtfortOmsorgsarbeid(
 ) {
     fun monthsWithOmsorgsarbeid(omsorgsAr: Int): Int = totalMonthsOfPayment().restrictToYear(omsorgsAr).countMonths()
 
+    infix fun isUtfortAvPerson(otherPerson: Person) = person isSamePerson otherPerson
+
     private fun totalMonthsOfPayment() = omsorgsArbeidsUtbetalinger
         .fold(initial = crateUtbetalingMoneder()) { accumulatedMonths, period -> accumulatedMonths + period.monthsWithPayment }
 }
