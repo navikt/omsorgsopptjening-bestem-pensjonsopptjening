@@ -28,7 +28,7 @@ internal class OmsorgsOpptjeningTest {
 
         val personWithOmsorgsopptjening = OmsorgsopptjeningFactory
             .createOmsorgsopptjening(omsorgsArbeidInput)
-            .personMedOmsorgsopptjening()
+            .personerMedOmsorgsopptjening()
 
         assertTrue(personWithOmsorgsopptjening.first() isIdentifiedBy Fnr(FNR_1))
     }
@@ -48,7 +48,7 @@ internal class OmsorgsOpptjeningTest {
 
         val omsorgsOpptjening = OmsorgsopptjeningFactory.createOmsorgsopptjening(omsorgsArbeidInput)
 
-        omsorgsOpptjening.personMedOmsorgsopptjening()
+        omsorgsOpptjening.personerMedOmsorgsopptjening()
     }
 
 

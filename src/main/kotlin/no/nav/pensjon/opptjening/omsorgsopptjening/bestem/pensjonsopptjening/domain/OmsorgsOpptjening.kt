@@ -8,5 +8,8 @@ class OmsorgsOpptjening(
     val omsorgsarbeidSak: OmsorgsArbeidSak,
     val personer: List<Person>
 ) {
-    fun personMedOmsorgsopptjening() = personer.filter { (omsorgsarbeidSak.monthsWithOmsorgsarbeid(omsorgsAr, it) >= 6) }
+    fun personerMedOmsorgsopptjening() = personer.filter { person ->
+        omsorgsarbeidSak.monthsWithOmsorgsarbeid(omsorgsAr, person) >= 6
+    }
+
 }
