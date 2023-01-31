@@ -4,7 +4,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.dom
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person.Person
 
 class PersonFactory {
-    companion object{
-        fun createPerson(fnr:String) = Person(gjeldendeFnr = Fnr(fnr))
+    companion object {
+        fun createPerson(gjeldendeFnr: String, historiskeFnr: List<String> = listOf()) =
+            Person(
+                gjeldendeFnr = Fnr(gjeldendeFnr),
+                historiskeFnr = historiskeFnr.map { Fnr(it) }
+            )
     }
 }
