@@ -9,11 +9,13 @@ class OmsorgsArbeidFactory {
     companion object {
         fun createOmsorgsArbeid(inputOmsorgsArbeid: OmsorgsArbeidModel): OmsorgsArbeidSak {
             return OmsorgsArbeidSak(
-                utfortOmsorgsArbeid = UtfortOmsorgsarbeid(
-                    person = PersonFactory.createPerson(inputOmsorgsArbeid.omsorgsyter.fnr),
-                    omsorgsArbeidsUtbetalinger = inputOmsorgsArbeid.omsorgsyter.utbetalingsperioder.map {
-                        OmsorgsArbeidsUtbetalinger(it.fom, it.tom)
-                    }
+                utfortOmsorgsArbeid = listOf(
+                    UtfortOmsorgsarbeid(
+                        person = PersonFactory.createPerson(inputOmsorgsArbeid.omsorgsyter.fnr),
+                        omsorgsArbeidsUtbetalinger = inputOmsorgsArbeid.omsorgsyter.utbetalingsperioder.map {
+                            OmsorgsArbeidsUtbetalinger(it.fom, it.tom)
+                        }
+                    )
                 )
             )
         }
