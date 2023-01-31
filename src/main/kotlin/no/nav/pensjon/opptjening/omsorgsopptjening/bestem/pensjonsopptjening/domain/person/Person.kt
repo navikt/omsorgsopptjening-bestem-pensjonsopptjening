@@ -1,8 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person
 
-data class Person(
+class Person(
     private val gjeldendeFnr: Fnr,
-    private val historiskeFnr: List<Fnr> = listOf()
+    historiskeFnr: Set<Fnr> = setOf()
 ) {
-    infix fun isIdentifiedBy(fnr: Fnr) = gjeldendeFnr == fnr || historiskeFnr.contains(fnr)
+
+    private val allFnrs = historiskeFnr + gjeldendeFnr
+
+    infix fun isIdentifiedBy(fnr: Fnr) = allFnrs.contains(fnr)
+
 }

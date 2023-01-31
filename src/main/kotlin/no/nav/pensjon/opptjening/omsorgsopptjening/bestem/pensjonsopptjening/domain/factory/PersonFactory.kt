@@ -8,7 +8,7 @@ class PersonFactory {
         fun createPerson(gjeldendeFnr: String, historiskeFnr: List<String> = listOf()) =
             Person(
                 gjeldendeFnr = Fnr(gjeldendeFnr),
-                historiskeFnr = historiskeFnr.map { Fnr(it) }
+                historiskeFnr = historiskeFnr.map { Fnr(it) }.toSet()
             )
     }
 }
