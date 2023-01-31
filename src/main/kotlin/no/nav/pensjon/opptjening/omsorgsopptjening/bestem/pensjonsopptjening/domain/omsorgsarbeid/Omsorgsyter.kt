@@ -1,6 +1,6 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsarbeid
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.UtbetalingMoneder.Companion.crateUtbetalingMoneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsarbeid.UtbetalingMoneder.Companion.crateUtbetalingMoneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person.Person
 
 class Omsorgsyter(

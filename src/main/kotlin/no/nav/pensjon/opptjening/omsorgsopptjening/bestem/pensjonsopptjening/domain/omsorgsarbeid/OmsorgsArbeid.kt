@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsarbeid
 
 class OmsorgsArbeid internal constructor(
     private val omsorgsYter: Omsorgsyter,
