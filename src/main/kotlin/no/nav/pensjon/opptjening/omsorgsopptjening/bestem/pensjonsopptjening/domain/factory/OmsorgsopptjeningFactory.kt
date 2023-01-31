@@ -8,7 +8,7 @@ class OmsorgsopptjeningFactory {
         fun createOmsorgsopptjening(omsorgsArbeidModel: OmsorgsArbeidModel): OmsorgsOpptjening {
             return OmsorgsOpptjening(
                 omsorgsAr = omsorgsArbeidModel.omsorgsAr.toInt(),
-                involvertePerson = PersonFactory.createPerson(omsorgsArbeidModel.omsorgsyter.fnr),
+                personer = listOf(PersonFactory.createPerson(omsorgsArbeidModel.omsorgsyter.fnr)),
                 omsorgsarbeidSak = OmsorgsArbeidFactory.createOmsorgsArbeid(omsorgsArbeidModel)
             )
         }

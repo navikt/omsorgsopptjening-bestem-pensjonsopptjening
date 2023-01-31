@@ -30,7 +30,7 @@ internal class OmsorgsOpptjeningTest {
             .createOmsorgsopptjening(omsorgsArbeidInput)
             .personMedOmsorgsopptjening()
 
-        assertTrue(personWithOmsorgsopptjening!! isIdentifiedBy Fnr(FNR_1))
+        assertTrue(personWithOmsorgsopptjening.first() isIdentifiedBy Fnr(FNR_1))
     }
 
     @Test
