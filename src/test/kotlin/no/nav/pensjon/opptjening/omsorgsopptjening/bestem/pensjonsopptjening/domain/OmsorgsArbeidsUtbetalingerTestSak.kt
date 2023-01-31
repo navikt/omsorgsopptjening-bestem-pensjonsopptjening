@@ -44,7 +44,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
             )
         )
 
-        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg(2020))
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorgsarbeid(2020))
     }
 
     @ParameterizedTest
@@ -76,7 +76,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
             )
         )
 
-        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg(2020))
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorgsarbeid(2020))
     }
 
 
@@ -105,7 +105,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
             )
         )
 
-        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg(2020))
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorgsarbeid(2020))
     }
 
     @ParameterizedTest
@@ -126,7 +126,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
             )
         )
 
-        assertEquals(0, omsorgsArbeid.monthsWithOmsorg(2020))
+        assertEquals(0, omsorgsArbeid.monthsWithOmsorgsarbeid(2020))
     }
 
     @ParameterizedTest
@@ -158,7 +158,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
             )
         )
 
-        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg(2020))
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorgsarbeid(2020))
     }
 
     @ParameterizedTest
@@ -190,7 +190,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
             )
         )
 
-        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorg(2020))
+        assertEquals(expectedAmountOfMoths, omsorgsArbeid.monthsWithOmsorgsarbeid(2020))
     }
 
 
@@ -200,7 +200,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
             creatOmsorgsArbeidModel(utbetalingsPeriode = listOf(), omsorgsAr = "2020")
         )
 
-        assertEquals(0, omsorgsArbeid.monthsWithOmsorg(2020))
+        assertEquals(0, omsorgsArbeid.monthsWithOmsorgsarbeid(2020))
     }
 
 

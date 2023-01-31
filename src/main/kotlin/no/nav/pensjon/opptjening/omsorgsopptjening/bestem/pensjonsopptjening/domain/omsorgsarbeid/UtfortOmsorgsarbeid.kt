@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.do
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsarbeid.UtbetalingMoneder.Companion.crateUtbetalingMoneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person.Person
 
-class Omsorgsyter(
+class UtfortOmsorgsarbeid(
     private val omsorgsArbeidsUtbetalinger: List<OmsorgsArbeidsUtbetalinger>,
     private val person: Person
 ) {

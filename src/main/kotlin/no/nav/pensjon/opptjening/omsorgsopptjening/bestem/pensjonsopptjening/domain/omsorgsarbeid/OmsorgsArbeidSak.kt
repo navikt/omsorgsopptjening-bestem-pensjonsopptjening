@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsarbeid
 
 class OmsorgsArbeidSak internal constructor(
-    private val omsorgsYter: Omsorgsyter,
+    private val utfortOmsorgsArbeid: UtfortOmsorgsarbeid,
 ) {
-    fun monthsWithOmsorg(omsorgsAr: Int) = omsorgsYter.monthsWithOmsorgsarbeid(omsorgsAr)
+    fun monthsWithOmsorgsarbeid(omsorgsAr: Int) = utfortOmsorgsArbeid.monthsWithOmsorgsarbeid(omsorgsAr)
 }
