@@ -5,9 +5,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.dom
 
 class OmsorgsOpptjening(
     val omsorgsAr: Int,
-    val omsorgsarbeid: OmsorgsArbeidSak,
+    val omsorgsarbeidSak: OmsorgsArbeidSak,
     val involvertePerson: Person
 ) {
-    fun personMedOmsorgsopptjening() = if (omsorgsarbeid.monthsWithOmsorgsarbeid(omsorgsAr, involvertePerson) >= 6) involvertePerson else null
+    fun personMedOmsorgsopptjening() = if (omsorgsarbeidSak.monthsWithOmsorgsarbeid(omsorgsAr, involvertePerson) >= 6) involvertePerson else null
 
 }

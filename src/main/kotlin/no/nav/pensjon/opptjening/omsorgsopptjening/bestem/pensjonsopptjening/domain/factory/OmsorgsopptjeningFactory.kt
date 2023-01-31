@@ -9,7 +9,7 @@ class OmsorgsopptjeningFactory {
             return OmsorgsOpptjening(
                 omsorgsAr = omsorgsArbeidModel.omsorgsAr.toInt(),
                 involvertePerson = PersonFactory.createPerson(omsorgsArbeidModel.omsorgsyter.fnr),
-                omsorgsarbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(omsorgsArbeidModel)
+                omsorgsarbeidSak = OmsorgsArbeidFactory.createOmsorgsArbeid(omsorgsArbeidModel)
             )
         }
     }
