@@ -7,7 +7,7 @@ class OmsorgsOpptjening(
     val omsorgsarbeid: OmsorgsArbeid,
     val involvertePerson: Person
 ) {
-    fun personMedPomsorgsopptjening() =
+    fun personMedOmsorgsopptjening() =
         if (omsorgsarbeid.monthsWithOmsorg(omsorgsAr) >= 6) involvertePerson else null
 
 }

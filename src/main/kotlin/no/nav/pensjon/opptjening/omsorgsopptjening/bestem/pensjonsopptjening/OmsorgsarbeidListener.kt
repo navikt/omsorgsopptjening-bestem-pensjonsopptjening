@@ -33,7 +33,7 @@ class OmsorgsarbeidListener(registry: MeterRegistry) {
         SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $value")
 
         val opptjening = OmsorgsopptjeningFactory.createOmsorgsopptjening(value)
-        SECURE_LOG.info("Person som fikk opptjening: ${opptjening.personMedPomsorgsopptjening().toString()}")
+        SECURE_LOG.info("Person som fikk opptjening: ${opptjening.personMedOmsorgsopptjening().toString()}")
 
         acknowledgment.acknowledge()
     }

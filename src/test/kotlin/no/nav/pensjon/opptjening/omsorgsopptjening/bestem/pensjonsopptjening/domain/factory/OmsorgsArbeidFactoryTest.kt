@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 
 internal class OmsorgsArbeidFactoryTest {
 
-
     @Test
     fun `Given OmsorgsArbeid from model When using OmsorgsArbeidFactory Then create OmsorgsArbeid domain`() {
         val omsorgsArbeidModel = creatOmsorgsArbeidModel()
