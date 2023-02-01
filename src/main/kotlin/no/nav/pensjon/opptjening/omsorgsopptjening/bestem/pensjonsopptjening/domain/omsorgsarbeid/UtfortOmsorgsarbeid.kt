@@ -6,11 +6,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.dom
 class UtfortOmsorgsarbeid(
     private val omsorgsArbeidsUtbetalinger: List<OmsorgsArbeidsUtbetalinger>, private val person: Person
 ) {
-    fun monthsWithOmsorgsarbeid(omsorgsAr: Int): Int = totalMonthsOfPayment().innenforAr(omsorgsAr).monedCount()
+    fun monthsWithOmsorgsarbeid(omsorgsAr: Int): Int = (mondederMedUtbetalingerTotalt hentforAr omsorgsAr).monedCount()
 
     infix fun isUtfortAvPerson(otherPerson: Person) = person isSamePerson otherPerson
 
-    private fun totalMonthsOfPayment() =
+    private val mondederMedUtbetalingerTotalt get() =
         omsorgsArbeidsUtbetalinger
             .map { utbetalinger -> utbetalinger.utbetalingMoneder }
             .fold(utbetalingMoneder()) { acc, moneder -> acc + moneder }

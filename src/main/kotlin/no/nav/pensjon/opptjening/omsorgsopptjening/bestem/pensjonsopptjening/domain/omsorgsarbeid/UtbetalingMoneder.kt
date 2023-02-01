@@ -7,7 +7,7 @@ class UtbetalingMoneder private constructor(private val months: Set<YearMonth> =
 
     fun monedCount(): Int = months.size
 
-    infix fun innenforAr(ar: Int): UtbetalingMoneder = UtbetalingMoneder(months.filter { it.year == ar }.toSet())
+    infix fun hentforAr(ar: Int): UtbetalingMoneder = UtbetalingMoneder(months.filter { it.year == ar }.toSet())
 
     operator fun plus(other: UtbetalingMoneder) = UtbetalingMoneder(this.months + other.months)
 
