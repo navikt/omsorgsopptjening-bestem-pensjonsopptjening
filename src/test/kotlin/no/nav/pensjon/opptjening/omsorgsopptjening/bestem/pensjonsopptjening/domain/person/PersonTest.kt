@@ -12,7 +12,7 @@ internal class PersonTest {
         val person: Person = PersonFactory.createPerson("11111111111")
         val fnr = Fnr("11111111111")
 
-        assertTrue(person isIdentifiedBy fnr)
+        assertTrue(person identifiseresAv fnr)
     }
 
     @Test
@@ -23,7 +23,7 @@ internal class PersonTest {
         )
         val fnr = Fnr("11111111111")
 
-        assertTrue(person isIdentifiedBy fnr)
+        assertTrue(person identifiseresAv fnr)
     }
 
     @Test
@@ -34,7 +34,7 @@ internal class PersonTest {
         )
         val fnr = Fnr("2222222222")
 
-        assertTrue(person isIdentifiedBy fnr)
+        assertTrue(person identifiseresAv fnr)
     }
 
     @Test
@@ -42,7 +42,7 @@ internal class PersonTest {
         val person: Person = PersonFactory.createPerson("11111111111")
         val fnr = Fnr("33333333333")
 
-        assertFalse(person isIdentifiedBy fnr)
+        assertFalse(person identifiseresAv fnr)
     }
 
     @Test
@@ -53,7 +53,7 @@ internal class PersonTest {
         )
         val fnr = Fnr("4444444444")
 
-        assertFalse(person isIdentifiedBy fnr)
+        assertFalse(person identifiseresAv fnr)
     }
 
     @Test
@@ -68,7 +68,7 @@ internal class PersonTest {
             historiskeFnr = listOf("2222222222", "3333333333")
         )
 
-        assertTrue(person1 isSamePerson person2)
+        assertTrue(person1 erSammePerson person2)
     }
 
     @Test
@@ -83,7 +83,7 @@ internal class PersonTest {
             historiskeFnr = listOf("11111111111")
         )
 
-        assertTrue(person1 isSamePerson person2)
+        assertTrue(person1 erSammePerson person2)
     }
 
     @Test
@@ -98,7 +98,7 @@ internal class PersonTest {
             historiskeFnr = listOf("444444444444")
         )
 
-        assertTrue(person1 isSamePerson person2)
+        assertTrue(person1 erSammePerson person2)
     }
 
     @Test
@@ -113,7 +113,7 @@ internal class PersonTest {
             historiskeFnr = listOf("5555555555", "3333333333")
         )
 
-        assertTrue(person1 isSamePerson person2)
+        assertTrue(person1 erSammePerson person2)
     }
 
     @Test
@@ -128,6 +128,6 @@ internal class PersonTest {
             historiskeFnr = listOf("5555555555", "66666666666")
         )
 
-        assertFalse(person1 isSamePerson person2)
+        assertFalse(person1 erSammePerson person2)
     }
 }

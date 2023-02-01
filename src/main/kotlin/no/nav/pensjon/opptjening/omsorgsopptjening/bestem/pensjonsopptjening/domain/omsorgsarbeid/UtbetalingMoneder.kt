@@ -5,9 +5,9 @@ import java.time.YearMonth
 
 class UtbetalingMoneder private constructor(private val months: Set<YearMonth> = setOf()) {
 
-    fun monedCount(): Int = months.size
+    fun antall(): Int = months.size
 
-    infix fun hentforAr(ar: Int): UtbetalingMoneder = UtbetalingMoneder(months.filter { it.year == ar }.toSet())
+    infix fun begrensTilAr(ar: Int): UtbetalingMoneder = UtbetalingMoneder(months.filter { it.year == ar }.toSet())
 
     operator fun plus(other: UtbetalingMoneder) = UtbetalingMoneder(this.months + other.months)
 

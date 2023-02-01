@@ -3,10 +3,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.do
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person.Person
 
 class OmsorgsArbeidSak internal constructor(
-    private val utfortOmsorgsArbeid: List<UtfortOmsorgsarbeid>,
+    private val utfortOmsorgsArbeid: List<Omsorgsarbeid>,
 ) {
     fun monthsWithOmsorgsarbeid(omsorgsAr: Int, person: Person) =
         utfortOmsorgsArbeid
-            .filter { it isUtfortAvPerson person }
-            .sumOf { it.monthsWithOmsorgsarbeid(omsorgsAr) }
+            .filter { omsorgsarbeid -> omsorgsarbeid erUtfortAv person }
+            .sumOf { omsorgsarbeid -> omsorgsarbeid mondederMedUtbetalinger omsorgsAr }
 }

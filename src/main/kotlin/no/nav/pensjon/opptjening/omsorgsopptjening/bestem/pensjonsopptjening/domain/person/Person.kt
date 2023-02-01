@@ -2,10 +2,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.do
 
 class Person(gjeldendeFnr: Fnr, historiskeFnr: Set<Fnr> = setOf()) {
 
-    private val allFnrs = historiskeFnr + gjeldendeFnr
+    private val alleFnr = historiskeFnr + gjeldendeFnr
 
-    infix fun isSamePerson(otherPerson: Person) = (otherPerson.allFnrs intersect allFnrs).isNotEmpty()
+    infix fun erSammePerson(annenPerson: Person) = (annenPerson.alleFnr intersect alleFnr).isNotEmpty()
 
-    infix fun isIdentifiedBy(fnr: Fnr) = allFnrs.contains(fnr)
+    infix fun identifiseresAv(fnr: Fnr) = alleFnr.contains(fnr)
 
 }
