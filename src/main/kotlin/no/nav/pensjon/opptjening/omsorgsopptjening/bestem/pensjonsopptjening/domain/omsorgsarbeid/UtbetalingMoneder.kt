@@ -5,15 +5,15 @@ import java.time.YearMonth
 
 class UtbetalingMoneder private constructor(private val months: Set<YearMonth> = setOf()) {
 
-    fun countMonths(): Int = months.size
+    fun monedCount(): Int = months.size
 
-    infix fun restrictToYear(year: Int): UtbetalingMoneder = UtbetalingMoneder(months.filter { it.year == year }.toSet())
+    infix fun innenforAr(ar: Int): UtbetalingMoneder = UtbetalingMoneder(months.filter { it.year == ar }.toSet())
 
     operator fun plus(other: UtbetalingMoneder) = UtbetalingMoneder(this.months + other.months)
 
     companion object {
-        fun crateUtbetalingMoneder(fom: YearMonth, tom: YearMonth) = UtbetalingMoneder((fom..tom).toSet())
+        fun utbetalingMoneder(fom: YearMonth, tom: YearMonth) = UtbetalingMoneder((fom..tom).toSet())
 
-        fun crateUtbetalingMoneder() = UtbetalingMoneder()
+        fun utbetalingMoneder() = UtbetalingMoneder()
     }
 }
