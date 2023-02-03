@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.Og.Companion.og
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -14,7 +15,7 @@ internal class RegelTest {
         "5, true, false",
         "5, false, false"
     )
-    fun `Given an and rule when evaluating the rule then return true only if all rules are true`(
+    fun `Given an AND rule when evaluating the rule then return true only if all rules are true`(
         moneder: Int, erMedlem:Boolean, forventetUtfall:Boolean
     ) {
         val ogRegel = og(
@@ -25,7 +26,23 @@ internal class RegelTest {
         assertEquals(forventetUtfall, ogRegel.bruk().oppFyllerRegel)
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        "6, true, true",
+        "6, false, true",
+        "5, true, true",
+        "5, false, false"
+    )
+    fun `Given an OR rule when evaluating the rule then return true if one rule is true`(
+        moneder: Int, erMedlem:Boolean, forventetUtfall:Boolean
+    ) {
+        val ellerRegel = eller(
+            minstSeksMonederRegel(moneder = moneder),
+            erFolketrygdetRegel(erMedlem = erMedlem)
+        )
 
+        assertEquals(forventetUtfall, ellerRegel.bruk().oppFyllerRegel)
+    }
 
     fun minstSeksMonederRegel(moneder:Int ) = Regel(
         regelInformasjon = RegelInformasjon(
