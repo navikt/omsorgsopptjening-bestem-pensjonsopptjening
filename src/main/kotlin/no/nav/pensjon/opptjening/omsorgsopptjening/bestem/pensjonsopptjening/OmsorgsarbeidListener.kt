@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsArbeidSakFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsopptjening.FastsettOmsorgsOpptjening
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsopptjening.OmsorgsOpptjening
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -39,8 +38,8 @@ class OmsorgsarbeidListener(registry: MeterRegistry) {
         val omsorgsOpptjeninger = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSak, value.omsorgsAr.toInt())
 
         omsorgsOpptjeninger.forEach{
-            SECURE_LOG.info("Person som fikk opptjening: ${it.person}")
-            SECURE_LOG.info("Person som fikk opptjening: ${ObjectMapper().writeValueAsString(it)}")
+            SECURE_LOG.info("Person: ${it.person}")
+            SECURE_LOG.info("Opptjening: ${ObjectMapper().writeValueAsString(it)}")
         }
 
         acknowledgment.acknowledge()
