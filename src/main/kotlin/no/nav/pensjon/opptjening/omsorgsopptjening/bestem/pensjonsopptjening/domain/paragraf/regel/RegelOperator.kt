@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.regel
 
 class Og private constructor(input: List<RegelResultat>) : Regel<List<RegelResultat>>(
     regelInformasjon = RegelInformasjon(
