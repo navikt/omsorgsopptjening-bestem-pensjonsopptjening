@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsopptjening
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsarbeid.OmsorgsArbeidSak
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.lover.HalvtArMedOmsorgForBarn
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.lover.MåHaEtHalvtÅrMedOmsorg
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person.Person
 
 //TODO lag bønne og lere personer osv
@@ -14,9 +14,9 @@ class FastsettOmsorgsOpptjening {
         }
 
         private fun behandlPerson(person: Person, ar: Int, sak: OmsorgsArbeidSak): OmsorgsOpptjening {
-            val regelResultat = HalvtArMedOmsorgForBarn()
-                .medInput(sak.monthsWithOmsorgsarbeid(ar, person))
-                .utforRegel()
+            val regelResultat = MåHaEtHalvtÅrMedOmsorg()
+                .inputTilVilkarsvurdering(sak.monthsWithOmsorgsarbeid(ar, person))
+                .utførVilkarsVurdering()
 
             return OmsorgsOpptjening.lagOmsorgsopptjening(
                 omsorgsAr = ar,

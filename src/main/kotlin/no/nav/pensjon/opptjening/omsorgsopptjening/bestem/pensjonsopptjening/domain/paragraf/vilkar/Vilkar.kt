@@ -3,11 +3,11 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.do
 
 //TODO make sexy
 open class Vilkar<T : Any>(
-    private val regelInformasjon: RegelInformasjon,
+    private val vilkarsInformasjon: VilkarsInformasjon,
     private val oppfyllerRegler: (T) -> Boolean,
 ) {
-    fun medInput(inputVerdi: T) = VilkarsVurdering(
-        regelInformasjon = regelInformasjon,
+    fun inputTilVilkarsvurdering(inputVerdi: T) = VilkarsVurdering(
+        vilkarsInformasjon = vilkarsInformasjon,
         oppfyllerRegler = oppfyllerRegler,
         inputVerdi = inputVerdi
     )
@@ -15,30 +15,28 @@ open class Vilkar<T : Any>(
 
 //TODO reneame parameter to something more relevant for the domain
 open class VilkarsVurdering<T : Any>(
-    private val regelInformasjon: RegelInformasjon,
+    private val vilkarsInformasjon: VilkarsInformasjon,
     private val oppfyllerRegler: (T) -> Boolean,
     private val inputVerdi: T
 ) {
-    open fun utforRegel(): RegelResultat {
+    open fun utførVilkarsVurdering(): VilkarsResultat {
         val oppfyllerRegel = oppfyllerRegler(inputVerdi)
-        return RegelResultat(
+        return VilkarsResultat(
             input = inputVerdi,
-            beskrivelse = regelInformasjon.beskrivelse,
+            beskrivelse = vilkarsInformasjon.beskrivelse,
             oppFyllerRegel = oppfyllerRegel,
-            begrunnelseForAvgjørelse = if (oppfyllerRegel) regelInformasjon.begrunnelseForInnvilgelse else regelInformasjon.begrunnesleForAvslag
+            begrunnelseForAvgjørelse = if (oppfyllerRegel) vilkarsInformasjon.begrunnelseForInnvilgelse else vilkarsInformasjon.begrunnesleForAvslag
         )
     }
 }
 
-
-
-data class RegelInformasjon(
+data class VilkarsInformasjon(
     val beskrivelse: String,
     val begrunnesleForAvslag: String,
     val begrunnelseForInnvilgelse: String,
 )
 
-data class RegelResultat(
+data class VilkarsResultat(
     val brukteResultat: List<Result<Any>> = listOf(),
     val beskrivelse: String,
     val oppFyllerRegel: Boolean,

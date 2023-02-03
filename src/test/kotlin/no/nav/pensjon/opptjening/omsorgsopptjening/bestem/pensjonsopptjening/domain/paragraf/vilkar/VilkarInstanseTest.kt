@@ -23,7 +23,7 @@ internal class VilkarInstanseTest {
             erFolketrygdetRegel(erMedlem = erMedlem)
         )
 
-        assertEquals(forventetUtfall, ogRegel.utforRegel().oppFyllerRegel)
+        assertEquals(forventetUtfall, ogRegel.utførVilkarsVurdering().oppFyllerRegel)
     }
 
     @ParameterizedTest
@@ -41,11 +41,11 @@ internal class VilkarInstanseTest {
             erFolketrygdetRegel(erMedlem = erMedlem)
         )
 
-        assertEquals(forventetUtfall, ellerRegel.utforRegel().oppFyllerRegel)
+        assertEquals(forventetUtfall, ellerRegel.utførVilkarsVurdering().oppFyllerRegel)
     }
 
     fun minstSeksMonederRegel(moneder:Int ) = VilkarsVurdering(
-        regelInformasjon = RegelInformasjon(
+        vilkarsInformasjon = VilkarsInformasjon(
             beskrivelse = "Bruker må ha et halvt år med barnetrygd",
             begrunnelseForInnvilgelse = "Bruker har over 6 måneder med barnetrygd",
             begrunnesleForAvslag = "Bruker har under 6 måneder med barnetrygd",
@@ -55,7 +55,7 @@ internal class VilkarInstanseTest {
     )
 
     fun erFolketrygdetRegel(erMedlem:Boolean ) = VilkarsVurdering(
-        regelInformasjon = RegelInformasjon(
+        vilkarsInformasjon = VilkarsInformasjon(
             beskrivelse = "Bruker må være medlem",
             begrunnelseForInnvilgelse = "Bruker er medlem",
             begrunnesleForAvslag = "Bruker er ikke medlem",
