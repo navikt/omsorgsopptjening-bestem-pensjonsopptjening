@@ -1,6 +1,6 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.regel
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.vilkar
 
-class Og private constructor(input: List<RegelResultat>) : RegelInstanse<List<RegelResultat>>(
+class Og private constructor(input: List<RegelResultat>) : VilkarsVurdering<List<RegelResultat>>(
     regelInformasjon = RegelInformasjon(
         beskrivelse = "Alle brukte regler må være de sanne.",
         begrunnelseForInnvilgelse = "Alle regler var sanne.",
@@ -11,11 +11,11 @@ class Og private constructor(input: List<RegelResultat>) : RegelInstanse<List<Re
 ) {
 
     companion object {
-        fun og(vararg regler: RegelInstanse<*>) = Og(regler.map { it.utforRegel() })
+        fun og(vararg regler: VilkarsVurdering<*>) = Og(regler.map { it.utforRegel() })
     }
 }
 
-class Eller private constructor(input: List<RegelResultat>) : RegelInstanse<List<RegelResultat>>(
+class Eller private constructor(input: List<RegelResultat>) : VilkarsVurdering<List<RegelResultat>>(
     RegelInformasjon(
         beskrivelse = "En av Reglene som blir brukt må være sann.",
         begrunnelseForInnvilgelse = "En av reglene var sanne",
@@ -26,6 +26,6 @@ class Eller private constructor(input: List<RegelResultat>) : RegelInstanse<List
 ) {
 
     companion object {
-        fun eller(vararg regler: RegelInstanse<*>) = Eller(regler.map { it.utforRegel() })
+        fun eller(vararg regler: VilkarsVurdering<*>) = Eller(regler.map { it.utforRegel() })
     }
 }

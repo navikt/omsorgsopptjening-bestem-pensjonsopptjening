@@ -1,12 +1,12 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.regel
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.vilkar
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.regel.Eller.Companion.eller
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.regel.Og.Companion.og
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.vilkar.Eller.Companion.eller
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.vilkar.Og.Companion.og
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import kotlin.test.assertEquals
 
-internal class RegelInstanseTest {
+internal class VilkarInstanseTest {
 
     @ParameterizedTest
     @CsvSource(
@@ -44,7 +44,7 @@ internal class RegelInstanseTest {
         assertEquals(forventetUtfall, ellerRegel.utforRegel().oppFyllerRegel)
     }
 
-    fun minstSeksMonederRegel(moneder:Int ) = RegelInstanse(
+    fun minstSeksMonederRegel(moneder:Int ) = VilkarsVurdering(
         regelInformasjon = RegelInformasjon(
             beskrivelse = "Bruker må ha et halvt år med barnetrygd",
             begrunnelseForInnvilgelse = "Bruker har over 6 måneder med barnetrygd",
@@ -54,7 +54,7 @@ internal class RegelInstanseTest {
         inputVerdi = moneder
     )
 
-    fun erFolketrygdetRegel(erMedlem:Boolean ) = RegelInstanse(
+    fun erFolketrygdetRegel(erMedlem:Boolean ) = VilkarsVurdering(
         regelInformasjon = RegelInformasjon(
             beskrivelse = "Bruker må være medlem",
             begrunnelseForInnvilgelse = "Bruker er medlem",

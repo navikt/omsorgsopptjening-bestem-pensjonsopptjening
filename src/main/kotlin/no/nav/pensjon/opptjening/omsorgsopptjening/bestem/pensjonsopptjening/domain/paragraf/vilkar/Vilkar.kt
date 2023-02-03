@@ -1,13 +1,12 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.regel
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.vilkar
 
 
 //TODO make sexy
-open class Regel<T : Any>(
+open class Vilkar<T : Any>(
     private val regelInformasjon: RegelInformasjon,
     private val oppfyllerRegler: (T) -> Boolean,
 ) {
-
-    fun medInput(inputVerdi: T) = RegelInstanse(
+    fun medInput(inputVerdi: T) = VilkarsVurdering(
         regelInformasjon = regelInformasjon,
         oppfyllerRegler = oppfyllerRegler,
         inputVerdi = inputVerdi
@@ -15,7 +14,7 @@ open class Regel<T : Any>(
 }
 
 //TODO reneame parameter to something more relevant for the domain
-open class RegelInstanse<T : Any>(
+open class VilkarsVurdering<T : Any>(
     private val regelInformasjon: RegelInformasjon,
     private val oppfyllerRegler: (T) -> Boolean,
     private val inputVerdi: T
