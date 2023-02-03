@@ -4,8 +4,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsMottakerModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsyterModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtbetalingsPeriodeModel
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsopptjeningFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsArbeidSakFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsopptjening.FastsettOmsorgsOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person.Fnr
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.Month
@@ -26,11 +28,11 @@ internal class OmsorgsOpptjeningTest {
             )
         )
 
-        val personWithOmsorgsopptjening = OmsorgsopptjeningFactory
-            .createOmsorgsopptjening(omsorgsArbeidInput)
-            .personerMedOmsorgsopptjening()
+        val omsorgsArbeidSak = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(omsorgsArbeidInput)
+        val opptjeningList = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSak,2010)
 
-        assertTrue(personWithOmsorgsopptjening.first() identifiseresAv Fnr(FNR_1))
+        assertTrue(opptjeningList.first().person identifiseresAv Fnr(FNR_1))
+        assertTrue(opptjeningList.first().invilget)
     }
 
     @Test
@@ -46,9 +48,11 @@ internal class OmsorgsOpptjeningTest {
             )
         )
 
-        val omsorgsOpptjening = OmsorgsopptjeningFactory.createOmsorgsopptjening(omsorgsArbeidInput)
+        val omsorgsArbeidSak = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(omsorgsArbeidInput)
+        val opptjeningList = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSak,2010)
 
-        omsorgsOpptjening.personerMedOmsorgsopptjening()
+        assertTrue(opptjeningList.first().person identifiseresAv Fnr(FNR_1))
+        assertFalse(opptjeningList.first().invilget)
     }
 
 

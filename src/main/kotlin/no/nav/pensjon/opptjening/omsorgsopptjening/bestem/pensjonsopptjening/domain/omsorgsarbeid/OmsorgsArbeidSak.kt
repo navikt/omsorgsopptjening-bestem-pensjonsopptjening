@@ -5,6 +5,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.dom
 class OmsorgsArbeidSak internal constructor(
     private val utfortOmsorgsArbeid: List<Omsorgsarbeid>,
 ) {
+
+    fun involvetePersoner() = utfortOmsorgsArbeid.map { it.getPerson() }
     fun monthsWithOmsorgsarbeid(omsorgsAr: Int, person: Person) =
         utfortOmsorgsArbeid
             .filter { omsorgsarbeid -> omsorgsarbeid erUtfortAv person }

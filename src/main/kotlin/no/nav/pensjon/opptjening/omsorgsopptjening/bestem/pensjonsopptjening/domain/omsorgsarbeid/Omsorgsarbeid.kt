@@ -9,6 +9,8 @@ class Omsorgsarbeid(
 ) {
     infix fun mondederMedUtbetalinger(omsorgsAr: Int): Int = (mondederMedUtbetalingerTotalt begrensTilAr omsorgsAr).antall()
 
+    fun getPerson() = person
+
     infix fun erUtfortAv(annenPerson: Person) = annenPerson erSammePerson person
 
     private val mondederMedUtbetalingerTotalt

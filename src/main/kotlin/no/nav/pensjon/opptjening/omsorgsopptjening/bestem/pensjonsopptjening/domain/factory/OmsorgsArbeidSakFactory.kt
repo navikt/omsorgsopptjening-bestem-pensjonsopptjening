@@ -5,9 +5,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.dom
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsarbeid.OmsorgsArbeidsUtbetalinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsarbeid.Omsorgsarbeid
 
-class OmsorgsArbeidFactory {
+class OmsorgsArbeidSakFactory {
     companion object {
-        fun createOmsorgsArbeid(inputOmsorgsArbeid: OmsorgsArbeidModel): OmsorgsArbeidSak {
+        fun createOmsorgsArbeidSak(inputOmsorgsArbeid: OmsorgsArbeidModel): OmsorgsArbeidSak {
             return OmsorgsArbeidSak(
                 utfortOmsorgsArbeid = listOf(
                     Omsorgsarbeid(

@@ -4,7 +4,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsMottakerModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsyterModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtbetalingsPeriodeModel
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsArbeidFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsArbeidSakFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.PersonFactory
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -36,7 +36,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         tom: String,
         expectedAmountOfMoths: Int
     ) {
-        val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
+        val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
             creatOmsorgsArbeidModel(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
@@ -69,7 +69,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         tom: String,
         expectedAmountOfMoths: Int
     ) {
-        val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
+        val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
             creatOmsorgsArbeidModel(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
@@ -99,7 +99,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         tom: String,
         expectedAmountOfMoths: Int
     ) {
-        val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
+        val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
             creatOmsorgsArbeidModel(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
@@ -121,7 +121,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         fom: String,
         tom: String,
     ) {
-        val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
+        val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
             creatOmsorgsArbeidModel(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
@@ -153,7 +153,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         tom2: String,
         expectedAmountOfMoths: Int
     ) {
-        val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
+        val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
             creatOmsorgsArbeidModel(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
@@ -185,7 +185,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         tom3: String,
         expectedAmountOfMoths: Int
     ) {
-        val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
+        val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
             creatOmsorgsArbeidModel(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
@@ -203,7 +203,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
 
     @Test
     fun `Given omsorgsarbeid without utbetalingsperioder When calling monthsOfOmsorg Then 0`() {
-        val omsorgsArbeid = OmsorgsArbeidFactory.createOmsorgsArbeid(
+        val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
             creatOmsorgsArbeidModel(utbetalingsPeriode = listOf(), omsorgsAr = "2020")
         )
 

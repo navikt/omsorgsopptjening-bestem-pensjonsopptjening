@@ -11,7 +11,7 @@ class Og private constructor(input: List<RegelResultat>) : RegelInstanse<List<Re
 ) {
 
     companion object {
-        fun og(vararg regler: RegelInstanse<*>) = Og(regler.map { it.bruk() })
+        fun og(vararg regler: RegelInstanse<*>) = Og(regler.map { it.utforRegel() })
     }
 }
 
@@ -26,6 +26,6 @@ class Eller private constructor(input: List<RegelResultat>) : RegelInstanse<List
 ) {
 
     companion object {
-        fun eller(vararg regler: RegelInstanse<*>) = Eller(regler.map { it.bruk() })
+        fun eller(vararg regler: RegelInstanse<*>) = Eller(regler.map { it.utforRegel() })
     }
 }

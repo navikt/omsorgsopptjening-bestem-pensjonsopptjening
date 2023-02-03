@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.do
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsArbeidModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsyterModel
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsArbeidFactory
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
@@ -11,7 +10,7 @@ internal class OmsorgsArbeidSakFactoryTest {
     @Test
     fun `Given OmsorgsArbeid from model When using OmsorgsArbeidFactory Then create OmsorgsArbeid domain`() {
         val omsorgsArbeidModel = creatOmsorgsArbeidModel()
-        assertNotNull(OmsorgsArbeidFactory.createOmsorgsArbeid(omsorgsArbeidModel))
+        assertNotNull(OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(omsorgsArbeidModel))
     }
 
     private fun creatOmsorgsArbeidModel() = OmsorgsArbeidModel(

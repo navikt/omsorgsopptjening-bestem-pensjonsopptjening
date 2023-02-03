@@ -1,7 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsopptjeningFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.factory.OmsorgsArbeidSakFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsopptjening.FastsettOmsorgsOpptjening
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsopptjening.OmsorgsOpptjening
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -32,8 +35,13 @@ class OmsorgsarbeidListener(registry: MeterRegistry) {
 
         SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $value")
 
-        val opptjening = OmsorgsopptjeningFactory.createOmsorgsopptjening(value)
-        SECURE_LOG.info("Person som fikk opptjening: ${opptjening.personerMedOmsorgsopptjening()}")
+        val omsorgsArbeidSak = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(value)
+        val omsorgsOpptjeninger = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSak, value.omsorgsAr.toInt())
+
+        omsorgsOpptjeninger.forEach{
+            SECURE_LOG.info("Person som fikk opptjening: ${it.person}")
+            SECURE_LOG.info("Person som fikk opptjening: ${ObjectMapper().writeValueAsString(it)}")
+        }
 
         acknowledgment.acknowledge()
     }

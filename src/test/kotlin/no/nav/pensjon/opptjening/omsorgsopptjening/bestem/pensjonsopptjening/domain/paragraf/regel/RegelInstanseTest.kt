@@ -23,7 +23,7 @@ internal class RegelInstanseTest {
             erFolketrygdetRegel(erMedlem = erMedlem)
         )
 
-        assertEquals(forventetUtfall, ogRegel.bruk().oppFyllerRegel)
+        assertEquals(forventetUtfall, ogRegel.utforRegel().oppFyllerRegel)
     }
 
     @ParameterizedTest
@@ -41,7 +41,7 @@ internal class RegelInstanseTest {
             erFolketrygdetRegel(erMedlem = erMedlem)
         )
 
-        assertEquals(forventetUtfall, ellerRegel.bruk().oppFyllerRegel)
+        assertEquals(forventetUtfall, ellerRegel.utforRegel().oppFyllerRegel)
     }
 
     fun minstSeksMonederRegel(moneder:Int ) = RegelInstanse(

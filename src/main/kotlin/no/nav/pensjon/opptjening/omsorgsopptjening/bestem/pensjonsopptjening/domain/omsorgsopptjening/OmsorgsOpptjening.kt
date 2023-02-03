@@ -1,15 +1,30 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsopptjening
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.omsorgsarbeid.OmsorgsArbeidSak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.regel.RegelResultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person.Person
 
-class OmsorgsOpptjening(
+class OmsorgsOpptjening private constructor(
     val omsorgsAr: Int,
-    val omsorgsarbeidSak: OmsorgsArbeidSak,
-    val personer: List<Person>
+    val person: Person,
+    val grunnlag: OmsorgsArbeidSak, //TODO lag grunnlag som er statisk for denne omsorgsopptjeningen
+    val omsorgsopptjeningResultater: RegelResultat,
+    val invilget: Boolean
 ) {
-    fun personerMedOmsorgsopptjening() = personer.filter { person ->
-        omsorgsarbeidSak.monthsWithOmsorgsarbeid(omsorgsAr, person) >= 6
-    }
+    fun harOmsorgsOpptjening() = invilget
 
+    companion object {
+        fun lagOmsorgsopptjening(
+            omsorgsAr: Int,
+            person: Person,
+            grunnlag: OmsorgsArbeidSak,
+            omsorgsopptjeningResultater: RegelResultat,
+        ) = OmsorgsOpptjening(
+            omsorgsAr,
+            person,
+            grunnlag,
+            omsorgsopptjeningResultater,
+            omsorgsopptjeningResultater.oppFyllerRegel
+        )
+    }
 }
