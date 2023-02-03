@@ -2,11 +2,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.do
 
 open class Regel<T : Any>(
     private val regelInformasjon: RegelInformasjon,
-    val inputVerdi: T,
-    private val oppfyllerRegler : (T) -> Boolean
+    private val oppfyllerRegler : (T) -> Boolean,
+    private val inputVerdi: T
 ) {
-
-    open fun brukRegel(): RegelResultat {
+    open fun bruk(): RegelResultat {
         val oppfyllerRegel = oppfyllerRegler(inputVerdi)
         return RegelResultat(
             input = inputVerdi,
