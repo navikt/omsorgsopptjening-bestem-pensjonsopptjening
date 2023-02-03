@@ -6,14 +6,13 @@ open class Vilkar<T : Any>(
     private val vilkarsInformasjon: VilkarsInformasjon,
     private val oppfyllerRegler: (T) -> Boolean,
 ) {
-    fun inputTilVilkarsvurdering(inputVerdi: T) = VilkarsVurdering(
+    fun lagVilkarsVurdering(inputVerdi: T) = VilkarsVurdering(
         vilkarsInformasjon = vilkarsInformasjon,
         oppfyllerRegler = oppfyllerRegler,
         inputVerdi = inputVerdi
     )
 }
 
-//TODO reneame parameter to something more relevant for the domain
 open class VilkarsVurdering<T : Any>(
     private val vilkarsInformasjon: VilkarsInformasjon,
     private val oppfyllerRegler: (T) -> Boolean,

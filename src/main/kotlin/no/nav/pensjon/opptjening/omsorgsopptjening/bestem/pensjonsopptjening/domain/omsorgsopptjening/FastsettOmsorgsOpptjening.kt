@@ -15,7 +15,7 @@ class FastsettOmsorgsOpptjening {
 
         private fun behandlPerson(person: Person, ar: Int, sak: OmsorgsArbeidSak): OmsorgsOpptjening {
             val regelResultat = MåHaEtHalvtÅrMedOmsorg()
-                .inputTilVilkarsvurdering(sak.monthsWithOmsorgsarbeid(ar, person))
+                .lagVilkarsVurdering(sak.monthsWithOmsorgsarbeid(ar, person))
                 .utførVilkarsVurdering()
 
             return OmsorgsOpptjening.lagOmsorgsopptjening(
