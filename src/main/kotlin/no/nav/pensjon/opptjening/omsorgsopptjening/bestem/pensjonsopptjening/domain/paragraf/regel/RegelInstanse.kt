@@ -1,8 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.regel
 
-open class Regel<T : Any>(
+//TODO reneame parameter to something more relevant for the domain
+open class RegelInstanse<T : Any>(
     private val regelInformasjon: RegelInformasjon,
-    private val oppfyllerRegler : (T) -> Boolean,
+    private val oppfyllerRegler: (T) -> Boolean,
     private val inputVerdi: T
 ) {
     open fun bruk(): RegelResultat {
@@ -14,6 +15,19 @@ open class Regel<T : Any>(
             begrunnelseForAvgjørelse = if (oppfyllerRegel) regelInformasjon.begrunnelseForInnvilgelse else regelInformasjon.begrunnesleForAvslag
         )
     }
+}
+
+//TODO make sexy
+open class Regel<T : Any>(
+    private val regelInformasjon: RegelInformasjon,
+    private val oppfyllerRegler: (T) -> Boolean,
+) {
+
+    fun lagRegelInstanse(inputVerdi: T) = RegelInstanse(
+        regelInformasjon = regelInformasjon,
+        oppfyllerRegler = oppfyllerRegler,
+        inputVerdi = inputVerdi
+    )
 }
 
 data class RegelInformasjon(

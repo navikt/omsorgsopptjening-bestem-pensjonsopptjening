@@ -6,7 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import kotlin.test.assertEquals
 
-internal class RegelTest {
+internal class RegelInstanseTest {
 
     @ParameterizedTest
     @CsvSource(
@@ -44,7 +44,7 @@ internal class RegelTest {
         assertEquals(forventetUtfall, ellerRegel.bruk().oppFyllerRegel)
     }
 
-    fun minstSeksMonederRegel(moneder:Int ) = Regel(
+    fun minstSeksMonederRegel(moneder:Int ) = RegelInstanse(
         regelInformasjon = RegelInformasjon(
             beskrivelse = "Bruker må ha et halvt år med barnetrygd",
             begrunnelseForInnvilgelse = "Bruker har over 6 måneder med barnetrygd",
@@ -54,7 +54,7 @@ internal class RegelTest {
         inputVerdi = moneder
     )
 
-    fun erFolketrygdetRegel(erMedlem:Boolean ) = Regel(
+    fun erFolketrygdetRegel(erMedlem:Boolean ) = RegelInstanse(
         regelInformasjon = RegelInformasjon(
             beskrivelse = "Bruker må være medlem",
             begrunnelseForInnvilgelse = "Bruker er medlem",
