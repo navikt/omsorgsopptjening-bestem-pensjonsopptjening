@@ -1,47 +1,39 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.paragraf.vilkar
 
 
-//TODO make sexy
-open class Vilkar<T : Any>(
-    private val vilkarsInformasjon: VilkarsInformasjon,
-    private val oppfyllerRegler: (T) -> Boolean,
+open class Vilkar<InputType : Any>(
+    val regelInformasjon: RegelInformasjon,
+    val oppfyllerRegler: (InputType) -> Boolean,
 ) {
-    fun lagVilkarsVurdering(inputVerdi: T) = VilkarsVurdering(
-        vilkarsInformasjon = vilkarsInformasjon,
-        oppfyllerRegler = oppfyllerRegler,
+    fun lagVilkarsVurdering(inputVerdi: InputType) = VilkarsVurdering(
+        vilkar = this,
         inputVerdi = inputVerdi
     )
+
+    fun utførVilkarsVurdering(input: InputType) =  VilkarsVurdering(this, input).utførVilkarsVurdering()
 }
 
-open class VilkarsVurdering<T : Any>(
-    private val vilkarsInformasjon: VilkarsInformasjon,
-    private val oppfyllerRegler: (T) -> Boolean,
-    private val inputVerdi: T
-) {
-    open fun utførVilkarsVurdering(): VilkarsResultat {
-        val oppfyllerRegel = oppfyllerRegler(inputVerdi)
-        return VilkarsResultat(
-            input = inputVerdi,
-            beskrivelse = vilkarsInformasjon.beskrivelse,
-            oppFyllerRegel = oppfyllerRegel,
-            begrunnelseForAvgjørelse = if (oppfyllerRegel) vilkarsInformasjon.begrunnelseForInnvilgelse else vilkarsInformasjon.begrunnesleForAvslag
-        )
-    }
-}
-
-data class VilkarsInformasjon(
+data class RegelInformasjon(
     val beskrivelse: String,
     val begrunnesleForAvslag: String,
     val begrunnelseForInnvilgelse: String,
 )
 
-data class VilkarsResultat(
-    val brukteResultat: List<Result<Any>> = listOf(),
-    val beskrivelse: String,
+open class VilkarsVurdering<InputType : Any>(
+    private val vilkar: Vilkar<InputType>,
+    private val inputVerdi: InputType
+) {
+    open fun utførVilkarsVurdering(): VilkarsResultat<InputType> {
+        return VilkarsResultat(
+            oppFyllerRegel = vilkar.oppfyllerRegler(inputVerdi),
+            inputVerdi = inputVerdi,
+            vilkar = vilkar
+        )
+    }
+}
+
+data class VilkarsResultat<InputType: Any>(
     val oppFyllerRegel: Boolean,
-    val begrunnelseForAvgjørelse: String,
-    val input: Any,
+    val inputVerdi: InputType,
+    val vilkar : Vilkar<InputType>,
 )
-
-
-

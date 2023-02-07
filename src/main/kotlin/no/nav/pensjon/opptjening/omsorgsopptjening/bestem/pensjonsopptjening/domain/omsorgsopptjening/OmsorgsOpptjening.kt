@@ -8,7 +8,7 @@ class OmsorgsOpptjening private constructor(
     val omsorgsAr: Int,
     val person: Person,
     val grunnlag: OmsorgsArbeidSak, //TODO lag grunnlag som er statisk for denne omsorgsopptjeningen
-    val omsorgsopptjeningResultater: VilkarsResultat,
+    val omsorgsopptjeningResultater: VilkarsResultat<*>,
     val invilget: Boolean
 ) {
     fun harOmsorgsOpptjening() = invilget
@@ -18,7 +18,7 @@ class OmsorgsOpptjening private constructor(
             omsorgsAr: Int,
             person: Person,
             grunnlag: OmsorgsArbeidSak,
-            omsorgsopptjeningResultater: VilkarsResultat,
+            omsorgsopptjeningResultater: VilkarsResultat<*>,
         ) = OmsorgsOpptjening(
             omsorgsAr,
             person,
