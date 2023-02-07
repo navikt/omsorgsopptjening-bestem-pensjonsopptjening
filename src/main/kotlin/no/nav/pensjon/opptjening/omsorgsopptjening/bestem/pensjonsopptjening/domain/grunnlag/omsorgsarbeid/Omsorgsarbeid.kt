@@ -4,18 +4,16 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.dom
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person.Person
 
 class Omsorgsarbeid(
-    private val omsorgsArbeidsUtbetalinger: List<OmsorgsArbeidsUtbetalinger>,
-    private val person: Person
+    val omsorgsArbeidsUtbetalinger: List<OmsorgsArbeidsUtbetalinger>,
+    val person: Person
 ) {
     infix fun mondederMedUtbetalinger(omsorgsAr: Int): Int = (mondederMedUtbetalingerTotalt begrensTilAr omsorgsAr).antall()
-
-    fun getPerson() = person
 
     infix fun erUtfortAv(annenPerson: Person) = annenPerson erSammePerson person
 
     private val mondederMedUtbetalingerTotalt
         get() =
             omsorgsArbeidsUtbetalinger
-                .map { utbetalinger -> utbetalinger.utbetalingMoneder }
+                .map { utbetalinger -> utbetalinger.utbetalingMoneder() }
                 .fold(utbetalingMoneder()) { acc, moneder -> acc + moneder }
 }

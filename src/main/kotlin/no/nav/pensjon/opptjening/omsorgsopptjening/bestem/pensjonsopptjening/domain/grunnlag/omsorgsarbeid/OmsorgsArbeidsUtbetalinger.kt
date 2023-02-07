@@ -4,8 +4,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.dom
 import java.time.YearMonth
 
 class OmsorgsArbeidsUtbetalinger(
-    private val fom: YearMonth,
-    private val tom: YearMonth
+    val fom: YearMonth,
+    val tom: YearMonth
 ) {
-    val utbetalingMoneder get() = utbetalingMoneder(fom,  tom)
+    fun utbetalingMoneder() = utbetalingMoneder(fom,  tom)
 }
