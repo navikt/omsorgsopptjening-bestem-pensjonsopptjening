@@ -4,7 +4,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.MåHaEtHalvtÅrMedOmsorg
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Person
 
-//TODO lag bønne og lere personer osv
+//TODO lag bønne og flere personer osv
 class FastsettOmsorgsOpptjening {
     companion object {
         fun fastsettOmsorgsOpptjening(omsorgsArbeidSak: OmsorgsArbeidSak, omsorgsAr: Int): List<OmsorgsOpptjening> {
@@ -18,11 +18,12 @@ class FastsettOmsorgsOpptjening {
                 .lagVilkarsVurdering(sak.monthsWithOmsorgsarbeid(ar, person))
                 .utførVilkarsVurdering()
 
-            return OmsorgsOpptjening.lagOmsorgsopptjening(
+            return OmsorgsOpptjening(
                 omsorgsAr = ar,
                 person = person,
-                grunnlag = sak,
+                grunnlag = sak.dataObject(),
                 omsorgsopptjeningResultater = regelResultat,
+                invilget = regelResultat.oppFyllerRegel
             )
         }
     }
