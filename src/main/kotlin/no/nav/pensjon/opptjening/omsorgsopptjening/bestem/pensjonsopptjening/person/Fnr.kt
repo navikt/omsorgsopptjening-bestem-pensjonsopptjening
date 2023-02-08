@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person
 
 class Fnr(private val fnr: String) {
 
