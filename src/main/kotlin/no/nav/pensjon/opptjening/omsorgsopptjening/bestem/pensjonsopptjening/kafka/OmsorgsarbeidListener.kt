@@ -3,8 +3,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ka
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeidKey
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -33,10 +31,11 @@ class OmsorgsarbeidListener(
         antallLesteMeldinger.increment()
         SECURE_LOG.info("Konsumerer omsorgsmelding: ${consumerRecord.key()}, ${consumerRecord.value()}")
 
-        if(consumerRecord.getMessageType() == KafkaMessageType.OMSORGSARBEID){
-            val key: OmsorgsArbeidKey = convertToOmsorgsArbeidKey(consumerRecord.key())
-            val value: OmsorgsArbeid = convertToOmsorgsArbeid(consumerRecord.value())
-            omsorgsOpptjeningService.behandlOmsorgsarbeid(key, value)
+        if (consumerRecord.getMessageType() == KafkaMessageType.OMSORGSARBEID) {
+            omsorgsOpptjeningService.behandlOmsorgsarbeid(
+                consumerRecord.getOmsorgsArbeidKey(),
+                consumerRecord.getOmsorgsArbeidValue()
+            )
         }
 
         acknowledgment.acknowledge()
