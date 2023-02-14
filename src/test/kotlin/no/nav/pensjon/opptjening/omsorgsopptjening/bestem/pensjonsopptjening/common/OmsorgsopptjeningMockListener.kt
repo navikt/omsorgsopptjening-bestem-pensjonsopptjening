@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsarbeid.konsument.omsorgsarbeid.common
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
