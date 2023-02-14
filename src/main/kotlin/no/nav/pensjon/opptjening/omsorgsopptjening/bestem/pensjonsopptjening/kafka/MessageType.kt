@@ -5,6 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMess
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import java.nio.charset.StandardCharsets
 
+//TODO flere sjekker og logging til secure log hvis noe går til .....
 fun ConsumerRecord<String, String>.getMessageType(): KafkaMessageType {
     val messageTypeHeaders = headers().headers(KafkaHeaderKey.MESSAGE_TYPE).toList()
     assert(messageTypeHeaders.isNotEmpty()) { "Kafka header with key ${KafkaHeaderKey.MESSAGE_TYPE} was not found" }

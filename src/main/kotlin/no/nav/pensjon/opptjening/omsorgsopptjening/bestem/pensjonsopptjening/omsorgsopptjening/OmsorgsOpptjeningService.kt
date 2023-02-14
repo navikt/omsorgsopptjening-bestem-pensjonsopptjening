@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class OmsorgsOpptjeningService(
-    omsorgsOpptejningProducer: OmsorgsOpptejningProducer
+    private val omsorgsOpptejningProducer: OmsorgsOpptejningProducer
 ) {
 
     fun behandlOmsorgsarbeid(key: OmsorgsArbeidKey, value: OmsorgsArbeid) {
@@ -18,6 +18,7 @@ class OmsorgsOpptjeningService(
         val omsorgsArbeidSak = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(value)
         val omsorgsOpptjeninger = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSak, value.omsorgsAr.toInt())
 
+        omsorgsOpptejningProducer.publiserOmsorgsopptejning(omsorgsOpptjeninger)
     }
 
     companion object {
