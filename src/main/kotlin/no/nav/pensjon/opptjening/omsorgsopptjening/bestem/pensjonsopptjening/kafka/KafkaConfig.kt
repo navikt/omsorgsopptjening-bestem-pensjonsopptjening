@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka
 
 
 import org.apache.kafka.clients.CommonClientConfigs
@@ -37,8 +37,9 @@ class KafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers:
         }
 
     @Bean
-    fun omsorgsopptjeningProducerKafkaTemplate(kafkaSecurityConfig: KafkaSecurityConfig): KafkaTemplate<String, String> =
-        KafkaTemplate(DefaultKafkaProducerFactory(omsorgsopptjeningProducerConfig() + kafkaSecurityConfig.securityConfigs))
+    fun omsorgsopptjeningProducerKafkaTemplate(kafkaSecurityConfig: KafkaSecurityConfig): KafkaTemplate<String, String> {
+        return KafkaTemplate(DefaultKafkaProducerFactory(omsorgsopptjeningProducerConfig() + kafkaSecurityConfig.securityConfigs))
+    }
 
     private fun consumerConfig() = mapOf(
         ConsumerConfig.CLIENT_ID_CONFIG to "omsorgsopptjening-konsument-omsorgsarbeid",

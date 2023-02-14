@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.KafkaSecurityConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.KafkaSecurityConfig
 import org.apache.kafka.clients.CommonClientConfigs
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
