@@ -7,14 +7,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.PersonDataObject
 
 class Omsorgsarbeid(
-    private val omsorgsArbeidsUtbetalinger: List<OmsorgsArbeidsUtbetalinger>,
-    private val person: Person
+    val omsorgsArbeidsUtbetalinger: List<OmsorgsArbeidsUtbetalinger>,
+    val person: Person
 ) : Grunnlag{
     infix fun mondederMedUtbetalinger(omsorgsAr: Int): Int = (mondederMedUtbetalingerTotalt begrensTilAr omsorgsAr).antall()
 
     infix fun erUtfortAv(annenPerson: Person) = annenPerson erSammePerson person
-
-    fun getPerson() = person
 
     private val mondederMedUtbetalingerTotalt
         get() =

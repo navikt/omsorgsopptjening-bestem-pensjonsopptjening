@@ -4,8 +4,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.gru
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.grunnlag.GrunnlagsVisitor
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Person
 
-class OmsorgsArbeidSak internal constructor(private val utfortOmsorgsArbeid: List<Omsorgsarbeid>) : Grunnlag {
-    fun involvetePersoner() = utfortOmsorgsArbeid.map { it.getPerson() }
+class OmsorgsArbeidSak internal constructor(val utfortOmsorgsArbeid: List<Omsorgsarbeid>) : Grunnlag {
+    fun involvetePersoner() = utfortOmsorgsArbeid.map { it.person }
     fun monthsWithOmsorgsarbeid(omsorgsAr: Int, person: Person) =
         utfortOmsorgsArbeid
             .filter { omsorgsarbeid -> omsorgsarbeid erUtfortAv person }
