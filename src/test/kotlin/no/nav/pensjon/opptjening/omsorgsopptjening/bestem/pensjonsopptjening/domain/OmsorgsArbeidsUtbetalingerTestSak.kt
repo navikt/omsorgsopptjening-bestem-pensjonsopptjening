@@ -1,11 +1,11 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsArbeidModel
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsMottakerModel
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsyterModel
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtbetalingsPeriodeModel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.factory.OmsorgsArbeidSakFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.factory.PersonFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsMottaker
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Omsorgsyter
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.UtbetalingsPeriode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -37,11 +37,11 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         expectedAmountOfMoths: Int
     ) {
         val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
-            creatOmsorgsArbeidModel(
+            creatOmsorgsArbeid(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
+                    creatUtbetalingsPeriode(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
                 )
             )
         )
@@ -70,11 +70,11 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         expectedAmountOfMoths: Int
     ) {
         val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
-            creatOmsorgsArbeidModel(
+            creatOmsorgsArbeid(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
+                    creatUtbetalingsPeriode(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
                 )
             )
         )
@@ -100,11 +100,11 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         expectedAmountOfMoths: Int
     ) {
         val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
-            creatOmsorgsArbeidModel(
+            creatOmsorgsArbeid(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
+                    creatUtbetalingsPeriode(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
                 )
             )
         )
@@ -122,11 +122,11 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         tom: String,
     ) {
         val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
-            creatOmsorgsArbeidModel(
+            creatOmsorgsArbeid(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
+                    creatUtbetalingsPeriode(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
                 )
             )
         )
@@ -154,12 +154,12 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         expectedAmountOfMoths: Int
     ) {
         val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
-            creatOmsorgsArbeidModel(
+            creatOmsorgsArbeid(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(fom = YearMonth.parse(fom1), tom = YearMonth.parse(tom1)),
-                    creatUtbetalingsPeriodeModel(fom = YearMonth.parse(fom2), tom = YearMonth.parse(tom2))
+                    creatUtbetalingsPeriode(fom = YearMonth.parse(fom1), tom = YearMonth.parse(tom1)),
+                    creatUtbetalingsPeriode(fom = YearMonth.parse(fom2), tom = YearMonth.parse(tom2))
                 )
             )
         )
@@ -186,13 +186,13 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
         expectedAmountOfMoths: Int
     ) {
         val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
-            creatOmsorgsArbeidModel(
+            creatOmsorgsArbeid(
                 omsorgsYter = FNR_1,
                 omsorgsAr = "2020",
                 utbetalingsPeriode = listOf(
-                    creatUtbetalingsPeriodeModel(fom = YearMonth.parse(fom1), tom = YearMonth.parse(tom1)),
-                    creatUtbetalingsPeriodeModel(fom = YearMonth.parse(fom2), tom = YearMonth.parse(tom2)),
-                    creatUtbetalingsPeriodeModel(fom = YearMonth.parse(fom3), tom = YearMonth.parse(tom3))
+                    creatUtbetalingsPeriode(fom = YearMonth.parse(fom1), tom = YearMonth.parse(tom1)),
+                    creatUtbetalingsPeriode(fom = YearMonth.parse(fom2), tom = YearMonth.parse(tom2)),
+                    creatUtbetalingsPeriode(fom = YearMonth.parse(fom3), tom = YearMonth.parse(tom3))
                 )
             )
         )
@@ -204,31 +204,31 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
     @Test
     fun `Given omsorgsarbeid without utbetalingsperioder When calling monthsOfOmsorg Then 0`() {
         val omsorgsArbeid = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(
-            creatOmsorgsArbeidModel(utbetalingsPeriode = listOf(), omsorgsAr = "2020")
+            creatOmsorgsArbeid(utbetalingsPeriode = listOf(), omsorgsAr = "2020")
         )
 
         assertEquals(0, omsorgsArbeid.monthsWithOmsorgsarbeid(2020, PersonFactory.createPerson(FNR_1)))
     }
 
-    private fun creatOmsorgsArbeidModel(
+    private fun creatOmsorgsArbeid(
         omsorgsAr: String,
         omsorgsYter: String = "1234566",
-        utbetalingsPeriode: List<UtbetalingsPeriodeModel>
+        utbetalingsPeriode: List<UtbetalingsPeriode>
     ) =
-        OmsorgsArbeidModel(
+        OmsorgsArbeid(
             omsorgsAr = omsorgsAr,
             hash = "12345",
-            omsorgsyter = OmsorgsyterModel(
+            omsorgsyter = Omsorgsyter(
                 fnr = omsorgsYter,
                 utbetalingsperioder = utbetalingsPeriode
             )
         )
 
-    private fun creatUtbetalingsPeriodeModel(
+    private fun creatUtbetalingsPeriode(
         fom: YearMonth = YearMonth.of(2020, Month.JANUARY),
         tom: YearMonth = YearMonth.of(2020, Month.JUNE),
-    ) = UtbetalingsPeriodeModel(
-        omsorgsmottaker = OmsorgsMottakerModel("123123"),
+    ) = UtbetalingsPeriode(
+        omsorgsmottaker = OmsorgsMottaker("123123"),
         fom = fom,
         tom = tom,
     )

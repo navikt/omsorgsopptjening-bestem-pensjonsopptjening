@@ -3,18 +3,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import java.time.YearMonth
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeidKey
 
-private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+private val mapper = jacksonObjectMapper().registerModule(JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-
-data class OmsorgsArbeidModel(val omsorgsyter: OmsorgsyterModel, val omsorgsAr: String, val hash: String)
-data class OmsorgsyterModel(val fnr: String, val utbetalingsperioder: List<UtbetalingsPeriodeModel>)
-data class UtbetalingsPeriodeModel(val fom: YearMonth, val tom: YearMonth, val omsorgsmottaker: OmsorgsMottakerModel)
-data class OmsorgsMottakerModel(val fnr: String)
-data class OmsorgsArbeidKeyModel(val omsorgsyterFnr: String, val omsorgsAr: String)
-
-internal fun convertToOmsorgsArbeid(omsorgsArbeid: String) =
-    objectMapper.readValue(omsorgsArbeid, OmsorgsArbeidModel::class.java)
-internal fun convertToOmsorgsArbeidKey(omsorgsArbeid: String) =
-    objectMapper.readValue(omsorgsArbeid, OmsorgsArbeidKeyModel::class.java)
+internal fun convertToOmsorgsArbeid(omsorgsArbeid: String) = mapper.readValue(omsorgsArbeid, OmsorgsArbeid::class.java)
+internal fun convertToOmsorgsArbeidKey(omsorgsArbeidKey: String) = mapper.readValue(omsorgsArbeidKey, OmsorgsArbeidKey::class.java)

@@ -4,6 +4,7 @@ open class VilkarsVurdering<InputType : Any>(
     private val vilkar: Vilkar<InputType>,
     private val inputVerdi: InputType
 ) {
+
     open fun utførVilkarsVurdering(): VilkarsResultat<InputType> {
         return VilkarsResultat(
             oppFyllerRegel = vilkar.oppfyllerRegler(inputVerdi),
