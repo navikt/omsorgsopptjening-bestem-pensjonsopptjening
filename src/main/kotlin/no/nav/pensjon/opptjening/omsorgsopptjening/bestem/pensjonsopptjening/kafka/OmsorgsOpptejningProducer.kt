@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka
 
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component

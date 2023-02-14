@@ -1,7 +1,8 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.getMessageType
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.convertToOmsorgsArbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.convertToOmsorgsArbeidKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
