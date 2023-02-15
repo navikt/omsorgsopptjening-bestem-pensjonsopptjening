@@ -5,7 +5,7 @@ open class Vilkar<Input : Any>(
     val regelInformasjon: RegelInformasjon,
     val oppfyllerRegler: (Input) -> Boolean,
 ) {
-    fun lagVilkarsVurdering(inputVerdi: Input) = VilkarsVurdering(
+    fun vilkarsVurder(inputVerdi: Input) = VilkarsVurdering(
         vilkar = this,
         inputVerdi = inputVerdi
     )

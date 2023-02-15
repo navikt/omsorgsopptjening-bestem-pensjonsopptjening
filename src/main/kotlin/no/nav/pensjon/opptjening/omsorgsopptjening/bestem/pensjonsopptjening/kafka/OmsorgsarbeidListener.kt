@@ -34,7 +34,7 @@ class OmsorgsarbeidListener(
         if (consumerRecord.getMessageType() == KafkaMessageType.OMSORGSARBEID) {
             omsorgsOpptjeningService.behandlOmsorgsarbeid(
                 consumerRecord.getOmsorgsArbeidKey(),
-                consumerRecord.getOmsorgsArbeidValue()
+                consumerRecord.getOmsorgsarbeidsSnapshot()
             )
         }
 

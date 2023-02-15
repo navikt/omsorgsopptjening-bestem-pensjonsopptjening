@@ -12,8 +12,8 @@ class UtbetalingMoneder private constructor(val months: Set<YearMonth> = setOf()
     operator fun plus(other: UtbetalingMoneder) = UtbetalingMoneder(this.months + other.months)
 
     companion object {
-        fun utbetalingMoneder(fom: YearMonth, tom: YearMonth) = UtbetalingMoneder((fom..tom).toSet())
+        fun utbetalinger(fom: YearMonth, tom: YearMonth) = UtbetalingMoneder((fom..tom).toSet())
 
-        fun utbetalingMoneder() = UtbetalingMoneder()
+        fun utbetalinger() = UtbetalingMoneder()
     }
 }

@@ -1,32 +1,25 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.grunnlag.Grunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.grunnlag.GrunnlagsVisitor
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.UtbetalingMoneder.Companion.utbetalingMoneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.UtbetalingMoneder.Companion.utbetalinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Person
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.PersonDataObject
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 
-class Omsorgsarbeid(
-    val omsorgsArbeidsUtbetalinger: List<OmsorgsArbeidsUtbetalinger>,
-    val person: Person
-) : Grunnlag{
-    infix fun mondederMedUtbetalinger(omsorgsAr: Int): Int = (mondederMedUtbetalingerTotalt begrensTilAr omsorgsAr).antall()
 
-    infix fun erUtfortAv(annenPerson: Person) = annenPerson erSammePerson person
-
-    private val mondederMedUtbetalingerTotalt
-        get() =
-            omsorgsArbeidsUtbetalinger
-                .map { utbetalinger -> utbetalinger.utbetalingMoneder() }
-                .fold(utbetalingMoneder()) { acc, moneder -> acc + moneder }
-
-    override fun accept(grunnlagsVisitor: GrunnlagsVisitor) {
-        grunnlagsVisitor.visit(this)
-        omsorgsArbeidsUtbetalinger.forEach{it.accept(grunnlagsVisitor)}
-        person.accept(grunnlagsVisitor)
+fun OmsorgsarbeidsSnapshot.finnOmsorgsArbeid(person: Person): List<OmsorgsArbeid> {
+    return omsorgsArbeidSaker.flatMap { sak ->
+        sak.omsorgsarbedUtfort.filter { omsorgsArbeid ->
+            person.identifiseresAv(Fnr(omsorgsArbeid.omsorgsyter.fnr))
+        }
     }
-
-    override fun dataObject() =   OmsorgsarbeidDataObject(omsorgsArbeidsUtbetalinger.map { it.dataObject() }, person.dataObject())
 }
 
-data class OmsorgsarbeidDataObject(val omsorgsArbeidsUtbetalinger: List<OmsorgsArbeidsUtbetalingerDataObject>, val person : PersonDataObject)
+fun List<OmsorgsArbeid>.getUtbetalinger(omsorgsAr: Int) = (getUtbetalinger() begrensTilAr omsorgsAr).antall()
+
+private fun List<OmsorgsArbeid>.getUtbetalinger() =
+    map { utbetalinger -> utbetalinger.utbetalinger() }
+        .fold(initial = utbetalinger()) { acc, moneder -> acc + moneder }
+
+fun OmsorgsArbeid.utbetalinger() = utbetalinger(omsorgsArbeidsUtbetalinger.fom, omsorgsArbeidsUtbetalinger.tom)
+

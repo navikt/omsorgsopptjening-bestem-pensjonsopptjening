@@ -17,10 +17,8 @@ class OmsorgsOpptejningProducer(
 
 ) {
 
-    fun publiserOmsorgsopptejning(omsorgsOpptjeninger: List<OmsorgsOpptjening>) {
-        omsorgsOpptjeninger.forEach {
+    fun publiserOmsorgsopptejning(omsorgsOpptjeninger: OmsorgsOpptjening) {
 
-        }
     }
 
     fun send(key: String, value: String) {

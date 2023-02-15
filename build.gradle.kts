@@ -30,7 +30,7 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    implementation("no.nav.pensjon.opptjening:omsorgsopptjening-domene-lib:1.0.4")
+    implementation("no.nav.pensjon.opptjening:omsorgsopptjening-domene-lib:1.0.9")
 
     implementation("com.google.guava:guava:31.1-jre")
     // Kotlin

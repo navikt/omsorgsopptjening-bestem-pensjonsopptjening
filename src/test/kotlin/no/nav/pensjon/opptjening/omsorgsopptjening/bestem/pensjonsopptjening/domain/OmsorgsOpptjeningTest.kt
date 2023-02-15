@@ -1,12 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.factory.OmsorgsArbeidSakFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.factory.PersonFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.FastsettOmsorgsOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Fnr
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsMottaker
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Omsorgsyter
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.UtbetalingsPeriode
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -17,7 +14,7 @@ internal class OmsorgsOpptjeningTest {
 
     @Test
     fun `Given omsorgs arbeid for six months When calling personMedInvilgetOmsorgsopptjening Then return person`() {
-        val omsorgsArbeidInput = creatOmsorgsArbeid(
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = "2010",
             omsorgsYter = FNR_1,
             utbetalingsPeriode = listOf(
@@ -28,16 +25,17 @@ internal class OmsorgsOpptjeningTest {
             )
         )
 
-        val omsorgsArbeidSak = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(omsorgsArbeidInput)
-        val opptjeningList = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSak, 2010)
+        val person = PersonFactory.createPerson(FNR_1, listOf())
 
-        assertTrue(opptjeningList.first().person identifiseresAv Fnr(FNR_1))
-        assertTrue(opptjeningList.first().invilget)
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
+
+        assertTrue(opptjening.person identifiseresAv Fnr(FNR_1))
+        assertTrue(opptjening.invilget)
     }
 
     @Test
     fun `Given omsorgs arbeid for less than six months When calling personMedInvilgetOmsorgsopptjening Then return null`() {
-        val omsorgsArbeidInput = creatOmsorgsArbeid(
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = "2010",
             omsorgsYter = FNR_1,
             utbetalingsPeriode = listOf(
@@ -48,36 +46,40 @@ internal class OmsorgsOpptjeningTest {
             )
         )
 
-        val omsorgsArbeidSak = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(omsorgsArbeidInput)
-        val opptjeningList = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSak, 2010)
+        val person = PersonFactory.createPerson(FNR_1, listOf())
 
-        assertTrue(opptjeningList.first().person identifiseresAv Fnr(FNR_1))
-        assertFalse(opptjeningList.first().invilget)
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
+
+        assertTrue(opptjening.person identifiseresAv Fnr(FNR_1))
+        assertFalse(opptjening.invilget)
     }
 
 
-    private fun creatOmsorgsArbeid(
+    private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: String,
         omsorgsYter: String = "1234566",
-        utbetalingsPeriode: List<UtbetalingsPeriode>
+        utbetalingsPeriode: List<OmsorgsArbeidsUtbetalinger>
     ) =
-        OmsorgsArbeid(
+
+        OmsorgsarbeidsSnapshot(
             omsorgsAr = omsorgsAr,
-            hash = "12345",
-            omsorgsyter = Omsorgsyter(
-                fnr = omsorgsYter,
-                utbetalingsperioder = utbetalingsPeriode
+            kjoreHash = "xxx",
+            omsorgsYter = Person(omsorgsYter),
+            omsorgstype = Omsorgstype.BARNETRYGD,
+            kilde = Kilde.BA,
+            omsorgsArbeidSaker = listOf(
+                OmsorgsArbeidSak(
+                    utbetalingsPeriode.map {
+                        OmsorgsArbeid(
+                            omsorgsyter = Person(omsorgsYter),
+                            omsorgsArbeidsUtbetalinger = it
+                        )
+                    }
+                )
             )
         )
 
-    private fun creatUtbetalingsPeriode(
-        fom: YearMonth = YearMonth.of(2020, Month.JANUARY),
-        tom: YearMonth = YearMonth.of(2020, Month.JUNE),
-    ) = UtbetalingsPeriode(
-        omsorgsmottaker = OmsorgsMottaker("123123"),
-        fom = fom,
-        tom = tom,
-    )
+    private fun creatUtbetalingsPeriode(fom: YearMonth, tom: YearMonth) = OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom)
 
     companion object {
         const val FNR_1: String = "12345678902"

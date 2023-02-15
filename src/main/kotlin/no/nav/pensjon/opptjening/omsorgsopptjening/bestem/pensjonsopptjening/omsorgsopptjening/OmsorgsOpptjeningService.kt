@@ -1,9 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.factory.OmsorgsArbeidSakFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.factory.PersonFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsOpptejningProducer
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeidKey
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -12,13 +12,13 @@ class OmsorgsOpptjeningService(
     private val omsorgsOpptejningProducer: OmsorgsOpptejningProducer
 ) {
 
-    fun behandlOmsorgsarbeid(key: OmsorgsArbeidKey, value: OmsorgsArbeid) {
-        SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $value")
+    fun behandlOmsorgsarbeid(key: OmsorgsArbeidKey, omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot) {
+        SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $omsorgsArbeidSnapshot")
 
-        val omsorgsArbeidSak = OmsorgsArbeidSakFactory.createOmsorgsArbeidSak(value)
-        val omsorgsOpptjeninger = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSak, value.omsorgsAr.toInt())
+        val person = PersonFactory.createPerson(omsorgsArbeidSnapshot.omsorgsYter.fnr, listOf())
+        val omsorgsOpptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot,person)
 
-        omsorgsOpptejningProducer.publiserOmsorgsopptejning(omsorgsOpptjeninger)
+        omsorgsOpptejningProducer.publiserOmsorgsopptejning(omsorgsOpptjening)
     }
 
     companion object {

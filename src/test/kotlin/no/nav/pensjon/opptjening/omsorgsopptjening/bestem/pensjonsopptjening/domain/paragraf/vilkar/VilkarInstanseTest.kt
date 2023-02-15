@@ -21,8 +21,8 @@ internal class VilkarInstanseTest {
         moneder: Int, erMedlem: Boolean, forventetUtfall: Boolean
     ) {
         val ogRegel = og(
-            minstSeksMonederVilkar.lagVilkarsVurdering(inputVerdi = moneder),
-            erFolketrygdetVilkar.lagVilkarsVurdering(erMedlem)
+            minstSeksMonederVilkar.vilkarsVurder(inputVerdi = moneder),
+            erFolketrygdetVilkar.vilkarsVurder(erMedlem)
         )
 
         assertEquals(forventetUtfall, ogRegel.oppFyllerRegel)
@@ -39,8 +39,8 @@ internal class VilkarInstanseTest {
         moneder: Int, erMedlem: Boolean, forventetUtfall: Boolean
     ) {
         val ellerRegel = eller(
-            minstSeksMonederVilkar.lagVilkarsVurdering(inputVerdi = moneder),
-            erFolketrygdetVilkar.lagVilkarsVurdering(erMedlem)
+            minstSeksMonederVilkar.vilkarsVurder(inputVerdi = moneder),
+            erFolketrygdetVilkar.vilkarsVurder(erMedlem)
         )
 
         assertEquals(forventetUtfall, ellerRegel.oppFyllerRegel)
