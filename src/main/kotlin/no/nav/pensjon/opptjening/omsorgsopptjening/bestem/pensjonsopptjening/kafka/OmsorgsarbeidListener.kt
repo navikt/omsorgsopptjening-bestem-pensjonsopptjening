@@ -44,4 +44,5 @@ class OmsorgsarbeidListener(
     companion object {
         private val SECURE_LOG = LoggerFactory.getLogger("secure")
     }
+
 }
