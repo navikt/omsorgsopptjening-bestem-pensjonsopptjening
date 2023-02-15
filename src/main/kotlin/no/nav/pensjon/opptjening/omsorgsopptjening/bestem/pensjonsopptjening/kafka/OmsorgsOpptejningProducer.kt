@@ -18,7 +18,7 @@ class OmsorgsOpptejningProducer(
 ) {
 
     fun publiserOmsorgsopptejning(omsorgsOpptjeninger: OmsorgsOpptjening) {
-
+        send(omsorgsOpptjeninger.createKafkaKey(), omsorgsOpptjeninger.createKafkaValue())
     }
 
     fun send(key: String, value: String) {
