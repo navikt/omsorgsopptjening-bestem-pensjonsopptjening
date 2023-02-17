@@ -35,7 +35,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsYter = FNR_1,
-            omsorgsAr = "2020",
+            omsorgsAr = 2020,
             utbetalingsPeriode = listOf(
                 creatUtbetalingsPeriode(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
             )
@@ -70,7 +70,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsYter = FNR_1,
-            omsorgsAr = "2020",
+            omsorgsAr = 2020,
             utbetalingsPeriode = listOf(
                 creatUtbetalingsPeriode(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
             )
@@ -102,7 +102,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsYter = FNR_1,
-            omsorgsAr = "2020",
+            omsorgsAr = 2020,
             utbetalingsPeriode = listOf(
                 creatUtbetalingsPeriode(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
             )
@@ -126,7 +126,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsYter = FNR_1,
-            omsorgsAr = "2020",
+            omsorgsAr = 2020,
             utbetalingsPeriode = listOf(
                 creatUtbetalingsPeriode(fom = YearMonth.parse(fom), tom = YearMonth.parse(tom))
             )
@@ -160,7 +160,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsYter = FNR_1,
-            omsorgsAr = "2020",
+            omsorgsAr = 2020,
             utbetalingsPeriode = listOf(
                 creatUtbetalingsPeriode(fom = YearMonth.parse(fom1), tom = YearMonth.parse(tom1)),
                 creatUtbetalingsPeriode(fom = YearMonth.parse(fom2), tom = YearMonth.parse(tom2))
@@ -193,7 +193,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsYter = FNR_1,
-            omsorgsAr = "2020",
+            omsorgsAr = 2020,
             utbetalingsPeriode = listOf(
                 creatUtbetalingsPeriode(fom = YearMonth.parse(fom1), tom = YearMonth.parse(tom1)),
                 creatUtbetalingsPeriode(fom = YearMonth.parse(fom2), tom = YearMonth.parse(tom2)),
@@ -210,7 +210,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
 
     @Test
     fun `Given omsorgsarbeid without utbetalingsperioder When calling monthsOfOmsorg Then 0`() {
-        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(utbetalingsPeriode = listOf(), omsorgsAr = "2020")
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(utbetalingsPeriode = listOf(), omsorgsAr = 2020)
 
 
         assertEquals(
@@ -220,7 +220,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
     }
 
     private fun creatOmsorgsArbeidSnapshot(
-        omsorgsAr: String,
+        omsorgsAr: Int,
         omsorgsYter: String = "1234566",
         utbetalingsPeriode: List<OmsorgsArbeidsUtbetalinger>
     ) =

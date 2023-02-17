@@ -15,7 +15,7 @@ internal class OmsorgsOpptjeningTest {
     @Test
     fun `Given omsorgs arbeid for six months When calling personMedInvilgetOmsorgsopptjening Then return person`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
-            omsorgsAr = "2010",
+            omsorgsAr = 2010,
             omsorgsYter = FNR_1,
             utbetalingsPeriode = listOf(
                 creatUtbetalingsPeriode(
@@ -36,7 +36,7 @@ internal class OmsorgsOpptjeningTest {
     @Test
     fun `Given omsorgs arbeid for less than six months When calling personMedInvilgetOmsorgsopptjening Then return null`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
-            omsorgsAr = "2010",
+            omsorgsAr = 2010,
             omsorgsYter = FNR_1,
             utbetalingsPeriode = listOf(
                 creatUtbetalingsPeriode(
@@ -56,7 +56,7 @@ internal class OmsorgsOpptjeningTest {
 
 
     private fun creatOmsorgsArbeidSnapshot(
-        omsorgsAr: String,
+        omsorgsAr: Int,
         omsorgsYter: String = "1234566",
         utbetalingsPeriode: List<OmsorgsArbeidsUtbetalinger>
     ) =
