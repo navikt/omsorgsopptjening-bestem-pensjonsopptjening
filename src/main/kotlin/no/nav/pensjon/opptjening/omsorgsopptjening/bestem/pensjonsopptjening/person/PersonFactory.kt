@@ -1,7 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.factory
-
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Fnr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Person
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person
 
 class PersonFactory {
     companion object {
