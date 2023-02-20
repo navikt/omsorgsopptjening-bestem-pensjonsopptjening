@@ -1,0 +1,36 @@
+fragment metadata on Metadata {
+    master
+    historisk
+    endringer {
+        registrert
+    }
+}
+
+fragment folkeregistermetadata on Folkeregistermetadata {
+    ajourholdstidspunkt
+}
+
+query pdlPerson($ident: ID!) {
+    hentPerson(ident: $ident) {
+        folkeregisteridentifikator(historikk: true) {
+            identifikasjonsnummer
+            status
+            type
+            folkeregistermetadata {
+                ...folkeregistermetadata
+            }
+            metadata {
+                ...metadata
+            }
+        }
+        foedsel{
+            foedselsaar
+            folkeregistermetadata {
+                ...folkeregistermetadata
+            }
+            metadata {
+                ...metadata
+            }
+        }
+    }
+}
