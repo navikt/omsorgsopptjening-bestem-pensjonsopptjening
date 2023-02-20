@@ -1,20 +1,15 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
-data class PdlError(val message: String, val extensions: Extensions = Extensions())
+import com.fasterxml.jackson.annotation.JsonProperty
 
-data class Extensions(val code: String? = null) {
-    val pdlErrorCode = code?.uppercase()?.let {
-        try {
-            PdlErrorCode.valueOf(it)
-        } catch (e: IllegalArgumentException) {
-            PdlErrorCode.UNKNOWN
-        }
-    } ?: PdlErrorCode.UNKNOWN
-}
+data class PdlError(val message: String, val extensions: Extensions)
+
+data class Extensions(val code: PdlErrorCode)
 
 enum class PdlErrorCode {
-    NOT_FOUND,
-    UNAUTHORIZED,
-    SERVER_ERROR,
-    UNKNOWN
+    @JsonProperty("unauthenticated") UNAUTHENTICATED,
+    @JsonProperty("unauthorized") UNAUTHORIZED,
+    @JsonProperty("not_found") NOT_FOUND,
+    @JsonProperty("bad_request") BAD_REQUEST,
+    @JsonProperty("server_error") SERVER_ERROR,
 }
