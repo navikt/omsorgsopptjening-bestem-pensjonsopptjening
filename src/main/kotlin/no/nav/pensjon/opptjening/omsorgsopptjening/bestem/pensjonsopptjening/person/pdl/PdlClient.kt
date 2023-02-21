@@ -13,8 +13,8 @@ class PdlClient(
 ) {
 
     fun hentPerson(fnr: String): ResponseEntity<PdlResponse> {
-        val ape: PdlQuery = query.createPersonFodselsaarQuery(fnr)
-        return restTemplate.postForEntity(pdlUrl, ape, PdlResponse::class.java)
+        val request: PdlQuery = query.createPersonFodselsaarQuery(fnr)
+        return restTemplate.postForEntity(pdlUrl, request, PdlResponse::class.java)
     }
 
 }

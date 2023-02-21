@@ -45,6 +45,7 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test:3.0.2")
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner:3.0.0")
 }
 
 tasks.test {

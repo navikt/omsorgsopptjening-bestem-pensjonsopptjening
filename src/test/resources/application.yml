@@ -2,3 +2,5 @@ OMSORGSOPPTJENING_TOPIC: omsorgsopptjening
 OMSORGSOPPTJENING_BESTEM_GROUP_ID: testgruppe
 kafka:
   brokers: ${spring.embedded.kafka.brokers}
+
+PDL_URL: http://localhost:9991/graphql
