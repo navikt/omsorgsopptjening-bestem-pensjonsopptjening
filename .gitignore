@@ -37,3 +37,4 @@ out/
 .vscode/
 /.gradle/
 /build/
+/src/test/kotlin/no/nav/pensjon/opptjening/omsorgsopptjening/bestem/pensjonsopptjening/person/pdl/ApeTest.kt
