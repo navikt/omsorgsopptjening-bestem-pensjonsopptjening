@@ -13,6 +13,10 @@ spec:
       value: pensjonopptjening.omsorgsopptjening
     - name: OMSORGSOPPTJENING_BESTEM_GROUP_ID
       value: omsorgsopptjening-bestem-group
+    - name: PDL_URL
+      value: https://pdl-api.dev-fss-pub.nais.io/graphql
+    - name: PDL_API_ID
+      value: dev-fss.pdl.pdl-api
   kafka:
     pool: nav-dev
   secureLogs:
