@@ -25,7 +25,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 internal class PdlClientTest {
 
     @Autowired
-    lateinit var pdlClient: PdlClient
+    lateinit var pdlService: PdlService
 
     @BeforeEach
     fun resetWiremock() {
@@ -36,7 +36,7 @@ internal class PdlClientTest {
     fun `Given hentPerson then call pdl one time`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(200)))
 
-        pdlClient.hentPerson(FNR)
+        pdlService.hentPerson(FNR)
 
         wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
@@ -45,7 +45,7 @@ internal class PdlClientTest {
     fun `Given hentPerson then call pdl with fnr`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(200)))
 
-        pdlClient.hentPerson(FNR)
+        pdlService.hentPerson(FNR)
 
         wiremock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)).withRequestBody(containing("$FNR")))
     }
@@ -54,7 +54,7 @@ internal class PdlClientTest {
     fun `Given hentPerson then call pdl with token and other headers`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(200)))
 
-        pdlClient.hentPerson(FNR)
+        pdlService.hentPerson(FNR)
 
         wiremock.verify(
             WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH))
@@ -65,8 +65,6 @@ internal class PdlClientTest {
                 .withHeader("Nav-Call-Id", WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"))
         )
     }
-
-
 
 
     companion object {

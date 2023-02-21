@@ -8,12 +8,14 @@ import org.springframework.web.client.RestTemplate
 @Component
 class PdlClient(
     @Value("\${PDL_URL}") private val pdlUrl: String,
-    private val restTemplate: RestTemplate,
-    private val query: GraphqlQuery
+    private val restTemplate: RestTemplate
 ) {
 
-    fun hentPerson(fnr: String): ResponseEntity<PdlResponse> {
-        val request: PdlQuery = query.createPersonFodselsaarQuery(fnr)
-        return restTemplate.postForEntity(pdlUrl, request, PdlResponse::class.java)
+    fun hentPerson(graphqlQuery: String, fnr: String): ResponseEntity<PdlResponse> {
+        return restTemplate.postForEntity(
+            pdlUrl,
+            PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
+            PdlResponse::class.java
+        )
     }
 }
