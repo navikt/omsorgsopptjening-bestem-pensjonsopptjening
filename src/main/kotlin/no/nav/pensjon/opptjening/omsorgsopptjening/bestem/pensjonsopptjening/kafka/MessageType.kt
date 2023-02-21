@@ -16,7 +16,7 @@ fun ConsumerRecord<String, String>.kafkaMessageType(): KafkaMessageType {
     }
     assert(headers.size < 2) {
         log("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, had multiple values: $headers", this)
-        "Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, had multiple values: $headers, was not found. For more information see secure log"
+        "Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, had multiple values: $headers. For more information see secure log"
     }
     assert(KafkaMessageType.values().map { it.name }.contains(headers.first())) {
         log("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE} contained the unrecognized value: ${headers.first()}", this)
