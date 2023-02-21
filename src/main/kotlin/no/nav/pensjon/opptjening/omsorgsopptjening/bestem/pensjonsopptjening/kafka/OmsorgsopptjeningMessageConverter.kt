@@ -6,8 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
 
 
-fun OmsorgsOpptjening.kafkaKey(): String =
-    OmsorgsOpptjeningKey(omsorgsAr, person.gjeldendeFnr.fnr, invilget).mapToJson()
+fun OmsorgsOpptjening.kafkaKey(): String = OmsorgsOpptjeningKey(omsorgsAr, person.gjeldendeFnr.fnr, invilget).mapToJson()
 
 fun OmsorgsOpptjening.kafkaValue(): String =
     no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening(

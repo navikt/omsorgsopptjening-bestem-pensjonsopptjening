@@ -5,9 +5,9 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsarbeidListenerTest.Companion.OMSORGSOPPTJENING_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.json
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListener
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToClass
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
@@ -31,12 +31,6 @@ import kotlin.test.assertEquals
 @SpringBootTest(classes = [App::class])
 @Import(KafkaIntegrationTestConfig::class, OmsorgsopptjeningMockListener::class)
 internal class OmsorgsarbeidListenerTest {
-
-    @Autowired
-    lateinit var embeddedKafka: EmbeddedKafkaBroker
-
-    @Autowired
-    lateinit var omsorgsArbeidListener: OmsorgsarbeidListener
 
     @Autowired
     lateinit var omsorgsarbeidProducer: KafkaTemplate<String, String>
@@ -63,14 +57,14 @@ internal class OmsorgsarbeidListenerTest {
         )
 
         sendOmsorgsarbeidsSnapshot(
-            omsorgsAr =  2020,
-            fnr =  "12345678910",
-            omsorgstype =  Omsorgstype.BARNETRYGD,
-            messageType =  KafkaMessageType.OMSORGSARBEID
+            omsorgsAr = 2020,
+            fnr = "12345678910",
+            omsorgstype = Omsorgstype.BARNETRYGD,
+            messageType = KafkaMessageType.OMSORGSARBEID
         )
 
         val record = omsorgsopptjeingListener.getRecord(10)
-        val omsorgsOpptjening = mapper.readValue(record!!.value(),OmsorgsOpptjening::class.java)
+        val omsorgsOpptjening = record!!.value().mapToClass(OmsorgsOpptjening::class.java)
 
         assertEquals(omsorgsOpptjening.invilget, false)
         assertEquals(omsorgsOpptjening.omsorgsAr, 2020)
@@ -88,23 +82,23 @@ internal class OmsorgsarbeidListenerTest {
         messageType: KafkaMessageType
     ): OmsorgsarbeidsSnapshot {
         val omsorgsarbeidsSnapshot =
-             OmsorgsarbeidsSnapshot(
+            OmsorgsarbeidsSnapshot(
                 omsorgsYter = Person(fnr),
                 omsorgsAr = omsorgsAr,
                 omsorgstype = Omsorgstype.BARNETRYGD,
                 kjoreHash = "XXX",
                 kilde = Kilde.BA,
                 omsorgsArbeidSaker = listOf()
-        )
+            )
 
-        val omsorgsArbeidKey = OmsorgsArbeidKey(fnr, omsorgsAr ,omsorgstype)
+        val omsorgsArbeidKey = OmsorgsArbeidKey(fnr, omsorgsAr, omsorgstype)
 
         val pr = ProducerRecord(
             OMSORGSOPPTJENING_TOPIC,
             null,
             null,
-            omsorgsArbeidKey.json(),
-            omsorgsarbeidsSnapshot.json(),
+            omsorgsArbeidKey.mapToJson(),
+            omsorgsarbeidsSnapshot.mapToJson(),
             createHeaders(messageType)
         )
         omsorgsarbeidProducer.send(pr).get()
@@ -120,7 +114,7 @@ internal class OmsorgsarbeidListenerTest {
     )
 
     companion object {
-         const val OMSORGSOPPTJENING_TOPIC = "omsorgsopptjening"
+        const val OMSORGSOPPTJENING_TOPIC = "omsorgsopptjening"
         private const val PDL_PATH = "/graphql"
 
         private val wiremock = WireMockServer(WireMockSpring.options().port(9991)).also { it.start() }
