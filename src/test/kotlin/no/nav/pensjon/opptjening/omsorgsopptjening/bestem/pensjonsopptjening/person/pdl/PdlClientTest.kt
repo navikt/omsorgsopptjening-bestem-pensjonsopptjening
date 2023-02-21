@@ -37,7 +37,14 @@ internal class PdlClientTest {
 
     @Test
     fun `Given hentPerson then call pdl one time`() {
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(200)))
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("folkeregisteridentifikator.json")
+            )
+        )
 
         pdlService.hentPerson(FNR)
 
@@ -46,7 +53,14 @@ internal class PdlClientTest {
 
     @Test
     fun `Given hentPerson then call pdl with fnr`() {
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(200)))
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("folkeregisteridentifikator.json")
+            )
+        )
 
         pdlService.hentPerson(FNR)
 
@@ -55,7 +69,14 @@ internal class PdlClientTest {
 
     @Test
     fun `Given hentPerson then call pdl with token and other headers`() {
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(200)))
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("folkeregisteridentifikator.json")
+            )
+        )
 
         pdlService.hentPerson(FNR)
 
@@ -70,19 +91,23 @@ internal class PdlClientTest {
     }
 
     @Test
-    fun `Given hentPerson When PDL return folkeregisteridentifikator then return pdl response`(){
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn( WireMock.aResponse()
-            .withHeader("Content-Type", "application/json")
-            .withBodyFile("folkeregisteridentifikator.json")))
+    fun `Given hentPerson When PDL return folkeregisteridentifikator then return pdl response`() {
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("folkeregisteridentifikator.json")
+            )
+        )
 
 
         assertNotNull(pdlService.hentPerson(FNR))
     }
 
     @Test
-    fun `Given a bad request when getting person then retry 3 times before give up` () {
+    fun `Given a bad request when getting person then retry 3 times before give up`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(401)))
-        assertThrows<RestClientException>{ pdlService.hentPerson(FNR) }
+        assertThrows<RestClientException> { pdlService.hentPerson(FNR) }
         wiremock.verify(3, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
 
