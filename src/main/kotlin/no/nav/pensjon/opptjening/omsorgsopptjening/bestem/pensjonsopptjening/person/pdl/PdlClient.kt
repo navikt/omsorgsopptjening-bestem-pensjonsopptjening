@@ -16,5 +16,4 @@ class PdlClient(
         val request: PdlQuery = query.createPersonFodselsaarQuery(fnr)
         return restTemplate.postForEntity(pdlUrl, request, PdlResponse::class.java)
     }
-
 }

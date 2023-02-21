@@ -31,12 +31,12 @@ internal class PdlClientTest {
     }
 
     @Test
-    fun `Given a valid fnr when getting person then return person`() {
+    fun `Given hentPerson then call pdl one time`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(200)))
 
+        pdlClient.hentPerson(FNR)
 
-        val pdlResponse = pdlClient.hentPerson(FNR)
-
+        wiremock.verify(1,WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
 
     companion object {
