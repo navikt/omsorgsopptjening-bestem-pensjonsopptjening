@@ -13,7 +13,10 @@ class PdlClient(
     private val restTemplate: RestTemplate
 ) {
 
-    @Retryable(value = [RestClientException::class], backoff = Backoff(delay = 1000L, maxDelay = 170000L, multiplier = 3.0))
+    @Retryable(
+        value = [RestClientException::class],
+        backoff = Backoff(delay = 1000L, maxDelay = 170000L, multiplier = 3.0)
+    )
     fun hentPerson(graphqlQuery: String, fnr: String): PdlResponse? {
         return restTemplate.postForEntity(
             pdlUrl,

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class GraphqlQuery(@Value("classpath:pdl/folkeregisteridentifikator.graphql") private val resourceFile: Resource){
+class GraphqlQuery(@Value("classpath:pdl/folkeregisteridentifikator.graphql") private val resourceFile: Resource) {
     fun getPersonFodselsaarQuery(): String {
         return String(resourceFile.file.readBytes()).replace("[\n\r]", "")
     }
