@@ -11,12 +11,14 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.WireMockSpring
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.web.client.RestClientException
 import kotlin.test.assertNotNull
 
 @AutoConfigureMockMvc
@@ -75,6 +77,13 @@ internal class PdlClientTest {
 
 
         assertNotNull(pdlService.hentPerson(FNR))
+    }
+
+    @Test
+    fun `Given a bad request when getting person then retry 3 times before give up` () {
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(401)))
+        assertThrows<RestClientException>{ pdlService.hentPerson(FNR) }
+        wiremock.verify(3, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
 
 
