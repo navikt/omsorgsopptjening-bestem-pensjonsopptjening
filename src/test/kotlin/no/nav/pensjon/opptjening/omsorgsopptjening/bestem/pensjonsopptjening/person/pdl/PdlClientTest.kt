@@ -140,7 +140,7 @@ internal class PdlClientTest {
 
     companion object {
         const val FNR = "11111111111"
-        const val PDL_PATH = "/graphql"
+        private const val PDL_PATH = "/graphql"
         private val wiremock = WireMockServer(WireMockSpring.options().port(9991)).also { it.start() }
 
         @JvmStatic

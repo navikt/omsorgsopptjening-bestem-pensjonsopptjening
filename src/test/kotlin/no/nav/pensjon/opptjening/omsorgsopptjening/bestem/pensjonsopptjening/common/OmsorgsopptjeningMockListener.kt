@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.getMessageType
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -19,7 +21,10 @@ class OmsorgsopptjeningMockListener {
     )
     fun consumeOmsorgPGodskriving(hendelse: String, consumerRecord: ConsumerRecord<String, String>, acknowledgment: Acknowledgment) {
         logger.info("Konsumerer omsorgsmelding: ${consumerRecord.key()}, ${consumerRecord.value()}")
-        records.add(consumerRecord)
+        if(consumerRecord.getMessageType() == KafkaMessageType.OMSORGSOPPTJENING) {
+            records.add(consumerRecord)
+        }
+        acknowledgment.acknowledge()
     }
 
     fun getRecord(waitForSeconds: Int): ConsumerRecord<String, String>? {

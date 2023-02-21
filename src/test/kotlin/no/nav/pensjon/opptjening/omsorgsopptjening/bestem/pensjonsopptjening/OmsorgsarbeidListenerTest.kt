@@ -1,16 +1,31 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsarbeidListenerTest.Companion.OMSORGSOPPTJENING_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.json
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListener
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.header.internals.RecordHeader
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cloud.contract.wiremock.WireMockSpring
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
+import kotlin.test.assertEquals
+
 
 @EmbeddedKafka(partitions = 1, topics = [OMSORGSOPPTJENING_TOPIC])
 @SpringBootTest(classes = [App::class])
@@ -30,37 +45,91 @@ internal class OmsorgsarbeidListenerTest {
     lateinit var omsorgsopptjeingListener: OmsorgsopptjeningMockListener
 
 
-    @Test
-    fun `given omsorgsarbeid event then produce omsorgsopptjening event`() {
-        omsorgsarbeidProducer.send(OMSORGSOPPTJENING_TOPIC, omsorgsMeldingKey(), omsorgsMeldingValue())
-
+    @BeforeEach
+    fun resetWiremock() {
+        wiremock.resetAll()
     }
 
-    fun omsorgsMeldingKey(omsorgsyter: String = "12345678910", ar: String = "2020") =
-        """
-        {
-            "omsorgsyterFnr": "12345678910",
-            "omsorgsAr": "2005"
-        }
-        """.trimIndent()
 
+    @Test
+    fun `given omsorgsarbeid event then produce omsorgsopptjening event`() {
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("folkeregisteridentifikator.json")
+            )
+        )
 
-    fun omsorgsMeldingValue(
-        omsorgsyter: String = "12345678910",
-        ar: String = "2020",
-        hash: String = """2023-01-19T15:55:35.766223643"""
-    ) =
-        """{
-              "omsorgsyter": {
-                "fnr": "12345678910",
-                "utbetalingsperioder": []
-              },
-              "omsorgsAr": "2005",
-              "hash": "2023-01-20T10:35:23.15820754"
-        }""".trimIndent()
+        sendOmsorgsarbeidsSnapshot(
+            omsorgsAr =  2020,
+            fnr =  "12345678910",
+            omsorgstype =  Omsorgstype.BARNETRYGD,
+            messageType =  KafkaMessageType.OMSORGSARBEID
+        )
 
+        val record = omsorgsopptjeingListener.getRecord(10)
+        val omsorgsOpptjening = mapper.readValue(record!!.value(),OmsorgsOpptjening::class.java)
+
+        assertEquals(omsorgsOpptjening.invilget, false)
+        assertEquals(omsorgsOpptjening.omsorgsAr, 2020)
+        assertEquals(omsorgsOpptjening.person.fnr, "12345678910")
+        assertNotNull(omsorgsOpptjening.grunnlag)
+        assertNotNull(omsorgsOpptjening.omsorgsopptjeningResultater)
+
+        wiremock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+    }
+
+    private fun sendOmsorgsarbeidsSnapshot(
+        omsorgsAr: Int,
+        fnr: String,
+        omsorgstype: Omsorgstype,
+        messageType: KafkaMessageType
+    ): OmsorgsarbeidsSnapshot {
+        val omsorgsarbeidsSnapshot =
+             OmsorgsarbeidsSnapshot(
+                omsorgsYter = Person(fnr),
+                omsorgsAr = omsorgsAr,
+                omsorgstype = Omsorgstype.BARNETRYGD,
+                kjoreHash = "XXX",
+                kilde = Kilde.BA,
+                omsorgsArbeidSaker = listOf()
+        )
+
+        val omsorgsArbeidKey = OmsorgsArbeidKey(fnr, omsorgsAr ,omsorgstype)
+
+        val pr = ProducerRecord(
+            OMSORGSOPPTJENING_TOPIC,
+            null,
+            null,
+            omsorgsArbeidKey.json(),
+            omsorgsarbeidsSnapshot.json(),
+            createHeaders(messageType)
+        )
+        omsorgsarbeidProducer.send(pr).get()
+
+        return omsorgsarbeidsSnapshot
+    }
+
+    private fun createHeaders(messageType: KafkaMessageType) = mutableListOf(
+        RecordHeader(
+            KafkaHeaderKey.MESSAGE_TYPE,
+            messageType.name.encodeToByteArray()
+        )
+    )
 
     companion object {
-        const val OMSORGSOPPTJENING_TOPIC = "omsorgsopptjening"
+         const val OMSORGSOPPTJENING_TOPIC = "omsorgsopptjening"
+        private const val PDL_PATH = "/graphql"
+
+        private val wiremock = WireMockServer(WireMockSpring.options().port(9991)).also { it.start() }
+
+        @JvmStatic
+        @AfterAll
+        fun clean() {
+            wiremock.stop()
+            wiremock.shutdown()
+        }
     }
 }
