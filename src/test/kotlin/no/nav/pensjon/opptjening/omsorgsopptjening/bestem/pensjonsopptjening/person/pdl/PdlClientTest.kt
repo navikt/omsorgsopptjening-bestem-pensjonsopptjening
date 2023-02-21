@@ -86,7 +86,11 @@ internal class PdlClientTest {
                 .withHeader("Accept", WireMock.equalTo("application/json"))
                 .withHeader("Content-Type", WireMock.equalTo("application/json"))
                 .withHeader("Nav-Consumer-Id", WireMock.equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
-                .withHeader("Nav-Call-Id", WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"))
+                .withHeader("Tema", WireMock.equalTo("PEN"))
+                .withHeader(
+                    "Nav-Call-Id",
+                    WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$")
+                )
         )
     }
 

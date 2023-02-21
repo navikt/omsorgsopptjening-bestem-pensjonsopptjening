@@ -16,6 +16,7 @@ class HeaderInterceptor(private val tokenProvider: TokenProvider) : ClientHttpRe
         request.headers.apply {
             add("Nav-Call-Id", UUID.randomUUID().toString())
             add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
+            add("Tema", "PEN")
             accept = listOf(MediaType.APPLICATION_JSON)
             contentType = MediaType.APPLICATION_JSON
             setBearerAuth(tokenProvider.getToken())
