@@ -2,23 +2,23 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.finnOmsorgsArbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.getUtbetalinger
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.MåHaEtHalvtÅrMedOmsorg
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HalvtArMedOmsorg
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 
 class FastsettOmsorgsOpptjening {
     companion object {
         fun fastsettOmsorgsOpptjening(snapshot: OmsorgsarbeidsSnapshot, person: Person): OmsorgsOpptjening {
-            val vilkarsResultat = MåHaEtHalvtÅrMedOmsorg()
+            val vilkarsResultat = HalvtArMedOmsorg()
                 .vilkarsVurder(
                     snapshot
                         .finnOmsorgsArbeid(person)
-                        .getUtbetalinger(snapshot.omsorgsAr.toInt())
+                        .getUtbetalinger(snapshot.omsorgsAr)
                 )
                 .utførVilkarsVurdering()
 
             return OmsorgsOpptjening(
-                omsorgsAr = snapshot.omsorgsAr.toInt(),
+                omsorgsAr = snapshot.omsorgsAr,
                 person = person,
                 grunnlag = snapshot,
                 omsorgsopptjeningResultater = vilkarsResultat,

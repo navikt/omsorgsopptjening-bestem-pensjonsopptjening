@@ -12,10 +12,11 @@ open class VilkarsVurdering<InputType : Any>(
             vilkar = vilkar
         )
     }
+
 }
 
-data class VilkarsResultat<InputType: Any>(
+data class VilkarsResultat<InputType : Any>(
     val oppFyllerRegel: Boolean,
     val inputVerdi: InputType,
-    val vilkar : Vilkar<InputType>,
+    val vilkar: Vilkar<InputType>,
 )

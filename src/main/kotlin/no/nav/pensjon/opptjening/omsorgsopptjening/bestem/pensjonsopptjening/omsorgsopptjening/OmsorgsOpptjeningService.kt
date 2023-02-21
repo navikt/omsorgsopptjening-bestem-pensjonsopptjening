@@ -17,7 +17,7 @@ class OmsorgsOpptjeningService(
         SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $omsorgsArbeidSnapshot")
 
         val person = personService.getPerson(omsorgsArbeidSnapshot.omsorgsYter.fnr)
-        val omsorgsOpptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot,person)
+        val omsorgsOpptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
         omsorgsOpptejningProducer.publiserOmsorgsopptejning(omsorgsOpptjening)
     }

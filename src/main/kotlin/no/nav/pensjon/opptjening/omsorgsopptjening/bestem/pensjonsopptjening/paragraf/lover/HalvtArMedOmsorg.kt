@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.RegelInformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 
-class MåHaEtHalvtÅrMedOmsorg : Vilkar<Int>(
+class HalvtArMedOmsorg : Vilkar<Int>(
     regelInformasjon = RegelInformasjon(
         beskrivelse = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn",
         begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",

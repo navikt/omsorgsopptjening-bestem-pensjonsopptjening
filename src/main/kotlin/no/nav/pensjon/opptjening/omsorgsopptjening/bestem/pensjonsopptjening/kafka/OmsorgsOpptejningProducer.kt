@@ -18,13 +18,12 @@ class OmsorgsOpptejningProducer(
 ) {
 
     fun publiserOmsorgsopptejning(omsorgsOpptjeninger: OmsorgsOpptjening) {
-        send(omsorgsOpptjeninger.createKafkaKey(), omsorgsOpptjeninger.createKafkaValue())
+        send(omsorgsOpptjeninger.kafkaKey(), omsorgsOpptjeninger.kafkaValue())
     }
 
     fun send(key: String, value: String) {
-        val pr = ProducerRecord(omsorgsOpptjeningTopic, null, null, key, value, createHeaders())
-
-        kafkaTemplate.send(pr).get(1, TimeUnit.SECONDS)
+        val record = ProducerRecord(omsorgsOpptjeningTopic, null, null, key, value, createHeaders())
+        kafkaTemplate.send(record).get(1, TimeUnit.SECONDS)
     }
 
     private fun createHeaders() = mutableListOf(

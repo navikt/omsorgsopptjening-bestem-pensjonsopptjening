@@ -7,13 +7,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 
 
-fun OmsorgsarbeidsSnapshot.finnOmsorgsArbeid(person: Person): List<OmsorgsArbeid> {
-    return omsorgsArbeidSaker.flatMap { sak ->
+fun OmsorgsarbeidsSnapshot.finnOmsorgsArbeid(person: Person): List<OmsorgsArbeid> =
+    omsorgsArbeidSaker.flatMap { sak ->
         sak.omsorgsarbedUtfort.filter { omsorgsArbeid ->
             person.identifiseresAv(Fnr(omsorgsArbeid.omsorgsyter.fnr))
         }
     }
-}
 
 fun List<OmsorgsArbeid>.getUtbetalinger(omsorgsAr: Int) = (getUtbetalinger() begrensTilAr omsorgsAr).antall()
 

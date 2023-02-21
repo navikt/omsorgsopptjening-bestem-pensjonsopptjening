@@ -7,5 +7,4 @@ class Person(val gjeldendeFnr: Fnr, val historiskeFnr: Set<Fnr> = setOf()) {
     infix fun erSammePerson(annenPerson: Person) = (annenPerson.alleFnr intersect alleFnr).isNotEmpty()
 
     infix fun identifiseresAv(fnr: Fnr) = alleFnr.contains(fnr)
-
 }
