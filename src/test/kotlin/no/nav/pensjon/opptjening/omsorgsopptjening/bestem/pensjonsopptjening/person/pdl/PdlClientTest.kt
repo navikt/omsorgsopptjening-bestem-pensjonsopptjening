@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.containing
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsarbeidListenerTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
@@ -37,7 +38,16 @@ internal class PdlClientTest {
 
         pdlClient.hentPerson(FNR)
 
-        wiremock.verify(1,WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+        wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+    }
+
+    @Test
+    fun `Given hentPerson then call pdl with fnr`() {
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(200)))
+
+        pdlClient.hentPerson(FNR)
+
+        wiremock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)).withRequestBody(containing("$FNR")))
     }
 
     @Test
@@ -46,14 +56,18 @@ internal class PdlClientTest {
 
         pdlClient.hentPerson(FNR)
 
-        wiremock.verify(1,WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH))
-            .withHeader("Authorization", WireMock.equalTo("Bearer $MOCK_TOKEN"))
-            .withHeader("Accept", WireMock.equalTo("application/json"))
-            .withHeader("Content-Type", WireMock.equalTo("application/json"))
-            .withHeader("Nav-Consumer-Id", WireMock.equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
-            .withHeader("Nav-Call-Id", WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"))
+        wiremock.verify(
+            WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH))
+                .withHeader("Authorization", WireMock.equalTo("Bearer $MOCK_TOKEN"))
+                .withHeader("Accept", WireMock.equalTo("application/json"))
+                .withHeader("Content-Type", WireMock.equalTo("application/json"))
+                .withHeader("Nav-Consumer-Id", WireMock.equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
+                .withHeader("Nav-Call-Id", WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"))
         )
     }
+
+
+
 
     companion object {
         const val FNR = "11111111111"
