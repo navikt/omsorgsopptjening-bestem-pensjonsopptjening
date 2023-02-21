@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.WireMockSpring
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.test.context.EmbeddedKafka
+import kotlin.test.assertNotNull
 
 @AutoConfigureMockMvc
 @EmbeddedKafka(partitions = 1, topics = [OmsorgsarbeidListenerTest.OMSORGSOPPTJENING_TOPIC])
@@ -64,6 +65,16 @@ internal class PdlClientTest {
                 .withHeader("Nav-Consumer-Id", WireMock.equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
                 .withHeader("Nav-Call-Id", WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"))
         )
+    }
+
+    @Test
+    fun `Given hentPerson When PDL return folkeregisteridentifikator then return pdl response`(){
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn( WireMock.aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBodyFile("folkeregisteridentifikator.json")))
+
+
+        assertNotNull(pdlService.hentPerson(FNR))
     }
 
 

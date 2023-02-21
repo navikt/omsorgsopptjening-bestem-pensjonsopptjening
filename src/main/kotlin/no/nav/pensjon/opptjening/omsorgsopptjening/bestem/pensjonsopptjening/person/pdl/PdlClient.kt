@@ -11,11 +11,11 @@ class PdlClient(
     private val restTemplate: RestTemplate
 ) {
 
-    fun hentPerson(graphqlQuery: String, fnr: String): ResponseEntity<PdlResponse> {
+    fun hentPerson(graphqlQuery: String, fnr: String): PdlResponse? {
         return restTemplate.postForEntity(
             pdlUrl,
             PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
             PdlResponse::class.java
-        )
+        ).body
     }
 }
