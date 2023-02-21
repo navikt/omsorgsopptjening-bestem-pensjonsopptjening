@@ -5,11 +5,11 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsarbeidListenerTest.Companion.OMSORGSOPPTJENING_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType.OMSORGSOPPTJENING
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.header.internals.RecordHeader
@@ -22,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.WireMockSpring
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.test.EmbeddedKafkaBroker
 import org.springframework.kafka.test.context.EmbeddedKafka
 import kotlin.test.assertEquals
 
@@ -63,7 +62,7 @@ internal class OmsorgsarbeidListenerTest {
             messageType = KafkaMessageType.OMSORGSARBEID
         )
 
-        val record = omsorgsopptjeingListener.getRecord(10)
+        val record = omsorgsopptjeingListener.getRecord(10, OMSORGSOPPTJENING)
         val omsorgsOpptjening = record!!.value().mapToClass(OmsorgsOpptjening::class.java)
 
         assertEquals(omsorgsOpptjening.invilget, false)

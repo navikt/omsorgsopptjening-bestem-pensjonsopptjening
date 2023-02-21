@@ -3,7 +3,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.kafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
@@ -19,25 +18,18 @@ class OmsorgsopptjeningMockListener {
         topics = ["\${OMSORGSOPPTJENING_TOPIC}"],
         groupId = "TEST"
     )
-    fun consumeOmsorgPGodskriving(hendelse: String, consumerRecord: ConsumerRecord<String, String>, acknowledgment: Acknowledgment) {
-        logger.info("Konsumerer omsorgsmelding: ${consumerRecord.key()}, ${consumerRecord.value()}")
-        if(consumerRecord.kafkaMessageType() == KafkaMessageType.OMSORGSOPPTJENING) {
-            records.add(consumerRecord)
-        }
-        acknowledgment.acknowledge()
+    fun consumeOmsorgPGodskriving(hendelse: String, record: ConsumerRecord<String, String>, ack: Acknowledgment) {
+        records.add(record)
+        ack.acknowledge()
     }
 
-    fun getRecord(waitForSeconds: Int): ConsumerRecord<String, String>? {
+    fun getRecord(waitForSeconds: Int, messageType: KafkaMessageType): ConsumerRecord<String, String>? {
         var secondsPassed = 0
-        while (secondsPassed < waitForSeconds && records.size < 1) {
+        while (secondsPassed < waitForSeconds && records.none { it.kafkaMessageType() == messageType }) {
             Thread.sleep(1000)
             secondsPassed++
         }
 
-        return records.removeFirstOrNull()
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(OmsorgsopptjeningMockListener::class.java)
+        return records.first { it.kafkaMessageType() == messageType }
     }
 }
