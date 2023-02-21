@@ -27,8 +27,6 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
     private fun PdlPerson.gjeldendeIdent() = Fnr(folkeregisteridentifikator.first { it.status == Status.I_BRUK }.identifikasjonsnummer)
 }
 
-class PdlException(pdlError: PdlError?) : RuntimeException(pdlError?.message ?: "Unknown error from PDL")
-// TODO Utvid med kode
-
-
-
+class PdlException(pdlError: PdlError?) : RuntimeException(pdlError?.message ?: "Unknown error from PDL"){
+    val code: PdlErrorCode? = pdlError?.extensions?.code
+}
