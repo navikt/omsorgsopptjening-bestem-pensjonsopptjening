@@ -115,6 +115,28 @@ internal class PdlClientTest {
         wiremock.verify(3, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
 
+    @Test
+    fun `Given not found When calling pdl Then throw PdlException`() {
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+            WireMock.aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBodyFile("error_not_found.json")
+        ))
+        assertThrows<PdlException> { pdlService.hentPerson(FNR) }
+        wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+    }
+
+    @Test
+    fun `Given unauthorized When calling pdl Then throw PdlException`() {
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+            WireMock.aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBodyFile("error_unauthorized.json")
+        ))
+        assertThrows<PdlException> { pdlService.hentPerson(FNR) }
+        wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+    }
+
 
     companion object {
         const val FNR = "11111111111"

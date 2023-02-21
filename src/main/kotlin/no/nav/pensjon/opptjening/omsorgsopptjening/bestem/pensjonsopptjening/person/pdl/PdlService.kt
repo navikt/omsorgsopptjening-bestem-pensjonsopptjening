@@ -10,21 +10,25 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
     fun hentPerson(fnr: String): Person {
         val pdlResponse = pdlClient.hentPerson(graphqlQuery = graphqlQuery.getPersonFodselsaarQuery(), fnr = fnr)
 
+        val pdlPerson = pdlResponse?.data?.hentPerson ?: throw PdlException(pdlResponse?.error)
+
         return Person(
-            pdlResponse!!.gjeldendeIdent(),
-            pdlResponse.historisk()
+            pdlPerson.gjeldendeIdent(),
+            pdlPerson.historisk()
         )
     }
 
-    private fun PdlResponse.historisk() = data!!.hentPerson!!.folkeregisteridentifikator
+    private fun PdlPerson.historisk() = folkeregisteridentifikator
         .filter { it.status == Status.OPPHOERT }
         .distinctBy { it.identifikasjonsnummer }
         .map { Fnr(it.identifikasjonsnummer) }
         .toSet()
 
-    private fun PdlResponse.gjeldendeIdent() =
-        Fnr(data!!.hentPerson!!.folkeregisteridentifikator.first { it.status == Status.I_BRUK }.identifikasjonsnummer)
+    private fun PdlPerson.gjeldendeIdent() = Fnr(folkeregisteridentifikator.first { it.status == Status.I_BRUK }.identifikasjonsnummer)
 }
+
+class PdlException(pdlError: PdlError?) : RuntimeException(pdlError?.message ?: "Unknown error from PDL")
+// TODO Utvid med kode
 
 
 
