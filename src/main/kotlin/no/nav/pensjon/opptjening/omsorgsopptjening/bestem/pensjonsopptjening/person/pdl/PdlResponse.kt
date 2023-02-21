@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 data class PdlResponse(val data: PdlData?, private val errors: List<PdlError>? = null) {
     val error: PdlError? = errors?.firstOrNull()
-} // TODO Sjekk ut hvorfor vi ikke forholder oss til en liste??
+}
 
 data class PdlData(val hentPerson: Person?)
 

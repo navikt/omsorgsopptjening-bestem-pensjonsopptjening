@@ -2,10 +2,12 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
+import org.springframework.stereotype.Component
 
 
-class Query(@Value("classpath:data/resource-data.txt") private val resourceFile: Resource){
-    fun createQuery(fnr: String): PdlQuery {
+@Component
+class GraphqlQuery(@Value("classpath:data/resource-data.txt") private val resourceFile: Resource){
+    fun createPersonFodselsaarQuery(fnr: String): PdlQuery {
         val query = String(resourceFile.file.readBytes()).replace("[\n\r]", "")
         return PdlQuery(query, FnrVariables(fnr))
     }

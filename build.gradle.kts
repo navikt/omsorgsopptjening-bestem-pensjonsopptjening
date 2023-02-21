@@ -30,7 +30,9 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    // Internal libraries
     implementation("no.nav.pensjon.opptjening:omsorgsopptjening-domene-lib:1.0.10")
+    implementation("no.nav.pensjonopptjening:pensjon-opptjening-azure-ad-client:0.0.7")
 
     implementation("com.google.guava:guava:31.1-jre")
     // Kotlin
