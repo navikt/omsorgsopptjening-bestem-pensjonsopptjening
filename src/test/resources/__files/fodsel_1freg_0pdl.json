@@ -1,0 +1,30 @@
+{
+  "data": {
+    "hentPerson": {
+      "folkeregisteridentifikator": [
+        {
+          "identifikasjonsnummer": "12345678910",
+          "status": "I_BRUK",
+          "type": "FNR",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsaar": 1992,
+          "metadata": {
+            "master": "FREG",
+            "historisk": false,
+            "endringer": []
+          },
+          "folkeregistermetadata": {
+            "ajourholdstidspunkt": "2018-05-17T13:10:45"
+          }
+        }
+      ]
+    }
+  }
+}

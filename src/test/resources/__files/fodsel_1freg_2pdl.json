@@ -1,0 +1,62 @@
+{
+  "data": {
+    "hentPerson": {
+      "folkeregisteridentifikator": [
+        {
+          "identifikasjonsnummer": "12345678910",
+          "status": "I_BRUK",
+          "type": "FNR",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsaar": 1996,
+          "metadata": {
+            "master": "PDL",
+            "historisk": false,
+            "endringer": [
+              {
+                "kilde": "Syden Social Security",
+                "registrert": "2001-04-25T08:45:24",
+                "registrertAv": "NICE001",
+                "systemkilde": "",
+                "type": "OPPRETT"
+              }
+            ]
+          }
+        },
+        {
+          "foedselsaar": 1997,
+          "metadata": {
+            "master": "PDL",
+            "historisk": false,
+            "endringer": [
+              {
+                "kilde": "Syden Social Security",
+                "registrert": "2021-04-25T08:45:24",
+                "registrertAv": "NICE001",
+                "systemkilde": "",
+                "type": "OPPRETT"
+              }
+            ]
+          }
+        },
+        {
+          "foedselsaar": 1998,
+          "metadata": {
+            "master": "FREG",
+            "historisk": false,
+            "endringer": []
+          },
+          "folkeregistermetadata": {
+            "ajourholdstidspunkt": "2018-05-17T13:10:45"
+          }
+        }
+      ]
+    }
+  }
+}
