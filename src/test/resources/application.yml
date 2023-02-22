@@ -4,3 +4,9 @@ kafka:
   brokers: ${spring.embedded.kafka.brokers}
 
 PDL_URL: http://localhost:9991/graphql
+
+spring.datasource:
+  driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  url: jdbc:tc:postgresql:14:///test
+  username: test
+  password: test
