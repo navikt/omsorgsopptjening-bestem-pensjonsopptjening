@@ -1,0 +1,26 @@
+{
+  "data": {
+    "hentPerson": {
+      "folkeregisteridentifikator": [
+        {
+          "identifikasjonsnummer": "12345678918",
+          "status": "OPPHOERT",
+          "type": "FNR",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsaar": 2000,
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ]
+    }
+  }
+}

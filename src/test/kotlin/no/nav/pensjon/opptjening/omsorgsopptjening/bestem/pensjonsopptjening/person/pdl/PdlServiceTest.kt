@@ -7,7 +7,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Person
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -29,12 +28,12 @@ internal class PdlServiceTest {
     }
 
     @Test
-    fun `Et fnr i bruk fra freg - Ett fnr`() {
+    fun `Et fnr i bruk - Ett fnr i person`() {
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
                 WireMock.aResponse()
                     .withHeader("Content-Type", "application/json")
-                    .withBodyFile("fnr_1freg_bruk.json")
+                    .withBodyFile("fnr_1bruk.json")
             )
         )
         val person: Person = pdlService.hentPerson(FNR)
@@ -44,7 +43,7 @@ internal class PdlServiceTest {
     }
 
     @Test
-    fun `Samme historiske fnr som gjeldende - alle fnr innehloder ett fnr`() {
+    fun `Samme historiske fnr som gjeldende - et fnr i person`() {
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
                 WireMock.aResponse()
@@ -58,6 +57,30 @@ internal class PdlServiceTest {
         assertEquals("04010012797", person.gjeldendeFnr.fnr)
     }
 
+
+    @Test
+    fun `Et fnr 1 OPPHOERT - kast exception`() {
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("fnr_1opphort.json")
+            )
+        )
+        assertThrows<PdlMottatDataException> { pdlService.hentPerson(FNR) }
+    }
+
+    @Test
+    fun `Et fnr 0 OPPHOERT 0 BRUK - kast exception`() {
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("fnr_0bruk_0opphort.json")
+            )
+        )
+        assertThrows<PdlMottatDataException> { pdlService.hentPerson(FNR) }
+    }
 
 
     @Test

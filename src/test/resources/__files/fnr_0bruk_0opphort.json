@@ -1,0 +1,16 @@
+{
+  "data": {
+    "hentPerson": {
+      "folkeregisteridentifikator": [],
+      "foedsel": [
+        {
+          "foedselsaar": 2000,
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ]
+    }
+  }
+}

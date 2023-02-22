@@ -26,12 +26,16 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         .toSet()
 
     private fun PdlPerson.gjeldendeIdent() =
-        Fnr(folkeregisteridentifikator.first { it.status == Status.I_BRUK }.identifikasjonsnummer)
+        Fnr(
+            folkeregisteridentifikator.firstOrNull { it.status == Status.I_BRUK }?.identifikasjonsnummer
+                ?: throw PdlMottatDataException("Fnr i bruk finnes ikke")
+        )
 
     private fun PdlPerson.foedselsAr(): Int =
         when (foedsel.size) {
             1 -> foedsel.first().foedselsaar
-            else -> foedsel.avklarFoedsel()?.foedselsaar ?: throw PdlMottatDataException("Fødselsår finnes ikke i respons fra pdl")
+            else -> foedsel.avklarFoedsel()?.foedselsaar
+                ?: throw PdlMottatDataException("Fødselsår finnes ikke i respons fra pdl")
         }
 }
 
