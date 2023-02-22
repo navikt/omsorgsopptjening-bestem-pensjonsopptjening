@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.PersonFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PersonFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.finnOmsorgsArbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.getUtbetalinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
@@ -44,7 +44,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
 
         assertEquals(
             expectedAmountOfMoths,
-            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1)).getUtbetalinger(2020)
+            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1, emptyList(), 56)).getUtbetalinger(2020)
         )
     }
 
@@ -79,7 +79,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
 
         assertEquals(
             expectedAmountOfMoths,
-            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1)).getUtbetalinger(2020)
+            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1, emptyList(), 56)).getUtbetalinger(2020)
         )
     }
 
@@ -111,7 +111,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
 
         assertEquals(
             expectedAmountOfMoths,
-            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1)).getUtbetalinger(2020)
+            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1, emptyList(), 56)).getUtbetalinger(2020)
         )
     }
 
@@ -135,7 +135,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
 
         assertEquals(
             0,
-            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1)).getUtbetalinger(2020)
+            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1, emptyList(), 56)).getUtbetalinger(2020)
         )
     }
 
@@ -169,7 +169,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
 
         assertEquals(
             expectedAmountOfMoths,
-            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1)).getUtbetalinger(2020)
+            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1, emptyList(), 56)).getUtbetalinger(2020)
         )
     }
 
@@ -203,7 +203,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
 
         assertEquals(
             expectedAmountOfMoths,
-            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1)).getUtbetalinger(2020)
+            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1, emptyList(), 56)).getUtbetalinger(2020)
         )
     }
 
@@ -215,7 +215,7 @@ internal class OmsorgsArbeidsUtbetalingerTestSak {
 
         assertEquals(
             0,
-            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1)).getUtbetalinger(2020)
+            omsorgsArbeidSnapshot.finnOmsorgsArbeid(PersonFactory.createPerson(FNR_1, emptyList(), 56)).getUtbetalinger(2020)
         )
     }
 

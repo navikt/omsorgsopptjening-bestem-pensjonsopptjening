@@ -14,7 +14,8 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
 
         return Person(
             pdlPerson.gjeldendeIdent(),
-            pdlPerson.historisk()
+            pdlPerson.historisk(),
+            pdlPerson.
         )
     }
 
