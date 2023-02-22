@@ -29,6 +29,9 @@ spec:
         databases:
           - name: omsorgsopptjeningdb
             envVarPrefix: DATABASE
+  azure:
+    application:
+      enabled: true
   secureLogs:
     enabled: true
   image: {{ image }}
