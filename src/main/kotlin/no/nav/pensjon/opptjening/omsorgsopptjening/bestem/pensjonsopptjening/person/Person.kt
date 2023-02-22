@@ -6,7 +6,7 @@ class Person(
     val fodselsAr: Int
 ) {
 
-    private val alleFnr = historiskeFnr + gjeldendeFnr
+    val alleFnr = historiskeFnr + gjeldendeFnr
 
     infix fun erSammePerson(annenPerson: Person) = (annenPerson.alleFnr intersect alleFnr).isNotEmpty()
 

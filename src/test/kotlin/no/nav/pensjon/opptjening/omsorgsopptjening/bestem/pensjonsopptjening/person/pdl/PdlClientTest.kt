@@ -42,7 +42,7 @@ internal class PdlClientTest {
                 WireMock.aResponse()
                     .withStatus(200)
                     .withHeader("Content-Type", "application/json")
-                    .withBodyFile("folkeregisteridentifikator.json")
+                    .withBodyFile("fnr_1freg_bruk.json")
             )
         )
 
@@ -58,7 +58,7 @@ internal class PdlClientTest {
                 WireMock.aResponse()
                     .withStatus(200)
                     .withHeader("Content-Type", "application/json")
-                    .withBodyFile("folkeregisteridentifikator.json")
+                    .withBodyFile("fnr_1freg_bruk.json")
             )
         )
 
@@ -74,7 +74,7 @@ internal class PdlClientTest {
                 WireMock.aResponse()
                     .withStatus(200)
                     .withHeader("Content-Type", "application/json")
-                    .withBodyFile("folkeregisteridentifikator.json")
+                    .withBodyFile("fnr_1freg_bruk.json")
             )
         )
 
@@ -100,7 +100,7 @@ internal class PdlClientTest {
             WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
                 WireMock.aResponse()
                     .withHeader("Content-Type", "application/json")
-                    .withBodyFile("folkeregisteridentifikator.json")
+                    .withBodyFile("fnr_1freg_bruk.json")
             )
         )
 
