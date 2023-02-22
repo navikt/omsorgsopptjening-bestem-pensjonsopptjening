@@ -19,4 +19,4 @@ private fun sisteEndringstidspunktOrNull(metadata: Metadata, fregMetadata: Folke
         else -> metadata.endringer.map { it.registrert }.maxByOrNull { it }
     }
 
-private infix fun Metadata.harMaster(master: String) = master.uppercase() == master
+private infix fun Metadata.harMaster(antattMaster: String) = master.uppercase() == antattMaster
