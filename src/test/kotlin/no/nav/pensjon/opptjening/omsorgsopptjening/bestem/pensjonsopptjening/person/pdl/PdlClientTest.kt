@@ -112,7 +112,7 @@ internal class PdlClientTest {
     fun `Given a bad request when getting person then retry 3 times before give up`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(401)))
         assertThrows<RestClientException> { pdlService.hentPerson(FNR) }
-        wiremock.verify(3, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+        wiremock.verify(4, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
 
     @Test

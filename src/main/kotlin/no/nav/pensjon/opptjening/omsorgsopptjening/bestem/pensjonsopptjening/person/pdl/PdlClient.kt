@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
+import java.time.LocalTime
 
 @Component
 class PdlClient(
@@ -14,10 +15,12 @@ class PdlClient(
 ) {
 
     @Retryable(
+        maxAttempts = 4,
         value = [RestClientException::class, PdlException::class],
-        backoff = Backoff(delay = 1000L, maxDelay = 170000L, multiplier = 3.0)
+        backoff = Backoff(delay = 1500L, maxDelay = 30000L, multiplier = 2.5)
     )
     fun hentPerson(graphqlQuery: String, fnr: String): PdlResponse? {
+        println("Henter person: ${LocalTime.now()}")
         val response = restTemplate.postForEntity(
             pdlUrl,
             PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
