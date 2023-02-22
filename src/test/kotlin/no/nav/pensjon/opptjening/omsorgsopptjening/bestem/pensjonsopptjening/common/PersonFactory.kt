@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 
 class PersonFactory {
     companion object {
-        fun createPerson(gjeldendeFnr: String, historiskeFnr: List<String> = listOf(), fodselsAr: Int) =
+        fun createPerson(gjeldendeFnr: String, fodselsAr: Int,historiskeFnr: List<String> = listOf()) =
             Person(
                 gjeldendeFnr = Fnr(gjeldendeFnr),
                 historiskeFnr = historiskeFnr.map { Fnr(it) }.toSet(),

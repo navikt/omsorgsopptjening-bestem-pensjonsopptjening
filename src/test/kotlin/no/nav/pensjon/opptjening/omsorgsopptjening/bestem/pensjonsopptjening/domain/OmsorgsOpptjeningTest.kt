@@ -25,7 +25,7 @@ internal class OmsorgsOpptjeningTest {
             )
         )
 
-        val person = PersonFactory.createPerson(FNR_1, listOf())
+        val person = PersonFactory.createPerson(FNR_1, 1990)
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
@@ -46,7 +46,7 @@ internal class OmsorgsOpptjeningTest {
             )
         )
 
-        val person = PersonFactory.createPerson(FNR_1, listOf())
+        val person = PersonFactory.createPerson(FNR_1, 1990)
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 

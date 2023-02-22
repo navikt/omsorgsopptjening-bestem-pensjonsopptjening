@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class PdlResponse(val data: PdlData, private val errors: List<PdlError>? = null) {
     val error: PdlError? = errors?.firstOrNull()
@@ -29,9 +30,9 @@ data class Foedsel(
 
 data class Metadata(val historisk: Boolean, val master: String, val endringer: List<Endring> = emptyList())
 
-data class Folkeregistermetadata(val ajourholdstidspunkt: LocalDate? = null)
+data class Folkeregistermetadata(val ajourholdstidspunkt: LocalDateTime? = null)
 
-data class Endring(val registrert: LocalDate)
+data class Endring(val registrert: LocalDateTime)
 
 enum class Status { I_BRUK, OPPHOERT }
 

@@ -15,7 +15,7 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         return Person(
             pdlPerson.gjeldendeIdent(),
             pdlPerson.historisk(),
-            pdlPerson.
+            pdlPerson.foedselsAr()
         )
     }
 
@@ -25,9 +25,18 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         .map { Fnr(it.identifikasjonsnummer) }
         .toSet()
 
-    private fun PdlPerson.gjeldendeIdent() = Fnr(folkeregisteridentifikator.first { it.status == Status.I_BRUK }.identifikasjonsnummer)
+    private fun PdlPerson.gjeldendeIdent() =
+        Fnr(folkeregisteridentifikator.first { it.status == Status.I_BRUK }.identifikasjonsnummer)
+
+    private fun PdlPerson.foedselsAr(): Int =
+        when (foedsel.size) {
+            1 -> foedsel.first().foedselsaar
+            else -> foedsel.avklarFoedsel()?.foedselsaar ?: throw PdlMottatDataException("Fødselsår finnes ikke i respons fra pdl")
+        }
 }
 
-class PdlException(pdlError: PdlError?) : RuntimeException(pdlError?.message ?: "Unknown error from PDL"){
+class PdlException(pdlError: PdlError?) : RuntimeException(pdlError?.message ?: "Unknown error from PDL") {
     val code: PdlErrorCode? = pdlError?.extensions?.code
 }
+
+class PdlMottatDataException(message: String) : RuntimeException(message)
