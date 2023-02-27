@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val jacksonVersion = "2.14.1"
 val logbackEncoderVersion = "7.2"
 val postgresqlVersion = "42.5.1"
+val flywayCoreVersion = "9.11.0"
 val testcontainersVersion = "1.17.6"
 
 plugins {
@@ -47,6 +48,7 @@ dependencies {
 
     // DB
     implementation("org.postgresql:postgresql:$postgresqlVersion")
+    implementation("org.flywaydb:flyway-core:$flywayCoreVersion")
 
     testImplementation("org.springframework.kafka:spring-kafka-test:3.0.2")
     testImplementation(kotlin("test"))
