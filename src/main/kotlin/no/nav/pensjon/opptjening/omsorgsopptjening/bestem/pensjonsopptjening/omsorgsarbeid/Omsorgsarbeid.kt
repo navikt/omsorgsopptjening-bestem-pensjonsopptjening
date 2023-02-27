@@ -10,7 +10,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 fun OmsorgsarbeidsSnapshot.finnOmsorgsArbeid(person: Person): List<OmsorgsArbeid> =
     omsorgsArbeidSaker.flatMap { sak ->
         sak.omsorgsarbedUtfort.filter { omsorgsArbeid ->
-            person.identifiseresAv(Fnr(omsorgsArbeid.omsorgsyter.fnr))
+            person.identifiseresAv(Fnr(fnr = omsorgsArbeid.omsorgsyter.fnr))
         }
     }
 

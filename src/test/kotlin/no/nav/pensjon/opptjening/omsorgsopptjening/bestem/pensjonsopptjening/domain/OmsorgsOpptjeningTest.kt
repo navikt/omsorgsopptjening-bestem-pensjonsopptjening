@@ -29,7 +29,7 @@ internal class OmsorgsOpptjeningTest {
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
-        assertTrue(opptjening.person identifiseresAv Fnr(FNR_1))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
         assertTrue(opptjening.invilget)
     }
 
@@ -50,7 +50,7 @@ internal class OmsorgsOpptjeningTest {
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
-        assertTrue(opptjening.person identifiseresAv Fnr(FNR_1))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
         assertFalse(opptjening.invilget)
     }
 

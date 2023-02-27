@@ -12,23 +12,24 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
 
         val pdlPerson = pdlResponse?.data?.hentPerson ?: throw PdlException(pdlResponse?.error)
 
+        val alleFnr =  pdlPerson.historisk() + pdlPerson.gjeldendeIdent()
+
         return Person(
-            pdlPerson.gjeldendeIdent(),
-            pdlPerson.historisk(),
-            pdlPerson.foedselsAr()
+            alleFnr = alleFnr,
+            fodselsAr = pdlPerson.foedselsAr()
         )
     }
 
     private fun PdlPerson.historisk() = folkeregisteridentifikator
         .filter { it.status == Status.OPPHOERT }
         .distinctBy { it.identifikasjonsnummer }
-        .map { Fnr(it.identifikasjonsnummer) }
+        .map { Fnr(fnr = it.identifikasjonsnummer) }
         .toSet()
 
     private fun PdlPerson.gjeldendeIdent() =
         Fnr(
-            folkeregisteridentifikator.firstOrNull { it.status == Status.I_BRUK }?.identifikasjonsnummer
-                ?: throw PdlMottatDataException("Fnr i bruk finnes ikke")
+            fnr = folkeregisteridentifikator.firstOrNull { it.status == Status.I_BRUK }?.identifikasjonsnummer ?: throw PdlMottatDataException("Fnr i bruk finnes ikke"),
+            gjeldende = true
         )
 
     private fun PdlPerson.foedselsAr(): Int =

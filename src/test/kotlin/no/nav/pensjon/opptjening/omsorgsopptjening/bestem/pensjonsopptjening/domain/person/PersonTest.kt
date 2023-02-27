@@ -12,7 +12,7 @@ internal class PersonTest {
     @Test
     fun `Given fnr matches gjeldende fnr When calling isIdentifiedBy Then return true`() {
         val person: Person = PersonFactory.createPerson("11111111111", 1990)
-        val fnr = Fnr("11111111111")
+        val fnr = Fnr(fnr = "11111111111")
 
         assertTrue(person identifiseresAv fnr)
     }
@@ -24,7 +24,7 @@ internal class PersonTest {
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
         )
-        val fnr = Fnr("11111111111")
+        val fnr = Fnr(fnr = "11111111111")
 
         assertTrue(person identifiseresAv fnr)
     }
@@ -36,7 +36,7 @@ internal class PersonTest {
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
         )
-        val fnr = Fnr("2222222222")
+        val fnr = Fnr(fnr = "2222222222")
 
         assertTrue(person identifiseresAv fnr)
     }
@@ -44,7 +44,7 @@ internal class PersonTest {
     @Test
     fun `Given fnr does not matches gjeldende fnr When calling isIdentifiedBy Then return false`() {
         val person: Person = PersonFactory.createPerson("11111111111", 1988)
-        val fnr = Fnr("33333333333")
+        val fnr = Fnr(fnr = "33333333333")
 
         assertFalse(person identifiseresAv fnr)
     }
@@ -56,7 +56,7 @@ internal class PersonTest {
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
         )
-        val fnr = Fnr("4444444444")
+        val fnr = Fnr(fnr = "4444444444")
 
         assertFalse(person identifiseresAv fnr)
     }

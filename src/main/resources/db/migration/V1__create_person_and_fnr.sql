@@ -1,5 +1,5 @@
 CREATE SEQUENCE person_seq INCREMENT 50;
-CREATE TABLE Person
+CREATE TABLE PERSON
 (
     PERSON_ID     BIGINT primary key       not null,
     FODSELSAR     VARCHAR(11)              not null,
