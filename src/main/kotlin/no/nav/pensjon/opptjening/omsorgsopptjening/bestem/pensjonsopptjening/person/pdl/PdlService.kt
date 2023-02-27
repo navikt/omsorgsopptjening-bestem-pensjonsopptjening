@@ -12,7 +12,7 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
 
         val pdlPerson = pdlResponse?.data?.hentPerson ?: throw PdlException(pdlResponse?.error)
 
-        val alleFnr =  pdlPerson.historisk() + pdlPerson.gjeldendeIdent()
+        val alleFnr =  (pdlPerson.historisk() - pdlPerson.gjeldendeIdent()) +  pdlPerson.gjeldendeIdent()
 
         return Person(
             alleFnr = alleFnr,

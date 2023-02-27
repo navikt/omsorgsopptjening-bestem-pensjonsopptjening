@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class PdlResponse(val data: PdlData, private val errors: List<PdlError>? = null) {
