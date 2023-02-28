@@ -16,17 +16,23 @@ class FastsettOmsorgsOpptjening {
             val vilkarsResultat =
                 og(
                     Over16Ar().vilkarsVurder(
-                        PersonOgOmsorgsAr(person = person, omsorgsAr = snapshot.omsorgsAr)
+                        PersonOgOmsorgsAr(
+                            person = person,
+                            omsorgsAr = snapshot.omsorgsAr
+                        )
                     ),
                     Under70Ar().vilkarsVurder(
-                        PersonOgOmsorgsAr(person = person, omsorgsAr = snapshot.omsorgsAr)
+                        PersonOgOmsorgsAr(
+                            person = person,
+                            omsorgsAr = snapshot.omsorgsAr
+                        )
                     ),
                     HalvtArMedOmsorg().vilkarsVurder(
                         OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                             omsorgsArbeidsUtbetalinger = snapshot.finnOmsorgsArbeidsUtbetalinger(person),
                             omsorgsAr = snapshot.omsorgsAr
                         )
-                    ),
+                    )
                 )
 
             return OmsorgsOpptjening(

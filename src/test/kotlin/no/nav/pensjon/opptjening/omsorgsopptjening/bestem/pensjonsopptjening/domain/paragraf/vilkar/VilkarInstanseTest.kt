@@ -21,7 +21,7 @@ internal class VilkarInstanseTest {
         moneder: Int, erMedlem: Boolean, forventetUtfall: Boolean
     ) {
         val ogRegel = og(
-            minstSeksMonederVilkar.vilkarsVurder(inputVerdi = moneder),
+            minstSeksMonederVilkar.vilkarsVurder(grunnlag = moneder),
             erFolketrygdetVilkar.vilkarsVurder(erMedlem)
         )
 
@@ -39,7 +39,7 @@ internal class VilkarInstanseTest {
         moneder: Int, erMedlem: Boolean, forventetUtfall: Boolean
     ) {
         val ellerRegel = eller(
-            minstSeksMonederVilkar.vilkarsVurder(inputVerdi = moneder),
+            minstSeksMonederVilkar.vilkarsVurder(grunnlag = moneder),
             erFolketrygdetVilkar.vilkarsVurder(erMedlem)
         )
 

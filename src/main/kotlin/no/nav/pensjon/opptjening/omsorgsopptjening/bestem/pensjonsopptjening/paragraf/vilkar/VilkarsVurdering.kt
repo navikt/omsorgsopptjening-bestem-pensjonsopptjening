@@ -1,22 +1,22 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar
 
-open class VilkarsVurdering<InputType : Any>(
-    private val vilkar: Vilkar<InputType>,
-    private val inputVerdi: InputType
+open class VilkarsVurdering<Grunnlag : Any>(
+    private val vilkar: Vilkar<Grunnlag>,
+    private val grunnlag: Grunnlag
 ) {
 
-    open fun utførVilkarsVurdering(): VilkarsResultat<InputType> {
+    open fun utførVilkarsVurdering(): VilkarsResultat<Grunnlag> {
         return VilkarsResultat(
-            oppFyllerRegel = vilkar.oppfyllerRegler(inputVerdi),
-            inputVerdi = inputVerdi,
+            oppFyllerRegel = vilkar.oppfyllerRegler(grunnlag),
+            grunnlag = grunnlag,
             vilkar = vilkar
         )
     }
 
 }
 
-data class VilkarsResultat<InputType : Any>(
+data class VilkarsResultat<Grunnlag : Any>(
     val oppFyllerRegel: Boolean,
-    val inputVerdi: InputType,
-    val vilkar: Vilkar<InputType>,
+    val grunnlag: Grunnlag,
+    val vilkar: Vilkar<Grunnlag>,
 )

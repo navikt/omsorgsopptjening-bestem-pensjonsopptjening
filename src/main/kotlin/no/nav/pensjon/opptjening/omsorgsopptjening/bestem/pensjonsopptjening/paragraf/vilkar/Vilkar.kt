@@ -1,16 +1,13 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar
 
 
-open class Vilkar<Input : Any>(
+open class Vilkar<Grunnlag : Any>(
     val regelInformasjon: RegelInformasjon,
-    val oppfyllerRegler: (Input) -> Boolean,
+    val oppfyllerRegler: (Grunnlag) -> Boolean,
 ) {
-    fun vilkarsVurder(inputVerdi: Input) = VilkarsVurdering(
-        vilkar = this,
-        inputVerdi = inputVerdi
-    )
+    fun vilkarsVurder(grunnlag: Grunnlag) = VilkarsVurdering(vilkar = this, grunnlag = grunnlag)
 
-    fun utførVilkarsVurdering(input: Input) = VilkarsVurdering(this, input).utførVilkarsVurdering()
+    fun utførVilkarsVurdering(input: Grunnlag) = VilkarsVurdering(this, input).utførVilkarsVurdering()
 }
 
 data class RegelInformasjon(
