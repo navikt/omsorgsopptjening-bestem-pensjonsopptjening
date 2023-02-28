@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.finnOmsorgsArbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.finnOmsorgsArbeidsUtbetalinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.getUtbetalinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HalvtArMedOmsorg
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.Over16Ar
@@ -22,7 +22,7 @@ class FastsettOmsorgsOpptjening {
                         PersonOgOmsorgsAr(person = person, omsorgsAr = snapshot.omsorgsAr)
                     ),
                     HalvtArMedOmsorg().vilkarsVurder(
-                        snapshot.finnOmsorgsArbeid(person).getUtbetalinger(snapshot.omsorgsAr)
+                        snapshot.finnOmsorgsArbeidsUtbetalinger(person).getUtbetalinger(snapshot.omsorgsAr)
                     ),
                 )
 
