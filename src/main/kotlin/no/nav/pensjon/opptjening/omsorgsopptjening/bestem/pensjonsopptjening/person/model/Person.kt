@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model
 
 import jakarta.persistence.*
 import java.time.LocalDateTime
