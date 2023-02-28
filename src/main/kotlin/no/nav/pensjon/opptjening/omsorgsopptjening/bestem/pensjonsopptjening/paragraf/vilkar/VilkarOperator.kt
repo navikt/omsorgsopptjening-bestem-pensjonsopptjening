@@ -3,9 +3,9 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 
 class Og<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
     regelInformasjon = RegelInformasjon(
-        beskrivelse = "Alle brukte regler må være de sanne.",
-        begrunnelseForInnvilgelse = "Alle regler var sanne.",
-        begrunnesleForAvslag = "Alle regler var ikke sanne."
+        beskrivelse = "Alle vilkår må være sanne.",
+        begrunnelseForInnvilgelse = "Alle vilkår var sanne.",
+        begrunnesleForAvslag = "Alle vilkår var ikke sanne."
     ),
     oppfyllerRegler = { vilkarsVurdering -> vilkarsVurdering.all { it.utførVilkarsVurdering().oppFyllerRegel } }
 ) {
@@ -17,9 +17,9 @@ class Og<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
 
 class Eller<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
     regelInformasjon = RegelInformasjon(
-        beskrivelse = "Alle brukte regler må være de sanne.",
-        begrunnelseForInnvilgelse = "Alle regler var sanne.",
-        begrunnesleForAvslag = "Alle regler var ikke sanne."
+        beskrivelse = "Et av vilkårene må være sanne.",
+        begrunnelseForInnvilgelse = "Et av vilkårene var sanne.",
+        begrunnesleForAvslag = "Ingen av vilkårene var sanne."
     ),
     oppfyllerRegler = { vilkarsVurdering -> vilkarsVurdering.any { it.utførVilkarsVurdering().oppFyllerRegel } }
 ) {
