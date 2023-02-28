@@ -67,7 +67,7 @@ internal class PdlClientTest {
 
         pdlService.hentPerson(FNR)
 
-        wiremock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)).withRequestBody(containing("$FNR")))
+        wiremock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)).withRequestBody(containing(FNR)))
     }
 
     @Test

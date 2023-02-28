@@ -1,14 +1,13 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Fnr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 
 class PersonFactory {
     companion object {
-        fun createPerson(gjeldendeFnr: String, fodselsAr: Int,historiskeFnr: List<String> = listOf()) =
+        fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
             Person(
-                gjeldendeFnr = Fnr(gjeldendeFnr),
-                historiskeFnr = historiskeFnr.map { Fnr(it) }.toSet(),
+                alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toSet() + Fnr(fnr = gjeldendeFnr, gjeldende = true),
                 fodselsAr = fodselsAr
             )
     }

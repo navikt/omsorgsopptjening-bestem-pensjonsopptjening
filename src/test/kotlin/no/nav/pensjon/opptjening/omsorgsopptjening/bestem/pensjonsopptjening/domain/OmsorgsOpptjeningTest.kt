@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.do
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PersonFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.FastsettOmsorgsOpptjening
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.Fnr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -29,7 +29,7 @@ internal class OmsorgsOpptjeningTest {
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
-        assertTrue(opptjening.person identifiseresAv Fnr(FNR_1))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
         assertTrue(opptjening.invilget)
     }
 
@@ -50,7 +50,7 @@ internal class OmsorgsOpptjeningTest {
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
-        assertTrue(opptjening.person identifiseresAv Fnr(FNR_1))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
         assertFalse(opptjening.invilget)
     }
 

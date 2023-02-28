@@ -1,15 +1,14 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class PdlResponse(val data: PdlData, private val errors: List<PdlError>? = null) {
     val error: PdlError? = errors?.firstOrNull()
 }
 
-data class PdlData(val hentPerson: PdlPerson?)
+data class PdlData(val hentPerson: HentPersonQueryResponse?)
 
-data class PdlPerson(
+data class HentPersonQueryResponse(
     val folkeregisteridentifikator: List<Folkeregisteridentifikator>,
     val foedsel: List<Foedsel>,
 )
