@@ -1,10 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.finnOmsorgsArbeidsUtbetalinger
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.getUtbetalinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HalvtArMedOmsorg
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.Over16Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.Under70Ar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.OmsorgsArbeidsUtbetalingerOgOmsorgsAr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.PersonOgOmsorgsAr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Og.Companion.og
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
@@ -22,7 +22,10 @@ class FastsettOmsorgsOpptjening {
                         PersonOgOmsorgsAr(person = person, omsorgsAr = snapshot.omsorgsAr)
                     ),
                     HalvtArMedOmsorg().vilkarsVurder(
-                        snapshot.finnOmsorgsArbeidsUtbetalinger(person).getUtbetalinger(snapshot.omsorgsAr)
+                        OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
+                            omsorgsArbeidsUtbetalinger = snapshot.finnOmsorgsArbeidsUtbetalinger(person),
+                            omsorgsAr = snapshot.omsorgsAr
+                        )
                     ),
                 )
 
