@@ -20,10 +20,5 @@ class PersonService(
             alleFnr = ((pdlPerson.historiskeFnr - pdlPerson.gjeldendeFnr).map { Fnr(fnr = it) } +  Fnr(fnr = pdlPerson.gjeldendeFnr , gjeldende = true)).toSet(),
             fodselsAr = pdlPerson.fodselsAr
         )
-        /*
-        val pdlPerson = pdlService.hentPerson(fnr)
-        return personRepository.updatePerson(pdlPerson)
-
-         */
     }
 }

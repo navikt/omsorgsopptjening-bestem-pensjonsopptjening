@@ -10,6 +10,9 @@ class FnrRepository(private val jpaRepository: FnrJpaRepository) {
 
     fun findPersonByFnr(fnr: String) = jpaRepository.findByFnr(fnr).firstOrNull()?.person
 
+    fun findByFnr(fnr: String) = jpaRepository.findByFnr(fnr).firstOrNull()
+
+    fun findByFnrIn(fnrs: List<String>) = jpaRepository.findByFnrIn(fnrs)
 
 }
 
@@ -19,6 +22,6 @@ interface FnrJpaRepository : JpaRepository<Fnr, Long> {
 
     fun findByFnr(fnr: String): List<Fnr>
 
-    fun findByFnrIn(fnrs: List<String>) : List<Fnr>
+    fun findByFnrIn(fnrs: List<String>): List<Fnr>
 
 }
