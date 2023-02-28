@@ -5,7 +5,6 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.OmsorgsarbeidListenerTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -23,12 +22,12 @@ internal class PdlServiceTest {
     @Autowired
     lateinit var pdlService: PdlService
 
+    private val dbContainer = PostgresqlTestContainer.instance
+
     @BeforeEach
     fun resetWiremock() {
         wiremock.resetAll()
     }
-
-    private val dbContainer = PostgresqlTestContainer.instance
 
     @Test
     fun `Et fnr i bruk - Ett fnr i person`() {
@@ -39,10 +38,9 @@ internal class PdlServiceTest {
                     .withBodyFile("fnr_1bruk.json")
             )
         )
-        val person: Person = pdlService.hentPerson(FNR)
-        assertEquals(1, person.alleFnr.size)
-        assertEquals("12345678910", person.alleFnr.first().fnr)
-        assertEquals("12345678910", person.gjeldendeFnr.fnr)
+        val person: PdlPerson = pdlService.hentPerson(FNR)
+        assertEquals(0, person.historiskeFnr.size)
+        assertEquals("12345678910", person.gjeldendeFnr)
     }
 
     @Test
@@ -54,10 +52,10 @@ internal class PdlServiceTest {
                     .withBodyFile("fnr_samme_fnr_gjeldende_og_historisk.json")
             )
         )
-        val person: Person = pdlService.hentPerson(FNR)
-        assertEquals(1, person.alleFnr.size)
-        assertEquals("04010012797", person.alleFnr.first().fnr)
-        assertEquals("04010012797", person.gjeldendeFnr.fnr)
+        val person: PdlPerson = pdlService.hentPerson(FNR)
+        assertEquals(1, person.historiskeFnr.size)
+        assertEquals("04010012797", person.historiskeFnr.first())
+        assertEquals("04010012797", person.gjeldendeFnr)
     }
 
 
@@ -108,7 +106,7 @@ internal class PdlServiceTest {
                     .withBodyFile("fodsel_1freg_0pdl.json")
             )
         )
-        val person: Person = pdlService.hentPerson(FNR)
+        val person: PdlPerson = pdlService.hentPerson(FNR)
         assertEquals(1992, person.fodselsAr)
     }
 
