@@ -11,7 +11,7 @@ class Og<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
 ) {
 
     companion object {
-        fun og(vararg vilkar: VilkarsVurdering<*>) = Og<VilkarsVurdering<*>>().utførVilkarsVurdering(vilkar.toList())
+        fun og(vararg vilkar: VilkarsVurdering<*>) = Og<VilkarsVurdering<*>>().utforVilkarsVurdering(vilkar.toList())
     }
 }
 
@@ -25,6 +25,6 @@ class Eller<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
 ) {
 
     companion object {
-        fun eller(vararg vilkar: VilkarsVurdering<*>) = Eller<VilkarsVurdering<*>>().utførVilkarsVurdering(vilkar.toList())
+        fun eller(vararg vilkar: VilkarsVurdering<*>) = Eller<VilkarsVurdering<*>>().utforVilkarsVurdering(vilkar.toList())
     }
 }

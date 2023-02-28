@@ -7,13 +7,16 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import java.time.Month
 import java.time.YearMonth
+import kotlin.test.assertEquals
 
 internal class OmsorgsOpptjeningTest {
 
     @Test
-    fun `Given omsorgs arbeid for six months When calling personMedInvilgetOmsorgsopptjening Then return person`() {
+    fun `Given omsorgs arbeid for six months When calling When calling fastsettOmsorgsOpptjening Then return opptjening invilget true`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsYter = FNR_1,
@@ -34,7 +37,7 @@ internal class OmsorgsOpptjeningTest {
     }
 
     @Test
-    fun `Given omsorgs arbeid for less than six months When calling personMedInvilgetOmsorgsopptjening Then return null`() {
+    fun `Given omsorgs arbeid for less than six months When calling fastsettOmsorgsOpptjening Then return opptjening invilget false`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsYter = FNR_1,
@@ -52,6 +55,37 @@ internal class OmsorgsOpptjeningTest {
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
         assertFalse(opptjening.invilget)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "2000, 2016, false",
+        "2000, 2017, true",
+        "2000, 2069, true",
+        "2000, 2070, false",
+    )
+    fun `Given person over 16 and under 70 When calling fastsettOmsorgsOpptjening Then return opptjening invilget true`(
+        fodselsAr: Int,
+        omsorgsAr: Int,
+        expectedInvilgetResult: Boolean
+    ) {
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
+            omsorgsAr = omsorgsAr,
+            omsorgsYter = FNR_1,
+            utbetalingsPeriode = listOf(
+                creatUtbetalingsPeriode(
+                    fom = YearMonth.of(omsorgsAr, Month.JANUARY),
+                    tom = YearMonth.of(omsorgsAr, Month.JUNE),
+                )
+            )
+        )
+
+        val person = PersonFactory.createPerson(FNR_1, fodselsAr)
+
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
+
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
+        assertEquals(expectedInvilgetResult, opptjening.invilget)
     }
 
 

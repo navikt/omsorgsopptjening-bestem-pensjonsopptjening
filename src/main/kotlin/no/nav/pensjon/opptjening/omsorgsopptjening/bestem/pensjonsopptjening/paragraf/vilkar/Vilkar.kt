@@ -10,7 +10,7 @@ open class Vilkar<Input : Any>(
         inputVerdi = inputVerdi
     )
 
-    fun utførVilkarsVurdering(input: Input) =  VilkarsVurdering(this, input).utførVilkarsVurdering()
+    fun utførVilkarsVurdering(input: Input) = VilkarsVurdering(this, input).utførVilkarsVurdering()
 }
 
 data class RegelInformasjon(
