@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PersonFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.FastsettOmsorgsOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
@@ -28,7 +27,7 @@ internal class OmsorgsOpptjeningTest {
             )
         )
 
-        val person = PersonFactory.createPerson(FNR_1, 1990)
+        val person = createPerson(FNR_1, 1990)
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
@@ -49,7 +48,7 @@ internal class OmsorgsOpptjeningTest {
             )
         )
 
-        val person = PersonFactory.createPerson(FNR_1, 1990)
+        val person = createPerson(FNR_1, 1990)
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
@@ -80,7 +79,7 @@ internal class OmsorgsOpptjeningTest {
             )
         )
 
-        val person = PersonFactory.createPerson(FNR_1, fodselsAr)
+        val person = createPerson(FNR_1, fodselsAr)
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
@@ -114,6 +113,12 @@ internal class OmsorgsOpptjeningTest {
         )
 
     private fun creatUtbetalingsPeriode(fom: YearMonth, tom: YearMonth) = OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom)
+
+    private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
+        no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
+            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toSet() + Fnr(fnr = gjeldendeFnr, gjeldende = true),
+            fodselsAr = fodselsAr
+        )
 
     companion object {
         const val FNR_1: String = "12345678902"

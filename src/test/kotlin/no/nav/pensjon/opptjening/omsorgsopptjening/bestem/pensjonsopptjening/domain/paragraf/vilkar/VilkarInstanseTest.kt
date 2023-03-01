@@ -48,8 +48,6 @@ internal class VilkarInstanseTest {
 
 
     companion object {
-
-
         val MINST_ET_HALVT_AR = fun(moneder: Int) = moneder >= 6
         val MÅ_VÆRE_FOLKETRYGDET = fun(erFolketrygdet: Boolean) = erFolketrygdet
 

@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain.person
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PersonFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -11,7 +10,7 @@ internal class PersonTest {
 
     @Test
     fun `Given fnr matches gjeldende fnr When calling isIdentifiedBy Then return true`() {
-        val person: Person = PersonFactory.createPerson("11111111111", 1990)
+        val person: Person = createPerson("11111111111", 1990)
         val fnr = Fnr(fnr = "11111111111")
 
         assertTrue(person identifiseresAv fnr)
@@ -19,7 +18,7 @@ internal class PersonTest {
 
     @Test
     fun `Given fnr matches gjeldende fnr and there exsists historiske fnr When calling isIdentifiedBy Then return true`() {
-        val person: Person = PersonFactory.createPerson(
+        val person: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
@@ -31,7 +30,7 @@ internal class PersonTest {
 
     @Test
     fun `Given fnr matches one historisk fnr When calling isIdentifiedBy Then return true`() {
-        val person: Person = PersonFactory.createPerson(
+        val person: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
@@ -43,7 +42,7 @@ internal class PersonTest {
 
     @Test
     fun `Given fnr does not matches gjeldende fnr When calling isIdentifiedBy Then return false`() {
-        val person: Person = PersonFactory.createPerson("11111111111", 1988)
+        val person: Person = createPerson("11111111111", 1988)
         val fnr = Fnr(fnr = "33333333333")
 
         assertFalse(person identifiseresAv fnr)
@@ -51,7 +50,7 @@ internal class PersonTest {
 
     @Test
     fun `Given fnr does not matches gjeldende fnr or historiske fnr When calling isIdentifiedBy Then return false`() {
-        val person: Person = PersonFactory.createPerson(
+        val person: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
@@ -63,13 +62,13 @@ internal class PersonTest {
 
     @Test
     fun `Given persons have identical fnrs When calling isSamePerson Then return true`(){
-        val person1: Person = PersonFactory.createPerson(
+        val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
         )
 
-        val person2: Person = PersonFactory.createPerson(
+        val person2: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
@@ -80,13 +79,13 @@ internal class PersonTest {
 
     @Test
     fun `Given gjeldendeFnr intersect with historiskeFnr of another person When calling isSamePerson Then return true`(){
-        val person1: Person = PersonFactory.createPerson(
+        val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
         )
 
-        val person2: Person = PersonFactory.createPerson(
+        val person2: Person = createPerson(
             gjeldendeFnr = "444444444444",
             historiskeFnr = listOf("11111111111"),
             fodselsAr = 1988
@@ -97,13 +96,13 @@ internal class PersonTest {
 
     @Test
     fun `Given gjeldendeFnr intersects When calling isSamePerson Then return true`(){
-        val person1: Person = PersonFactory.createPerson(
+        val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
         )
 
-        val person2: Person = PersonFactory.createPerson(
+        val person2: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("444444444444"),
             fodselsAr = 1988
@@ -114,13 +113,13 @@ internal class PersonTest {
 
     @Test
     fun `Given one historisk fnr intersects When calling isSamePerson Then return true`(){
-        val person1: Person = PersonFactory.createPerson(
+        val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
         )
 
-        val person2: Person = PersonFactory.createPerson(
+        val person2: Person = createPerson(
             gjeldendeFnr = "444444444444",
             historiskeFnr = listOf("5555555555", "3333333333"),
             fodselsAr = 1988
@@ -131,13 +130,13 @@ internal class PersonTest {
 
     @Test
     fun `Given no fnrs intersect When calling isSamePerson Then return false`(){
-        val person1: Person = PersonFactory.createPerson(
+        val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
             fodselsAr = 1988
         )
 
-        val person2: Person = PersonFactory.createPerson(
+        val person2: Person = createPerson(
             gjeldendeFnr = "444444444444",
             historiskeFnr = listOf("5555555555", "66666666666"),
             fodselsAr = 1988
@@ -145,4 +144,10 @@ internal class PersonTest {
 
         assertFalse(person1 erSammePerson person2)
     }
+
+    private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
+        Person(
+            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toSet() + Fnr(fnr = gjeldendeFnr, gjeldende = true),
+            fodselsAr = fodselsAr
+        )
 }
