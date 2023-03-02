@@ -41,7 +41,6 @@ internal class OmsorgsarbeidListenerTest {
 
     private val dbContainer = PostgresqlTestContainer.instance
 
-
     @BeforeEach
     fun resetWiremock() {
         wiremock.resetAll()
