@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HalvtArMedOmsorg
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.OmsorgsArbeidsUtbetalingerOgOmsorgsAr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeidsUtbetalinger
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -27,17 +26,14 @@ internal class HalvtArMedOmsorgTest {
         "2020-01, 2020-12, true",
     )
     fun `Given 6 months of omsorgsarbeid When conducting vilkars vurdering halvt ar med omsorg Then true`(
-        fom: String,
-        tom: String,
+        fom: YearMonth,
+        tom: YearMonth,
         expectedInvilget: Boolean
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(
-                        YearMonth.parse(fom),
-                        YearMonth.parse(tom)
-                    )
+                    OmsorgsArbeidsUtbetalinger(fom, tom)
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
@@ -61,17 +57,14 @@ internal class HalvtArMedOmsorgTest {
         "2020-07, 2021-01, true",
     )
     fun `Given 6 months of omsorgsarbeid When fom or tom overlap with omsorgsar Then halvt ar med omsorg is true`(
-        fom: String,
-        tom: String,
+        fom: YearMonth,
+        tom: YearMonth,
         expectedInvilget: Boolean
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(
-                        YearMonth.parse(fom),
-                        YearMonth.parse(tom)
-                    )
+                    OmsorgsArbeidsUtbetalinger(fom, tom)
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
@@ -86,16 +79,13 @@ internal class HalvtArMedOmsorgTest {
         "2021-01, 2021-06",
     )
     fun `Given fom and tom dont overlap with omsorgsAr Then halvt ar med omsorg is false`(
-        fom: String,
-        tom: String,
+        fom: YearMonth,
+        tom: YearMonth,
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(
-                        YearMonth.parse(fom),
-                        YearMonth.parse(tom)
-                    )
+                    OmsorgsArbeidsUtbetalinger(fom, tom)
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
@@ -119,17 +109,17 @@ internal class HalvtArMedOmsorgTest {
         "2019-01, 2020-02, 2020-10, 2021-12, false",
     )
     fun `Given 6 months of omsorgsarbeid When two utbetalings periodes Then halvt ar med omsorg is true`(
-        fom1: String,
-        tom1: String,
-        fom2: String,
-        tom2: String,
+        fom1: YearMonth,
+        tom1: YearMonth,
+        fom2: YearMonth,
+        tom2: YearMonth,
         expectedInvilget: Boolean
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(YearMonth.parse(fom1), YearMonth.parse(tom1)),
-                    OmsorgsArbeidsUtbetalinger(YearMonth.parse(fom2), YearMonth.parse(tom2))
+                    OmsorgsArbeidsUtbetalinger(fom1, tom1),
+                    OmsorgsArbeidsUtbetalinger(fom2, tom2)
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
@@ -148,20 +138,20 @@ internal class HalvtArMedOmsorgTest {
         "2012-01, 2012-03, 2019-01, 2019-12, 2021-01, 2021-01, false",
     )
     fun `Given 6 months of omsorgsarbeid When three utbetalings periodes Then halvt ar med omsorg is true`(
-        fom1: String,
-        tom1: String,
-        fom2: String,
-        tom2: String,
-        fom3: String,
-        tom3: String,
+        fom1: YearMonth,
+        tom1: YearMonth,
+        fom2: YearMonth,
+        tom2: YearMonth,
+        fom3: YearMonth,
+        tom3: YearMonth,
         expectedInvilget: Boolean
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(YearMonth.parse(fom1), YearMonth.parse(tom1)),
-                    OmsorgsArbeidsUtbetalinger(YearMonth.parse(fom2), YearMonth.parse(tom2)),
-                    OmsorgsArbeidsUtbetalinger(YearMonth.parse(fom3), YearMonth.parse(tom3))
+                    OmsorgsArbeidsUtbetalinger(fom1, tom1),
+                    OmsorgsArbeidsUtbetalinger(fom2, tom2),
+                    OmsorgsArbeidsUtbetalinger(fom3, tom3)
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
