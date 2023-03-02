@@ -1,19 +1,15 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.domain
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.FastsettOmsorgsOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.time.Month
 import java.time.YearMonth
-import kotlin.test.assertEquals
 
-internal class OmsorgsOpptjeningTest {
-
+internal class FastsettOmsorgsOpptjeningTest{
     @Test
     fun `Given omsorgs arbeid for six months When calling When calling fastsettOmsorgsOpptjening Then return opptjening invilget true`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
@@ -84,7 +80,7 @@ internal class OmsorgsOpptjeningTest {
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
-        assertEquals(expectedInvilgetResult, opptjening.invilget)
+        kotlin.test.assertEquals(expectedInvilgetResult, opptjening.invilget)
     }
 
 

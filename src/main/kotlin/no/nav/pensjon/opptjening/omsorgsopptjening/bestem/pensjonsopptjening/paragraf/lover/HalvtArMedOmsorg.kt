@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.getUtbetalinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.getAntallUtbetalingMoneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.OmsorgsArbeidsUtbetalingerOgOmsorgsAr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.RegelInformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
@@ -15,7 +15,7 @@ class HalvtArMedOmsorg : Vilkar<OmsorgsArbeidsUtbetalingerOgOmsorgsAr>(
 ) {
     companion object {
         val `Minst 6 måneder med omsorg` = fun(input: OmsorgsArbeidsUtbetalingerOgOmsorgsAr) =
-            input.omsorgsArbeidsUtbetalinger.getUtbetalinger(input.omsorgsAr) >= 6
+            input.omsorgsArbeidsUtbetalinger.getAntallUtbetalingMoneder(input.omsorgsAr) >= 6
     }
 }
 
