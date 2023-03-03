@@ -33,13 +33,13 @@ import kotlin.test.assertEquals
 @Import(KafkaIntegrationTestConfig::class, OmsorgsopptjeningMockListener::class)
 internal class OmsorgsarbeidListenerTest {
 
+    private val dbContainer = PostgresqlTestContainer.instance
+
     @Autowired
     lateinit var omsorgsarbeidProducer: KafkaTemplate<String, String>
 
     @Autowired
     lateinit var omsorgsopptjeingListener: OmsorgsopptjeningMockListener
-
-    private val dbContainer = PostgresqlTestContainer.instance
 
     @BeforeEach
     fun resetWiremock() {

@@ -19,7 +19,7 @@ class PersonService(
         val pdlPerson = pdlService.hentPerson(fnr)
 
         // Oppdaterer DB med historiske og gjeldende identer
-        personRepository.updatePerson(pdlPerson)
+        // personRepository.updatePerson(pdlPerson)
 
         return Person(
             alleFnr = ((pdlPerson.historiskeFnr - pdlPerson.gjeldendeFnr).map { Fnr(fnr = it) } +  Fnr(fnr = pdlPerson.gjeldendeFnr , gjeldende = true)).toSet(),
