@@ -15,11 +15,49 @@ class PersonRepository(
     val fnrRepository: FnrRepository
 ){
     fun updatePerson(pdlPerson:PdlPerson) {
+        validerPerson(pdlPerson)
+
+        val personIDb = findPerson(pdlPerson)
+
+        if(personIDb == null) {
+            opprettPersonIdb(pdlPerson)
+        } else {
+            personIDb.oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
+            personIDb.oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
+        }
+    }
+
+    private fun opprettPersonIdb(pdlPerson: PdlPerson) {
+        val gjeldendeFnr = Fnr(fnr = pdlPerson.gjeldendeFnr, gjeldende = true)
+        val historiskeFnr = pdlPerson.historiskeFnr.map { Fnr(fnr = it, gjeldende = false)}
+
+        val alleFnr = mutableSetOf<Fnr>()
+        alleFnr.plus(gjeldendeFnr).plus(historiskeFnr)
+
+        personJpaRepository.save((Person(alleFnr = alleFnr, fodselsAr = pdlPerson.fodselsAr)))
+    }
+
+    fun validerPerson(pdlPerson: PdlPerson) {
         val historisk = fnrRepository.findByFnrIn(pdlPerson.historiskeFnr)
         val gjeldende = fnrRepository.findByFnr(pdlPerson.gjeldendeFnr)
-
         checkFnrOnlyRelatedToOnePerson(historisk + gjeldende)
+    }
 
+    /**
+     * Forsøker å slå opp person ved å slå opp personen i lokal DB med gjeldende fnr i PDL.
+     * Deretter forsøkes det å så opp person basert på hvert historiske fnr i PDL
+     */
+    fun findPerson(pdlPerson: PdlPerson): Person? {
+        val personMedGjeldendeFnr = fnrRepository.findPersonByFnr(pdlPerson.gjeldendeFnr)
+        if(personMedGjeldendeFnr == null) {
+            pdlPerson.historiskeFnr.forEach {
+                val personMedHistoriskFnr = fnrRepository.findPersonByFnr(it)
+                if( personMedHistoriskFnr != null) {
+                    return personMedHistoriskFnr
+                }
+            }
+        } else return personMedGjeldendeFnr
+        return null
     }
 
     private fun checkFnrOnlyRelatedToOnePerson(fnrs : List<Fnr?>){

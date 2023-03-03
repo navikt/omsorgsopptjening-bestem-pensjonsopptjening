@@ -11,7 +11,7 @@ class Person(
     @Column(name = "PERSON_ID", nullable = false)
     var id: Long? = null,
     @OneToMany(mappedBy = "person")
-    var alleFnr: Set<Fnr> = setOf(),
+    var alleFnr: Set<Fnr> = mutableSetOf<Fnr>(),
     @Column(name = "FODSELSAR", nullable = false)
     var fodselsAr: Int? = null,
     @Column(name = "TIMESTAMP", nullable = false)
@@ -25,4 +25,40 @@ class Person(
     infix fun erSammePerson(annenPerson: Person) = (annenPerson.alleFnr intersect alleFnr).isNotEmpty()
 
     infix fun identifiseresAv(fnr: Fnr) = alleFnr.contains(fnr)
+
+    /**
+     * Legg til fnr dersom fnr ikke finnes i DB fra før
+     **/
+    fun oppdaterGjeldendeFnr(fnr: String) {
+        val eksisterendeGjeldendeFnr: Set<Fnr?> = alleFnr.filter { it.gjeldende }.toSet()
+        if (eksisterendeGjeldendeFnr.isEmpty()) {
+            // Legger til gjeldende fnr på en person som ikke har gjeldende fnr fra før
+            alleFnr.plus(Fnr(fnr = fnr, gjeldende = true, person = this))
+        } else if (!(eksisterendeGjeldendeFnr.first()!!.equals(fnr))) {
+            // Sletter nåværende gjeldende fnr før nytt gjeldende overtar
+            alleFnr.minus(eksisterendeGjeldendeFnr)
+            alleFnr.plus(Fnr(fnr = fnr, gjeldende = true, person = this))
+        }
+    }
+
+    /**
+     * Dersom historisk fnr fra PDL ikke eksisterer i DB legges den til
+     * Dersom historisk fnr eksisterer i DB men ikke i PDL fjernes den fra DB
+     */
+    fun oppdaterHistoriskeFnr(fnr: List<String>) {
+        val eksisterendeHistoriskeFnr: Set<Fnr?> = alleFnr.filter { !it.gjeldende }.toSet()
+        eksisterendeHistoriskeFnr.containsAll(fnr.map { Fnr(fnr = it) })
+
+        fnr.forEach {
+            if(!eksisterendeHistoriskeFnr.contains(Fnr(fnr = it))) {
+                alleFnr.plus(Fnr(fnr = it, gjeldende = false, person = this))
+            }
+        }
+
+        alleFnr.forEach {
+            if(!fnr.contains(it.fnr)) {
+                alleFnr.minus(it)
+            }
+        }
+    }
 }
