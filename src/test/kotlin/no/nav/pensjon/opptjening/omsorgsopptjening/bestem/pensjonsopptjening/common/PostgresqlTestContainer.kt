@@ -18,11 +18,12 @@ class PostgresqlTestContainer private constructor() : PostgreSQLContainer<Postgr
 
     companion object {
         private const val IMAGE_VERSION = "postgres:14.7-alpine"
-        private var container: PostgresqlTestContainer? = null
+        private var container: PostgresqlTestContainer = PostgresqlTestContainer().apply {
+            start()
+        }
         val instance: PostgresqlTestContainer
             get() {
-                if (container == null) container = PostgresqlTestContainer()
-                return container!!
+                return container
             }
     }
 }
