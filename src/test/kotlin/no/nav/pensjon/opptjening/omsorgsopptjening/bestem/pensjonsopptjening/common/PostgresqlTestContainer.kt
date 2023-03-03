@@ -17,7 +17,7 @@ class PostgresqlTestContainer private constructor() : PostgreSQLContainer<Postgr
     }
 
     companion object {
-        private const val IMAGE_VERSION = "postgres:14.4"
+        private const val IMAGE_VERSION = "postgres:14.7-alpine"
         private var container: PostgresqlTestContainer? = null
         val instance: PostgresqlTestContainer
             get() {
