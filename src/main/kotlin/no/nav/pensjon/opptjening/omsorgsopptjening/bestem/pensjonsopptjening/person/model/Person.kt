@@ -10,7 +10,7 @@ class Person(
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "PERSON_ID", nullable = false)
     var id: Long? = null,
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     var alleFnr: MutableSet<Fnr> = mutableSetOf<Fnr>(),
     @Column(name = "FODSELSAR", nullable = false)
     var fodselsAr: Int? = null,
@@ -45,16 +45,14 @@ class Person(
      * Dersom historisk fnr fra PDL ikke eksisterer i DB legges den til
      * Dersom historisk fnr eksisterer i DB men ikke i PDL fjernes den fra DB
      */
-    fun oppdaterHistoriskeFnr(fnr: List<String>) {
+    fun oppdaterHistoriskeFnr(fnrListe: List<String>) {
         val eksisterendeHistoriskeFnr: Set<Fnr?> = alleFnr.filter { !it.gjeldende }.toSet()
-        eksisterendeHistoriskeFnr.containsAll(fnr.map { Fnr(fnr = it) })
+        eksisterendeHistoriskeFnr.containsAll(fnrListe.map { Fnr(fnr = it) })
 
-        fnr.forEach {
+        fnrListe.forEach {
             if(!eksisterendeHistoriskeFnr.contains(Fnr(fnr = it))) {
                 alleFnr.add(Fnr(fnr = it, gjeldende = false, person = this))
             }
         }
-
-        alleFnr = alleFnr.filter { fnr.contains(it.fnr) }.toMutableSet()
     }
 }

@@ -30,6 +30,6 @@ class OmsorgsopptjeningMockListener {
             secondsPassed++
         }
 
-        return records.first { it.kafkaMessageType() == messageType }
+        return records.last() { it.kafkaMessageType() == messageType }
     }
 }

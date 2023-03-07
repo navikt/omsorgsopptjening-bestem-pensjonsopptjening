@@ -2,11 +2,13 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ka
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest.Companion.OMSORGSOPPTJENING_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
@@ -41,6 +43,9 @@ internal class OmsorgsarbeidListenerTest {
     @Autowired
     lateinit var omsorgsopptjeingListener: OmsorgsopptjeningMockListener
 
+    @Autowired
+    lateinit var personRepository: PersonRepository
+
     @BeforeEach
     fun resetWiremock() {
         wiremock.resetAll()
@@ -50,12 +55,27 @@ internal class OmsorgsarbeidListenerTest {
     @Test
     fun `given omsorgsarbeid event then produce omsorgsopptjening event`() {
         wiremock.stubFor(
-            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
-                WireMock.aResponse()
-                    .withStatus(200)
-                    .withHeader("Content-Type", "application/json")
-                    .withBodyFile("fnr_1bruk.json")
-            )
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                .inScenario("Opprett eller oppdater person")
+                .whenScenarioStateIs(STARTED)
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_1bruk.json")
+                )
+                .willSetStateTo("Ny person opprettet")
+        )
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                .inScenario("Opprett eller oppdater person")
+                .whenScenarioStateIs("Ny person opprettet")
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_1bruk_pluss_historisk.json")
+                )
         )
 
         sendOmsorgsarbeidsSnapshot(
@@ -73,6 +93,19 @@ internal class OmsorgsarbeidListenerTest {
         assertEquals(omsorgsOpptjening.person.fnr, "12345678910")
         assertNotNull(omsorgsOpptjening.grunnlag)
         assertNotNull(omsorgsOpptjening.omsorgsopptjeningResultater)
+
+        // Melding nummer 2
+
+        sendOmsorgsarbeidsSnapshot(
+            omsorgsAr = 2020,
+            fnr = "12345678910",
+            omsorgstype = Omsorgstype.BARNETRYGD,
+            messageType = KafkaMessageType.OMSORGSARBEID
+        )
+
+        val record2 = omsorgsopptjeingListener.getRecord(10, OMSORGSOPPTJENING)
+        assertNotNull(record2)
+        assertEquals("12345678911", personRepository.fnrRepository.findPersonByFnr("12345678910")!!.historiskeFnr.first().fnr)
 
         wiremock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }

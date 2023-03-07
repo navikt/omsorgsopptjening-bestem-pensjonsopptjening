@@ -29,14 +29,18 @@ class PersonRepository(
     }
 
     private fun opprettPersonIdb(pdlPerson: PdlPerson): Person {
-        val gjeldendeFnr = Fnr(fnr = pdlPerson.gjeldendeFnr, gjeldende = true)
-        val historiskeFnr = pdlPerson.historiskeFnr.map { Fnr(fnr = it, gjeldende = false)}
+        val person = Person()
+        val gjeldendeFnr = Fnr(fnr = pdlPerson.gjeldendeFnr, gjeldende = true, person = person)
+        val historiskeFnr = pdlPerson.historiskeFnr.map { Fnr(fnr = it, gjeldende = false, person = person)}
 
         val alleFnr = mutableSetOf<Fnr>().apply {
             add(gjeldendeFnr)
             addAll(historiskeFnr)
         }
-        return personJpaRepository.save((Person(alleFnr = alleFnr, fodselsAr = pdlPerson.fodselsAr)))
+        person.alleFnr = alleFnr
+        person.fodselsAr = pdlPerson.fodselsAr
+
+        return personJpaRepository.save(person)
     }
 
     fun validerPerson(pdlPerson: PdlPerson) {
