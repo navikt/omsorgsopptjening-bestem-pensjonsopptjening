@@ -36,7 +36,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     // Internal libraries
-    implementation("no.nav.pensjon.opptjening:omsorgsopptjening-domene-lib:1.0.10")
+    implementation("no.nav.pensjon.opptjening:omsorgsopptjening-domene-lib:1.0.11")
     implementation("no.nav.pensjonopptjening:pensjon-opptjening-azure-ad-client:0.0.7")
 
     // Kotlin
