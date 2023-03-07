@@ -11,7 +11,7 @@ class Person(
     @Column(name = "PERSON_ID", nullable = false)
     var id: Long? = null,
     @OneToMany(mappedBy = "person")
-    var alleFnr: Set<Fnr> = mutableSetOf<Fnr>(),
+    var alleFnr: MutableSet<Fnr> = mutableSetOf<Fnr>(),
     @Column(name = "FODSELSAR", nullable = false)
     var fodselsAr: Int? = null,
     @Column(name = "TIMESTAMP", nullable = false)
@@ -30,14 +30,14 @@ class Person(
      * Legg til fnr dersom fnr ikke finnes i DB fra før
      **/
     fun oppdaterGjeldendeFnr(fnr: String) {
-        val eksisterendeGjeldendeFnr: Set<Fnr?> = alleFnr.filter { it.gjeldende }.toSet()
-        if (eksisterendeGjeldendeFnr.isEmpty()) {
+        val eksisterendeGjeldendeFnr: Fnr? = alleFnr.firstOrNull { it.gjeldende }
+        if (eksisterendeGjeldendeFnr == null) {
             // Legger til gjeldende fnr på en person som ikke har gjeldende fnr fra før
-            alleFnr.plus(Fnr(fnr = fnr, gjeldende = true, person = this))
-        } else if (!(eksisterendeGjeldendeFnr.first()!!.equals(fnr))) {
+            alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))
+        } else {
             // Sletter nåværende gjeldende fnr før nytt gjeldende overtar
-            alleFnr.minus(eksisterendeGjeldendeFnr)
-            alleFnr.plus(Fnr(fnr = fnr, gjeldende = true, person = this))
+            alleFnr.remove(eksisterendeGjeldendeFnr)
+            alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))
         }
     }
 
@@ -51,14 +51,10 @@ class Person(
 
         fnr.forEach {
             if(!eksisterendeHistoriskeFnr.contains(Fnr(fnr = it))) {
-                alleFnr.plus(Fnr(fnr = it, gjeldende = false, person = this))
+                alleFnr.add(Fnr(fnr = it, gjeldende = false, person = this))
             }
         }
 
-        alleFnr.forEach {
-            if(!fnr.contains(it.fnr)) {
-                alleFnr.minus(it)
-            }
-        }
+        alleFnr = alleFnr.filter { fnr.contains(it.fnr) }.toMutableSet()
     }
 }

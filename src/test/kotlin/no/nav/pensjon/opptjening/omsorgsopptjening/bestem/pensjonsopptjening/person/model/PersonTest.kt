@@ -1,7 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model
 
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class PersonTest {
@@ -143,9 +142,42 @@ internal class PersonTest {
         assertFalse(person1 erSammePerson person2)
     }
 
+    @Test
+    fun `Given no gjeldende fnr in db for person when trying to update gjeldende fnr in DB then insert new fnr to person`(){
+        val person = Person()
+        assertEquals( 0, person.alleFnr.filter { it.gjeldende }.size)
+        person.oppdaterGjeldendeFnr("12345678901")
+        assertEquals( 1, person.alleFnr.filter { it.gjeldende }.size)
+    }
+
+    @Test
+    fun `Given a gjeldende fnr in db for person when trying to update gjeldende fnr in DBthen insert new fnr to person and remove old gjeldende fnr`(){
+        val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = true)))
+        person.oppdaterGjeldendeFnr("12345678902")
+        assertEquals( 1, person.alleFnr.filter { it.gjeldende }.size)
+        assertEquals("12345678902", person.alleFnr.first().fnr)
+    }
+
+    @Test
+    fun `Given no historiske fnr in db for person when trying to update historiske fnr in DB then insert new fnr to person`(){
+        val person = Person()
+        assertEquals( 0, person.alleFnr.filter { !it.gjeldende}.size)
+        person.oppdaterHistoriskeFnr(listOf("12345678901"))
+        assertEquals( 1, person.alleFnr.filter { !it.gjeldende }.size)
+        assertEquals("12345678901", person.historiskeFnr.first().fnr)
+    }
+
+    @Test
+    fun `Given a historiske fnr in db for person when trying to update historiske fnr in DBthen insert new fnr to person and remove old historiske fnr`(){
+        val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = false)))
+        person.oppdaterHistoriskeFnr(listOf("12345678902"))
+        assertEquals( 1, person.alleFnr.filter { !it.gjeldende }.size)
+        assertEquals("12345678902", person.alleFnr.first().fnr)
+    }
+
     private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
         Person(
-            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toSet() + Fnr(fnr = gjeldendeFnr, gjeldende = true),
+            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toMutableSet().apply { add(Fnr(fnr = gjeldendeFnr, gjeldende = true)) },
             fodselsAr = fodselsAr
         )
 }

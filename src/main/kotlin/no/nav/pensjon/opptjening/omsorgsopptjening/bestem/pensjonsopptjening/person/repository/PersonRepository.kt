@@ -14,27 +14,29 @@ class PersonRepository(
     val personJpaRepository: PersonJpaRepository,
     val fnrRepository: FnrRepository
 ){
-    fun updatePerson(pdlPerson:PdlPerson) {
+    fun updatePerson(pdlPerson:PdlPerson): Person {
         validerPerson(pdlPerson)
 
         val personIDb = findPerson(pdlPerson)
 
-        if(personIDb == null) {
+        return if(personIDb == null) {
             opprettPersonIdb(pdlPerson)
         } else {
             personIDb.oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
             personIDb.oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
+            personJpaRepository.save(personIDb)
         }
     }
 
-    private fun opprettPersonIdb(pdlPerson: PdlPerson) {
+    private fun opprettPersonIdb(pdlPerson: PdlPerson): Person {
         val gjeldendeFnr = Fnr(fnr = pdlPerson.gjeldendeFnr, gjeldende = true)
         val historiskeFnr = pdlPerson.historiskeFnr.map { Fnr(fnr = it, gjeldende = false)}
 
-        val alleFnr = mutableSetOf<Fnr>()
-        alleFnr.plus(gjeldendeFnr).plus(historiskeFnr)
-
-        personJpaRepository.save((Person(alleFnr = alleFnr, fodselsAr = pdlPerson.fodselsAr)))
+        val alleFnr = mutableSetOf<Fnr>().apply {
+            add(gjeldendeFnr)
+            addAll(historiskeFnr)
+        }
+        return personJpaRepository.save((Person(alleFnr = alleFnr, fodselsAr = pdlPerson.fodselsAr)))
     }
 
     fun validerPerson(pdlPerson: PdlPerson) {
