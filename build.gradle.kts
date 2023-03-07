@@ -1,10 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-
+val domeneVersion = "1.0.11"
+val azureAdClient = "0.0.7"
 val jacksonVersion = "2.14.1"
 val logbackEncoderVersion = "7.2"
 val postgresqlVersion = "42.5.1"
 val flywayCoreVersion = "9.15.1"
+val springKafkaTestVersion = "3.0.4"
+val springCloudContractVersion = "4.0.1"
 val testcontainersVersion = "1.17.6"
 
 plugins {
@@ -34,26 +37,22 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework:spring-aspects")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
     // Internal libraries
-    implementation("no.nav.pensjon.opptjening:omsorgsopptjening-domene-lib:1.0.11")
-    implementation("no.nav.pensjonopptjening:pensjon-opptjening-azure-ad-client:0.0.7")
-
+    implementation("no.nav.pensjon.opptjening:omsorgsopptjening-domene-lib:$domeneVersion")
+    implementation("no.nav.pensjonopptjening:pensjon-opptjening-azure-ad-client:$azureAdClient")
     // Kotlin
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-
     // Log and metric
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("net.logstash.logback:logstash-logback-encoder:$logbackEncoderVersion")
-
     // DB
     implementation("org.postgresql:postgresql:$postgresqlVersion")
     implementation("org.flywaydb:flyway-core:$flywayCoreVersion")
-
-    testImplementation("org.springframework.kafka:spring-kafka-test:3.0.3")
+    // Test
+    testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner:4.0.1")
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$springCloudContractVersion")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
 }
 
