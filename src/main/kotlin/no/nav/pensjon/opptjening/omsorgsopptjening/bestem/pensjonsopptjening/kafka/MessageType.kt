@@ -10,24 +10,22 @@ import java.nio.charset.StandardCharsets
 fun ConsumerRecord<String, String>.kafkaMessageType(): KafkaMessageType {
     val headers = headers().getHeaders(KafkaHeaderKey.MESSAGE_TYPE)
 
-    assert(headers.isNotEmpty()) {
-        log("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, was not found", this)
-        "Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, was not found. For more information see secure log"
+    return if (headers.isEmpty()) {
+        SECURE_LOG.error("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, was not found. For record with key: ${key()} and value ${value()}.")
+        throw KafkaMessageTypeException("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, was not found. For more information see secure log")
+    } else if (headers.size > 1) {
+        SECURE_LOG.error("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, had multiple values: $headers. For record with key: ${key()} and value ${value()}.")
+        throw KafkaMessageTypeException("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, had multiple values: $headers. For more information see secure log")
+    } else if (!KafkaMessageType.values().map { it.name }.contains(headers.first())) {
+        SECURE_LOG.error("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE} contained the unrecognized value: ${headers.first()}. For record with key: ${key()} and value ${value()}.")
+        throw KafkaMessageTypeException("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE} contained the unrecognized value: ${headers.first()}. For more information see secure log")
+    } else {
+        KafkaMessageType.valueOf(headers.first())
     }
-    assert(headers.size < 2) {
-        log("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, had multiple values: $headers", this)
-        "Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, had multiple values: $headers. For more information see secure log"
-    }
-    assert(KafkaMessageType.values().map { it.name }.contains(headers.first())) {
-        log("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE} contained the unrecognized value: ${headers.first()}", this)
-        "Kafka header ${KafkaHeaderKey.MESSAGE_TYPE} contained the unrecognized value: ${headers.first()}. For more information see secure log"
-    }
-
-    return KafkaMessageType.valueOf(headers.first())
 }
 
 private fun Headers.getHeaders(key: String) = headers(key).map { String(it.value(), StandardCharsets.UTF_8) }
 
-private val SECURE_LOG = LoggerFactory.getLogger("secure")
+class KafkaMessageTypeException(message: String) : RuntimeException(message)
 
-private fun log(reason: String, record: ConsumerRecord<String, String>) = SECURE_LOG.error("$reason. For record with key: ${record.key()} and value ${record.value()}. ")
+private val SECURE_LOG = LoggerFactory.getLogger("secure")
