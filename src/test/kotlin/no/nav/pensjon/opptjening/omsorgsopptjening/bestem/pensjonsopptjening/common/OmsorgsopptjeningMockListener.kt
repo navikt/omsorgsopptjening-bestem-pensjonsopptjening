@@ -23,7 +23,7 @@ class OmsorgsopptjeningMockListener {
         ack.acknowledge()
     }
 
-    fun getRecord(waitForSeconds: Int, messageType: KafkaMessageType): ConsumerRecord<String, String>? {
+    fun removeFirstRecord(waitForSeconds: Int, messageType: KafkaMessageType): ConsumerRecord<String, String>? {
         var secondsPassed = 0
         while (secondsPassed < waitForSeconds && records.none { it.kafkaMessageType() == messageType }) {
             Thread.sleep(1000)

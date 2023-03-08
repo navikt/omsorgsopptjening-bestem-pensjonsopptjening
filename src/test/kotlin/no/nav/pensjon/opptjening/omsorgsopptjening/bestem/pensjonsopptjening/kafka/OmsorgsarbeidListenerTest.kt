@@ -4,10 +4,10 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest.Companion.OMSORGSOPPTJENING_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest.Companion.OMSORGSOPPTJENING_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToJson
@@ -58,6 +58,35 @@ internal class OmsorgsarbeidListenerTest {
     fun `given omsorgsarbeid event then produce omsorgsopptjening event`() {
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_1bruk.json")
+                )
+        )
+
+        sendOmsorgsarbeidsSnapshot(
+            omsorgsAr = 2020,
+            fnr = "12345678910",
+            omsorgstype = Omsorgstype.BARNETRYGD,
+            messageType = KafkaMessageType.OMSORGSARBEID
+        )
+
+        val record = omsorgsopptjeingListener.removeFirstRecord(10, OMSORGSOPPTJENING)
+        val omsorgsOpptjening = record!!.value().mapToClass(OmsorgsOpptjening::class.java)
+
+        assertEquals(omsorgsOpptjening.invilget, false)
+        assertEquals(omsorgsOpptjening.omsorgsAr, 2020)
+        assertEquals(omsorgsOpptjening.person.fnr, "12345678910")
+        assertNotNull(omsorgsOpptjening.grunnlag)
+        assertNotNull(omsorgsOpptjening.omsorgsopptjeningResultater)
+    }
+
+    @Test
+    fun `given two omsorgsarbeid events with two different pdl responses then update database with the last message from pdl`() {
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
                 .inScenario("Opprett eller oppdater person")
                 .whenScenarioStateIs(STARTED)
                 .willReturn(
@@ -86,18 +115,6 @@ internal class OmsorgsarbeidListenerTest {
             omsorgstype = Omsorgstype.BARNETRYGD,
             messageType = KafkaMessageType.OMSORGSARBEID
         )
-
-        val record = omsorgsopptjeingListener.getRecord(10, OMSORGSOPPTJENING)
-        val omsorgsOpptjening = record!!.value().mapToClass(OmsorgsOpptjening::class.java)
-
-        assertEquals(omsorgsOpptjening.invilget, false)
-        assertEquals(omsorgsOpptjening.omsorgsAr, 2020)
-        assertEquals(omsorgsOpptjening.person.fnr, "12345678910")
-        assertNotNull(omsorgsOpptjening.grunnlag)
-        assertNotNull(omsorgsOpptjening.omsorgsopptjeningResultater)
-
-        // Melding nummer 2
-
         sendOmsorgsarbeidsSnapshot(
             omsorgsAr = 2020,
             fnr = "12345678910",
@@ -105,11 +122,16 @@ internal class OmsorgsarbeidListenerTest {
             messageType = KafkaMessageType.OMSORGSARBEID
         )
 
-        assertNotNull(omsorgsopptjeingListener.getRecord(20, OMSORGSOPPTJENING))
-        assertEquals("12345678911", personRepository.fnrRepository.findPersonByFnr("12345678910")!!.historiskeFnr.first().fnr)
+        assertNotNull(omsorgsopptjeingListener.removeFirstRecord(10, OMSORGSOPPTJENING))
+        assertNotNull(omsorgsopptjeingListener.removeFirstRecord(10, OMSORGSOPPTJENING))
 
+        val person = personRepository.fnrRepository.findPersonByFnr("12345678911")!!
+        assertEquals(2, person.alleFnr.size)
+        assertEquals("12345678910", person.gjeldendeFnr.fnr)
+        assertEquals("12345678911", person.historiskeFnr.first().fnr)
         wiremock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
+
 
     private fun sendOmsorgsarbeidsSnapshot(
         omsorgsAr: Int,
@@ -148,6 +170,8 @@ internal class OmsorgsarbeidListenerTest {
             messageType.name.encodeToByteArray()
         )
     )
+
+    private data class identifikator(val fnr: String, val iBruk: Boolean)
 
     companion object {
         const val OMSORGSOPPTJENING_TOPIC = "omsorgsopptjening"
