@@ -10,8 +10,8 @@ class Person(
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "PERSON_ID", nullable = false)
     var id: Long? = null,
-    @OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-    var alleFnr: MutableSet<Fnr> = mutableSetOf<Fnr>(),
+    @OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+    var alleFnr: MutableSet<Fnr> = mutableSetOf(),
     @Column(name = "FODSELSAR", nullable = false)
     var fodselsAr: Int? = null,
     @Column(name = "TIMESTAMP", nullable = false)
@@ -26,19 +26,17 @@ class Person(
 
     infix fun identifiseresAv(fnr: Fnr) = alleFnr.contains(fnr)
 
+    infix fun identifiseresAv(fnr: String) = alleFnr.map { it.fnr }.contains(fnr)
+
     /**
      * Legg til fnr dersom fnr ikke finnes i DB fra før
      **/
     fun oppdaterGjeldendeFnr(fnr: String) {
-        val eksisterendeGjeldendeFnr: Fnr? = alleFnr.firstOrNull { it.gjeldende }
-        if (eksisterendeGjeldendeFnr == null) {
-            // Legger til gjeldende fnr på en person som ikke har gjeldende fnr fra før
-            alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))
-        } else {
-            // Sletter nåværende gjeldende fnr før nytt gjeldende overtar
-            alleFnr.remove(eksisterendeGjeldendeFnr)
-            alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))
+        alleFnr.firstOrNull { it.gjeldende }?.let {
+            alleFnr.remove(it)
         }
+
+        alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))
     }
 
     /**
@@ -46,11 +44,10 @@ class Person(
      * Dersom historisk fnr eksisterer i DB men ikke i PDL fjernes den fra DB
      */
     fun oppdaterHistoriskeFnr(fnrListe: List<String>) {
-        val eksisterendeHistoriskeFnr: Set<Fnr?> = alleFnr.filter { !it.gjeldende }.toSet()
-        eksisterendeHistoriskeFnr.containsAll(fnrListe.map { Fnr(fnr = it) })
+        val eksisterendeHistoriskeFnr: Set<Fnr> = alleFnr.filter { !it.gjeldende }.toSet()
 
         fnrListe.forEach {
-            if(!eksisterendeHistoriskeFnr.contains(Fnr(fnr = it))) {
+            if (!eksisterendeHistoriskeFnr.contains(Fnr(fnr = it))) {
                 alleFnr.add(Fnr(fnr = it, gjeldende = false, person = this))
             }
         }

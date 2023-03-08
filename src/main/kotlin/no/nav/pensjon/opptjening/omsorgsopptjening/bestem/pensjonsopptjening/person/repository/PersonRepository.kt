@@ -43,11 +43,7 @@ class PersonRepository(
         return personJpaRepository.save(person)
     }
 
-    fun validerPerson(pdlPerson: PdlPerson) {
-        val historisk = fnrRepository.findByFnrIn(pdlPerson.historiskeFnr)
-        val gjeldende = fnrRepository.findByFnr(pdlPerson.gjeldendeFnr)
-        checkFnrOnlyRelatedToOnePerson(historisk + gjeldende)
-    }
+
 
     /**
      * Forsøker å slå opp person ved å slå opp personen i lokal DB med gjeldende fnr i PDL.
@@ -66,6 +62,12 @@ class PersonRepository(
         return null
     }
 
+    fun validerPerson(pdlPerson: PdlPerson) {
+        checkFnrOnlyRelatedToOnePerson(
+            fnrRepository.findByFnrIn(pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr)
+        )
+    }
+
     private fun checkFnrOnlyRelatedToOnePerson(fnrs : List<Fnr?>){
         val persons = fnrs.filterNotNull().map { it.person }.toSet()
         if(persons.size > 1){
@@ -73,31 +75,6 @@ class PersonRepository(
             throw DatabaseError("Multiple persons identified by fnrs. For more information see secure log")
         }
     }
-
-    /*
-    fun updateFnr(pdlPerson: PdlPerson){
-        val historisk = jpaRepository.findByFnrIn(pdlPerson.historiskeFnr)
-        val gjeldende = jpaRepository.findByFnr(pdlPerson.gjeldendeFnr).firstOrNull()
-
-
-    }
-
-    private fun updateGjeldende(gjeldendeFnr: String): Fnr {
-        return jpaRepository.save(
-            (jpaRepository.findByFnr(gjeldendeFnr).firstOrNull() ?: Fnr(fnr = gjeldendeFnr)).apply {
-                gjeldende = true
-            }
-        )
-    }
-
-    private fun updateHistoriskeFnr(historiskeFnr: List<String>) {
-
-        historisk.map { it.person }.
-
-        historisk.forEach { it.gjeldende = false }
-    }
-
-     */
 
     companion object {
         private val SECURE_LOG = LoggerFactory.getLogger("secure")

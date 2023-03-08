@@ -49,6 +49,7 @@ internal class OmsorgsarbeidListenerTest {
     @BeforeEach
     fun resetWiremock() {
         wiremock.resetAll()
+        personRepository
     }
 
 
