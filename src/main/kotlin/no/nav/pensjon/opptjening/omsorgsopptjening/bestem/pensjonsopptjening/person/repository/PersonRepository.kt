@@ -28,7 +28,7 @@ class PersonRepository(
 
         fnrRepository.deleteByFnrIn(initialFnrs.filter { !updatedPerson.identifiseresAv(it) })
 
-        return personJpaRepository.saveAndFlush(updatedPerson)
+        return personJpaRepository.save(updatedPerson)
     }
 
     fun findPerson(pdlPerson: PdlPerson): Person? {
