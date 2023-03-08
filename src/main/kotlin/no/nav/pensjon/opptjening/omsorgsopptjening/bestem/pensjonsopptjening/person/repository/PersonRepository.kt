@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository
 
 @Component
 class PersonRepository(
-    val personJpaRepository: PersonJpaRepository,
+    private val personJpaRepository: PersonJpaRepository,
     private val fnrRepository: FnrRepository
 ) {
     @Transactional
