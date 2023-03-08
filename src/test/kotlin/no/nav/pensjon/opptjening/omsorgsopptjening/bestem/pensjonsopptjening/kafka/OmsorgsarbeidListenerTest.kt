@@ -27,7 +27,6 @@ import org.springframework.cloud.contract.wiremock.WireMockSpring
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
-import javax.sql.DataSource
 import kotlin.test.assertEquals
 
 
@@ -47,8 +46,6 @@ internal class OmsorgsarbeidListenerTest {
     @Autowired
     lateinit var personRepository: PersonRepository
 
-    @Autowired
-    lateinit var datasource: DataSource
 
     @BeforeEach
     fun resetWiremock() {
