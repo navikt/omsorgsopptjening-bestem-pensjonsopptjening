@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
@@ -57,9 +57,9 @@ internal class OmsorgsarbeidListenerTest {
     @Test
     fun `given omsorgsarbeid event then produce omsorgsopptjening event`() {
         wiremock.stubFor(
-            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+            post(urlEqualTo(PDL_PATH))
                 .willReturn(
-                    WireMock.aResponse()
+                    aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBodyFile("fnr_1bruk.json")
@@ -86,11 +86,11 @@ internal class OmsorgsarbeidListenerTest {
     @Test
     fun `given two omsorgsarbeid events with two different pdl responses then update database with the last message from pdl`() {
         wiremock.stubFor(
-            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+            post(urlEqualTo(PDL_PATH))
                 .inScenario("Opprett eller oppdater person")
                 .whenScenarioStateIs(STARTED)
                 .willReturn(
-                    WireMock.aResponse()
+                    aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBodyFile("fnr_1bruk.json")
@@ -98,11 +98,11 @@ internal class OmsorgsarbeidListenerTest {
                 .willSetStateTo("Ny person opprettet")
         )
         wiremock.stubFor(
-            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+            post(urlEqualTo(PDL_PATH))
                 .inScenario("Opprett eller oppdater person")
                 .whenScenarioStateIs("Ny person opprettet")
                 .willReturn(
-                    WireMock.aResponse()
+                    aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBodyFile("fnr_1bruk_pluss_historisk.json")
@@ -129,7 +129,7 @@ internal class OmsorgsarbeidListenerTest {
         assertEquals(2, person.alleFnr.size)
         assertEquals("12345678910", person.gjeldendeFnr.fnr)
         assertEquals("12345678911", person.historiskeFnr.first().fnr)
-        wiremock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+        wiremock.verify(2, postRequestedFor(urlEqualTo(PDL_PATH)))
     }
 
 
@@ -170,8 +170,6 @@ internal class OmsorgsarbeidListenerTest {
             messageType.name.encodeToByteArray()
         )
     )
-
-    private data class identifikator(val fnr: String, val iBruk: Boolean)
 
     companion object {
         const val OMSORGSOPPTJENING_TOPIC = "omsorgsopptjening"
