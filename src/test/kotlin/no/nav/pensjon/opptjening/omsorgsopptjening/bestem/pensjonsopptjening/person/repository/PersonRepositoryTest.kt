@@ -9,6 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -25,6 +26,9 @@ internal class PersonRepositoryTest {
 
     @Autowired
     lateinit var personRepository: PersonRepository
+
+    @Autowired
+    lateinit var fnrJpaRepository: FnrJpaRepository
 
     @BeforeEach
     fun clearDb() {
@@ -86,11 +90,12 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val personUpdated: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
+        val updatedPerson: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
 
-        assertEquals(updatedPdlPerson.fodselsAr, personUpdated.fodselsAr)
-        assertEquals(updatedPdlPerson.gjeldendeFnr, personUpdated.gjeldendeFnr.fnr)
-        assertEquals(1, personUpdated.alleFnr.size)
+        assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
+        assertEquals(updatedPdlPerson.gjeldendeFnr, updatedPerson.gjeldendeFnr.fnr)
+        assertEquals(1, updatedPerson.alleFnr.size)
+        assertOnlyFnrsFromPdlPersonExistsInDb(updatedPdlPerson)
     }
 
     @Test
@@ -104,22 +109,77 @@ internal class PersonRepositoryTest {
 
         val updatedPdlPerson = PdlPerson(
             gjeldendeFnr = "4444",
-            historiskeFnr = listOf("3333","5555"),
+            historiskeFnr = listOf("3333", "5555"),
             fodselsAr = 2000
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val personUpdated: Person = personRepository.fnrRepository.findPersonByFnr("4444")!!
+        val updatedPerson: Person = personRepository.fnrRepository.findPersonByFnr("4444")!!
 
-        assertEquals(updatedPdlPerson.fodselsAr, personUpdated.fodselsAr)
-        assertEquals(updatedPdlPerson.gjeldendeFnr, personUpdated.gjeldendeFnr.fnr)
-        assertContainsOnlySameFnrs(updatedPdlPerson, personUpdated)
+        assertEquals(initialPersonId, updatedPerson.id)
+        assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
+        assertEquals(updatedPdlPerson.gjeldendeFnr, updatedPerson.gjeldendeFnr.fnr)
+        assertContainsOnlySameFnrs(updatedPdlPerson, updatedPerson)
+        assertOnlyFnrsFromPdlPersonExistsInDb(updatedPdlPerson)
     }
 
-    private fun assertContainsOnlySameFnrs(pdlPerson:PdlPerson, person: Person){
+    @Test
+    fun `given updated fodselsAr When updatePerson with pdlPerson Then update fodselsAr`() {
+        val initialPdlPerson = PdlPerson(
+            gjeldendeFnr = "1111",
+            historiskeFnr = listOf(),
+            fodselsAr = 2000
+        )
+        personRepository.updatePerson(initialPdlPerson)
+
+        val updatedPdlPerson = PdlPerson(
+            gjeldendeFnr = "1111",
+            historiskeFnr = listOf(),
+            fodselsAr = 2010
+        )
+        personRepository.updatePerson(updatedPdlPerson)
+
+        val updatedPerson: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
+
+        assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
+    }
+
+    @Test
+    fun `given overlapping person When updatePerson with pdlPerson Then throw exception  `() {
+        val pdlPerson1 = PdlPerson(
+            gjeldendeFnr = "1111",
+            historiskeFnr = listOf("2222", "3333"),
+            fodselsAr = 2000
+        )
+        personRepository.updatePerson(pdlPerson1).id
+
+        val pdlPerson2 = PdlPerson(
+            gjeldendeFnr = "4444",
+            historiskeFnr = listOf("5555", "6666"),
+            fodselsAr = 2000
+        )
+        personRepository.updatePerson(pdlPerson2)
+
+        val overlappingPdlPerson = PdlPerson(
+            gjeldendeFnr = "4444",
+            historiskeFnr = listOf("1111"),
+            fodselsAr = 2000
+        )
+        assertThrows<DatabaseError> { personRepository.updatePerson(overlappingPdlPerson) }
+    }
+
+    private fun assertContainsOnlySameFnrs(pdlPerson: PdlPerson, person: Person) {
         val allFnrsPdl = (pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr).toSet()
         assertTrue(allFnrsPdl.all { person.identifiseresAv(it) }, "Alle fnr fra pdl var ikke i person")
         assertEquals(person.alleFnr.size, allFnrsPdl.size, "Det er flere fnr i person enn i pdlPerson")
+    }
+
+    private fun assertOnlyFnrsFromPdlPersonExistsInDb(pdlPerson: PdlPerson){
+        val allFnrsInDb = fnrJpaRepository.findAll().toSet()
+        val allFnrsFromPdl = (pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr).toSet()
+
+        assertTrue(allFnrsFromPdl.all { allFnrsInDb.map {dbFnr ->  dbFnr.fnr }.contains(it)}, "Alle fnr fra pdl var ikke i database")
+        assertEquals(allFnrsFromPdl.size, allFnrsInDb.size, "Det er flere fnr i db enn i pdlPerson")
     }
 }
 
