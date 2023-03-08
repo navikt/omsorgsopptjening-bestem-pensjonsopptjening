@@ -48,7 +48,6 @@ class PersonRepository(
     companion object {
         private val SECURE_LOG = LoggerFactory.getLogger("secure")
     }
-
 }
 
 @Repository

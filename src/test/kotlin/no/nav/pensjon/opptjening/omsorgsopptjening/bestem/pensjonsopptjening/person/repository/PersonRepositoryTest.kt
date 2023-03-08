@@ -38,11 +38,12 @@ internal class PersonRepositoryTest {
             historiskeFnr = listOf("6666", "7777"),
             fodselsAr = 2000
         )
-        val person1 = personRepository.updatePerson(pdlPerson)
-        assertEquals(pdlPerson.gjeldendeFnr, person1.gjeldendeFnr.fnr)
-        assertEquals(pdlPerson.fodselsAr, person1.fodselsAr)
-        assertEquals(pdlPerson.historiskeFnr.size, person1.historiskeFnr.size)
-        assertTrue(person1.historiskeFnr.any { pdlPerson.historiskeFnr.contains(it.fnr) })
+        val person = personRepository.updatePerson(pdlPerson)
+
+        assertEquals(pdlPerson.gjeldendeFnr, person.gjeldendeFnr.fnr)
+        assertEquals(pdlPerson.fodselsAr, person.fodselsAr)
+        assertEquals(pdlPerson.historiskeFnr.size, person.historiskeFnr.size)
+        assertTrue(person.historiskeFnr.any { pdlPerson.historiskeFnr.contains(it.fnr) })
     }
 
     @Test
@@ -54,7 +55,6 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(initialPdlPerson)
 
-
         val updatedPdlPerson = PdlPerson(
             gjeldendeFnr = "1111",
             historiskeFnr = listOf("2222", "3333"),
@@ -62,11 +62,12 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val personUpdated: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
-        assertEquals(updatedPdlPerson.gjeldendeFnr, personUpdated.gjeldendeFnr.fnr)
-        assertEquals(updatedPdlPerson.fodselsAr, personUpdated.fodselsAr)
-        assertEquals(updatedPdlPerson.historiskeFnr.size, personUpdated.historiskeFnr.size)
-        assertTrue((updatedPdlPerson.historiskeFnr + updatedPdlPerson.gjeldendeFnr).all { personUpdated.identifiseresAv(it) })
+        val updatedPerson: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
+
+        assertEquals(updatedPdlPerson.gjeldendeFnr, updatedPerson.gjeldendeFnr.fnr)
+        assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
+        assertEquals(updatedPdlPerson.historiskeFnr.size, updatedPerson.historiskeFnr.size)
+        assertContainsOnlySameFnrs(updatedPdlPerson, updatedPerson)
     }
 
     @Test
@@ -78,7 +79,6 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(initialPdlPerson)
 
-
         val updatedPdlPerson = PdlPerson(
             gjeldendeFnr = "1111",
             historiskeFnr = listOf(),
@@ -86,11 +86,40 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-
         val personUpdated: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
+
         assertEquals(updatedPdlPerson.fodselsAr, personUpdated.fodselsAr)
-        assertEquals(1, personUpdated.alleFnr.size)
         assertEquals(updatedPdlPerson.gjeldendeFnr, personUpdated.gjeldendeFnr.fnr)
+        assertEquals(1, personUpdated.alleFnr.size)
+    }
+
+    @Test
+    fun `Given saved person has only one historisk fnr in common with updated person When updatePerson with pdlPerson Then update in person`() {
+        val initialPdlPerson = PdlPerson(
+            gjeldendeFnr = "1111",
+            historiskeFnr = listOf("2222", "3333"),
+            fodselsAr = 2000
+        )
+        val initialPersonId = personRepository.updatePerson(initialPdlPerson).id
+
+        val updatedPdlPerson = PdlPerson(
+            gjeldendeFnr = "4444",
+            historiskeFnr = listOf("3333","5555"),
+            fodselsAr = 2000
+        )
+        personRepository.updatePerson(updatedPdlPerson)
+
+        val personUpdated: Person = personRepository.fnrRepository.findPersonByFnr("4444")!!
+
+        assertEquals(updatedPdlPerson.fodselsAr, personUpdated.fodselsAr)
+        assertEquals(updatedPdlPerson.gjeldendeFnr, personUpdated.gjeldendeFnr.fnr)
+        assertContainsOnlySameFnrs(updatedPdlPerson, personUpdated)
+    }
+
+    private fun assertContainsOnlySameFnrs(pdlPerson:PdlPerson, person: Person){
+        val allFnrsPdl = (pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr).toSet()
+        assertTrue(allFnrsPdl.all { person.identifiseresAv(it) }, "Alle fnr fra pdl var ikke i person")
+        assertEquals(person.alleFnr.size, allFnrsPdl.size, "Det er flere fnr i person enn i pdlPerson")
     }
 }
 
