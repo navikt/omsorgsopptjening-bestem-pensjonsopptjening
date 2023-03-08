@@ -28,6 +28,9 @@ internal class PersonRepositoryTest {
     lateinit var personRepository: PersonRepository
 
     @Autowired
+    lateinit var fnrRepository: FnrRepository
+
+    @Autowired
     lateinit var fnrJpaRepository: FnrJpaRepository
 
     @BeforeEach
@@ -66,7 +69,7 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val updatedPerson: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
+        val updatedPerson: Person = fnrRepository.findPersonByFnr("1111")!!
 
         assertEquals(updatedPdlPerson.gjeldendeFnr, updatedPerson.gjeldendeFnr.fnr)
         assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
@@ -90,7 +93,7 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val updatedPerson: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
+        val updatedPerson: Person = fnrRepository.findPersonByFnr("1111")!!
 
         assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
         assertEquals(updatedPdlPerson.gjeldendeFnr, updatedPerson.gjeldendeFnr.fnr)
@@ -114,7 +117,7 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val updatedPerson: Person = personRepository.fnrRepository.findPersonByFnr("4444")!!
+        val updatedPerson: Person = fnrRepository.findPersonByFnr("4444")!!
 
         assertEquals(initialPersonId, updatedPerson.id)
         assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
@@ -139,7 +142,7 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val updatedPerson: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
+        val updatedPerson: Person = fnrRepository.findPersonByFnr("1111")!!
 
         assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
     }

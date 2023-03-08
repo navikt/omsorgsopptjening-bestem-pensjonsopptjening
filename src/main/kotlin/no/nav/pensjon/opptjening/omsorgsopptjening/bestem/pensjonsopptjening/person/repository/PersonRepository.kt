@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository
 @Component
 class PersonRepository(
     val personJpaRepository: PersonJpaRepository,
-    val fnrRepository: FnrRepository
+    private val fnrRepository: FnrRepository
 ) {
     @Transactional
     fun updatePerson(pdlPerson: PdlPerson): Person {
