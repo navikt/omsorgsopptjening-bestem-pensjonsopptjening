@@ -151,11 +151,12 @@ internal class PersonTest {
     }
 
     @Test
-    fun `Given a gjeldende fnr in db for person when trying to update gjeldende fnr in DBthen insert new fnr to person and remove old gjeldende fnr`(){
+    fun `Given a gjeldende fnr in db for person when trying to update gjeldende fnr in DB then insert new fnr to person and make old gjeldende to historisk`(){
         val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = true)))
         person.oppdaterGjeldendeFnr("12345678902")
         assertEquals( 1, person.alleFnr.filter { it.gjeldende }.size)
-        assertEquals("12345678902", person.alleFnr.first().fnr)
+        assertEquals("12345678902", person.gjeldendeFnr.fnr)
+        assertEquals("12345678901", person.historiskeFnr.first().fnr)
     }
 
     @Test
