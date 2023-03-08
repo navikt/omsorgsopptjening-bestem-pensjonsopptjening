@@ -17,8 +17,6 @@ class PersonRepository(
 ) {
     @Transactional
     fun updatePerson(pdlPerson: PdlPerson): Person {
-        validerPerson(pdlPerson)
-
         val person = findPerson(pdlPerson) ?: Person()
         val initialFnrs = person.alleFnr.toSet()
 
@@ -33,28 +31,10 @@ class PersonRepository(
         return personJpaRepository.saveAndFlush(updatedPerson)
     }
 
-
-    /**
-     * Forsøker å slå opp person ved å slå opp personen i lokal DB med gjeldende fnr i PDL.
-     * Deretter forsøkes det å så opp person basert på hvert historiske fnr i PDL
-     */
     fun findPerson(pdlPerson: PdlPerson): Person? {
-        val personMedGjeldendeFnr = fnrRepository.findPersonByFnr(pdlPerson.gjeldendeFnr)
-        if (personMedGjeldendeFnr == null) {
-            pdlPerson.historiskeFnr.forEach {
-                val personMedHistoriskFnr = fnrRepository.findPersonByFnr(it)
-                if (personMedHistoriskFnr != null) {
-                    return personMedHistoriskFnr
-                }
-            }
-        } else return personMedGjeldendeFnr
-        return null
-    }
-
-    fun validerPerson(pdlPerson: PdlPerson) {
-        checkFnrOnlyRelatedToOnePerson(
-            fnrRepository.findByFnrIn(pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr)
-        )
+        val eksisterendeFnr = fnrRepository.findByFnrIn(pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr)
+        checkFnrOnlyRelatedToOnePerson(eksisterendeFnr)
+        return eksisterendeFnr.firstOrNull()?.person
     }
 
     private fun checkFnrOnlyRelatedToOnePerson(fnrs: List<Fnr?>) {
