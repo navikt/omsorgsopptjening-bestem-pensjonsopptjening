@@ -50,11 +50,11 @@ internal class OmsorgsarbeidListenerTest {
     @BeforeEach
     fun resetWiremock() {
         wiremock.resetAll()
-        dbContainer.removeDataFroDB()
+        dbContainer.removeDataFromDB()
     }
 
     @Test
-    fun `given omsorgsarbeid event then produce omsorgsopptjening event`() {
+    fun `Given omsorgsarbeid event Then produce omsorgsopptjening event`() {
         wiremock.stubFor(
             post(urlEqualTo(PDL_PATH))
                 .willReturn(
@@ -83,7 +83,7 @@ internal class OmsorgsarbeidListenerTest {
     }
 
     @Test
-    fun `given two omsorgsarbeid events with two different pdl responses then update database with the last message from pdl`() {
+    fun `Given two omsorgsarbeid events with two different pdl responses Then update database with the last response from pdl`() {
         wiremock.stubFor(
             post(urlEqualTo(PDL_PATH))
                 .inScenario("Opprett eller oppdater person")
@@ -130,7 +130,6 @@ internal class OmsorgsarbeidListenerTest {
         assertEquals("12345678911", person.historiskeFnr.first().fnr)
         wiremock.verify(2, postRequestedFor(urlEqualTo(PDL_PATH)))
     }
-
 
     private fun sendOmsorgsarbeidsSnapshot(
         omsorgsAr: Int,

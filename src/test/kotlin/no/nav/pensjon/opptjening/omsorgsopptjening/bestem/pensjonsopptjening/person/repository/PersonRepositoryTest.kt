@@ -28,7 +28,7 @@ internal class PersonRepositoryTest {
 
     @BeforeEach
     fun clearDb() {
-        dbContainer.removeDataFroDB()
+        dbContainer.removeDataFromDB()
     }
 
     @Test

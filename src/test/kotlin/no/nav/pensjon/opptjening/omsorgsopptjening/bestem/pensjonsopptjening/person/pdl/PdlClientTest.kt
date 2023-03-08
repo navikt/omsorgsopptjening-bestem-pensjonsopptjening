@@ -36,7 +36,7 @@ internal class PdlClientTest {
     @BeforeEach
     fun resetWiremock() {
         wiremock.resetAll()
-        dbContainer.removeDataFroDB()
+        dbContainer.removeDataFromDB()
     }
 
     @Test

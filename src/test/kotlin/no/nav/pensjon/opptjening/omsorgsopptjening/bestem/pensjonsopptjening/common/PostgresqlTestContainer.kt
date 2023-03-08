@@ -18,7 +18,7 @@ class PostgresqlTestContainer private constructor() : PostgreSQLContainer<Postgr
         //do nothing, JVM handles shut down
     }
 
-    fun removeDataFroDB() {
+    fun removeDataFromDB() {
         dataSource.connection.apply {
             createStatement().execute("DELETE FROM FNR")
             createStatement().execute("DELETE FROM PERSON")
