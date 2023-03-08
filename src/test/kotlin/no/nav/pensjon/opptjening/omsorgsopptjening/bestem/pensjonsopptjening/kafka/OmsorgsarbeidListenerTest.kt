@@ -53,7 +53,6 @@ internal class OmsorgsarbeidListenerTest {
         dbContainer.removeDataFroDB()
     }
 
-
     @Test
     fun `given omsorgsarbeid event then produce omsorgsopptjening event`() {
         wiremock.stubFor(
@@ -73,7 +72,7 @@ internal class OmsorgsarbeidListenerTest {
             messageType = KafkaMessageType.OMSORGSARBEID
         )
 
-        val record = omsorgsopptjeingListener.removeFirstRecord(10, OMSORGSOPPTJENING)
+        val record = omsorgsopptjeingListener.removeFirstRecord(maxSeconds = 10, messageType = OMSORGSOPPTJENING)
         val omsorgsOpptjening = record!!.value().mapToClass(OmsorgsOpptjening::class.java)
 
         assertEquals(omsorgsOpptjening.invilget, false)
@@ -122,8 +121,8 @@ internal class OmsorgsarbeidListenerTest {
             messageType = KafkaMessageType.OMSORGSARBEID
         )
 
-        assertNotNull(omsorgsopptjeingListener.removeFirstRecord(10, OMSORGSOPPTJENING))
-        assertNotNull(omsorgsopptjeingListener.removeFirstRecord(10, OMSORGSOPPTJENING))
+        assertNotNull(omsorgsopptjeingListener.removeFirstRecord(maxSeconds = 10, messageType = OMSORGSOPPTJENING))
+        assertNotNull(omsorgsopptjeingListener.removeFirstRecord(maxSeconds = 10, messageType = OMSORGSOPPTJENING))
 
         val person = personRepository.fnrRepository.findPersonByFnr("12345678911")!!
         assertEquals(2, person.alleFnr.size)

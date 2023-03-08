@@ -23,13 +23,13 @@ class OmsorgsopptjeningMockListener {
         ack.acknowledge()
     }
 
-    fun removeFirstRecord(waitForSeconds: Int, messageType: KafkaMessageType): ConsumerRecord<String, String>? {
+    fun removeFirstRecord(maxSeconds: Int, messageType: KafkaMessageType): ConsumerRecord<String, String>? {
         var secondsPassed = 0
-        while (secondsPassed < waitForSeconds && records.none { it.kafkaMessageType() == messageType }) {
+        while (secondsPassed < maxSeconds && records.none { it.kafkaMessageType() == messageType }) {
             Thread.sleep(1000)
             secondsPassed++
         }
-        val lastRecord = records.last() { it.kafkaMessageType() == messageType }
+        val lastRecord = records.first { it.kafkaMessageType() == messageType }
         records.remove(lastRecord)
 
         return lastRecord
