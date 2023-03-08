@@ -7,6 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -24,6 +25,11 @@ internal class PersonRepositoryTest {
 
     @Autowired
     lateinit var personRepository: PersonRepository
+
+    @BeforeEach
+    fun clearDb() {
+        dbContainer.removeDataFroDB()
+    }
 
     @Test
     fun `Given updating saved person When find person by fnr Then new fnrs should be added`() {
@@ -49,7 +55,11 @@ internal class PersonRepositoryTest {
         assertEquals(pdlPersonUpdated.gjeldendeFnr, personUpdated.gjeldendeFnr.fnr)
         assertEquals(pdlPersonUpdated.fodselsAr, personUpdated.fodselsAr)
         assertEquals(pdlPersonUpdated.historiskeFnr.size, personUpdated.historiskeFnr.size)
-        assertTrue((pdlPersonUpdated.historiskeFnr + pdlPersonUpdated.gjeldendeFnr).all { personUpdated.identifiseresAv(it) })
+        assertTrue((pdlPersonUpdated.historiskeFnr + pdlPersonUpdated.gjeldendeFnr).all {
+            personUpdated.identifiseresAv(
+                it
+            )
+        })
     }
 }
 
