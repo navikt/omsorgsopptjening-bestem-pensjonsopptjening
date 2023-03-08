@@ -24,7 +24,7 @@ class PersonRepository(
         } else {
             personIDb.oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
             personIDb.oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
-            personJpaRepository.save(personIDb)
+            personJpaRepository.saveAndFlush(personIDb)
         }
     }
 

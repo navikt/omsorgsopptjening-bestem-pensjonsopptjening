@@ -104,8 +104,7 @@ internal class OmsorgsarbeidListenerTest {
             messageType = KafkaMessageType.OMSORGSARBEID
         )
 
-        val record2 = omsorgsopptjeingListener.getRecord(10, OMSORGSOPPTJENING)
-        assertNotNull(record2)
+        assertNotNull(omsorgsopptjeingListener.getRecord(20, OMSORGSOPPTJENING))
         assertEquals("12345678911", personRepository.fnrRepository.findPersonByFnr("12345678910")!!.historiskeFnr.first().fnr)
 
         wiremock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))

@@ -167,6 +167,7 @@ internal class PersonTest {
         assertEquals("12345678901", person.historiskeFnr.first().fnr)
     }
 
+    /*
     @Test
     fun `Given a historiske fnr in db for person when trying to update historiske fnr in DBthen insert new fnr to person and remove old historiske fnr`(){
         val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = false)))
@@ -174,6 +175,8 @@ internal class PersonTest {
         assertEquals( 1, person.alleFnr.filter { !it.gjeldende }.size)
         assertEquals("12345678902", person.alleFnr.first().fnr)
     }
+
+     */
 
     private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
         Person(

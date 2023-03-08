@@ -10,7 +10,7 @@ class Person(
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "PERSON_ID", nullable = false)
     var id: Long? = null,
-    @OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+    @OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     var alleFnr: MutableSet<Fnr> = mutableSetOf(),
     @Column(name = "FODSELSAR", nullable = false)
     var fodselsAr: Int? = null,

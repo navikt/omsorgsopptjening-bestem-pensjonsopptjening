@@ -29,7 +29,9 @@ class OmsorgsopptjeningMockListener {
             Thread.sleep(1000)
             secondsPassed++
         }
+        val lastRecord = records.last() { it.kafkaMessageType() == messageType }
+        records.remove(lastRecord)
 
-        return records.last() { it.kafkaMessageType() == messageType }
+        return lastRecord
     }
 }
