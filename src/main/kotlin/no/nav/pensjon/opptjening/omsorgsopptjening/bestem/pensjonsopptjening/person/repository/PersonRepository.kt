@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository
 
+import jakarta.transaction.Transactional
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
@@ -13,36 +14,24 @@ import org.springframework.stereotype.Repository
 class PersonRepository(
     val personJpaRepository: PersonJpaRepository,
     val fnrRepository: FnrRepository
-){
-    fun updatePerson(pdlPerson:PdlPerson): Person {
+) {
+    @Transactional
+    fun updatePerson(pdlPerson: PdlPerson): Person {
         validerPerson(pdlPerson)
 
-        val personIDb = findPerson(pdlPerson)
+        val person = findPerson(pdlPerson) ?: Person()
+        val initialFnrs = person.alleFnr.toSet()
 
-        return if(personIDb == null) {
-            opprettPersonIdb(pdlPerson)
-        } else {
-            personIDb.oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
-            personIDb.oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
-            personJpaRepository.saveAndFlush(personIDb)
+        val updatedPerson = person.apply {
+            fodselsAr = pdlPerson.fodselsAr
+            oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
+            oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
         }
+
+        fnrRepository.deleteByFnrIn(initialFnrs.filter { !updatedPerson.identifiseresAv(it) })
+
+        return personJpaRepository.saveAndFlush(updatedPerson)
     }
-
-    private fun opprettPersonIdb(pdlPerson: PdlPerson): Person {
-        val person = Person()
-        val gjeldendeFnr = Fnr(fnr = pdlPerson.gjeldendeFnr, gjeldende = true, person = person)
-        val historiskeFnr = pdlPerson.historiskeFnr.map { Fnr(fnr = it, gjeldende = false, person = person)}
-
-        val alleFnr = mutableSetOf<Fnr>().apply {
-            add(gjeldendeFnr)
-            addAll(historiskeFnr)
-        }
-        person.alleFnr = alleFnr
-        person.fodselsAr = pdlPerson.fodselsAr
-
-        return personJpaRepository.save(person)
-    }
-
 
 
     /**
@@ -51,10 +40,10 @@ class PersonRepository(
      */
     fun findPerson(pdlPerson: PdlPerson): Person? {
         val personMedGjeldendeFnr = fnrRepository.findPersonByFnr(pdlPerson.gjeldendeFnr)
-        if(personMedGjeldendeFnr == null) {
+        if (personMedGjeldendeFnr == null) {
             pdlPerson.historiskeFnr.forEach {
                 val personMedHistoriskFnr = fnrRepository.findPersonByFnr(it)
-                if( personMedHistoriskFnr != null) {
+                if (personMedHistoriskFnr != null) {
                     return personMedHistoriskFnr
                 }
             }
@@ -68,10 +57,10 @@ class PersonRepository(
         )
     }
 
-    private fun checkFnrOnlyRelatedToOnePerson(fnrs : List<Fnr?>){
+    private fun checkFnrOnlyRelatedToOnePerson(fnrs: List<Fnr?>) {
         val persons = fnrs.filterNotNull().map { it.person }.toSet()
-        if(persons.size > 1){
-            SECURE_LOG.error("Multiple persons identified by fnrs: $fnrs . Person id: ${persons.map{it?.id}}")
+        if (persons.size > 1) {
+            SECURE_LOG.error("Multiple persons identified by fnrs: $fnrs . Person id: ${persons.map { it?.id }}")
             throw DatabaseError("Multiple persons identified by fnrs. For more information see secure log")
         }
     }
@@ -83,6 +72,6 @@ class PersonRepository(
 }
 
 @Repository
-interface PersonJpaRepository : JpaRepository<Person,Long>
+interface PersonJpaRepository : JpaRepository<Person, Long>
 
 class DatabaseError(message: String) : RuntimeException(message)

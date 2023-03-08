@@ -33,7 +33,7 @@ class Person(
      **/
     fun oppdaterGjeldendeFnr(fnr: String) {
         alleFnr.forEach { it.gjeldende = false }
-        alleFnr.filter { it.fnr == fnr }.firstOrNull()?.let {
+        alleFnr.firstOrNull { it.fnr == fnr }?.let {
             it.gjeldende = true
         }?: alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))
     }

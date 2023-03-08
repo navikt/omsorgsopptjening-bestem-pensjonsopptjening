@@ -32,34 +32,65 @@ internal class PersonRepositoryTest {
     }
 
     @Test
-    fun `Given updating saved person When find person by fnr Then new fnrs should be added`() {
-        val pdlPerson1 = PdlPerson(
+    fun `Given updating person not in db When updatePerson Then create new person`() {
+        val pdlPerson = PdlPerson(
+            gjeldendeFnr = "5555",
+            historiskeFnr = listOf("6666", "7777"),
+            fodselsAr = 2000
+        )
+        val person1 = personRepository.updatePerson(pdlPerson)
+        assertEquals(pdlPerson.gjeldendeFnr, person1.gjeldendeFnr.fnr)
+        assertEquals(pdlPerson.fodselsAr, person1.fodselsAr)
+        assertEquals(pdlPerson.historiskeFnr.size, person1.historiskeFnr.size)
+        assertTrue(person1.historiskeFnr.any { pdlPerson.historiskeFnr.contains(it.fnr) })
+    }
+
+    @Test
+    fun `Given updating saved person with more historiskeFnr When updatePerson with pdlPerson Then new fnrs should be added`() {
+        val initialPdlPerson = PdlPerson(
             gjeldendeFnr = "1111",
             historiskeFnr = listOf(),
             fodselsAr = 2000
         )
-        val person1 = personRepository.updatePerson(pdlPerson1)
-        assertEquals(pdlPerson1.gjeldendeFnr, person1.gjeldendeFnr.fnr)
-        assertEquals(pdlPerson1.fodselsAr, person1.fodselsAr)
-        assertEquals(pdlPerson1.historiskeFnr.size, person1.historiskeFnr.size)
+        personRepository.updatePerson(initialPdlPerson)
 
-        val pdlPersonUpdated = PdlPerson(
+
+        val updatedPdlPerson = PdlPerson(
             gjeldendeFnr = "1111",
             historiskeFnr = listOf("2222", "3333"),
             fodselsAr = 2000
         )
-
-        personRepository.updatePerson(pdlPersonUpdated)
+        personRepository.updatePerson(updatedPdlPerson)
 
         val personUpdated: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
-        assertEquals(pdlPersonUpdated.gjeldendeFnr, personUpdated.gjeldendeFnr.fnr)
-        assertEquals(pdlPersonUpdated.fodselsAr, personUpdated.fodselsAr)
-        assertEquals(pdlPersonUpdated.historiskeFnr.size, personUpdated.historiskeFnr.size)
-        assertTrue((pdlPersonUpdated.historiskeFnr + pdlPersonUpdated.gjeldendeFnr).all {
-            personUpdated.identifiseresAv(
-                it
-            )
-        })
+        assertEquals(updatedPdlPerson.gjeldendeFnr, personUpdated.gjeldendeFnr.fnr)
+        assertEquals(updatedPdlPerson.fodselsAr, personUpdated.fodselsAr)
+        assertEquals(updatedPdlPerson.historiskeFnr.size, personUpdated.historiskeFnr.size)
+        assertTrue((updatedPdlPerson.historiskeFnr + updatedPdlPerson.gjeldendeFnr).all { personUpdated.identifiseresAv(it) })
+    }
+
+    @Test
+    fun `Given updating saved person with less historiskeFnr When updatePerson with pdlPerson Then remove historiskeFnr`() {
+        val initialPdlPerson = PdlPerson(
+            gjeldendeFnr = "1111",
+            historiskeFnr = listOf("2222", "3333"),
+            fodselsAr = 2000
+        )
+        personRepository.updatePerson(initialPdlPerson)
+
+
+        val updatedPdlPerson = PdlPerson(
+            gjeldendeFnr = "1111",
+            historiskeFnr = listOf(),
+            fodselsAr = 2000
+        )
+        personRepository.updatePerson(updatedPdlPerson)
+
+
+        val personUpdated: Person = personRepository.fnrRepository.findPersonByFnr("1111")!!
+        assertEquals(updatedPdlPerson.fodselsAr, personUpdated.fodselsAr)
+        assertEquals(1, personUpdated.alleFnr.size)
+        assertEquals(updatedPdlPerson.gjeldendeFnr, personUpdated.gjeldendeFnr.fnr)
     }
 }
 

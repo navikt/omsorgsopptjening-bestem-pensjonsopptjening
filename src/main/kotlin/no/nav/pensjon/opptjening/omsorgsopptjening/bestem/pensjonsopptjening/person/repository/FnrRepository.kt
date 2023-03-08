@@ -12,6 +12,8 @@ class FnrRepository(private val jpaRepository: FnrJpaRepository) {
 
     fun findByFnrIn(fnrs: List<String>) = jpaRepository.findByFnrIn(fnrs)
 
+    fun deleteByFnrIn(fnrs: List<Fnr>) = jpaRepository.deleteByFnrIn(fnrs.map { it.fnr!! })
+
 }
 
 
@@ -21,5 +23,7 @@ interface FnrJpaRepository : JpaRepository<Fnr, Long> {
     fun findByFnr(fnr: String): List<Fnr>
 
     fun findByFnrIn(fnrs: List<String>): List<Fnr>
+
+    fun deleteByFnrIn(fnrs: List<String>): List<Fnr>
 
 }
