@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import java.nio.charset.StandardCharsets
 
 fun ConsumerRecord<String, String>.kafkaMessageType(): KafkaMessageType {
-    val headers = headers().getHeaders(KafkaHeaderKey.MESSAGE_TYPE)
+    val headers = headers().getMessageTypeHeaders()
 
     return if (headers.isEmpty()) {
         SECURE_LOG.error("Kafka header ${KafkaHeaderKey.MESSAGE_TYPE}, was not found. For record with key: ${key()} and value ${value()}.")
@@ -24,7 +24,9 @@ fun ConsumerRecord<String, String>.kafkaMessageType(): KafkaMessageType {
     }
 }
 
-private fun Headers.getHeaders(key: String) = headers(key).map { String(it.value(), StandardCharsets.UTF_8) }
+private fun Headers.getMessageTypeHeaders() =
+    headers(KafkaHeaderKey.MESSAGE_TYPE)
+        .map { String(it.value(), StandardCharsets.UTF_8) }
 
 class KafkaMessageTypeException(message: String) : RuntimeException(message)
 

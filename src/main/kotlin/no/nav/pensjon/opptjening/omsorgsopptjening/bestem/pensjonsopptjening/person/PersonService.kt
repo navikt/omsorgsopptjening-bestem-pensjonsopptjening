@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class PersonService(
-    private val fnrRepository: FnrRepository,
     private val personRepository: PersonRepository,
     private val pdlService: PdlService
 ) {

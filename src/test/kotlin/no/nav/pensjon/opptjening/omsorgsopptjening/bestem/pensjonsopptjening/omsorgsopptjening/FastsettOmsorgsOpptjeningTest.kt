@@ -86,7 +86,7 @@ internal class FastsettOmsorgsOpptjeningTest{
 
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: Int,
-        omsorgsYter: String = "1234566",
+        omsorgsYter: String,
         utbetalingsPeriode: List<OmsorgsArbeidsUtbetalinger>
     ) =
 

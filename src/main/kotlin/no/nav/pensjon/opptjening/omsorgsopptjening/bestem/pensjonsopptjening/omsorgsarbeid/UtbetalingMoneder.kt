@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.yearmonth.rangeTo
 import java.time.YearMonth
 
-class UtbetalingMoneder private constructor(val months: Set<YearMonth> = setOf()) {
+class UtbetalingMoneder private constructor(private val months: Set<YearMonth> = setOf()) {
 
     fun antall(): Int = months.size
 

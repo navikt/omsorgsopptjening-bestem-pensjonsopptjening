@@ -70,7 +70,7 @@ internal class MessageTypeKtTest {
         assertTrue(error.message!!.contains("contained the unrecognized value"))
     }
 
-    fun createConsumerRecord(recordHeaders: RecordHeaders) =
+    private fun createConsumerRecord(recordHeaders: RecordHeaders) =
         ConsumerRecord(
             "test",
             1,
