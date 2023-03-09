@@ -10,8 +10,9 @@ import java.time.Month
 import java.time.YearMonth
 
 internal class FastsettOmsorgsOpptjeningTest{
+
     @Test
-    fun `Given omsorgs arbeid for six months When calling When calling fastsettOmsorgsOpptjening Then return opptjening invilget true`() {
+    fun `Given omsorgs arbeid for six months When calling fastsettOmsorgsOpptjening Then return opptjening invilget true`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsYter = FNR_1,
@@ -50,6 +51,48 @@ internal class FastsettOmsorgsOpptjeningTest{
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
         assertFalse(opptjening.invilget)
+    }
+
+    @Test
+    fun `Given person under 17 years in omsorgsAr When calling fastsettOmsorgsOpptjening Then return opptjening invilget false`() {
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
+            omsorgsAr = 2010,
+            omsorgsYter = FNR_1,
+            utbetalingsPeriode = listOf(
+                creatUtbetalingsPeriode(
+                    fom = YearMonth.of(2010, Month.JANUARY),
+                    tom = YearMonth.of(2010, Month.DECEMBER),
+                )
+            )
+        )
+
+        val person = createPerson(FNR_1, fodselsAr = 1994)
+
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
+
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
+        assertFalse(opptjening.invilget)
+    }
+
+    @Test
+    fun `Given person over 69 years in omsorgsAr When calling fastsettOmsorgsOpptjening Then return opptjening invilget false`() {
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
+            omsorgsAr = 2010,
+            omsorgsYter = FNR_1,
+            utbetalingsPeriode = listOf(
+                creatUtbetalingsPeriode(
+                    fom = YearMonth.of(2010, Month.JANUARY),
+                    tom = YearMonth.of(2010, Month.DECEMBER),
+                )
+            )
+        )
+
+        val person = createPerson(FNR_1, fodselsAr = 1941)
+
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
+
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
+        assertTrue(opptjening.invilget)
     }
 
     @ParameterizedTest
