@@ -4,7 +4,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.RegelInformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 
-class Under70Ar : Vilkar<PersonOgOmsorgsAr>(
+class PersonUnder70Ar : Vilkar<PersonOgOmsorgsAr>(
     regelInformasjon = RegelInformasjon(
         beskrivelse = "Det kan gis pensjonsopptjening etter første ledd til og med det året vedkommende fyller 69 år.",
         begrunnesleForAvslag = "Medlemmet er over 69 år.",

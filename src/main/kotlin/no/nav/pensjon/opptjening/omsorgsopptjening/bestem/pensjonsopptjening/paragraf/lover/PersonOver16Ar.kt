@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 
 
-class Over16Ar : Vilkar<PersonOgOmsorgsAr>(
+class PersonOver16Ar : Vilkar<PersonOgOmsorgsAr>(
     regelInformasjon = RegelInformasjon(
         beskrivelse = "Det kan gis pensjonsopptjening etter første ledd fra og med det året vedkommende fyller 17 år.",
         begrunnesleForAvslag = "Medlemmet er under 17 år.",
