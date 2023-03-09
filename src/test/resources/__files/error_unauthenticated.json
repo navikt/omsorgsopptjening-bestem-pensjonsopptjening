@@ -1,7 +1,7 @@
 {
   "errors": [
     {
-      "message": "Ikke tilgang til å se person",
+      "message": "Ikke autentisert",
       "locations": [
         {
           "line": 2,
@@ -13,11 +13,11 @@
       ],
       "extensions": {
         "details": {
-          "type": "abac-deny",
-          "cause": "konsument har ikke tilgang til tema",
-          "policy": "N/A"
+          "errors": [
+            "Unexpected Error"
+          ]
         },
-        "code": "unauthorized",
+        "code": "unauthenticated",
         "classification": "ExecutionAborted"
       }
     }

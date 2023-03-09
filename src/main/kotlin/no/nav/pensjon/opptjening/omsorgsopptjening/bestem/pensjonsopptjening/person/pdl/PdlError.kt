@@ -13,5 +13,3 @@ enum class PdlErrorCode {
     @JsonProperty("bad_request") BAD_REQUEST,
     @JsonProperty("server_error") SERVER_ERROR,
 }
-
-// TODO lag tester for disse

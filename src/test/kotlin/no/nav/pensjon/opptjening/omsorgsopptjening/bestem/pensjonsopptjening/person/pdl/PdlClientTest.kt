@@ -20,6 +20,7 @@ import org.springframework.cloud.contract.wiremock.WireMockSpring
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.web.client.RestClientException
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @AutoConfigureMockMvc
@@ -56,7 +57,7 @@ internal class PdlClientTest {
     }
 
     @Test
-    fun `Given hentPerson then call pdl with fnr`() {
+    fun `Given hentPerson Then call pdl with fnr`() {
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
                 WireMock.aResponse()
@@ -72,7 +73,7 @@ internal class PdlClientTest {
     }
 
     @Test
-    fun `Given hentPerson then call pdl with token and other headers`() {
+    fun `Given hentPerson Then call pdl with token and other headers`() {
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
                 WireMock.aResponse()
@@ -99,7 +100,7 @@ internal class PdlClientTest {
     }
 
     @Test
-    fun `Given hentPerson When PDL return folkeregisteridentifikator then return pdl response`() {
+    fun `Given PDL return folkeregisteridentifikator When hentPerson Then return pdl response`() {
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
                 WireMock.aResponse()
@@ -108,14 +109,26 @@ internal class PdlClientTest {
             )
         )
 
-
         assertNotNull(pdlService.hentPerson(FNR))
     }
 
     @Test
-    fun `Given a bad request when getting person then retry 3 times before give up`() {
+    fun `Given other code than 200 When getting person Then retry 3 times before give up`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(401)))
         assertThrows<RestClientException> { pdlService.hentPerson(FNR) }
+        wiremock.verify(4, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+    }
+
+    @Test
+    fun `Given server error When getting person Then retry 3 times before give up`() {
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+            WireMock.aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBodyFile("error_server_error.json")
+        ))
+
+        val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
+        assertEquals(PdlErrorCode.SERVER_ERROR, error.code)
         wiremock.verify(4, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
 
@@ -126,7 +139,22 @@ internal class PdlClientTest {
                 .withHeader("Content-Type", "application/json")
                 .withBodyFile("error_not_found.json")
         ))
-        assertThrows<PdlException> { pdlService.hentPerson(FNR) }
+
+        val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
+        assertEquals(PdlErrorCode.NOT_FOUND, error.code)
+        wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+    }
+
+    @Test
+    fun `Given unauthenticated When calling pdl Then throw PdlException`() {
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+            WireMock.aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBodyFile("error_unauthenticated.json")
+        ))
+
+        val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
+        assertEquals(PdlErrorCode.UNAUTHENTICATED, error.code)
         wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
 
@@ -137,7 +165,22 @@ internal class PdlClientTest {
                 .withHeader("Content-Type", "application/json")
                 .withBodyFile("error_unauthorized.json")
         ))
-        assertThrows<PdlException> { pdlService.hentPerson(FNR) }
+
+        val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
+        assertEquals(PdlErrorCode.UNAUTHORIZED, error.code)
+        wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+    }
+
+    @Test
+    fun `Given bad request When calling pdl Then throw PdlException`() {
+        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+            WireMock.aResponse()
+                .withHeader("Content-Type", "application/json")
+                .withBodyFile("error_bad_request.json")
+        ))
+
+        val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
+        assertEquals(PdlErrorCode.BAD_REQUEST, error.code)
         wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
 
