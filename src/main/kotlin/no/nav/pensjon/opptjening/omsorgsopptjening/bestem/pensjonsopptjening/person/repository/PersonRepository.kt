@@ -18,7 +18,7 @@ class PersonRepository(
     @Transactional
     fun updatePerson(pdlPerson: PdlPerson): Person {
         val person = findPerson(pdlPerson) ?: Person()
-        val initialFnrs = person.alleFnr.toSet()
+        val initialFnrsInDb = person.alleFnr.toSet()
 
         val updatedPerson = person.apply {
             fodselsAr = pdlPerson.fodselsAr
@@ -26,7 +26,7 @@ class PersonRepository(
             oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
         }
 
-        fnrRepository.deleteByFnrIn(initialFnrs.filter { !updatedPerson.identifiseresAv(it) })
+        fnrRepository.deleteByFnrIn(initialFnrsInDb.filter { !updatedPerson.identifiseresAv(it) })
 
         return personJpaRepository.save(updatedPerson)
     }
