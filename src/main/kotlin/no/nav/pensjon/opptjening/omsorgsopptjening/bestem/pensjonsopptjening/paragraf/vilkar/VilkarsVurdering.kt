@@ -5,7 +5,7 @@ open class VilkarsVurdering<Grunnlag : Any>(
     private val grunnlag: Grunnlag
 ) {
 
-    open fun utførVilkarsVurdering(): VilkarsResultat<Grunnlag> {
+    open fun utforVilkarsVurdering(): VilkarsResultat<Grunnlag> {
         return VilkarsResultat(
             oppFyllerRegel = vilkar.oppfyllerRegler(grunnlag),
             grunnlag = grunnlag,

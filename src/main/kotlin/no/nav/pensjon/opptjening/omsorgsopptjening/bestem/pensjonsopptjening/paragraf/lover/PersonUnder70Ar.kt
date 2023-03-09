@@ -10,9 +10,9 @@ class PersonUnder70Ar : Vilkar<PersonOgOmsorgsAr>(
         begrunnesleForAvslag = "Medlemmet er over 69 år.",
         begrunnelseForInnvilgelse = "Medlemmet er under 70 år.",
     ),
-    oppfyllerRegler = `Medlemmet er under 70 år`,
+    oppfyllerRegler = `Medlemmet er under 70 ar`,
 ) {
     companion object {
-        val `Medlemmet er under 70 år` = fun(input: PersonOgOmsorgsAr) = input.omsorgsAr - input.person.fodselsAr!! < 70
+        private val `Medlemmet er under 70 ar` = fun(input: PersonOgOmsorgsAr) = input.omsorgsAr - input.person.fodselsAr!! < 70
     }
 }

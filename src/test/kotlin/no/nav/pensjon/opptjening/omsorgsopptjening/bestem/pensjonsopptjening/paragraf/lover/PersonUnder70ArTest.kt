@@ -22,7 +22,7 @@ class PersonUnder70ArTest {
     ) {
         val resultat = PersonUnder70Ar()
             .vilkarsVurder(PersonOgOmsorgsAr(Person(fodselsAr = fodselsAr), omsorgsAr))
-            .utførVilkarsVurdering()
+            .utforVilkarsVurdering()
 
         assertEquals(expectedInvilget, resultat.oppFyllerRegel)
     }

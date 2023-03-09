@@ -37,7 +37,7 @@ internal class HalvtArMedOmsorgTest {
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utførVilkarsVurdering()
+        ).utforVilkarsVurdering()
 
         assertEquals(expectedInvilget, resultat.oppFyllerRegel)
     }
@@ -68,7 +68,7 @@ internal class HalvtArMedOmsorgTest {
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utførVilkarsVurdering()
+        ).utforVilkarsVurdering()
 
         assertEquals(expectedInvilget, resultat.oppFyllerRegel)
     }
@@ -89,7 +89,7 @@ internal class HalvtArMedOmsorgTest {
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utførVilkarsVurdering()
+        ).utforVilkarsVurdering()
 
         assertEquals(false, resultat.oppFyllerRegel)
     }
@@ -123,7 +123,7 @@ internal class HalvtArMedOmsorgTest {
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utførVilkarsVurdering()
+        ).utforVilkarsVurdering()
 
         assertEquals(expectedInvilget, resultat.oppFyllerRegel)
     }
@@ -155,7 +155,7 @@ internal class HalvtArMedOmsorgTest {
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utførVilkarsVurdering()
+        ).utforVilkarsVurdering()
 
         assertEquals(expectedInvilget, resultat.oppFyllerRegel)
     }
@@ -168,7 +168,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsArbeidsUtbetalinger = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utførVilkarsVurdering()
+        ).utforVilkarsVurdering()
 
         assertEquals(false, resultat.oppFyllerRegel)
     }

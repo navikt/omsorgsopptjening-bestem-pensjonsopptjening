@@ -11,9 +11,9 @@ class PersonOver16Ar : Vilkar<PersonOgOmsorgsAr>(
         begrunnesleForAvslag = "Medlemmet er under 17 år.",
         begrunnelseForInnvilgelse = "Medlemmet er over 16 år.",
     ),
-    oppfyllerRegler = `Medlemmet er over 16 år`,
+    oppfyllerRegler = `Person er over 16 ar`,
 ) {
     companion object {
-        val `Medlemmet er over 16 år` = fun(input: PersonOgOmsorgsAr) = input.omsorgsAr - input.person.fodselsAr!! > 16
+        private val `Person er over 16 ar` = fun(input: PersonOgOmsorgsAr) = input.omsorgsAr - input.person.fodselsAr!! > 16
     }
 }

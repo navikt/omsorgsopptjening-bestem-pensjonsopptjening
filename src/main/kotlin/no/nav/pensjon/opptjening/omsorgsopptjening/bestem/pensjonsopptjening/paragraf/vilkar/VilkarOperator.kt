@@ -7,11 +7,11 @@ class Og<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
         begrunnelseForInnvilgelse = "Alle vilkår var sanne.",
         begrunnesleForAvslag = "Alle vilkår var ikke sanne."
     ),
-    oppfyllerRegler = { vilkarsVurdering -> vilkarsVurdering.all { it.utførVilkarsVurdering().oppFyllerRegel } }
+    oppfyllerRegler = { vilkarsVurdering -> vilkarsVurdering.all { it.utforVilkarsVurdering().oppFyllerRegel } }
 ) {
 
     companion object {
-        fun og(vararg vilkar: VilkarsVurdering<*>) = Og<VilkarsVurdering<*>>().utførVilkarsVurdering(vilkar.toList())
+        fun og(vararg vilkar: VilkarsVurdering<*>) = Og<VilkarsVurdering<*>>().utforVilkarsVurdering(vilkar.toList())
     }
 }
 
@@ -21,10 +21,10 @@ class Eller<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
         begrunnelseForInnvilgelse = "Et av vilkårene var sanne.",
         begrunnesleForAvslag = "Ingen av vilkårene var sanne."
     ),
-    oppfyllerRegler = { vilkarsVurdering -> vilkarsVurdering.any { it.utførVilkarsVurdering().oppFyllerRegel } }
+    oppfyllerRegler = { vilkarsVurdering -> vilkarsVurdering.any { it.utforVilkarsVurdering().oppFyllerRegel } }
 ) {
 
     companion object {
-        fun eller(vararg vilkar: VilkarsVurdering<*>) = Eller<VilkarsVurdering<*>>().utførVilkarsVurdering(vilkar.toList())
+        fun eller(vararg vilkar: VilkarsVurdering<*>) = Eller<VilkarsVurdering<*>>().utforVilkarsVurdering(vilkar.toList())
     }
 }

@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ye
 import java.time.YearMonth
 
 class YearMonthIterator(start: YearMonth, private val endInclusive: YearMonth) : Iterator<YearMonth> {
+
     private var current = start
 
     override fun hasNext() = current <= endInclusive

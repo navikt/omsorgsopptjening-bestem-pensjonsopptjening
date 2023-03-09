@@ -7,7 +7,7 @@ open class Vilkar<Grunnlag : Any>(
 ) {
     fun vilkarsVurder(grunnlag: Grunnlag) = VilkarsVurdering(vilkar = this, grunnlag = grunnlag)
 
-    fun utførVilkarsVurdering(input: Grunnlag) = VilkarsVurdering(this, input).utførVilkarsVurdering()
+    fun utforVilkarsVurdering(input: Grunnlag) = VilkarsVurdering(this, input).utforVilkarsVurdering()
 }
 
 data class RegelInformasjon(

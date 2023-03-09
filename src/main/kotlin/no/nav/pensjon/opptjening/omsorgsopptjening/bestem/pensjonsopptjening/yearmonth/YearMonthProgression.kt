@@ -2,8 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ye
 
 import java.time.YearMonth
 
-class YearMonthProgression(override val start: YearMonth, override val endInclusive: YearMonth) : Iterable<YearMonth>,
-    ClosedRange<YearMonth> {
+class YearMonthProgression(override val start: YearMonth, override val endInclusive: YearMonth) : Iterable<YearMonth>, ClosedRange<YearMonth> {
 
     override fun iterator(): Iterator<YearMonth> = YearMonthIterator(start, endInclusive)
 }
