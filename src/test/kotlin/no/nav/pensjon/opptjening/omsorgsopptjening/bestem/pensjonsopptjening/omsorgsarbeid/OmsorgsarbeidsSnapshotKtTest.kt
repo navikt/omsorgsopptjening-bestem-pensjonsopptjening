@@ -95,7 +95,6 @@ internal class OmsorgsarbeidsSnapshotKtTest {
     }
 
     private fun creatOmsorgsArbeidSnapshot(omsorgsArbeidSaker: List<OmsorgsArbeidSak> = listOf()) =
-
         OmsorgsarbeidsSnapshot(
             omsorgsAr = 2010,
             kjoreHash = "xxx",

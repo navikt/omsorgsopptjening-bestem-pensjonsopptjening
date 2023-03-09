@@ -14,5 +14,4 @@ class MockTokenConfig {
     companion object{
         const val MOCK_TOKEN = "test.token.test"
     }
-
 }

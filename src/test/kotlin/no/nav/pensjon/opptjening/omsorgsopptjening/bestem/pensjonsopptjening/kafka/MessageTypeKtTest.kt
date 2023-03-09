@@ -30,13 +30,12 @@ internal class MessageTypeKtTest {
         assertEquals(KafkaMessageType.OMSORGSOPPTJENING, messageType)
     }
 
-
-
     @Test
     fun `Given no header with key MESSAGE_TYPE When retrieving kafkaMessageType Then throw error`() {
         val consumerRecord = createConsumerRecord(RecordHeaders())
 
         val error = assertThrows<KafkaMessageTypeException> { consumerRecord.kafkaMessageType() }
+
         assertTrue(error.message!!.contains("was not found"))
     }
 
@@ -52,6 +51,7 @@ internal class MessageTypeKtTest {
         )
 
         val error = assertThrows<KafkaMessageTypeException> { consumerRecord.kafkaMessageType() }
+
         assertTrue(error.message!!.contains("had multiple values"))
     }
 
@@ -66,6 +66,7 @@ internal class MessageTypeKtTest {
         )
 
         val error = assertThrows<KafkaMessageTypeException> { consumerRecord.kafkaMessageType() }
+
         assertTrue(error.message!!.contains("contained the unrecognized value"))
     }
 
@@ -84,17 +85,9 @@ internal class MessageTypeKtTest {
             Optional.empty()
         )
 
-
     private fun createHeader(headerKey: String, headerValue: String) =
         RecordHeader(
             headerKey,
             headerValue.encodeToByteArray()
         )
 }
-
-/**
-fun ape() {
-KafkaHeaderKey.MESSAGE_TYPE,
-KafkaMessageType.OMSORGSOPPTJENING.name.encodeToByteArray()
-}
- */

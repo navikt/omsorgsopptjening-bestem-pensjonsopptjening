@@ -29,9 +29,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(
-            OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom)
-        )
+        val utbetalinger = listOf(OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom))
 
         assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
     }
@@ -56,9 +54,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(
-            OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom)
-        )
+        val utbetalinger = listOf(OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom))
 
         assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
     }
@@ -80,9 +76,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(
-            OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom)
-        )
+        val utbetalinger = listOf(OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom))
 
         assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
     }
@@ -96,9 +90,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         fom: YearMonth,
         tom: YearMonth,
     ) {
-        val utbetalinger = listOf(
-            OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom)
-        )
+        val utbetalinger = listOf(OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom))
 
         assertEquals(0, utbetalinger.getAntallUtbetalingMoneder(2020))
     }

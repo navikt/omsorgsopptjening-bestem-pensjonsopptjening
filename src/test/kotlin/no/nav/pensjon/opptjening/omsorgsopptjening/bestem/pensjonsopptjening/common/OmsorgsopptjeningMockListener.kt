@@ -6,6 +6,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
+import shaded.com.google.common.util.concurrent.Futures.withTimeout
+
 
 @Component
 class OmsorgsopptjeningMockListener {
@@ -29,9 +31,9 @@ class OmsorgsopptjeningMockListener {
             Thread.sleep(1000)
             secondsPassed++
         }
-        val lastRecord = records.first { it.kafkaMessageType() == messageType }
-        records.remove(lastRecord)
 
-        return lastRecord
+        return records.first { it.kafkaMessageType() == messageType }.also {
+            records.remove(it)
+        }
     }
 }
