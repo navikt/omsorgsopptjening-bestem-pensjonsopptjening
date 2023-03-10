@@ -39,7 +39,7 @@ internal class HalvtArMedOmsorgTest {
             )
         ).utforVilkarsVurdering()
 
-        assertEquals(expectedInvilget, resultat.oppFyllerRegel)
+        assertEquals(expectedInvilget, resultat.avgjorelse)
     }
 
 
@@ -70,7 +70,7 @@ internal class HalvtArMedOmsorgTest {
             )
         ).utforVilkarsVurdering()
 
-        assertEquals(expectedInvilget, resultat.oppFyllerRegel)
+        assertEquals(expectedInvilget, resultat.avgjorelse)
     }
 
     @ParameterizedTest
@@ -91,7 +91,7 @@ internal class HalvtArMedOmsorgTest {
             )
         ).utforVilkarsVurdering()
 
-        assertEquals(false, resultat.oppFyllerRegel)
+        assertEquals(false, resultat.avgjorelse)
     }
 
     @ParameterizedTest
@@ -125,7 +125,7 @@ internal class HalvtArMedOmsorgTest {
             )
         ).utforVilkarsVurdering()
 
-        assertEquals(expectedInvilget, resultat.oppFyllerRegel)
+        assertEquals(expectedInvilget, resultat.avgjorelse)
     }
 
     @ParameterizedTest
@@ -157,7 +157,7 @@ internal class HalvtArMedOmsorgTest {
             )
         ).utforVilkarsVurdering()
 
-        assertEquals(expectedInvilget, resultat.oppFyllerRegel)
+        assertEquals(expectedInvilget, resultat.avgjorelse)
     }
 
 
@@ -170,7 +170,7 @@ internal class HalvtArMedOmsorgTest {
             )
         ).utforVilkarsVurdering()
 
-        assertEquals(false, resultat.oppFyllerRegel)
+        assertEquals(false, resultat.avgjorelse)
     }
 
     companion object {

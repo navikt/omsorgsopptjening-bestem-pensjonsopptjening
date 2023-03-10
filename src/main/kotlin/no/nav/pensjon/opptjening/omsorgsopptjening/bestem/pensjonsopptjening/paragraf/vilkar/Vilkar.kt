@@ -2,15 +2,15 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 
 
 open class Vilkar<Grunnlag : Any>(
-    val regelInformasjon: RegelInformasjon,
-    val oppfyllerRegler: (Grunnlag) -> Boolean,
+    val vilkarsInformasjon: VilkarsInformasjon,
+    val kalkulerAvgjorelse: (Grunnlag) -> Boolean,
 ) {
     fun vilkarsVurder(grunnlag: Grunnlag) = VilkarsVurdering(vilkar = this, grunnlag = grunnlag)
 
     fun utforVilkarsVurdering(input: Grunnlag) = VilkarsVurdering(this, input).utforVilkarsVurdering()
 }
 
-data class RegelInformasjon(
+data class VilkarsInformasjon(
     val beskrivelse: String,
     val begrunnesleForAvslag: String,
     val begrunnelseForInnvilgelse: String,

@@ -1,5 +1,7 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
@@ -22,13 +24,13 @@ internal class EllerTest {
             returnGrunnlag.vilkarsVurder(grunnlag = boolean2)
         )
 
-        kotlin.test.assertEquals(forventetUtfall, ellerRegel.oppFyllerRegel)
+        kotlin.test.assertEquals(forventetUtfall, ellerRegel.avgjorelse)
     }
 
     companion object {
         private val returnGrunnlag = Vilkar(
-            regelInformasjon = RegelInformasjon("test", "test", "test"),
-            oppfyllerRegler = fun(boolean: Boolean) = boolean
+            vilkarsInformasjon = VilkarsInformasjon("test", "test", "test"),
+            kalkulerAvgjorelse = fun(boolean: Boolean) = boolean
         )
     }
 }

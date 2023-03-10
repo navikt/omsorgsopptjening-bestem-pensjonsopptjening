@@ -7,16 +7,9 @@ open class VilkarsVurdering<Grunnlag : Any>(
 
     open fun utforVilkarsVurdering(): VilkarsResultat<Grunnlag> {
         return VilkarsResultat(
-            oppFyllerRegel = vilkar.oppfyllerRegler(grunnlag),
+            avgjorelse = vilkar.kalkulerAvgjorelse(grunnlag),
             grunnlag = grunnlag,
             vilkar = vilkar
         )
     }
-
 }
-
-data class VilkarsResultat<Grunnlag : Any>(
-    val oppFyllerRegel: Boolean,
-    val grunnlag: Grunnlag,
-    val vilkar: Vilkar<Grunnlag>,
-)

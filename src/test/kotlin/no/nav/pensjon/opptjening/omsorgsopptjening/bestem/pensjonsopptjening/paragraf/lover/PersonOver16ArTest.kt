@@ -24,6 +24,6 @@ class PersonOver16ArTest {
             .vilkarsVurder(PersonOgOmsorgsAr(Person(fodselsAr = fodselsAr), omsorgsAr))
             .utforVilkarsVurdering()
 
-        assertEquals(expectedInvilget, resultat.oppFyllerRegel)
+        assertEquals(expectedInvilget, resultat.avgjorelse)
     }
 }
