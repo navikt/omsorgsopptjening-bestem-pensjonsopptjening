@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsVurdering
@@ -10,10 +11,21 @@ class Og<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
         begrunnelseForInnvilgelse = "Alle vilkår var sanne.",
         begrunnesleForAvslag = "Alle vilkår var ikke sanne."
     ),
-    kalkulerAvgjorelse = { vilkarsVurdering -> vilkarsVurdering.all { it.utforVilkarsVurdering().avgjorelse } }
+    avgjorelsesFunksjon = ogFunksjon
 ) {
 
     companion object {
+
+        private val ogFunksjon = fun(vilkarsVurdering: List<VilkarsVurdering<*>>): Avgjorelse {
+            val avgjorelser = vilkarsVurdering.map { it.utforVilkarsVurdering().avgjorelse }
+
+            return when {
+                avgjorelser.all { it == Avgjorelse.INVILGET } -> Avgjorelse.INVILGET
+                avgjorelser.any { it == Avgjorelse.SAKSBEHANDLING } -> Avgjorelse.SAKSBEHANDLING
+                else -> Avgjorelse.AVSLAG
+            }
+        }
+
         fun og(vararg vilkar: VilkarsVurdering<*>) = Og<VilkarsVurdering<*>>().utforVilkarsVurdering(vilkar.toList())
     }
 }

@@ -1,36 +1,75 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.eller
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+
 
 internal class EllerTest {
 
     @ParameterizedTest
     @CsvSource(
-        "true, true, true",
-        "true, false, true",
-        "true, true, true",
-        "false, false, false"
+        "INVILGET, INVILGET",
+        "AVSLAG, INVILGET",
+        "INVILGET, AVSLAG",
+        "SAKSBEHANDLING, INVILGET",
+        "INVILGET, SAKSBEHANDLING",
     )
-    fun `Given an OR rule when evaluating the rule then return true if one rule is true`(
-        boolean1: Boolean,
-        boolean2: Boolean,
-        forventetUtfall: Boolean
+    fun `Given one vilkar INVILGET When evaluating eller Then INVILGET`(
+        avgjorelse1: Avgjorelse,
+        avgjorelse2: Avgjorelse,
     ) {
-        val ellerRegel = Eller.eller(
-            returnGrunnlag.vilkarsVurder(grunnlag = boolean1),
-            returnGrunnlag.vilkarsVurder(grunnlag = boolean2)
+        val ellerResultat = eller(
+            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
+            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
         )
 
-        kotlin.test.assertEquals(forventetUtfall, ellerRegel.avgjorelse)
+        assertEquals(Avgjorelse.INVILGET, ellerResultat.avgjorelse)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "AVSLAG, AVSLAG, SAKSBEHANDLING, SAKSBEHANDLING",
+        "AVSLAG, SAKSBEHANDLING, AVSLAG, SAKSBEHANDLING",
+        "SAKSBEHANDLING, AVSLAG, AVSLAG, SAKSBEHANDLING",
+        "SAKSBEHANDLING, SAKSBEHANDLING, AVSLAG, SAKSBEHANDLING",
+        "SAKSBEHANDLING, AVSLAG, SAKSBEHANDLING, SAKSBEHANDLING",
+        "AVSLAG, SAKSBEHANDLING, SAKSBEHANDLING, SAKSBEHANDLING",
+        "SAKSBEHANDLING, SAKSBEHANDLING, SAKSBEHANDLING, SAKSBEHANDLING",
+    )
+    fun `Given at least one vilkar SAKSBEHANDLING and no vilkar INVILGET When evaluating eller Then SAKSBEHANDLING`(
+        avgjorelse1: Avgjorelse,
+        avgjorelse2: Avgjorelse,
+        avgjorelse3: Avgjorelse,
+    ) {
+        val ellerResultat = eller(
+            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
+            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2),
+            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse3)
+        )
+
+        assertEquals(Avgjorelse.SAKSBEHANDLING, ellerResultat.avgjorelse)
+    }
+
+    @Test
+    fun `Given All vilkar AVSLAG When evaluating eller Then AVSLAG`() {
+        val ellerResultat = eller(
+            returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.AVSLAG),
+            returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.AVSLAG)
+        )
+
+        assertEquals(Avgjorelse.AVSLAG, ellerResultat.avgjorelse)
     }
 
     companion object {
-        private val returnGrunnlag = Vilkar(
+        private val returnAvgjorelse = Vilkar(
             vilkarsInformasjon = VilkarsInformasjon("test", "test", "test"),
-            kalkulerAvgjorelse = fun(boolean: Boolean) = boolean
+            avgjorelsesFunksjon = fun(avgjorelse: Avgjorelse) = avgjorelse
         )
     }
 }

@@ -7,7 +7,7 @@ open class VilkarsVurdering<Grunnlag : Any>(
 
     open fun utforVilkarsVurdering(): VilkarsResultat<Grunnlag> {
         return VilkarsResultat(
-            avgjorelse = vilkar.kalkulerAvgjorelse(grunnlag),
+            avgjorelse = vilkar.avgjorelsesFunksjon(grunnlag),
             grunnlag = grunnlag,
             vilkar = vilkar
         )

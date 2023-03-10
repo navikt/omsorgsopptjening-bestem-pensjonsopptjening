@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
 import org.junit.jupiter.api.Assertions.*
@@ -9,7 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource
 import java.time.Month
 import java.time.YearMonth
 
-internal class FastsettOmsorgsOpptjeningTest{
+internal class FastsettOmsorgsOpptjeningTest {
 
     @Test
     fun `Given omsorgs arbeid for six months When calling fastsettOmsorgsOpptjening Then return opptjening invilget true`() {
@@ -29,7 +30,7 @@ internal class FastsettOmsorgsOpptjeningTest{
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
-        assertTrue(opptjening.invilget)
+        assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
     }
 
     @Test
@@ -50,7 +51,7 @@ internal class FastsettOmsorgsOpptjeningTest{
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
-        assertFalse(opptjening.invilget)
+        assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
     }
 
     @Test
@@ -71,7 +72,7 @@ internal class FastsettOmsorgsOpptjeningTest{
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
-        assertFalse(opptjening.invilget)
+        assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
     }
 
     @Test
@@ -92,20 +93,20 @@ internal class FastsettOmsorgsOpptjeningTest{
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
-        assertTrue(opptjening.invilget)
+        assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
     }
 
     @ParameterizedTest
     @CsvSource(
-        "2000, 2016, false",
-        "2000, 2017, true",
-        "2000, 2069, true",
-        "2000, 2070, false",
+        "2000, 2016, AVSLAG",
+        "2000, 2017, INVILGET",
+        "2000, 2069, INVILGET",
+        "2000, 2070, AVSLAG",
     )
     fun `Given person over 16 and under 70 When calling fastsettOmsorgsOpptjening Then return opptjening invilget true`(
         fodselsAr: Int,
         omsorgsAr: Int,
-        expectedInvilgetResult: Boolean
+        expectedAvgjorelse: Avgjorelse
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
@@ -123,7 +124,7 @@ internal class FastsettOmsorgsOpptjeningTest{
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
-        kotlin.test.assertEquals(expectedInvilgetResult, opptjening.invilget)
+        assertEquals(expectedAvgjorelse, opptjening.invilget)
     }
 
 

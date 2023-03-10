@@ -75,9 +75,9 @@ internal class OmsorgsarbeidListenerTest {
         val record = omsorgsopptjeingListener.removeFirstRecord(maxSeconds = 10, messageType = OMSORGSOPPTJENING)
         val omsorgsOpptjening = record!!.value().mapToClass(OmsorgsOpptjening::class.java)
 
-        assertEquals(omsorgsOpptjening.invilget, false)
-        assertEquals(omsorgsOpptjening.omsorgsAr, 2020)
-        assertEquals(omsorgsOpptjening.person.fnr, "12345678910")
+        assertEquals(OpptjeningAvgjorelse.AVSLAG, omsorgsOpptjening.avgjorelse)
+        assertEquals(2020, omsorgsOpptjening.omsorgsAr)
+        assertEquals("12345678910", omsorgsOpptjening.person.fnr)
         assertNotNull(omsorgsOpptjening.grunnlag)
         assertNotNull(omsorgsOpptjening.omsorgsopptjeningResultater)
     }

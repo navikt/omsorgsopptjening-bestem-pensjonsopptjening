@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 
 open class Vilkar<Grunnlag : Any>(
     val vilkarsInformasjon: VilkarsInformasjon,
-    val kalkulerAvgjorelse: (Grunnlag) -> Boolean,
+    val avgjorelsesFunksjon: (Grunnlag) -> Avgjorelse,
 ) {
     fun vilkarsVurder(grunnlag: Grunnlag) = VilkarsVurdering(vilkar = this, grunnlag = grunnlag)
 
