@@ -5,6 +5,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 fun List<OmsorgsArbeid>.getAntallUtbetalingMoneder(omsorgsAr: Int) = (getUtbetalingMoneder() begrensTilAr omsorgsAr).antall()
 
 fun List<OmsorgsArbeid>.getUtbetalingMoneder(): UtbetalingMoneder {
-    val alleUtbetalingsMoneder = map{UtbetalingMoneder.UtbetalingMoneder(it.fom, it.tom)}
-    return alleUtbetalingsMoneder.fold(initial = UtbetalingMoneder.emptyUtbetalingMoneder()) { acc, moneder -> acc + moneder }
+    val alleUtbetalingsMoneder = map{UtbetalingMoneder(it.fom, it.tom)}
+    return alleUtbetalingsMoneder.fold(initial = UtbetalingMoneder()) { acc, moneder -> acc + moneder }
 }
