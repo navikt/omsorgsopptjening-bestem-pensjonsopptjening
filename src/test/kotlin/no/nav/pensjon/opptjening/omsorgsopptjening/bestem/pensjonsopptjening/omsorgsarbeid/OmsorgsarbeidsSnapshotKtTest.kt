@@ -107,7 +107,8 @@ internal class OmsorgsarbeidsSnapshotKtTest {
     private fun createOmsorgsarbeid(omsorgsYter: String, fom: YearMonth, tom: YearMonth) =
         OmsorgsArbeid(
             omsorgsyter = Person(omsorgsYter),
-            omsorgsArbeidsUtbetalinger = OmsorgsArbeidsUtbetalinger(fom, tom)
+            omsorgsArbeidsUtbetalinger = OmsorgsArbeidsUtbetalinger(fom, tom),
+            omsorgsmottaker = listOf()
         )
 
     companion object {

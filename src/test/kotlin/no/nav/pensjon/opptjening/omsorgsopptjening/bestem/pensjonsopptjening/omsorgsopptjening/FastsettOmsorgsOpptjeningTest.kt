@@ -103,7 +103,8 @@ internal class FastsettOmsorgsOpptjeningTest {
                     utbetalingsPeriode.map {
                         OmsorgsArbeid(
                             omsorgsyter = Person(omsorgsYter),
-                            omsorgsArbeidsUtbetalinger = it
+                            omsorgsArbeidsUtbetalinger = it,
+                            omsorgsmottaker = listOf()
                         )
                     }
                 )
