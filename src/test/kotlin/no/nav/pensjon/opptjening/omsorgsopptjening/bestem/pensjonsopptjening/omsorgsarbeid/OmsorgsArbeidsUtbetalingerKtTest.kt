@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeidsUtbetalinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -29,7 +30,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom))
+        val utbetalinger = listOf(OmsorgsArbeid(fom = fom, tom = tom, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()))
 
         assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
     }
@@ -54,7 +55,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom))
+        val utbetalinger = listOf(OmsorgsArbeid(fom = fom, tom = tom, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()))
 
         assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
     }
@@ -76,7 +77,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom))
+        val utbetalinger = listOf(OmsorgsArbeid(fom = fom, tom = tom, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()))
 
         assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
     }
@@ -90,7 +91,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         fom: YearMonth,
         tom: YearMonth,
     ) {
-        val utbetalinger = listOf(OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom))
+        val utbetalinger = listOf(OmsorgsArbeid(fom = fom, tom = tom, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()))
 
         assertEquals(0, utbetalinger.getAntallUtbetalingMoneder(2020))
     }
@@ -115,8 +116,8 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         expectedAmountOfMoths: Int
     ) {
         val utbetalinger = listOf(
-            OmsorgsArbeidsUtbetalinger(fom = fom1, tom = tom1),
-            OmsorgsArbeidsUtbetalinger(fom = fom2, tom = tom2)
+            OmsorgsArbeid(fom = fom1, tom = tom1, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()),
+            OmsorgsArbeid(fom = fom2, tom = tom2, omsorgsyter=Person(FNR), omsorgsmottaker = listOf())
         )
 
         assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
@@ -139,9 +140,9 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         expectedAmountOfMoths: Int
     ) {
         val utbetalinger = listOf(
-            OmsorgsArbeidsUtbetalinger(fom = fom1, tom = tom1),
-            OmsorgsArbeidsUtbetalinger(fom = fom2, tom = tom2),
-            OmsorgsArbeidsUtbetalinger(fom = fom3, tom = tom3)
+            OmsorgsArbeid(fom = fom1, tom = tom1, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()),
+            OmsorgsArbeid(fom = fom2, tom = tom2, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()),
+            OmsorgsArbeid(fom = fom3, tom = tom3, omsorgsyter=Person(FNR), omsorgsmottaker = listOf())
         )
 
         assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
@@ -150,6 +151,10 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
 
     @Test
     fun `Given zero omsorgsArbeidsUtbetalinger When calling getAntallUtbetalingMoneder Then 0`() {
-        assertEquals(0, listOf<OmsorgsArbeidsUtbetalinger>().getAntallUtbetalingMoneder(2020))
+        assertEquals(0, listOf<OmsorgsArbeid>().getAntallUtbetalingMoneder(2020))
+    }
+
+    companion object{
+        private const val FNR = "12345"
     }
 }

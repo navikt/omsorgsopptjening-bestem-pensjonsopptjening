@@ -17,10 +17,11 @@ internal class FastsettOmsorgsOpptjeningTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsYter = FNR_1,
-            utbetalingsPeriode = listOf(
-                creatUtbetalingsPeriode(
+            omsorgsArbeid = listOf(
+                createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
+                    omsorgsYter = FNR_1,
                 )
             )
         )
@@ -38,10 +39,11 @@ internal class FastsettOmsorgsOpptjeningTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsYter = FNR_1,
-            utbetalingsPeriode = listOf(
-                creatUtbetalingsPeriode(
+            omsorgsArbeid = listOf(
+                createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JUNE),
+                    omsorgsYter = FNR_1,
                 )
             )
         )
@@ -69,10 +71,11 @@ internal class FastsettOmsorgsOpptjeningTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
             omsorgsYter = FNR_1,
-            utbetalingsPeriode = listOf(
-                creatUtbetalingsPeriode(
+            omsorgsArbeid = listOf(
+                createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
+                    omsorgsYter = FNR_1,
                 )
             )
         )
@@ -89,7 +92,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: Int,
         omsorgsYter: String,
-        utbetalingsPeriode: List<OmsorgsArbeidsUtbetalinger>
+        omsorgsArbeid: List<OmsorgsArbeid>
     ) =
 
         OmsorgsarbeidsSnapshot(
@@ -100,18 +103,17 @@ internal class FastsettOmsorgsOpptjeningTest {
             kilde = Kilde.BA,
             omsorgsArbeidSaker = listOf(
                 OmsorgsArbeidSak(
-                    utbetalingsPeriode.map {
-                        OmsorgsArbeid(
-                            omsorgsyter = Person(omsorgsYter),
-                            omsorgsArbeidsUtbetalinger = it,
-                            omsorgsmottaker = listOf()
-                        )
-                    }
+                    omsorgsarbedUtfort = omsorgsArbeid
                 )
             )
         )
 
-    private fun creatUtbetalingsPeriode(fom: YearMonth, tom: YearMonth) = OmsorgsArbeidsUtbetalinger(fom = fom, tom = tom)
+    private fun createOmsorgsArbeid(fom: YearMonth, tom: YearMonth, omsorgsYter:String) = OmsorgsArbeid(
+        fom = fom,
+        tom = tom,
+        omsorgsyter = Person(omsorgsYter),
+        omsorgsmottaker = listOf()
+    )
 
     private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
         no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(

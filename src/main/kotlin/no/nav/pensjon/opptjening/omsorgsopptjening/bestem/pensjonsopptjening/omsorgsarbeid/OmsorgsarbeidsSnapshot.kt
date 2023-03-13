@@ -12,5 +12,3 @@ fun OmsorgsarbeidsSnapshot.omsorgsArbeid(person: Person): List<OmsorgsArbeid> =
             person.identifiseresAv(Fnr(fnr = omsorgsArbeid.omsorgsyter.fnr))
         }
     }
-
-fun List<OmsorgsArbeid>.omsorgsArbeidsUtbetalinger() = map { it.omsorgsArbeidsUtbetalinger }

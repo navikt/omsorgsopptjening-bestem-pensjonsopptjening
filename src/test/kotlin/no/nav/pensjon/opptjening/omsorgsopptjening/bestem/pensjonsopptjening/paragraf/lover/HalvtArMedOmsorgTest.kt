@@ -2,7 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.OmsorgsArbeidsUtbetalingerOgOmsorgsAr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeidsUtbetalinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -34,7 +35,7 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(fom, tom)
+                    OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
@@ -65,7 +66,7 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(fom, tom)
+                    OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
@@ -86,7 +87,7 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(fom, tom)
+                    OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
@@ -121,8 +122,8 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(fom1, tom1),
-                    OmsorgsArbeidsUtbetalinger(fom2, tom2)
+                    OmsorgsArbeid(fom1, tom1, Person(fnr = FNR), listOf()),
+                    OmsorgsArbeid(fom2, tom2, Person(fnr = FNR), listOf())
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
@@ -152,9 +153,9 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(
-                    OmsorgsArbeidsUtbetalinger(fom1, tom1),
-                    OmsorgsArbeidsUtbetalinger(fom2, tom2),
-                    OmsorgsArbeidsUtbetalinger(fom3, tom3)
+                    OmsorgsArbeid(fom1, tom1, Person(fnr = FNR), listOf()),
+                    OmsorgsArbeid(fom2, tom2, Person(fnr = FNR), listOf()),
+                    OmsorgsArbeid(fom3, tom3, Person(fnr = FNR), listOf())
                 ),
                 omsorgsAr = OMSORGS_AR_2020
             )
@@ -178,5 +179,6 @@ internal class HalvtArMedOmsorgTest {
 
     companion object {
         const val OMSORGS_AR_2020 = 2020
+        const val FNR = "1234"
     }
 }
