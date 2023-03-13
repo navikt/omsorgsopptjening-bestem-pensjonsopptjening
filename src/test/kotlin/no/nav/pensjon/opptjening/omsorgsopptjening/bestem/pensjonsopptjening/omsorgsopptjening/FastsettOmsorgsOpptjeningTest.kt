@@ -13,7 +13,28 @@ import java.time.YearMonth
 internal class FastsettOmsorgsOpptjeningTest {
 
     @Test
-    fun `Given omsorgs arbeid for six months When calling fastsettOmsorgsOpptjening Then return opptjening invilget true`() {
+    fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
+            omsorgsAr = 2010,
+            omsorgsYter = FNR_1,
+            utbetalingsPeriode = listOf(
+                creatUtbetalingsPeriode(
+                    fom = YearMonth.of(2010, Month.JANUARY),
+                    tom = YearMonth.of(2010, Month.JULY),
+                )
+            )
+        )
+
+        val person = createPerson(FNR_1, 1990)
+
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
+
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
+        assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
+    }
+
+    @Test
+    fun `Given omsorgs arbeid for less than seven months When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsYter = FNR_1,
@@ -30,70 +51,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
-        assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
-    }
-
-    @Test
-    fun `Given omsorgs arbeid for less than six months When calling fastsettOmsorgsOpptjening Then return opptjening invilget false`() {
-        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
-            omsorgsAr = 2010,
-            omsorgsYter = FNR_1,
-            utbetalingsPeriode = listOf(
-                creatUtbetalingsPeriode(
-                    fom = YearMonth.of(2010, Month.JANUARY),
-                    tom = YearMonth.of(2010, Month.MAY),
-                )
-            )
-        )
-
-        val person = createPerson(FNR_1, 1990)
-
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
-
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
         assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
-    }
-
-    @Test
-    fun `Given person under 17 years in omsorgsAr When calling fastsettOmsorgsOpptjening Then return opptjening invilget false`() {
-        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
-            omsorgsAr = 2010,
-            omsorgsYter = FNR_1,
-            utbetalingsPeriode = listOf(
-                creatUtbetalingsPeriode(
-                    fom = YearMonth.of(2010, Month.JANUARY),
-                    tom = YearMonth.of(2010, Month.DECEMBER),
-                )
-            )
-        )
-
-        val person = createPerson(FNR_1, fodselsAr = 1994)
-
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
-
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
-        assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
-    }
-
-    @Test
-    fun `Given person over 69 years in omsorgsAr When calling fastsettOmsorgsOpptjening Then return opptjening invilget false`() {
-        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
-            omsorgsAr = 2010,
-            omsorgsYter = FNR_1,
-            utbetalingsPeriode = listOf(
-                creatUtbetalingsPeriode(
-                    fom = YearMonth.of(2010, Month.JANUARY),
-                    tom = YearMonth.of(2010, Month.DECEMBER),
-                )
-            )
-        )
-
-        val person = createPerson(FNR_1, fodselsAr = 1941)
-
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
-
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
-        assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
     }
 
     @ParameterizedTest
@@ -103,7 +61,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         "2000, 2069, INVILGET",
         "2000, 2070, AVSLAG",
     )
-    fun `Given person over 16 and under 70 When calling fastsettOmsorgsOpptjening Then return opptjening invilget true`(
+    fun `Given person over 16 and under 70 When calling fastsettOmsorgsOpptjening Then INVILGET`(
         fodselsAr: Int,
         omsorgsAr: Int,
         expectedAvgjorelse: Avgjorelse
@@ -114,7 +72,7 @@ internal class FastsettOmsorgsOpptjeningTest {
             utbetalingsPeriode = listOf(
                 creatUtbetalingsPeriode(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
-                    tom = YearMonth.of(omsorgsAr, Month.JUNE),
+                    tom = YearMonth.of(omsorgsAr, Month.JULY),
                 )
             )
         )
