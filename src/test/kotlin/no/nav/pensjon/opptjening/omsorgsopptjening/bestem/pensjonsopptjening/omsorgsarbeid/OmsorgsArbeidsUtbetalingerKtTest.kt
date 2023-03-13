@@ -105,6 +105,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         "2019-01, 2020-06, 2020-08, 2021-01, 11",
         "2019-01, 2019-12, 2021-01, 2019-12, 0",
         "2019-01, 2019-06, 2021-06, 2019-12, 0",
+        "2020-01, 2020-01, 2020-03, 2020-04, 3",
     )
     fun `Given given two omsorgsArbeidsUtbetalinger Then count months overlapping with omsorgsAr`(
         fom1: YearMonth,
