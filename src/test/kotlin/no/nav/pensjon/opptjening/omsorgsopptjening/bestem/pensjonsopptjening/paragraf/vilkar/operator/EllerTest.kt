@@ -29,7 +29,7 @@ internal class EllerTest {
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
         )
 
-        assertEquals(Avgjorelse.INVILGET, ellerResultat.avgjorelse)
+        assertEquals(Avgjorelse.INVILGET, ellerResultat.utforVilkarsVurdering().avgjorelse)
     }
 
     @ParameterizedTest
@@ -53,7 +53,7 @@ internal class EllerTest {
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse3)
         )
 
-        assertEquals(Avgjorelse.SAKSBEHANDLING, ellerResultat.avgjorelse)
+        assertEquals(Avgjorelse.SAKSBEHANDLING, ellerResultat.utforVilkarsVurdering().avgjorelse)
     }
 
     @Test
@@ -63,7 +63,7 @@ internal class EllerTest {
             returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.AVSLAG)
         )
 
-        assertEquals(Avgjorelse.AVSLAG, ellerResultat.avgjorelse)
+        assertEquals(Avgjorelse.AVSLAG, ellerResultat.utforVilkarsVurdering().avgjorelse)
     }
 
     companion object {

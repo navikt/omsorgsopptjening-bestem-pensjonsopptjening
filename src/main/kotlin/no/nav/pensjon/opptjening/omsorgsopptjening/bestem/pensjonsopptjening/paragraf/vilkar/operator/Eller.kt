@@ -25,6 +25,6 @@ class Eller<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
             }
         }
 
-        fun eller(vararg vilkar: VilkarsVurdering<*>) = Eller<VilkarsVurdering<*>>().utforVilkarsVurdering(vilkar.toList())
+        fun eller(vararg vilkar: VilkarsVurdering<*>) = Eller<VilkarsVurdering<*>>().vilkarsVurder(vilkar.toList())
     }
 }

@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.PersonUnder70Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.PersonOgOmsorgsAr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Og.Companion.og
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
@@ -13,7 +14,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 class FastsettOmsorgsOpptjening private constructor() {
     companion object {
         fun fastsettOmsorgsOpptjening(snapshot: OmsorgsarbeidsSnapshot, omsorgsGiver: Person, omsorgsMottakere: List<Person>): OmsorgsOpptjening {
-            val vilkarsResultat =
+            val vilkarsVurdering =
                 og(
                     PersonOver16Ar().vilkarsVurder(
                         PersonOgOmsorgsAr(
@@ -27,14 +28,18 @@ class FastsettOmsorgsOpptjening private constructor() {
                             omsorgsAr = snapshot.omsorgsAr
                         )
                     ),
-                    HalvtArMedOmsorg().vilkarsVurder(
-                        HalvtArMedOmsorgGrunnlag(
-                            omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsGiver),
-                            omsorgsMottakere = omsorgsMottakere,
-                            omsorgsAr = snapshot.omsorgsAr
+                    eller(
+                        HalvtArMedOmsorg().vilkarsVurder(
+                            HalvtArMedOmsorgGrunnlag(
+                                omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsGiver),
+                                omsorgsMottakere = omsorgsMottakere,
+                                omsorgsAr = snapshot.omsorgsAr
+                            )
                         )
                     )
                 )
+
+            val vilkarsResultat = vilkarsVurdering.utforVilkarsVurdering()
 
             return OmsorgsOpptjening(
                 omsorgsAr = snapshot.omsorgsAr,

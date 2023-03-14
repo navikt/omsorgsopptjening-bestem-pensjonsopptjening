@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsVurdering
 
-class Og<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
+class Og<T : VilkarsVurdering<*>> : Vilkar<List<T>>(
     vilkarsInformasjon = VilkarsInformasjon(
         beskrivelse = "Alle vilkår må være sanne.",
         begrunnelseForInnvilgelse = "Alle vilkår var sanne.",
@@ -26,6 +26,6 @@ class Og<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
             }
         }
 
-        fun og(vararg vilkar: VilkarsVurdering<*>) = Og<VilkarsVurdering<*>>().utforVilkarsVurdering(vilkar.toList())
+        fun og(vararg vilkarsVurderinger: VilkarsVurdering<*>) = Og<VilkarsVurdering<*>>().vilkarsVurder(vilkarsVurderinger.toList())
     }
 }
