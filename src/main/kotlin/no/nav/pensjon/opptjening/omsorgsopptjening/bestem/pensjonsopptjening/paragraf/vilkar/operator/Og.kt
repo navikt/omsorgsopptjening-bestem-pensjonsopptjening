@@ -17,6 +17,7 @@ class Og<T : VilkarsVurdering<*>> : Vilkar<List<T>>(
     companion object {
 
         private val ogFunksjon = fun(vilkarsVurdering: List<VilkarsVurdering<*>>): Avgjorelse {
+            if(vilkarsVurdering.isEmpty()) return Avgjorelse.AVSLAG
             val avgjorelser = vilkarsVurdering.map { it.utfor().avgjorelse }
 
             return when {
