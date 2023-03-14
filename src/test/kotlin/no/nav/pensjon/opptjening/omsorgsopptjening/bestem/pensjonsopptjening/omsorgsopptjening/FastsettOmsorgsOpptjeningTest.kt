@@ -22,6 +22,7 @@ internal class FastsettOmsorgsOpptjeningTest {
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
                     omsorgsYter = FNR_OMSORGSGIVER,
+                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
@@ -45,6 +46,7 @@ internal class FastsettOmsorgsOpptjeningTest {
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JUNE),
                     omsorgsYter = FNR_OMSORGSGIVER,
+                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
@@ -78,6 +80,7 @@ internal class FastsettOmsorgsOpptjeningTest {
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
                     omsorgsYter = FNR_OMSORGSGIVER,
+                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
@@ -111,12 +114,13 @@ internal class FastsettOmsorgsOpptjeningTest {
             )
         )
 
-    private fun createOmsorgsArbeid(fom: YearMonth, tom: YearMonth, omsorgsYter:String) = OmsorgsArbeid(
+    private fun createOmsorgsArbeid(fom: YearMonth, tom: YearMonth, omsorgsYter: String, omsorgsMottakere: List<String>) = OmsorgsArbeid(
         fom = fom,
         tom = tom,
         omsorgsyter = Person(omsorgsYter),
-        omsorgsmottaker = listOf()
+        omsorgsmottaker = omsorgsMottakere.map { Person(it) }
     )
+
 
     private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
         no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(

@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.omsorgsArbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HalvtArMedOmsorg
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HarOmsorgForNoen
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.PersonOver16Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.PersonUnder70Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
@@ -14,7 +13,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 
 class FastsettOmsorgsOpptjening private constructor() {
     companion object {
-        fun fastsettOmsorgsOpptjening(snapshot: OmsorgsarbeidsSnapshot, omsorgsGiver: Person, omsorgsMottakere: List<Person>): OmsorgsOpptjening {
+        fun fastsettOmsorgsOpptjening(
+            snapshot: OmsorgsarbeidsSnapshot,
+            omsorgsGiver: Person,
+            omsorgsMottakere: List<Person>
+        ): OmsorgsOpptjening {
             val vilkarsVurdering =
                 og(
                     PersonOver16Ar().vilkarsVurder(
@@ -30,10 +33,10 @@ class FastsettOmsorgsOpptjening private constructor() {
                         )
                     ),
                     eller(
-                        omsorgsMottakere.map{
+                        omsorgsMottakere.map {
                             HalvtArMedOmsorg().vilkarsVurder(
                                 HalvtArMedOmsorgGrunnlag(
-                                    omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsGiver),
+                                    omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsGiver, it),
                                     omsorgsMottaker = it,
                                     omsorgsAr = snapshot.omsorgsAr
                                 )
