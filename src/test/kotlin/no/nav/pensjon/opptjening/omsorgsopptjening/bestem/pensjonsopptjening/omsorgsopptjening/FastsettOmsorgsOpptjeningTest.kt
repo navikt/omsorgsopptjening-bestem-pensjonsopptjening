@@ -16,21 +16,21 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsYter = FNR_1,
+            omsorgsYter = FNR,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
-                    omsorgsYter = FNR_1,
+                    omsorgsYter = FNR,
                 )
             )
         )
 
-        val person = createPerson(FNR_1, 1990)
+        val person = createPerson(FNR, 1990)
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf())
 
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR))
         assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
     }
 
@@ -38,21 +38,21 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given omsorgs arbeid for less than seven months When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsYter = FNR_1,
+            omsorgsYter = FNR,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JUNE),
-                    omsorgsYter = FNR_1,
+                    omsorgsYter = FNR,
                 )
             )
         )
 
-        val person = createPerson(FNR_1, 1990)
+        val person = createPerson(FNR, 1990)
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf())
 
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR))
         assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
     }
 
@@ -70,21 +70,21 @@ internal class FastsettOmsorgsOpptjeningTest {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
-            omsorgsYter = FNR_1,
+            omsorgsYter = FNR,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
-                    omsorgsYter = FNR_1,
+                    omsorgsYter = FNR,
                 )
             )
         )
 
-        val person = createPerson(FNR_1, fodselsAr)
+        val person = createPerson(FNR, fodselsAr)
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person)
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf())
 
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_1))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR))
         assertEquals(expectedAvgjorelse, opptjening.invilget)
     }
 
@@ -122,6 +122,6 @@ internal class FastsettOmsorgsOpptjeningTest {
         )
 
     companion object {
-        const val FNR_1: String = "12345678902"
+        const val FNR: String = "12345678902"
     }
 }

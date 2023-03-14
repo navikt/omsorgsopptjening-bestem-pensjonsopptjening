@@ -37,6 +37,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsArbeidsUtbetalinger = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
                 ),
+                barn = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -68,6 +69,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsArbeidsUtbetalinger = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
                 ),
+                barn = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -89,6 +91,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsArbeidsUtbetalinger = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
                 ),
+                barn = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -125,6 +128,7 @@ internal class HalvtArMedOmsorgTest {
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR), listOf()),
                     OmsorgsArbeid(fom2, tom2, Person(fnr = FNR), listOf())
                 ),
+                barn = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -157,6 +161,7 @@ internal class HalvtArMedOmsorgTest {
                     OmsorgsArbeid(fom2, tom2, Person(fnr = FNR), listOf()),
                     OmsorgsArbeid(fom3, tom3, Person(fnr = FNR), listOf())
                 ),
+                barn = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -170,6 +175,7 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                 omsorgsArbeidsUtbetalinger = listOf(),
+                barn = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()

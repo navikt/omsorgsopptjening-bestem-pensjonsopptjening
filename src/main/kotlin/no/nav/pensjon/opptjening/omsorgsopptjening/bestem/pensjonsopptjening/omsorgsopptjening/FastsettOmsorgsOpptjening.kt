@@ -12,7 +12,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 
 class FastsettOmsorgsOpptjening private constructor() {
     companion object {
-        fun fastsettOmsorgsOpptjening(snapshot: OmsorgsarbeidsSnapshot, person: Person): OmsorgsOpptjening {
+        fun fastsettOmsorgsOpptjening(snapshot: OmsorgsarbeidsSnapshot, person: Person, barn: List<Person>): OmsorgsOpptjening {
             val vilkarsResultat =
                 og(
                     PersonOver16Ar().vilkarsVurder(
@@ -30,6 +30,7 @@ class FastsettOmsorgsOpptjening private constructor() {
                     HalvtArMedOmsorg().vilkarsVurder(
                         OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
                             omsorgsArbeidsUtbetalinger = snapshot.omsorgsArbeid(person),
+                            barn = barn,
                             omsorgsAr = snapshot.omsorgsAr
                         )
                     )
