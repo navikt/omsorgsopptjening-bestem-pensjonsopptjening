@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.OmsorgsArbeidsUtbetalingerOgOmsorgsAr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
@@ -33,11 +33,11 @@ internal class HalvtArMedOmsorgTest {
         expectedAvgjorelse: Avgjorelse
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
-            grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
-                omsorgsArbeidsUtbetalinger = listOf(
+            grunnlag = HalvtArMedOmsorgGrunnlag(
+                omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
                 ),
-                barn = listOf(),
+                omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -65,11 +65,11 @@ internal class HalvtArMedOmsorgTest {
         expectedAvgjorelse: Avgjorelse
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
-            grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
-                omsorgsArbeidsUtbetalinger = listOf(
+            grunnlag = HalvtArMedOmsorgGrunnlag(
+                omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
                 ),
-                barn = listOf(),
+                omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -87,11 +87,11 @@ internal class HalvtArMedOmsorgTest {
         tom: YearMonth,
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
-            grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
-                omsorgsArbeidsUtbetalinger = listOf(
+            grunnlag = HalvtArMedOmsorgGrunnlag(
+                omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
                 ),
-                barn = listOf(),
+                omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -123,12 +123,12 @@ internal class HalvtArMedOmsorgTest {
         expectedAvgjorelse: Avgjorelse
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
-            grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
-                omsorgsArbeidsUtbetalinger = listOf(
+            grunnlag = HalvtArMedOmsorgGrunnlag(
+                omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR), listOf()),
                     OmsorgsArbeid(fom2, tom2, Person(fnr = FNR), listOf())
                 ),
-                barn = listOf(),
+                omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -155,13 +155,13 @@ internal class HalvtArMedOmsorgTest {
         expectedAvgjorelse: Avgjorelse
     ) {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
-            grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
-                omsorgsArbeidsUtbetalinger = listOf(
+            grunnlag = HalvtArMedOmsorgGrunnlag(
+                omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR), listOf()),
                     OmsorgsArbeid(fom2, tom2, Person(fnr = FNR), listOf()),
                     OmsorgsArbeid(fom3, tom3, Person(fnr = FNR), listOf())
                 ),
-                barn = listOf(),
+                omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()
@@ -173,9 +173,9 @@ internal class HalvtArMedOmsorgTest {
     @Test
     fun `Given no utbetalingsperioder Then halvt ar med omsorg is AVSLAG`() {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
-            grunnlag = OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
-                omsorgsArbeidsUtbetalinger = listOf(),
-                barn = listOf(),
+            grunnlag = HalvtArMedOmsorgGrunnlag(
+                omsorgsArbeid = listOf(),
+                omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utforVilkarsVurdering()

@@ -3,8 +3,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
 
-data class OmsorgsArbeidsUtbetalingerOgOmsorgsAr(
-    val omsorgsArbeidsUtbetalinger: List<OmsorgsArbeid>,
-    val barn: List<Person>,
+data class HalvtArMedOmsorgGrunnlag(
+    val omsorgsArbeid: List<OmsorgsArbeid>,
+    val omsorgsMottakere: List<Person>,
     val omsorgsAr: Int
 )
