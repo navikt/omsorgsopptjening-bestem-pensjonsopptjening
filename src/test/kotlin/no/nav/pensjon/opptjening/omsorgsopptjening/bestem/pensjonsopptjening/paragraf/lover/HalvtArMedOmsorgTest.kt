@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -35,9 +36,9 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
-                    OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
+                    OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottakere = listOf(),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -67,9 +68,9 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
-                    OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
+                    OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottakere = listOf(),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -89,9 +90,9 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
-                    OmsorgsArbeid(fom, tom, Person(fnr = FNR), listOf())
+                    OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottakere = listOf(),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -125,10 +126,10 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
-                    OmsorgsArbeid(fom1, tom1, Person(fnr = FNR), listOf()),
-                    OmsorgsArbeid(fom2, tom2, Person(fnr = FNR), listOf())
+                    OmsorgsArbeid(fom1, tom1, Person(fnr = FNR_OMSORGSYTER), listOf()),
+                    OmsorgsArbeid(fom2, tom2, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottakere = listOf(),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -157,11 +158,11 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
-                    OmsorgsArbeid(fom1, tom1, Person(fnr = FNR), listOf()),
-                    OmsorgsArbeid(fom2, tom2, Person(fnr = FNR), listOf()),
-                    OmsorgsArbeid(fom3, tom3, Person(fnr = FNR), listOf())
+                    OmsorgsArbeid(fom1, tom1, Person(fnr = FNR_OMSORGSYTER), listOf()),
+                    OmsorgsArbeid(fom2, tom2, Person(fnr = FNR_OMSORGSYTER), listOf()),
+                    OmsorgsArbeid(fom3, tom3, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottakere = listOf(),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -175,7 +176,7 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(),
-                omsorgsMottakere = listOf(),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -183,8 +184,13 @@ internal class HalvtArMedOmsorgTest {
         assertEquals(Avgjorelse.AVSLAG, resultat.avgjorelse)
     }
 
+    private fun createPerson(fnr: String) = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
+        alleFnr = mutableSetOf(Fnr(fnr = fnr))
+    )
+
     companion object {
         const val OMSORGS_AR_2020 = 2020
-        const val FNR = "1234"
+        const val FNR_OMSORGSYTER = "1234"
+        const val FNR_OMSORGSMOTTAKER = "5678"
     }
 }

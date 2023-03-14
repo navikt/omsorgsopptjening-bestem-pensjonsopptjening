@@ -29,10 +29,11 @@ class FastsettOmsorgsOpptjening private constructor() {
                         )
                     ),
                     eller(
+
                         HalvtArMedOmsorg().vilkarsVurder(
                             HalvtArMedOmsorgGrunnlag(
                                 omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsGiver),
-                                omsorgsMottakere = omsorgsMottakere,
+                                omsorgsMottaker = omsorgsMottakere.firstOrNull(),
                                 omsorgsAr = snapshot.omsorgsAr
                             )
                         )
