@@ -40,7 +40,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utforVilkarsVurdering()
+        ).utfor()
 
         assertEquals(expectedAvgjorelse, resultat.avgjorelse)
     }
@@ -72,7 +72,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utforVilkarsVurdering()
+        ).utfor()
 
         assertEquals(expectedAvgjorelse, resultat.avgjorelse)
     }
@@ -94,7 +94,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utforVilkarsVurdering()
+        ).utfor()
 
         assertEquals(Avgjorelse.AVSLAG, resultat.avgjorelse)
     }
@@ -131,7 +131,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utforVilkarsVurdering()
+        ).utfor()
 
         assertEquals(expectedAvgjorelse, resultat.avgjorelse)
     }
@@ -164,7 +164,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utforVilkarsVurdering()
+        ).utfor()
 
         assertEquals(expectedAvgjorelse, resultat.avgjorelse)
     }
@@ -178,7 +178,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsMottakere = listOf(),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utforVilkarsVurdering()
+        ).utfor()
 
         assertEquals(Avgjorelse.AVSLAG, resultat.avgjorelse)
     }

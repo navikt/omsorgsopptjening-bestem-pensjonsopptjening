@@ -39,7 +39,7 @@ class FastsettOmsorgsOpptjening private constructor() {
                     )
                 )
 
-            val vilkarsResultat = vilkarsVurdering.utforVilkarsVurdering()
+            val vilkarsResultat = vilkarsVurdering.utfor()
 
             return OmsorgsOpptjening(
                 omsorgsAr = snapshot.omsorgsAr,

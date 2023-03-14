@@ -6,8 +6,6 @@ open class Vilkar<Grunnlag : Any>(
     val avgjorelsesFunksjon: (Grunnlag) -> Avgjorelse,
 ) {
     fun vilkarsVurder(grunnlag: Grunnlag) = VilkarsVurdering(vilkar = this, grunnlag = grunnlag)
-
-    fun utforVilkarsVurdering(input: Grunnlag) = VilkarsVurdering(this, input).utforVilkarsVurdering()
 }
 
 data class VilkarsInformasjon(

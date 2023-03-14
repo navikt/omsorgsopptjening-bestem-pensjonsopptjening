@@ -18,7 +18,7 @@ internal class OgTest {
             returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.INVILGET)
         )
 
-        kotlin.test.assertEquals(Avgjorelse.INVILGET, ogRegel.utforVilkarsVurdering().avgjorelse)
+        kotlin.test.assertEquals(Avgjorelse.INVILGET, ogRegel.utfor().avgjorelse)
     }
 
     @ParameterizedTest
@@ -38,7 +38,7 @@ internal class OgTest {
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
         )
 
-        Assertions.assertEquals(Avgjorelse.SAKSBEHANDLING, ellerResultat.utforVilkarsVurdering().avgjorelse)
+        Assertions.assertEquals(Avgjorelse.SAKSBEHANDLING, ellerResultat.utfor().avgjorelse)
     }
 
     @ParameterizedTest
@@ -56,7 +56,7 @@ internal class OgTest {
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
         )
 
-        Assertions.assertEquals(Avgjorelse.AVSLAG, ellerResultat.utforVilkarsVurdering().avgjorelse)
+        Assertions.assertEquals(Avgjorelse.AVSLAG, ellerResultat.utfor().avgjorelse)
     }
 
 

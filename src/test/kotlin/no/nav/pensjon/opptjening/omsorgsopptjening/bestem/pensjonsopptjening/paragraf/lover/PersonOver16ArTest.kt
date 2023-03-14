@@ -23,7 +23,7 @@ class PersonOver16ArTest {
     ) {
         val resultat = PersonOver16Ar()
             .vilkarsVurder(PersonOgOmsorgsAr(Person(fodselsAr = fodselsAr), omsorgsAr))
-            .utforVilkarsVurdering()
+            .utfor()
 
         assertEquals(avgjorelseInvilget, resultat.avgjorelse)
     }

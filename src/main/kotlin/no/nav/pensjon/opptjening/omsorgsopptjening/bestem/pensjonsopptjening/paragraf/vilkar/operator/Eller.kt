@@ -16,7 +16,7 @@ class Eller<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
 
     companion object {
         private val ellerFunksjon = fun(vilkarsVurdering: List<VilkarsVurdering<*>>): Avgjorelse {
-            val avgjorelser = vilkarsVurdering.map { it.utforVilkarsVurdering().avgjorelse }
+            val avgjorelser = vilkarsVurdering.map { it.utfor().avgjorelse }
 
             return when {
                 avgjorelser.any { it == Avgjorelse.INVILGET } -> Avgjorelse.INVILGET
@@ -25,6 +25,8 @@ class Eller<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
             }
         }
 
-        fun eller(vararg vilkar: VilkarsVurdering<*>) = Eller<VilkarsVurdering<*>>().vilkarsVurder(vilkar.toList())
+        fun eller(vararg vilkarsVurderinger: VilkarsVurdering<*>) = Eller<VilkarsVurdering<*>>().vilkarsVurder(vilkarsVurderinger.toList())
+
+        fun eller(vilkarsVurderinger: List<VilkarsVurdering<*>>) = Eller<VilkarsVurdering<*>>().vilkarsVurder(vilkarsVurderinger.toList())
     }
 }
