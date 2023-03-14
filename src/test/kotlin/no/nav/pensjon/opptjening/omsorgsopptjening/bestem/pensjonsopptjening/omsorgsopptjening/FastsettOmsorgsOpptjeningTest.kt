@@ -16,21 +16,22 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsYter = FNR,
+            omsorgsYter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
-                    omsorgsYter = FNR,
+                    omsorgsYter = FNR_OMSORGSGIVER,
                 )
             )
         )
 
-        val person = createPerson(FNR, 1990)
+        val person = createPerson(FNR_OMSORGSGIVER, 1990)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015)
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf())
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
         assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
     }
 
@@ -38,21 +39,22 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given omsorgs arbeid for less than seven months When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsYter = FNR,
+            omsorgsYter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JUNE),
-                    omsorgsYter = FNR,
+                    omsorgsYter = FNR_OMSORGSGIVER,
                 )
             )
         )
 
-        val person = createPerson(FNR, 1990)
+        val person = createPerson(FNR_OMSORGSGIVER, 1990)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015)
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf())
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
         assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
     }
 
@@ -70,21 +72,22 @@ internal class FastsettOmsorgsOpptjeningTest {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
-            omsorgsYter = FNR,
+            omsorgsYter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
-                    omsorgsYter = FNR,
+                    omsorgsYter = FNR_OMSORGSGIVER,
                 )
             )
         )
 
-        val person = createPerson(FNR, fodselsAr)
+        val person = createPerson(FNR_OMSORGSGIVER, fodselsAr)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015)
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf())
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
         assertEquals(expectedAvgjorelse, opptjening.invilget)
     }
 
@@ -122,6 +125,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         )
 
     companion object {
-        const val FNR: String = "12345678902"
+        const val FNR_OMSORGSGIVER: String = "12345678902"
+        const val FNR_OMSORGSMOTTAKER: String = "55555555555"
     }
 }

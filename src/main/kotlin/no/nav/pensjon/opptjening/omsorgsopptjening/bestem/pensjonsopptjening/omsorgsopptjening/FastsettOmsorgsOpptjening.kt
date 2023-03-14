@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.omsorgsArbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HalvtArMedOmsorg
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HarOmsorgForNoen
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.PersonOver16Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.PersonUnder70Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
@@ -28,13 +29,17 @@ class FastsettOmsorgsOpptjening private constructor() {
                             omsorgsAr = snapshot.omsorgsAr
                         )
                     ),
-                    eller(
-
-                        HalvtArMedOmsorg().vilkarsVurder(
-                            HalvtArMedOmsorgGrunnlag(
-                                omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsGiver),
-                                omsorgsMottaker = omsorgsMottakere.firstOrNull(),
-                                omsorgsAr = snapshot.omsorgsAr
+                    og(
+                        HarOmsorgForNoen().vilkarsVurder(
+                            omsorgsMottakere
+                        ),
+                        eller(
+                            HalvtArMedOmsorg().vilkarsVurder(
+                                HalvtArMedOmsorgGrunnlag(
+                                    omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsGiver),
+                                    omsorgsMottaker = omsorgsMottakere.firstOrNull(),
+                                    omsorgsAr = snapshot.omsorgsAr
+                                )
                             )
                         )
                     )
