@@ -9,9 +9,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import java.time.Month
 import java.time.YearMonth
 
-internal class HalvtArMedOmsorgTest {
+internal class HalvtArMedOmsorgForBarnUnder6Test {
 
     @ParameterizedTest
     @CsvSource(
@@ -33,7 +34,7 @@ internal class HalvtArMedOmsorgTest {
         tom: YearMonth,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = HalvtArMedOmsorg().vilkarsVurder(
+        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
@@ -65,7 +66,7 @@ internal class HalvtArMedOmsorgTest {
         tom: YearMonth,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = HalvtArMedOmsorg().vilkarsVurder(
+        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
@@ -87,7 +88,7 @@ internal class HalvtArMedOmsorgTest {
         fom: YearMonth,
         tom: YearMonth,
     ) {
-        val resultat = HalvtArMedOmsorg().vilkarsVurder(
+        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
@@ -123,7 +124,7 @@ internal class HalvtArMedOmsorgTest {
         tom2: YearMonth,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = HalvtArMedOmsorg().vilkarsVurder(
+        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR_OMSORGSYTER), listOf()),
@@ -155,7 +156,7 @@ internal class HalvtArMedOmsorgTest {
         tom3: YearMonth,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = HalvtArMedOmsorg().vilkarsVurder(
+        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR_OMSORGSYTER), listOf()),
@@ -173,7 +174,7 @@ internal class HalvtArMedOmsorgTest {
 
     @Test
     fun `Given no utbetalingsperioder Then halvt ar med omsorg is AVSLAG`() {
-        val resultat = HalvtArMedOmsorg().vilkarsVurder(
+        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(),
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
@@ -182,6 +183,30 @@ internal class HalvtArMedOmsorgTest {
         ).utfor()
 
         assertEquals(Avgjorelse.AVSLAG, resultat.avgjorelse)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "2000, 2000, INVILGET",
+        "2005, 2000, INVILGET",
+        "2006, 2000, AVSLAG",
+    )
+    fun `Given omsorgsmottaker younger than 6 years Then halvt ar med omsorg is INVILGET`(
+        omsorgsAr: Int,
+        fodselsArBarn: Int,
+        expectedAvgjorelse: Avgjorelse
+    ) {
+        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = HalvtArMedOmsorgGrunnlag(
+                omsorgsArbeid = listOf(
+                    OmsorgsArbeid(YearMonth.of(omsorgsAr, Month.JANUARY), YearMonth.of(omsorgsAr, Month.DECEMBER), Person(fnr = FNR_OMSORGSYTER), listOf())
+                ),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, fodselsArBarn),
+                omsorgsAr = omsorgsAr
+            )
+        ).utfor()
+
+        assertEquals(expectedAvgjorelse, resultat.avgjorelse)
     }
 
     private fun createPerson(fnr: String, fodselsAr: Int) = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(

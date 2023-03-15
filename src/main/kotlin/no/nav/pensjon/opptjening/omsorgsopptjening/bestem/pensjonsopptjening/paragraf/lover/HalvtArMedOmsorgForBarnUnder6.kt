@@ -6,7 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 
-class HalvtArMedOmsorg : Vilkar<HalvtArMedOmsorgGrunnlag>(
+class HalvtArMedOmsorgForBarnUnder6 : Vilkar<HalvtArMedOmsorgGrunnlag>(
     vilkarsInformasjon = VilkarsInformasjon(
         beskrivelse = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn",
         begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",
@@ -15,11 +15,20 @@ class HalvtArMedOmsorg : Vilkar<HalvtArMedOmsorgGrunnlag>(
     avgjorelsesFunksjon = `Minst 7 moneder omsorg for barn under 6 ar`,
 ) {
     companion object {
-        private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(input: HalvtArMedOmsorgGrunnlag) =
-            if (input.omsorgsArbeid.getAntallUtbetalingMoneder(input.omsorgsAr) >= 7 && (input.omsorgsAr - input.omsorgsMottaker.fodselsAr!! < 6)) {
+        private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: HalvtArMedOmsorgGrunnlag) =
+            if (sevenMonthsOfOmsorgsarbeid(grunnlag) && beneathSixYears(grunnlag)) {
                 Avgjorelse.INVILGET
             } else {
                 Avgjorelse.AVSLAG
             }
+
+        private fun sevenMonthsOfOmsorgsarbeid(grunnlag: HalvtArMedOmsorgGrunnlag): Boolean {
+            return grunnlag.omsorgsArbeid.getAntallUtbetalingMoneder(grunnlag.omsorgsAr) >= 7
+        }
+
+        private fun beneathSixYears(grunnlag: HalvtArMedOmsorgGrunnlag): Boolean {
+            val alder = grunnlag.omsorgsAr - grunnlag.omsorgsMottaker.fodselsAr!!
+            return alder in 0..5
+        }
     }
 }

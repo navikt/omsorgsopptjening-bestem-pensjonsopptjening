@@ -28,7 +28,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         )
 
         val person = createPerson(FNR_OMSORGSGIVER, 1990)
-        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2005)
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 
@@ -87,6 +87,40 @@ internal class FastsettOmsorgsOpptjeningTest {
 
         val person = createPerson(FNR_OMSORGSGIVER, fodselsAr)
         val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 1995)
+
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
+
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
+        assertEquals(expectedAvgjorelse, opptjening.invilget)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "2000, 2001, AVSLAG",
+        "2000, 2000, INVILGET",
+        "2005, 2000, INVILGET",
+        "2006, 2000, AVSLAG",
+    )
+    fun `Given seven months of omsorgs arbeid for child beneath six years When calling fastsettOmsorgsOpptjening Then INVILGET`(
+        omsorgsAr: Int,
+        fodselsAr: Int,
+        expectedAvgjorelse: Avgjorelse
+    ) {
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
+            omsorgsAr = omsorgsAr,
+            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsArbeid = listOf(
+                createOmsorgsArbeid(
+                    fom = YearMonth.of(omsorgsAr, Month.JANUARY),
+                    tom = YearMonth.of(omsorgsAr, Month.JULY),
+                    omsorgsYter = FNR_OMSORGSGIVER,
+                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER)
+                )
+            )
+        )
+
+        val person = createPerson(FNR_OMSORGSGIVER, 1960)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, fodselsAr)
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 
