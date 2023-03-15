@@ -163,6 +163,28 @@ internal class FastsettOmsorgsOpptjeningTest {
         assertEquals(expectedAvgjorelse, opptjening.invilget)
     }
 
+    @Test
+    fun `Given no omsorgsmottaker When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
+            omsorgsAr = 2006,
+            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsArbeid = listOf(
+                createOmsorgsArbeid(
+                    fom = YearMonth.of(2006, Month.JANUARY),
+                    tom = YearMonth.of(2006, Month.JULY),
+                    omsorgsYter = FNR_OMSORGSGIVER,
+                    omsorgsMottakere = listOf()
+                )
+            )
+        )
+
+        val person = createPerson(FNR_OMSORGSGIVER, 1960)
+
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf())
+
+        assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
+    }
+
 
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: Int,
