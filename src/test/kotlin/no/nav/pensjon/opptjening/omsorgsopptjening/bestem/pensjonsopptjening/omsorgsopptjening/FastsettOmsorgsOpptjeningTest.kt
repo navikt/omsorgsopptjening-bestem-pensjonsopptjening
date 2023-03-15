@@ -128,6 +128,41 @@ internal class FastsettOmsorgsOpptjeningTest {
         assertEquals(expectedAvgjorelse, opptjening.invilget)
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        "2006, 2001, 2001, INVILGET",
+        "2006, 2001, 2000, INVILGET",
+        "2006, 2000, 2001, INVILGET",
+        "2006, 2000, 2000, AVSLAG",
+    )
+    fun `Given seven months of omsorgs arbeid for children beneath six years When calling fastsettOmsorgsOpptjening Then INVILGET`(
+        omsorgsAr: Int,
+        fodselsArOmsorgsMottaker1: Int,
+        fodselsArOmsorgsMottaker2: Int,
+        expectedAvgjorelse: Avgjorelse
+    ) {
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
+            omsorgsAr = omsorgsAr,
+            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsArbeid = listOf(
+                createOmsorgsArbeid(
+                    fom = YearMonth.of(omsorgsAr, Month.JANUARY),
+                    tom = YearMonth.of(omsorgsAr, Month.JULY),
+                    omsorgsYter = FNR_OMSORGSGIVER,
+                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER, FNR_OMSORGSMOTTAKER_2)
+                )
+            )
+        )
+
+        val person = createPerson(FNR_OMSORGSGIVER, 1960)
+        val omsorgsmottaker1 = createPerson(FNR_OMSORGSMOTTAKER, fodselsArOmsorgsMottaker1)
+        val omsorgsmottaker2 = createPerson(FNR_OMSORGSMOTTAKER_2, fodselsArOmsorgsMottaker2)
+
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker1, omsorgsmottaker2))
+
+        assertEquals(expectedAvgjorelse, opptjening.invilget)
+    }
+
 
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: Int,
@@ -165,5 +200,6 @@ internal class FastsettOmsorgsOpptjeningTest {
     companion object {
         const val FNR_OMSORGSGIVER: String = "12345678902"
         const val FNR_OMSORGSMOTTAKER: String = "55555555555"
+        const val FNR_OMSORGSMOTTAKER_2: String = "6666666666"
     }
 }
