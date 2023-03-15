@@ -38,7 +38,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -70,7 +70,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -92,7 +92,7 @@ internal class HalvtArMedOmsorgTest {
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -129,7 +129,7 @@ internal class HalvtArMedOmsorgTest {
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR_OMSORGSYTER), listOf()),
                     OmsorgsArbeid(fom2, tom2, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -162,7 +162,7 @@ internal class HalvtArMedOmsorgTest {
                     OmsorgsArbeid(fom2, tom2, Person(fnr = FNR_OMSORGSYTER), listOf()),
                     OmsorgsArbeid(fom3, tom3, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
-                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER,2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -176,7 +176,7 @@ internal class HalvtArMedOmsorgTest {
         val resultat = HalvtArMedOmsorg().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(),
-                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
         ).utfor()
@@ -184,8 +184,9 @@ internal class HalvtArMedOmsorgTest {
         assertEquals(Avgjorelse.AVSLAG, resultat.avgjorelse)
     }
 
-    private fun createPerson(fnr: String) = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
-        alleFnr = mutableSetOf(Fnr(fnr = fnr))
+    private fun createPerson(fnr: String, fodselsAr: Int) = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
+        alleFnr = mutableSetOf(Fnr(fnr = fnr)),
+        fodselsAr = fodselsAr
     )
 
     companion object {

@@ -62,10 +62,10 @@ internal class FastsettOmsorgsOpptjeningTest {
 
     @ParameterizedTest
     @CsvSource(
-        "2000, 2016, AVSLAG",
-        "2000, 2017, INVILGET",
-        "2000, 2069, INVILGET",
-        "2000, 2070, AVSLAG",
+        "1984, 2000, AVSLAG",
+        "1983, 2000, INVILGET",
+        "1931, 2000, INVILGET",
+        "1930, 2000, AVSLAG",
     )
     fun `Given person over 16 and under 70 When calling fastsettOmsorgsOpptjening Then INVILGET`(
         fodselsAr: Int,
@@ -86,7 +86,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         )
 
         val person = createPerson(FNR_OMSORGSGIVER, fodselsAr)
-        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 1995)
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 

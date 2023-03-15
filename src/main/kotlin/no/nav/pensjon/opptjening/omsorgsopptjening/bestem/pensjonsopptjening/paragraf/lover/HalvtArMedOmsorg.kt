@@ -12,11 +12,11 @@ class HalvtArMedOmsorg : Vilkar<HalvtArMedOmsorgGrunnlag>(
         begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",
         begrunnelseForInnvilgelse = "Medlemmet har et halve år med daglig omsorgen for et barn",
     ),
-    avgjorelsesFunksjon = `Minst 7 moneder med omsorg`,
+    avgjorelsesFunksjon = `Minst 7 moneder omsorg for barn under 6 ar`,
 ) {
     companion object {
-        private val `Minst 7 moneder med omsorg` = fun(input: HalvtArMedOmsorgGrunnlag) =
-            if (input.omsorgsArbeid.getAntallUtbetalingMoneder(input.omsorgsAr) >= 7) {
+        private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(input: HalvtArMedOmsorgGrunnlag) =
+            if (input.omsorgsArbeid.getAntallUtbetalingMoneder(input.omsorgsAr) >= 7 && (input.omsorgsAr - input.omsorgsMottaker.fodselsAr!! < 6)) {
                 Avgjorelse.INVILGET
             } else {
                 Avgjorelse.AVSLAG

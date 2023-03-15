@@ -5,6 +5,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 
 data class HalvtArMedOmsorgGrunnlag(
     val omsorgsArbeid: List<OmsorgsArbeid>,
-    val omsorgsMottaker: Person?,
+    val omsorgsMottaker: Person,
     val omsorgsAr: Int
 )
