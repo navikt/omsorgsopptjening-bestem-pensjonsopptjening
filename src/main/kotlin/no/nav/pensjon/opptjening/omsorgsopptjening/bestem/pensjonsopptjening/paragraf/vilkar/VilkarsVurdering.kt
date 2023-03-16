@@ -1,8 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar
 
 open class VilkarsVurdering<Grunnlag : Any>(
-    private val vilkar: Vilkar<Grunnlag>,
-    private val grunnlag: Grunnlag
+    val vilkar: Vilkar<Grunnlag>,
+    val grunnlag: Grunnlag
 ) {
 
     open fun utfor(): VilkarsResultat<Grunnlag> {
