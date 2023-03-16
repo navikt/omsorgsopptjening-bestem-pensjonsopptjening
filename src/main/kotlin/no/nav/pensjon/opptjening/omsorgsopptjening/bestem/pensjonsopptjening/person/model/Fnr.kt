@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -16,6 +17,7 @@ class Fnr(
     var gjeldende: Boolean = false,
     @ManyToOne
     @JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")
+    @JsonIgnore //TODO finn en bedre løsning
     var person: Person? = null,
     @Column(name = "TIMESTAMP", nullable = false)
     var timestamp: LocalDateTime = LocalDateTime.now()
