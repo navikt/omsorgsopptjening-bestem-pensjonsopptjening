@@ -4,12 +4,16 @@ open class VilkarsVurdering<Grunnlag : Any>(
     val vilkar: Vilkar<Grunnlag>,
     val grunnlag: Grunnlag
 ) {
+    fun accept(vilkarsVurderingVisitor: VilkarsVurderingVisitor) {
+        vilkarsVurderingVisitor.visit(this)
+        if(grunnlag is VilkarsVurdering<*> ) grunnlag.accept(vilkarsVurderingVisitor)
+    }
 
     open fun utfor(): VilkarsResultat<Grunnlag> {
         return VilkarsResultat(
             avgjorelse = vilkar.avgjorelsesFunksjon(grunnlag),
             grunnlag = grunnlag,
-            vilkar = vilkar
+            vilkarsVurdering = this
         )
     }
 }

@@ -59,7 +59,7 @@ internal class HalvtArMedOmsorgVisitorTest {
         val halvtArMedOmsorgResultat = HalvtArMedOmsorgVisitor.hentHalvtArMedOmsorg(resultat)
 
         assertEquals(3, halvtArMedOmsorgResultat.size)
-        assertTrue(halvtArMedOmsorgResultat.all { it.vilkar is HalvtArMedOmsorgForBarnUnder6 })
+        assertTrue(halvtArMedOmsorgResultat.all { it.vilkarsVurdering.vilkar is HalvtArMedOmsorgForBarnUnder6 })
         assertTrue(halvtArMedOmsorgResultat.map { it.grunnlag }.contains(halvtAr1.grunnlag))
         assertTrue(halvtArMedOmsorgResultat.map { it.grunnlag }.contains(halvtAr2.grunnlag))
         assertTrue(halvtArMedOmsorgResultat.map { it.grunnlag }.contains(halvtAr3.grunnlag))
