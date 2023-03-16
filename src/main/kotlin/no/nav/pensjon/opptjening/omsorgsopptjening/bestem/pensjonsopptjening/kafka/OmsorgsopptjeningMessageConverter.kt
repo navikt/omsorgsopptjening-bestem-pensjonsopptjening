@@ -14,13 +14,14 @@ fun OmsorgsOpptjening.kafkaValue(): String =
     no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening(
         omsorgsAr = omsorgsAr,
         person = Person(person.gjeldendeFnr.fnr!!),
+        omsorgsmottakereInvilget = omsorgsmottakereInvilget.map { Person(it.gjeldendeFnr.fnr!!) },
         grunnlag = grunnlag,
         omsorgsopptjeningResultater = omsorgsopptjeningResultater.mapToJson(),
         avgjorelse = mapAvgjorelse(invilget)
     ).mapToJson()
 
 private fun mapAvgjorelse(avgjorelse: Avgjorelse): OpptjeningAvgjorelse =
-    when(avgjorelse){
+    when (avgjorelse) {
         Avgjorelse.INVILGET -> OpptjeningAvgjorelse.INVILGET
         Avgjorelse.AVSLAG -> OpptjeningAvgjorelse.AVSLAG
         Avgjorelse.SAKSBEHANDLING -> OpptjeningAvgjorelse.SAKSBEHANDLING
