@@ -185,6 +185,33 @@ internal class FastsettOmsorgsOpptjeningTest {
         assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
     }
 
+    @Test
+    fun `Given omsorgs arbeid for seven months When having omsorgs for more than one person Then omsorgsmottakereInvilget must include INVILGET avgjorelse`() {
+        val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
+            omsorgsAr = 2010,
+            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsArbeid = listOf(
+                createOmsorgsArbeid(
+                    fom = YearMonth.of(2010, Month.JANUARY),
+                    tom = YearMonth.of(2010, Month.JULY),
+                    omsorgsYter = FNR_OMSORGSGIVER,
+                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER, FNR_OMSORGSMOTTAKER_2, FNR_OMSORGSMOTTAKER_3)
+                )
+            )
+        )
+
+        val person = createPerson(FNR_OMSORGSGIVER, 1990)
+        val omsorgsmottaker1 = createPerson(FNR_OMSORGSMOTTAKER, 2005)
+        val omsorgsmottaker2 = createPerson(FNR_OMSORGSMOTTAKER_2, 2007)
+        val omsorgsmottaker3 = createPerson(FNR_OMSORGSMOTTAKER_3, 1995)
+
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker1, omsorgsmottaker2, omsorgsmottaker3))
+
+        assertEquals(opptjening.omsorgsmottakereInvilget.size, 2)
+        assertTrue(opptjening.omsorgsmottakereInvilget.containsAll(listOf(omsorgsmottaker1, omsorgsmottaker2)))
+        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
+        assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
+    }
 
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: Int,
@@ -223,5 +250,6 @@ internal class FastsettOmsorgsOpptjeningTest {
         const val FNR_OMSORGSGIVER: String = "12345678902"
         const val FNR_OMSORGSMOTTAKER: String = "55555555555"
         const val FNR_OMSORGSMOTTAKER_2: String = "6666666666"
+        const val FNR_OMSORGSMOTTAKER_3: String = "4444444444"
     }
 }

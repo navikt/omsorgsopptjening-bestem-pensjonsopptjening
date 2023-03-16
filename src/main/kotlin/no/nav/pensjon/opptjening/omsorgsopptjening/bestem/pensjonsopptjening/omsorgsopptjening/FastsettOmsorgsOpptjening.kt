@@ -6,6 +6,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.PersonUnder70Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.PersonOgOmsorgsAr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.hentHalvtArMedOmsorgVilkarsVurderinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Og.Companion.og
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
@@ -50,10 +52,13 @@ class FastsettOmsorgsOpptjening private constructor() {
             return OmsorgsOpptjening(
                 omsorgsAr = snapshot.omsorgsAr,
                 person = omsorgsGiver,
-                omsorgsMottakere = omsorgsMottakere,
+                alleOmsorgsmottakere = omsorgsMottakere,
                 grunnlag = snapshot,
                 omsorgsopptjeningResultater = vilkarsResultat,
-                invilget = vilkarsResultat.avgjorelse
+                invilget = vilkarsResultat.avgjorelse,
+                omsorgsmottakereInvilget = hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsResultat)
+                    .filter { it.utfor().avgjorelse == Avgjorelse.INVILGET }
+                    .map { it.grunnlag.omsorgsMottaker }
             )
         }
     }

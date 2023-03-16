@@ -8,8 +8,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 class OmsorgsOpptjening(
     val omsorgsAr: Int,
     val person: Person,
-    val omsorgsMottakere: List<Person>,
+    val alleOmsorgsmottakere: List<Person>,
     val grunnlag: OmsorgsarbeidsSnapshot,
     val omsorgsopptjeningResultater: VilkarsResultat<*>,
-    val invilget: Avgjorelse
+    val invilget: Avgjorelse,
+    val omsorgsmottakereInvilget: List<Person> = listOf()
 )
