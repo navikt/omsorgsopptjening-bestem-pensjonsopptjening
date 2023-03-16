@@ -6,7 +6,7 @@ open class VilkarsVurdering<Grunnlag : Any>(
 ) {
     fun accept(vilkarsVurderingVisitor: VilkarsVurderingVisitor) {
         vilkarsVurderingVisitor.visit(this)
-        if(grunnlag is VilkarsVurdering<*> ) grunnlag.accept(vilkarsVurderingVisitor)
+        if (grunnlag is List<*>) grunnlag.forEach { if (it is VilkarsVurdering<*>) it.accept(vilkarsVurderingVisitor) }
     }
 
     open fun utfor(): VilkarsResultat<Grunnlag> {

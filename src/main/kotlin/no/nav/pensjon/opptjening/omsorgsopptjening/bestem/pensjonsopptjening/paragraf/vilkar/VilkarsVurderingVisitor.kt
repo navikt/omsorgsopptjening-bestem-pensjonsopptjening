@@ -9,15 +9,16 @@ interface VilkarsVurderingVisitor {
 
 class HalvtArMedOmsorgVisitor private constructor() : VilkarsVurderingVisitor {
 
-    private val halvtArMedOmsorgList: MutableList<VilkarsResultat<HalvtArMedOmsorgGrunnlag>> = mutableListOf()
+    private val halvtArMedOmsorgList: MutableList<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>> = mutableListOf()
 
     override fun visit(vilkarsVurdering: VilkarsVurdering<*>) {
-        if(vilkarsVurdering.grunnlag is HalvtArMedOmsorgForBarnUnder6 && vilkarsVurdering.vilkar is HalvtArMedOmsorgForBarnUnder6){
-            halvtArMedOmsorgList.add(vilkarsVurdering as VilkarsResultat<HalvtArMedOmsorgGrunnlag>)
-        }    }
+        if (vilkarsVurdering.vilkar is HalvtArMedOmsorgForBarnUnder6) {
+            halvtArMedOmsorgList.add(vilkarsVurdering as VilkarsVurdering<HalvtArMedOmsorgGrunnlag>)
+        }
+    }
 
-    companion object{
-        fun hentHalvtArMedOmsorg(vilkarsResultat: VilkarsResultat<*>) : List<VilkarsResultat<HalvtArMedOmsorgGrunnlag>>{
+    companion object {
+        fun hentHalvtArMedOmsorg(vilkarsResultat: VilkarsResultat<*>): List<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>> {
             val visitor = HalvtArMedOmsorgVisitor()
             vilkarsResultat.vilkarsVurdering.accept(visitor)
             return visitor.halvtArMedOmsorgList.toList()
