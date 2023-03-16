@@ -2,26 +2,30 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HalvtArMedOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.AlleVilkarsVurderinger.Companion.hentAlleVilkarsVurderinger
 
 interface VilkarsVurderingVisitor {
     fun visit(vilkarsVurdering: VilkarsVurdering<*>)
 }
 
-class HalvtArMedOmsorgVisitor private constructor() : VilkarsVurderingVisitor {
-
-    private val halvtArMedOmsorgList: MutableList<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>> = mutableListOf()
+class AlleVilkarsVurderinger private constructor() : VilkarsVurderingVisitor {
+    private val alleVilkarsVurderinger: MutableList<VilkarsVurdering<*>> = mutableListOf()
 
     override fun visit(vilkarsVurdering: VilkarsVurdering<*>) {
-        if (vilkarsVurdering.vilkar is HalvtArMedOmsorgForBarnUnder6) {
-            halvtArMedOmsorgList.add(vilkarsVurdering as VilkarsVurdering<HalvtArMedOmsorgGrunnlag>)
-        }
+        alleVilkarsVurderinger.add(vilkarsVurdering)
     }
 
     companion object {
-        fun hentHalvtArMedOmsorg(vilkarsResultat: VilkarsResultat<*>): List<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>> {
-            val visitor = HalvtArMedOmsorgVisitor()
+        fun hentAlleVilkarsVurderinger(vilkarsResultat: VilkarsResultat<*>): List<VilkarsVurdering<*>> {
+            val visitor = AlleVilkarsVurderinger()
             vilkarsResultat.vilkarsVurdering.accept(visitor)
-            return visitor.halvtArMedOmsorgList.toList()
+            return visitor.alleVilkarsVurderinger.toList()
         }
     }
+}
+
+fun hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsResultat: VilkarsResultat<*>) : List<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>>{
+    return hentAlleVilkarsVurderinger(vilkarsResultat)
+        .filter { it.vilkar is HalvtArMedOmsorgForBarnUnder6 }
+        .map { it as VilkarsVurdering<HalvtArMedOmsorgGrunnlag> }
 }

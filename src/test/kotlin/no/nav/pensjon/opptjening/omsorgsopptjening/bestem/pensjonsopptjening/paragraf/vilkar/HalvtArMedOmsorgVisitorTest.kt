@@ -56,7 +56,7 @@ internal class HalvtArMedOmsorgVisitorTest {
         )
 
         val resultat = vilkarsvurdering.utfor()
-        val halvtArMedOmsorgResultat = HalvtArMedOmsorgVisitor.hentHalvtArMedOmsorg(resultat)
+        val halvtArMedOmsorgResultat = hentHalvtArMedOmsorgVilkarsVurderinger(resultat)
 
         assertEquals(3, halvtArMedOmsorgResultat.size)
         assertTrue(halvtArMedOmsorgResultat.all { it.vilkar is HalvtArMedOmsorgForBarnUnder6 })
