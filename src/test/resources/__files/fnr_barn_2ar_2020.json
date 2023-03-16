@@ -1,0 +1,26 @@
+{
+  "data": {
+    "hentPerson": {
+      "folkeregisteridentifikator": [
+        {
+          "identifikasjonsnummer": "22222222222",
+          "status": "I_BRUK",
+          "type": "FNR",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsaar": 2018,
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ]
+    }
+  }
+}

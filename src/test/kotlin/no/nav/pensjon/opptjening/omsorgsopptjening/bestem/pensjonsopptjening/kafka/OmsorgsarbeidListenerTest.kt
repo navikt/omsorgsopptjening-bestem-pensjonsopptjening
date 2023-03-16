@@ -27,6 +27,8 @@ import org.springframework.cloud.contract.wiremock.WireMockSpring
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
+import java.time.Month
+import java.time.YearMonth
 import kotlin.test.assertEquals
 
 
@@ -57,17 +59,32 @@ internal class OmsorgsarbeidListenerTest {
     fun `Given omsorgsarbeid event Then produce omsorgsopptjening event`() {
         wiremock.stubFor(
             post(urlEqualTo(PDL_PATH))
+                .inScenario("hent for voksen og barn")
+                .whenScenarioStateIs(STARTED)
                 .willReturn(
                     aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBodyFile("fnr_1bruk.json")
                 )
+                .willSetStateTo("Voksen opprettet")
+        )
+        wiremock.stubFor(
+            post(urlEqualTo(PDL_PATH))
+                .inScenario("hent for voksen og barn")
+                .whenScenarioStateIs("Voksen opprettet")
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_barn_2ar_2020.json")
+                )
         )
 
         sendOmsorgsarbeidsSnapshot(
             omsorgsAr = 2020,
             fnr = "12345678910",
+            fnrOmsorgFor = "22222222222",
             omsorgstype = Omsorgstype.BARNETRYGD,
             messageType = KafkaMessageType.OMSORGSARBEID
         )
@@ -75,9 +92,10 @@ internal class OmsorgsarbeidListenerTest {
         val record = omsorgsopptjeingListener.removeFirstRecord(maxSeconds = 10, messageType = OMSORGSOPPTJENING)
         val omsorgsOpptjening = record!!.value().mapToClass(OmsorgsOpptjening::class.java)
 
-        assertEquals(OpptjeningAvgjorelse.AVSLAG, omsorgsOpptjening.avgjorelse)
+        assertEquals(OpptjeningAvgjorelse.INVILGET, omsorgsOpptjening.avgjorelse)
         assertEquals(2020, omsorgsOpptjening.omsorgsAr)
         assertEquals("12345678910", omsorgsOpptjening.person.fnr)
+        assertEquals("22222222222", omsorgsOpptjening.omsorgsmottakereInvilget.first().fnr)
         assertNotNull(omsorgsOpptjening.grunnlag)
         assertNotNull(omsorgsOpptjening.omsorgsopptjeningResultater)
     }
@@ -134,6 +152,7 @@ internal class OmsorgsarbeidListenerTest {
     private fun sendOmsorgsarbeidsSnapshot(
         omsorgsAr: Int,
         fnr: String,
+        fnrOmsorgFor: String? = null,
         omsorgstype: Omsorgstype,
         messageType: KafkaMessageType
     ): OmsorgsarbeidsSnapshot {
@@ -144,7 +163,18 @@ internal class OmsorgsarbeidListenerTest {
                 omsorgstype = Omsorgstype.BARNETRYGD,
                 kjoreHash = "XXX",
                 kilde = Kilde.BA,
-                omsorgsArbeidSaker = listOf()
+                omsorgsArbeidSaker = listOf(
+                    OmsorgsArbeidSak(
+                        omsorgsarbedUtfort = listOf(
+                            OmsorgsArbeid(
+                                fom = YearMonth.of(omsorgsAr, Month.JANUARY),
+                                tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
+                                omsorgsyter = Person(fnr),
+                                omsorgsmottaker = fnrOmsorgFor?.let{listOf(Person(fnrOmsorgFor))}?: listOf()
+                            )
+                        )
+                    )
+                )
             )
 
         val omsorgsArbeidKey = OmsorgsArbeidKey(fnr, omsorgsAr, omsorgstype)
