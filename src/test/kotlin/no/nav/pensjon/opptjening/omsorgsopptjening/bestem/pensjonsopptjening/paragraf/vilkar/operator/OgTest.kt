@@ -13,12 +13,12 @@ internal class OgTest {
 
     @Test
     fun `Given all vilkar is INVILGET When evaluating og Then INVILGET`() {
-        val ogRegel = og(
+        val ogVilkarsVurdering = og(
             returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.INVILGET),
             returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.INVILGET)
         )
 
-        kotlin.test.assertEquals(Avgjorelse.INVILGET, ogRegel.utfor().avgjorelse)
+        kotlin.test.assertEquals(Avgjorelse.INVILGET, ogVilkarsVurdering.avgjorelse)
     }
 
     @ParameterizedTest
@@ -33,12 +33,12 @@ internal class OgTest {
         avgjorelse1: Avgjorelse,
         avgjorelse2: Avgjorelse,
     ) {
-        val ellerResultat = og(
+        val ogVilkarsVurdering = og(
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
         )
 
-        Assertions.assertEquals(Avgjorelse.SAKSBEHANDLING, ellerResultat.utfor().avgjorelse)
+        Assertions.assertEquals(Avgjorelse.SAKSBEHANDLING, ogVilkarsVurdering.avgjorelse)
     }
 
     @ParameterizedTest
@@ -51,12 +51,12 @@ internal class OgTest {
         avgjorelse1: Avgjorelse,
         avgjorelse2: Avgjorelse,
     ) {
-        val ellerResultat = og(
+        val ogVilkarsVurdering = og(
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
         )
 
-        Assertions.assertEquals(Avgjorelse.AVSLAG, ellerResultat.utfor().avgjorelse)
+        Assertions.assertEquals(Avgjorelse.AVSLAG, ogVilkarsVurdering.avgjorelse)
     }
 
 

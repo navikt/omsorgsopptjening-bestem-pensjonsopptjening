@@ -17,7 +17,7 @@ class Eller<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
     companion object {
         private val ellerFunksjon = fun(vilkarsVurdering: List<VilkarsVurdering<*>>): Avgjorelse {
             if(vilkarsVurdering.isEmpty()) return Avgjorelse.AVSLAG
-            val avgjorelser = vilkarsVurdering.map { it.utfor().avgjorelse }
+            val avgjorelser = vilkarsVurdering.map { it.avgjorelse }
 
             return when {
                 avgjorelser.any { it == Avgjorelse.INVILGET } -> Avgjorelse.INVILGET

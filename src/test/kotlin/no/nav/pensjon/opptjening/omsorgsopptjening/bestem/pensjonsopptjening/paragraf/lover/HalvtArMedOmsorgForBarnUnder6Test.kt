@@ -34,7 +34,7 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
         tom: YearMonth,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
@@ -42,9 +42,9 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utfor()
+        )
 
-        assertEquals(expectedAvgjorelse, resultat.avgjorelse)
+        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
     }
 
 
@@ -66,7 +66,7 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
         tom: YearMonth,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
@@ -74,9 +74,9 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utfor()
+        )
 
-        assertEquals(expectedAvgjorelse, resultat.avgjorelse)
+        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
     }
 
     @ParameterizedTest
@@ -88,7 +88,7 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
         fom: YearMonth,
         tom: YearMonth,
     ) {
-        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
@@ -96,9 +96,9 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utfor()
+        )
 
-        assertEquals(Avgjorelse.AVSLAG, resultat.avgjorelse)
+        assertEquals(Avgjorelse.AVSLAG, vilkarsVurdering.avgjorelse)
     }
 
     @ParameterizedTest
@@ -124,7 +124,7 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
         tom2: YearMonth,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR_OMSORGSYTER), listOf()),
@@ -133,9 +133,9 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utfor()
+        )
 
-        assertEquals(expectedAvgjorelse, resultat.avgjorelse)
+        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
     }
 
     @ParameterizedTest
@@ -156,7 +156,7 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
         tom3: YearMonth,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR_OMSORGSYTER), listOf()),
@@ -166,23 +166,23 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER,2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utfor()
+        )
 
-        assertEquals(expectedAvgjorelse, resultat.avgjorelse)
+        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
     }
 
 
     @Test
     fun `Given no utbetalingsperioder Then halvt ar med omsorg is AVSLAG`() {
-        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(),
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
-        ).utfor()
+        )
 
-        assertEquals(Avgjorelse.AVSLAG, resultat.avgjorelse)
+        assertEquals(Avgjorelse.AVSLAG, vilkarsVurdering.avgjorelse)
     }
 
     @ParameterizedTest
@@ -196,7 +196,7 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
         fodselsArBarn: Int,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(YearMonth.of(omsorgsAr, Month.JANUARY), YearMonth.of(omsorgsAr, Month.DECEMBER), Person(fnr = FNR_OMSORGSYTER), listOf())
@@ -204,9 +204,9 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, fodselsArBarn),
                 omsorgsAr = omsorgsAr
             )
-        ).utfor()
+        )
 
-        assertEquals(expectedAvgjorelse, resultat.avgjorelse)
+        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
     }
 
     private fun createPerson(fnr: String, fodselsAr: Int) = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(

@@ -11,11 +11,10 @@ open class VilkarsVurdering<Grunnlag : Any>(
         vilkarsVurderingVisitor.visit(this)
         if (grunnlag is List<*>) grunnlag.forEach { if (it is VilkarsVurdering<*>) it.accept(vilkarsVurderingVisitor) }
     }
+}
 
-    open fun utfor(): VilkarsResultat {
-        return VilkarsResultat(
-            avgjorelse = vilkar.avgjorelsesFunksjon(grunnlag),
-            vilkarsVurdering = this
-        )
-    }
+enum class Avgjorelse {
+    INVILGET,
+    AVSLAG,
+    SAKSBEHANDLING,
 }

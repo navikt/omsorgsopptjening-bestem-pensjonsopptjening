@@ -47,17 +47,14 @@ class FastsettOmsorgsOpptjening private constructor() {
                     )
                 )
 
-            val vilkarsResultat = vilkarsVurdering.utfor()
-
             return OmsorgsOpptjening(
                 omsorgsAr = snapshot.omsorgsAr,
                 person = omsorgsGiver,
-                alleOmsorgsmottakere = omsorgsMottakere,
                 grunnlag = snapshot,
-                omsorgsopptjeningResultater = vilkarsResultat,
-                invilget = vilkarsResultat.avgjorelse,
-                omsorgsmottakereInvilget = hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsResultat)
-                    .filter { it.utfor().avgjorelse == Avgjorelse.INVILGET }
+                omsorgsopptjeningResultater = vilkarsVurdering,
+                invilget = vilkarsVurdering.avgjorelse,
+                omsorgsmottakereInvilget = hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsVurdering)
+                    .filter { it.avgjorelse == Avgjorelse.INVILGET }
                     .map { it.grunnlag.omsorgsMottaker }
             )
         }

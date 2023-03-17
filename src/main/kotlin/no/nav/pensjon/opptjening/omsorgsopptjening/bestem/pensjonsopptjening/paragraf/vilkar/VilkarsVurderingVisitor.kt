@@ -16,16 +16,16 @@ class AlleVilkarsVurderinger private constructor() : VilkarsVurderingVisitor {
     }
 
     companion object {
-        fun hentAlleVilkarsVurderinger(vilkarsResultat: VilkarsResultat): List<VilkarsVurdering<*>> {
+        fun hentAlleVilkarsVurderinger(vilkarsVurdering: VilkarsVurdering<*>): List<VilkarsVurdering<*>> {
             val visitor = AlleVilkarsVurderinger()
-            vilkarsResultat.vilkarsVurdering.accept(visitor)
+            vilkarsVurdering.accept(visitor)
             return visitor.alleVilkarsVurderinger.toList()
         }
     }
 }
 
-fun hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsResultat: VilkarsResultat) : List<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>>{
-    return hentAlleVilkarsVurderinger(vilkarsResultat)
+fun hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsVurdering: VilkarsVurdering<*>) : List<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>>{
+    return hentAlleVilkarsVurderinger(vilkarsVurdering)
         .filter { it.vilkar is HalvtArMedOmsorgForBarnUnder6 }
         .map { it as VilkarsVurdering<HalvtArMedOmsorgGrunnlag> }
 }

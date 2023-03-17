@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.PersonOgOmsorgsAr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
@@ -21,10 +21,8 @@ class PersonUnder70ArTest {
         omsorgsAr: Int,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val resultat = PersonUnder70Ar()
-            .vilkarsVurder(PersonOgOmsorgsAr(Person(fodselsAr = fodselsAr), omsorgsAr))
-            .utfor()
+        val vilkarsVurdering = PersonUnder70Ar().vilkarsVurder(PersonOgOmsorgsAr(Person(fodselsAr = fodselsAr), omsorgsAr))
 
-        assertEquals(expectedAvgjorelse, resultat.avgjorelse)
+        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
     }
 }

@@ -24,12 +24,12 @@ internal class EllerTest {
         avgjorelse1: Avgjorelse,
         avgjorelse2: Avgjorelse,
     ) {
-        val ellerResultat = eller(
+        val vilkarsVurdering = eller(
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
         )
 
-        assertEquals(Avgjorelse.INVILGET, ellerResultat.utfor().avgjorelse)
+        assertEquals(Avgjorelse.INVILGET, vilkarsVurdering.avgjorelse)
     }
 
     @ParameterizedTest
@@ -47,23 +47,23 @@ internal class EllerTest {
         avgjorelse2: Avgjorelse,
         avgjorelse3: Avgjorelse,
     ) {
-        val ellerResultat = eller(
+        val vilkarsVurdering = eller(
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2),
             returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse3)
         )
 
-        assertEquals(Avgjorelse.SAKSBEHANDLING, ellerResultat.utfor().avgjorelse)
+        assertEquals(Avgjorelse.SAKSBEHANDLING, vilkarsVurdering.avgjorelse)
     }
 
     @Test
     fun `Given All vilkar AVSLAG When evaluating eller Then AVSLAG`() {
-        val ellerResultat = eller(
+        val vilkarsVurdering = eller(
             returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.AVSLAG),
             returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.AVSLAG)
         )
 
-        assertEquals(Avgjorelse.AVSLAG, ellerResultat.utfor().avgjorelse)
+        assertEquals(Avgjorelse.AVSLAG, vilkarsVurdering.avgjorelse)
     }
 
     companion object {
