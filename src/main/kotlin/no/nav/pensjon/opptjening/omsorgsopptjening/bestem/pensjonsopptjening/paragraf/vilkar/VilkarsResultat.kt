@@ -1,10 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar
 
-data class VilkarsResultat<Grunnlag : Any>(
+data class VilkarsResultat(
     val avgjorelse: Avgjorelse,
-    val grunnlag: Grunnlag,
-    val vilkarsVurdering: VilkarsVurdering<Grunnlag>,
-) {}
+    val grunnlag: Any,
+    val vilkarsVurdering: VilkarsVurdering<*>,
+)
 
 enum class Avgjorelse {
     INVILGET,

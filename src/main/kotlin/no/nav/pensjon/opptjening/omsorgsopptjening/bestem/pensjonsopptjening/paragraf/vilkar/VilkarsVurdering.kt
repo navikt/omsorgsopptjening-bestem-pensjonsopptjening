@@ -9,7 +9,7 @@ open class VilkarsVurdering<Grunnlag : Any>(
         if (grunnlag is List<*>) grunnlag.forEach { if (it is VilkarsVurdering<*>) it.accept(vilkarsVurderingVisitor) }
     }
 
-    open fun utfor(): VilkarsResultat<Grunnlag> {
+    open fun utfor(): VilkarsResultat {
         return VilkarsResultat(
             avgjorelse = vilkar.avgjorelsesFunksjon(grunnlag),
             grunnlag = grunnlag,

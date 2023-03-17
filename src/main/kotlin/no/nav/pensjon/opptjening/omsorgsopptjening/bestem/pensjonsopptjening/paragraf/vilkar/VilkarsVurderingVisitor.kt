@@ -16,7 +16,7 @@ class AlleVilkarsVurderinger private constructor() : VilkarsVurderingVisitor {
     }
 
     companion object {
-        fun hentAlleVilkarsVurderinger(vilkarsResultat: VilkarsResultat<*>): List<VilkarsVurdering<*>> {
+        fun hentAlleVilkarsVurderinger(vilkarsResultat: VilkarsResultat): List<VilkarsVurdering<*>> {
             val visitor = AlleVilkarsVurderinger()
             vilkarsResultat.vilkarsVurdering.accept(visitor)
             return visitor.alleVilkarsVurderinger.toList()
@@ -24,7 +24,7 @@ class AlleVilkarsVurderinger private constructor() : VilkarsVurderingVisitor {
     }
 }
 
-fun hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsResultat: VilkarsResultat<*>) : List<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>>{
+fun hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsResultat: VilkarsResultat) : List<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>>{
     return hentAlleVilkarsVurderinger(vilkarsResultat)
         .filter { it.vilkar is HalvtArMedOmsorgForBarnUnder6 }
         .map { it as VilkarsVurdering<HalvtArMedOmsorgGrunnlag> }

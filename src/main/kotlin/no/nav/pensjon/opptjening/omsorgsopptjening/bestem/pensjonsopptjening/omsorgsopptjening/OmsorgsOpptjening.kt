@@ -10,7 +10,7 @@ class OmsorgsOpptjening(
     val person: Person,
     val alleOmsorgsmottakere: List<Person>,
     val grunnlag: OmsorgsarbeidsSnapshot,
-    val omsorgsopptjeningResultater: VilkarsResultat<*>,
+    val omsorgsopptjeningResultater: VilkarsResultat,
     val invilget: Avgjorelse,
     val omsorgsmottakereInvilget: List<Person> = listOf()
 )
