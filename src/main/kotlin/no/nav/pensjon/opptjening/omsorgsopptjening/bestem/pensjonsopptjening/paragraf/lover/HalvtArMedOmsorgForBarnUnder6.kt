@@ -16,16 +16,18 @@ class HalvtArMedOmsorgForBarnUnder6 : Vilkar<HalvtArMedOmsorgGrunnlag>(
 ) {
     companion object {
         private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: HalvtArMedOmsorgGrunnlag) =
-            if (grunnlag.minimumOmsorgsarbeid(moneder = 7) && grunnlag.omsorgsMottaker(alder = 0..5)) {
+            if (grunnlag.minimumOmsorgsarbeid(moneder = 7, ar = grunnlag.omsorgsAr) && grunnlag.omsorgsMottaker(alder = 0..5)) {
                 Avgjorelse.INVILGET
-            } else if( grunnlag.minimumOmsorgsarbeid(moneder = 1) && grunnlag.omsorgsMottaker(0..0) ) {
+            } else if (grunnlag.minimumOmsorgsarbeid(moneder = 1, ar = grunnlag.omsorgsAr) && grunnlag.omsorgsMottaker(0..0)) {
+                Avgjorelse.INVILGET
+            } else if (grunnlag.minimumOmsorgsarbeid(moneder = 1, ar = grunnlag.omsorgsAr + 1) && grunnlag.omsorgsMottaker(0..0)) {
                 Avgjorelse.INVILGET
             } else {
                 Avgjorelse.AVSLAG
             }
 
-        private fun HalvtArMedOmsorgGrunnlag.minimumOmsorgsarbeid(moneder: Int): Boolean {
-            return omsorgsArbeid.getAntallUtbetalingMoneder(omsorgsAr) >= moneder
+        private fun HalvtArMedOmsorgGrunnlag.minimumOmsorgsarbeid(moneder: Int, ar: Int): Boolean {
+            return omsorgsArbeid.getAntallUtbetalingMoneder(ar) >= moneder
         }
 
         private fun HalvtArMedOmsorgGrunnlag.omsorgsMottaker(alder: IntRange): Boolean {
