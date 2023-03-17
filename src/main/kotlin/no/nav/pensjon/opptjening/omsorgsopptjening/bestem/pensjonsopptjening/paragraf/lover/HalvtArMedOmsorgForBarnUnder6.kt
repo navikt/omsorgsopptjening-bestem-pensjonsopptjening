@@ -18,6 +18,8 @@ class HalvtArMedOmsorgForBarnUnder6 : Vilkar<HalvtArMedOmsorgGrunnlag>(
         private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: HalvtArMedOmsorgGrunnlag) =
             if (grunnlag.minimumOmsorgsarbeid(moneder = 7) && grunnlag.omsorgsMottaker(alder = 0..5)) {
                 Avgjorelse.INVILGET
+            } else if( grunnlag.minimumOmsorgsarbeid(moneder = 1) && grunnlag.omsorgsMottaker(0..0) ) {
+                Avgjorelse.INVILGET
             } else {
                 Avgjorelse.AVSLAG
             }

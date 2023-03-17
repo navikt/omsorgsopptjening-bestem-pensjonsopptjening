@@ -47,6 +47,31 @@ internal class HalvtArMedOmsorgForBarnUnder6Test {
         assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        "2020-01, 2020-01, INVILGET",
+        "2020-12, 2020-12, INVILGET",
+        "2020-01, 2020-12, INVILGET",
+        "2020-07, 2020-12, INVILGET",
+    )
+    fun `Given at least 1 months of omsorgsarbeid when child is 0 year old Then omsorg is INVILGET`(
+        fom: YearMonth,
+        tom: YearMonth,
+        expectedAvgjorelse: Avgjorelse
+    ) {
+        val vilkarsVurdering = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = HalvtArMedOmsorgGrunnlag(
+                omsorgsArbeid = listOf(
+                    OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
+                ),
+                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2020),
+                omsorgsAr = OMSORGS_AR_2020
+            )
+        )
+
+        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
+    }
+
 
     @ParameterizedTest
     @CsvSource(
