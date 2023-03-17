@@ -12,7 +12,6 @@ open class VilkarsVurdering<Grunnlag : Any>(
     open fun utfor(): VilkarsResultat {
         return VilkarsResultat(
             avgjorelse = vilkar.avgjorelsesFunksjon(grunnlag),
-            grunnlag = grunnlag,
             vilkarsVurdering = this
         )
     }

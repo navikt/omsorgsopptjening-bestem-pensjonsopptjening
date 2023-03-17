@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 
 data class VilkarsResultat(
     val avgjorelse: Avgjorelse,
-    val grunnlag: Any,
     val vilkarsVurdering: VilkarsVurdering<*>,
 )
 
