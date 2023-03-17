@@ -2,10 +2,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.omsorgsArbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.OmsorgForBarnUnder6
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.PersonOver16Ar
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.PersonUnder70Ar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.OmsorgsgiverOver16Ar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.OmsorgsgiverUnder70Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.PersonOgOmsorgsAr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.OmsorgsGiverOgOmsorgsAr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.hentHalvtArMedOmsorgVilkarsVurderinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.eller
@@ -17,20 +17,20 @@ class FastsettOmsorgsOpptjening private constructor() {
     companion object {
         fun fastsettOmsorgsOpptjening(
             snapshot: OmsorgsarbeidsSnapshot,
-            omsorgsGiver: Person,
+            omsorgsgiver: Person,
             omsorgsMottakere: List<Person>
         ): OmsorgsOpptjening {
             val vilkarsVurdering =
                 og(
-                    PersonOver16Ar().vilkarsVurder(
-                        PersonOgOmsorgsAr(
-                            person = omsorgsGiver,
+                    OmsorgsgiverOver16Ar().vilkarsVurder(
+                        OmsorgsGiverOgOmsorgsAr(
+                            omsorgsgiver = omsorgsgiver,
                             omsorgsAr = snapshot.omsorgsAr
                         )
                     ),
-                    PersonUnder70Ar().vilkarsVurder(
-                        PersonOgOmsorgsAr(
-                            person = omsorgsGiver,
+                    OmsorgsgiverUnder70Ar().vilkarsVurder(
+                        OmsorgsGiverOgOmsorgsAr(
+                            omsorgsgiver = omsorgsgiver,
                             omsorgsAr = snapshot.omsorgsAr
                         )
                     ),
@@ -38,7 +38,7 @@ class FastsettOmsorgsOpptjening private constructor() {
                         omsorgsMottakere.map {
                             OmsorgForBarnUnder6().vilkarsVurder(
                                 HalvtArMedOmsorgGrunnlag(
-                                    omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsGiver, it),
+                                    omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsgiver, it),
                                     omsorgsMottaker = it,
                                     omsorgsAr = snapshot.omsorgsAr
                                 )
@@ -49,7 +49,7 @@ class FastsettOmsorgsOpptjening private constructor() {
 
             return OmsorgsOpptjening(
                 omsorgsAr = snapshot.omsorgsAr,
-                person = omsorgsGiver,
+                person = omsorgsgiver,
                 grunnlag = snapshot,
                 omsorgsopptjeningResultater = vilkarsVurdering,
                 invilget = vilkarsVurdering.avgjorelse,

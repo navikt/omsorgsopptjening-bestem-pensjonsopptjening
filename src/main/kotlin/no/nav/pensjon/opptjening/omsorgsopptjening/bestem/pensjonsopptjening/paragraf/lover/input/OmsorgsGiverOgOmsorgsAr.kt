@@ -2,4 +2,4 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 
-data class PersonOgOmsorgsAr(val person: Person, val omsorgsAr: Int)
+data class OmsorgsGiverOgOmsorgsAr(val omsorgsgiver: Person, val omsorgsAr: Int)

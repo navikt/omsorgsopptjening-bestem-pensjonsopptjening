@@ -1,13 +1,13 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.PersonOgOmsorgsAr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.OmsorgsGiverOgOmsorgsAr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-class PersonUnder70ArTest {
+class OmsorgsgiverUnder70ArTest {
     @ParameterizedTest
     @CsvSource(
         "2000, 2071, AVSLAG",
@@ -21,7 +21,7 @@ class PersonUnder70ArTest {
         omsorgsAr: Int,
         expectedAvgjorelse: Avgjorelse
     ) {
-        val vilkarsVurdering = PersonUnder70Ar().vilkarsVurder(PersonOgOmsorgsAr(Person(fodselsAr = fodselsAr), omsorgsAr))
+        val vilkarsVurdering = OmsorgsgiverUnder70Ar().vilkarsVurder(OmsorgsGiverOgOmsorgsAr(Person(fodselsAr = fodselsAr), omsorgsAr))
 
         assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
     }
