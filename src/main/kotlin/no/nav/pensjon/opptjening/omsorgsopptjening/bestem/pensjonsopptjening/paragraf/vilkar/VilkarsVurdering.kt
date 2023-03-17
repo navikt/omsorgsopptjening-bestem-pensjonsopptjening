@@ -5,7 +5,7 @@ open class VilkarsVurdering<Grunnlag : Any>(
     val grunnlag: Grunnlag
 ) {
 
-    val avgjorelse = vilkar.avgjorelsesFunksjon(grunnlag)
+    val utfall = vilkar.utfallsFunksjon(grunnlag)
 
     fun accept(vilkarsVurderingVisitor: VilkarsVurderingVisitor) {
         vilkarsVurderingVisitor.visit(this)
@@ -13,7 +13,7 @@ open class VilkarsVurdering<Grunnlag : Any>(
     }
 }
 
-enum class Avgjorelse {
+enum class Utfall {
     INVILGET,
     AVSLAG,
     SAKSBEHANDLING,

@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pa
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.getAntallUtbetalingMoneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.GrunnlagOmsorgForBarnUnder6
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 
@@ -22,18 +22,18 @@ class OmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
         begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",
         begrunnelseForInnvilgelse = "Medlemmet har et halve år med daglig omsorgen for et barn",
     ),
-    avgjorelsesFunksjon = `Minst 7 moneder omsorg for barn under 6 ar`,
+    utfallsFunksjon = `Minst 7 moneder omsorg for barn under 6 ar`,
 ) {
     companion object {
         private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: GrunnlagOmsorgForBarnUnder6) =
             if (grunnlag.minimumOmsorgsarbeid(moneder = 7, ar = grunnlag.omsorgsAr) && grunnlag.omsorgsMottaker(alder = 0..5)) {
-                Avgjorelse.INVILGET
+                Utfall.INVILGET
             } else if (grunnlag.minimumOmsorgsarbeid(moneder = 1, ar = grunnlag.omsorgsAr) && grunnlag.omsorgsMottaker(0..0)) {
-                Avgjorelse.INVILGET
+                Utfall.INVILGET
             } else if (grunnlag.minimumOmsorgsarbeid(moneder = 1, ar = grunnlag.omsorgsAr + 1) && grunnlag.omsorgsMottaker(0..0)) {
-                Avgjorelse.INVILGET
+                Utfall.INVILGET
             } else {
-                Avgjorelse.AVSLAG
+                Utfall.AVSLAG
             }
 
         private fun GrunnlagOmsorgForBarnUnder6.minimumOmsorgsarbeid(moneder: Int, ar: Int): Boolean {

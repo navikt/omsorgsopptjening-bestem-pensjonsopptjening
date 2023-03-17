@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
 import org.junit.jupiter.api.Assertions.*
@@ -33,7 +33,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
+        assertEquals(Utfall.INVILGET, opptjening.utfall)
     }
 
     @Test
@@ -57,7 +57,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
+        assertEquals(Utfall.AVSLAG, opptjening.utfall)
     }
 
     @ParameterizedTest
@@ -70,7 +70,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given person over 16 and under 70 When calling fastsettOmsorgsOpptjening Then INVILGET`(
         fodselsAr: Int,
         omsorgsAr: Int,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
@@ -91,7 +91,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(expectedAvgjorelse, opptjening.invilget)
+        assertEquals(expectedUtfall, opptjening.utfall)
     }
 
     @ParameterizedTest
@@ -104,7 +104,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given seven months of omsorgs arbeid for child beneath six years When calling fastsettOmsorgsOpptjening Then INVILGET`(
         omsorgsAr: Int,
         fodselsAr: Int,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
@@ -125,7 +125,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(expectedAvgjorelse, opptjening.invilget)
+        assertEquals(expectedUtfall, opptjening.utfall)
     }
 
     @ParameterizedTest
@@ -139,7 +139,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         omsorgsAr: Int,
         fodselsArOmsorgsMottaker1: Int,
         fodselsArOmsorgsMottaker2: Int,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
@@ -160,7 +160,7 @@ internal class FastsettOmsorgsOpptjeningTest {
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker1, omsorgsmottaker2))
 
-        assertEquals(expectedAvgjorelse, opptjening.invilget)
+        assertEquals(expectedUtfall, opptjening.utfall)
     }
 
     @Test
@@ -182,11 +182,11 @@ internal class FastsettOmsorgsOpptjeningTest {
 
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf())
 
-        assertEquals(Avgjorelse.AVSLAG, opptjening.invilget)
+        assertEquals(Utfall.AVSLAG, opptjening.utfall)
     }
 
     @Test
-    fun `Given omsorgs arbeid for seven months When having omsorgs for more than one person Then omsorgsmottakereInvilget must include INVILGET avgjorelse`() {
+    fun `Given omsorgs arbeid for seven months When having omsorgs for more than one person Then INVILGET`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsYter = FNR_OMSORGSGIVER,
@@ -210,7 +210,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         assertEquals(opptjening.omsorgsmottakereInvilget.size, 2)
         assertTrue(opptjening.omsorgsmottakereInvilget.containsAll(listOf(omsorgsmottaker1, omsorgsmottaker2)))
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(Avgjorelse.INVILGET, opptjening.invilget)
+        assertEquals(Utfall.INVILGET, opptjening.utfall)
     }
 
     private fun creatOmsorgsArbeidSnapshot(

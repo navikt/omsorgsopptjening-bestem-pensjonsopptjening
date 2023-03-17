@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.OmsorgsGiverOgOmsorgsAr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.params.ParameterizedTest
@@ -19,10 +19,10 @@ class OmsorgsgiverOver16ArTest {
     fun `Given a person older than 16 years When conducting vilkars vurdering person over 16 Then INVILGET`(
         fodselsAr: Int,
         omsorgsAr: Int,
-        avgjorelseInvilget: Avgjorelse
+        utfallInvilget: Utfall
     ) {
         val vilkarsVurdering = OmsorgsgiverOver16Ar().vilkarsVurder(OmsorgsGiverOgOmsorgsAr(Person(fodselsAr = fodselsAr), omsorgsAr))
 
-        assertEquals(avgjorelseInvilget, vilkarsVurdering.avgjorelse)
+        assertEquals(utfallInvilget, vilkarsVurdering.utfall)
     }
 }

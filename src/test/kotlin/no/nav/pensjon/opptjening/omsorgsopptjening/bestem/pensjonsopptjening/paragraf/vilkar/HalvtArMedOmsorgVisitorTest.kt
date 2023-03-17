@@ -40,17 +40,17 @@ internal class HalvtArMedOmsorgVisitorTest {
         val vilkarsvurdering = og(
             eller(
                 halvtAr2,
-                dummyVilkar.vilkarsVurder(Avgjorelse.INVILGET),
-                dummyVilkar.vilkarsVurder(Avgjorelse.INVILGET),
+                dummyVilkar.vilkarsVurder(Utfall.INVILGET),
+                dummyVilkar.vilkarsVurder(Utfall.INVILGET),
             ),
             eller(
-                dummyVilkar.vilkarsVurder(Avgjorelse.INVILGET),
+                dummyVilkar.vilkarsVurder(Utfall.INVILGET),
                 halvtAr1,
-                dummyVilkar.vilkarsVurder(Avgjorelse.INVILGET),
+                dummyVilkar.vilkarsVurder(Utfall.INVILGET),
             ),
             eller(
-                dummyVilkar.vilkarsVurder(Avgjorelse.INVILGET),
-                dummyVilkar.vilkarsVurder(Avgjorelse.INVILGET),
+                dummyVilkar.vilkarsVurder(Utfall.INVILGET),
+                dummyVilkar.vilkarsVurder(Utfall.INVILGET),
                 halvtAr3
             ),
         )
@@ -79,7 +79,7 @@ internal class HalvtArMedOmsorgVisitorTest {
 
         private val dummyVilkar = Vilkar(
             vilkarsInformasjon = VilkarsInformasjon("test", "test", "test"),
-            avgjorelsesFunksjon = fun(avgjorelse: Avgjorelse) = avgjorelse
+            utfallsFunksjon = fun(utfall: Utfall) = utfall
         )
     }
 }

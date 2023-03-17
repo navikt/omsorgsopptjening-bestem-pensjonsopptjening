@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.eller
@@ -21,15 +21,15 @@ internal class EllerTest {
         "INVILGET, SAKSBEHANDLING",
     )
     fun `Given one vilkar INVILGET When evaluating eller Then INVILGET`(
-        avgjorelse1: Avgjorelse,
-        avgjorelse2: Avgjorelse,
+        utfall1: Utfall,
+        utfall2: Utfall,
     ) {
         val vilkarsVurdering = eller(
-            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
-            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
+            returnUtfall.vilkarsVurder(grunnlag = utfall1),
+            returnUtfall.vilkarsVurder(grunnlag = utfall2)
         )
 
-        assertEquals(Avgjorelse.INVILGET, vilkarsVurdering.avgjorelse)
+        assertEquals(Utfall.INVILGET, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -43,33 +43,33 @@ internal class EllerTest {
         "SAKSBEHANDLING, SAKSBEHANDLING, SAKSBEHANDLING, SAKSBEHANDLING",
     )
     fun `Given at least one vilkar SAKSBEHANDLING and no vilkar INVILGET When evaluating eller Then SAKSBEHANDLING`(
-        avgjorelse1: Avgjorelse,
-        avgjorelse2: Avgjorelse,
-        avgjorelse3: Avgjorelse,
+        utfall1: Utfall,
+        utfall2: Utfall,
+        utfall3: Utfall,
     ) {
         val vilkarsVurdering = eller(
-            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
-            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2),
-            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse3)
+            returnUtfall.vilkarsVurder(grunnlag = utfall1),
+            returnUtfall.vilkarsVurder(grunnlag = utfall2),
+            returnUtfall.vilkarsVurder(grunnlag = utfall3)
         )
 
-        assertEquals(Avgjorelse.SAKSBEHANDLING, vilkarsVurdering.avgjorelse)
+        assertEquals(Utfall.SAKSBEHANDLING, vilkarsVurdering.utfall)
     }
 
     @Test
     fun `Given All vilkar AVSLAG When evaluating eller Then AVSLAG`() {
         val vilkarsVurdering = eller(
-            returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.AVSLAG),
-            returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.AVSLAG)
+            returnUtfall.vilkarsVurder(grunnlag = Utfall.AVSLAG),
+            returnUtfall.vilkarsVurder(grunnlag = Utfall.AVSLAG)
         )
 
-        assertEquals(Avgjorelse.AVSLAG, vilkarsVurdering.avgjorelse)
+        assertEquals(Utfall.AVSLAG, vilkarsVurdering.utfall)
     }
 
     companion object {
-        private val returnAvgjorelse = Vilkar(
+        private val returnUtfall = Vilkar(
             vilkarsInformasjon = VilkarsInformasjon("test", "test", "test"),
-            avgjorelsesFunksjon = fun(avgjorelse: Avgjorelse) = avgjorelse
+            utfallsFunksjon = fun(utfall: Utfall) = utfall
         )
     }
 }

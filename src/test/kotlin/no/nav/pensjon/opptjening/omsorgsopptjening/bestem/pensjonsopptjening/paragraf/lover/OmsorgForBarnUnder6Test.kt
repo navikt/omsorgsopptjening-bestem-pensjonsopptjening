@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.GrunnlagOmsorgForBarnUnder6
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
@@ -32,7 +32,7 @@ internal class OmsorgForBarnUnder6Test {
     fun `Given 7 months of omsorgsarbeid Then halvt ar med omsorg is INVILGET`(
         fom: YearMonth,
         tom: YearMonth,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
@@ -44,7 +44,7 @@ internal class OmsorgForBarnUnder6Test {
             )
         )
 
-        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -57,7 +57,7 @@ internal class OmsorgForBarnUnder6Test {
     fun `Given at least 1 months of omsorgsarbeid when child is 0 year old Then omsorg is INVILGET`(
         fom: YearMonth,
         tom: YearMonth,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
@@ -69,7 +69,7 @@ internal class OmsorgForBarnUnder6Test {
             )
         )
 
-        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -82,7 +82,7 @@ internal class OmsorgForBarnUnder6Test {
     fun `Given months of omsorgsarbeid is 0 in omsorgsAr and 1 in omsorgsAr + 1 when omsorgsmottaker is born in omsorgsAr Then INVILGET`(
         fom: YearMonth,
         tom: YearMonth,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
@@ -94,7 +94,7 @@ internal class OmsorgForBarnUnder6Test {
             )
         )
 
-        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
 
@@ -114,7 +114,7 @@ internal class OmsorgForBarnUnder6Test {
     fun `Given 7 months of omsorgsarbeid When fom or tom overlap with omsorgsar Then halvt ar med omsorg is INVILGET`(
         fom: YearMonth,
         tom: YearMonth,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
@@ -126,7 +126,7 @@ internal class OmsorgForBarnUnder6Test {
             )
         )
 
-        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -148,7 +148,7 @@ internal class OmsorgForBarnUnder6Test {
             )
         )
 
-        assertEquals(Avgjorelse.AVSLAG, vilkarsVurdering.avgjorelse)
+        assertEquals(Utfall.AVSLAG, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -172,7 +172,7 @@ internal class OmsorgForBarnUnder6Test {
         tom1: YearMonth,
         fom2: YearMonth,
         tom2: YearMonth,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
@@ -185,7 +185,7 @@ internal class OmsorgForBarnUnder6Test {
             )
         )
 
-        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -204,7 +204,7 @@ internal class OmsorgForBarnUnder6Test {
         tom2: YearMonth,
         fom3: YearMonth,
         tom3: YearMonth,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
@@ -218,7 +218,7 @@ internal class OmsorgForBarnUnder6Test {
             )
         )
 
-        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
 
@@ -232,7 +232,7 @@ internal class OmsorgForBarnUnder6Test {
             )
         )
 
-        assertEquals(Avgjorelse.AVSLAG, vilkarsVurdering.avgjorelse)
+        assertEquals(Utfall.AVSLAG, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -244,7 +244,7 @@ internal class OmsorgForBarnUnder6Test {
     fun `Given omsorgsmottaker younger than 6 years Then halvt ar med omsorg is INVILGET`(
         omsorgsAr: Int,
         fodselsArBarn: Int,
-        expectedAvgjorelse: Avgjorelse
+        expectedUtfall: Utfall
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
@@ -256,7 +256,7 @@ internal class OmsorgForBarnUnder6Test {
             )
         )
 
-        assertEquals(expectedAvgjorelse, vilkarsVurdering.avgjorelse)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
     private fun createPerson(fnr: String, fodselsAr: Int) = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(

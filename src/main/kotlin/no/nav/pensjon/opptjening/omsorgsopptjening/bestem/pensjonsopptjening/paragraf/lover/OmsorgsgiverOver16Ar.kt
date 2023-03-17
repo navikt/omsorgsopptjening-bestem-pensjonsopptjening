@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.OmsorgsGiverOgOmsorgsAr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 
@@ -12,14 +12,14 @@ class OmsorgsgiverOver16Ar : Vilkar<OmsorgsGiverOgOmsorgsAr>(
         begrunnesleForAvslag = "Medlemmet er under 17 år.",
         begrunnelseForInnvilgelse = "Medlemmet er over 16 år.",
     ),
-    avgjorelsesFunksjon = `Person er over 16 ar`,
+    utfallsFunksjon = `Person er over 16 ar`,
 ) {
     companion object {
         private val `Person er over 16 ar` = fun(input: OmsorgsGiverOgOmsorgsAr) =
             if (input.omsorgsAr - input.omsorgsgiver.fodselsAr!! > 16) {
-                Avgjorelse.INVILGET
+                Utfall.INVILGET
             } else {
-                Avgjorelse.AVSLAG
+                Utfall.AVSLAG
             }
     }
 }

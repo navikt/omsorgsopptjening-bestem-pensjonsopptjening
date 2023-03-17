@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Og.Companion.og
@@ -14,11 +14,11 @@ internal class OgTest {
     @Test
     fun `Given all vilkar is INVILGET When evaluating og Then INVILGET`() {
         val ogVilkarsVurdering = og(
-            returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.INVILGET),
-            returnAvgjorelse.vilkarsVurder(grunnlag = Avgjorelse.INVILGET)
+            returnUtfall.vilkarsVurder(grunnlag = Utfall.INVILGET),
+            returnUtfall.vilkarsVurder(grunnlag = Utfall.INVILGET)
         )
 
-        kotlin.test.assertEquals(Avgjorelse.INVILGET, ogVilkarsVurdering.avgjorelse)
+        kotlin.test.assertEquals(Utfall.INVILGET, ogVilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -30,15 +30,15 @@ internal class OgTest {
         "AVSLAG, SAKSBEHANDLING",
     )
     fun `Given at least one vilkar is SAKSBEHANDLING When evaluating og Then SAKSBEHANDLING`(
-        avgjorelse1: Avgjorelse,
-        avgjorelse2: Avgjorelse,
+        utfall1: Utfall,
+        utfall2: Utfall,
     ) {
         val ogVilkarsVurdering = og(
-            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
-            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
+            returnUtfall.vilkarsVurder(grunnlag = utfall1),
+            returnUtfall.vilkarsVurder(grunnlag = utfall2)
         )
 
-        Assertions.assertEquals(Avgjorelse.SAKSBEHANDLING, ogVilkarsVurdering.avgjorelse)
+        Assertions.assertEquals(Utfall.SAKSBEHANDLING, ogVilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -48,23 +48,23 @@ internal class OgTest {
         "AVSLAG, AVSLAG",
     )
     fun `Given at least one vilkar with AVSLAG and no vilkar with SAKSBEHANDLING When evaluating og Then AVSLAG`(
-        avgjorelse1: Avgjorelse,
-        avgjorelse2: Avgjorelse,
+        utfall1: Utfall,
+        utfall2: Utfall,
     ) {
         val ogVilkarsVurdering = og(
-            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse1),
-            returnAvgjorelse.vilkarsVurder(grunnlag = avgjorelse2)
+            returnUtfall.vilkarsVurder(grunnlag = utfall1),
+            returnUtfall.vilkarsVurder(grunnlag = utfall2)
         )
 
-        Assertions.assertEquals(Avgjorelse.AVSLAG, ogVilkarsVurdering.avgjorelse)
+        Assertions.assertEquals(Utfall.AVSLAG, ogVilkarsVurdering.utfall)
     }
 
 
 
     companion object {
-        private val returnAvgjorelse = Vilkar(
+        private val returnUtfall = Vilkar(
             vilkarsInformasjon = VilkarsInformasjon("test", "test", "test"),
-            avgjorelsesFunksjon = fun(avgjorelse: Avgjorelse) = avgjorelse
+            utfallsFunksjon = fun(utfall: Utfall) = utfall
         )
     }
 }

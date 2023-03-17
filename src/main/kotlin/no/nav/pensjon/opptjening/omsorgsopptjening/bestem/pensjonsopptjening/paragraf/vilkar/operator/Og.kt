@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsVurdering
@@ -11,19 +11,19 @@ class Og<T : VilkarsVurdering<*>> : Vilkar<List<T>>(
         begrunnelseForInnvilgelse = "Alle vilkår var sanne.",
         begrunnesleForAvslag = "Alle vilkår var ikke sanne."
     ),
-    avgjorelsesFunksjon = ogFunksjon
+    utfallsFunksjon = ogFunksjon
 ) {
 
     companion object {
 
-        private val ogFunksjon = fun(vilkarsVurdering: List<VilkarsVurdering<*>>): Avgjorelse {
-            if(vilkarsVurdering.isEmpty()) return Avgjorelse.AVSLAG
-            val avgjorelser = vilkarsVurdering.map { it.avgjorelse }
+        private val ogFunksjon = fun(vilkarsVurdering: List<VilkarsVurdering<*>>): Utfall {
+            if(vilkarsVurdering.isEmpty()) return Utfall.AVSLAG
+            val utfall = vilkarsVurdering.map { it.utfall }
 
             return when {
-                avgjorelser.all { it == Avgjorelse.INVILGET } -> Avgjorelse.INVILGET
-                avgjorelser.any { it == Avgjorelse.SAKSBEHANDLING } -> Avgjorelse.SAKSBEHANDLING
-                else -> Avgjorelse.AVSLAG
+                utfall.all { it == Utfall.INVILGET } -> Utfall.INVILGET
+                utfall.any { it == Utfall.SAKSBEHANDLING } -> Utfall.SAKSBEHANDLING
+                else -> Utfall.AVSLAG
             }
         }
 
