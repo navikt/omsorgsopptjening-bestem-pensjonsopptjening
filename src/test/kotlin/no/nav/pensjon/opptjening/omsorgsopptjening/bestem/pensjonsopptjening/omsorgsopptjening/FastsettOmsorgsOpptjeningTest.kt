@@ -21,8 +21,8 @@ internal class FastsettOmsorgsOpptjeningTest {
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
-                    omsorgsYter = FNR_OMSORGSGIVER,
-                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER)
+                    omsorgsyter = FNR_OMSORGSGIVER,
+                    omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
@@ -45,8 +45,8 @@ internal class FastsettOmsorgsOpptjeningTest {
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JUNE),
-                    omsorgsYter = FNR_OMSORGSGIVER,
-                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER)
+                    omsorgsyter = FNR_OMSORGSGIVER,
+                    omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
@@ -79,8 +79,8 @@ internal class FastsettOmsorgsOpptjeningTest {
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
-                    omsorgsYter = FNR_OMSORGSGIVER,
-                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER)
+                    omsorgsyter = FNR_OMSORGSGIVER,
+                    omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
@@ -113,8 +113,8 @@ internal class FastsettOmsorgsOpptjeningTest {
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
-                    omsorgsYter = FNR_OMSORGSGIVER,
-                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER)
+                    omsorgsyter = FNR_OMSORGSGIVER,
+                    omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
@@ -148,8 +148,8 @@ internal class FastsettOmsorgsOpptjeningTest {
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
-                    omsorgsYter = FNR_OMSORGSGIVER,
-                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER, FNR_OMSORGSMOTTAKER_2)
+                    omsorgsyter = FNR_OMSORGSGIVER,
+                    omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER, FNR_OMSORGSMOTTAKER_2)
                 )
             )
         )
@@ -172,8 +172,8 @@ internal class FastsettOmsorgsOpptjeningTest {
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2006, Month.JANUARY),
                     tom = YearMonth.of(2006, Month.JULY),
-                    omsorgsYter = FNR_OMSORGSGIVER,
-                    omsorgsMottakere = listOf()
+                    omsorgsyter = FNR_OMSORGSGIVER,
+                    omsorgsmottakere = listOf()
                 )
             )
         )
@@ -194,8 +194,8 @@ internal class FastsettOmsorgsOpptjeningTest {
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
-                    omsorgsYter = FNR_OMSORGSGIVER,
-                    omsorgsMottakere = listOf(FNR_OMSORGSMOTTAKER, FNR_OMSORGSMOTTAKER_2, FNR_OMSORGSMOTTAKER_3)
+                    omsorgsyter = FNR_OMSORGSGIVER,
+                    omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER, FNR_OMSORGSMOTTAKER_2, FNR_OMSORGSMOTTAKER_3)
                 )
             )
         )
@@ -232,11 +232,11 @@ internal class FastsettOmsorgsOpptjeningTest {
             )
         )
 
-    private fun createOmsorgsArbeid(fom: YearMonth, tom: YearMonth, omsorgsYter: String, omsorgsMottakere: List<String>) = OmsorgsArbeid(
+    private fun createOmsorgsArbeid(fom: YearMonth, tom: YearMonth, omsorgsyter: String, omsorgsmottakere: List<String>) = OmsorgsArbeid(
         fom = fom,
         tom = tom,
-        omsorgsyter = Person(omsorgsYter),
-        omsorgsmottaker = omsorgsMottakere.map { Person(it) }
+        omsorgsyter = Person(omsorgsyter),
+        omsorgsmottaker = omsorgsmottakere.map { Person(it) }
     )
 
 

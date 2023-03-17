@@ -18,7 +18,7 @@ class FastsettOmsorgsOpptjening private constructor() {
         fun fastsettOmsorgsOpptjening(
             snapshot: OmsorgsarbeidsSnapshot,
             omsorgsgiver: Person,
-            omsorgsMottakere: List<Person>
+            omsorgsmottakere: List<Person>
         ): OmsorgsOpptjening {
             val vilkarsVurdering =
                 og(
@@ -35,7 +35,7 @@ class FastsettOmsorgsOpptjening private constructor() {
                         )
                     ),
                     eller(
-                        omsorgsMottakere.map {
+                        omsorgsmottakere.map {
                             OmsorgForBarnUnder6().vilkarsVurder(
                                 GrunnlagOmsorgForBarnUnder6(
                                     omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsgiver, it),
