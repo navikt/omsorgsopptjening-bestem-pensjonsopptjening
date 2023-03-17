@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.getAntallUtbetalingMoneder
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.GrunnlagOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
@@ -16,7 +16,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
  * Det betyr at vi må sjekke om omsorgsgiver har fått barnetrygd i året etter for å vite om omsorgsyter har rett til omsorgsopptjening
  *
  */
-class OmsorgForBarnUnder6 : Vilkar<HalvtArMedOmsorgGrunnlag>(
+class OmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
     vilkarsInformasjon = VilkarsInformasjon(
         beskrivelse = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn",
         begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",
@@ -25,7 +25,7 @@ class OmsorgForBarnUnder6 : Vilkar<HalvtArMedOmsorgGrunnlag>(
     avgjorelsesFunksjon = `Minst 7 moneder omsorg for barn under 6 ar`,
 ) {
     companion object {
-        private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: HalvtArMedOmsorgGrunnlag) =
+        private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: GrunnlagOmsorgForBarnUnder6) =
             if (grunnlag.minimumOmsorgsarbeid(moneder = 7, ar = grunnlag.omsorgsAr) && grunnlag.omsorgsMottaker(alder = 0..5)) {
                 Avgjorelse.INVILGET
             } else if (grunnlag.minimumOmsorgsarbeid(moneder = 1, ar = grunnlag.omsorgsAr) && grunnlag.omsorgsMottaker(0..0)) {
@@ -36,11 +36,11 @@ class OmsorgForBarnUnder6 : Vilkar<HalvtArMedOmsorgGrunnlag>(
                 Avgjorelse.AVSLAG
             }
 
-        private fun HalvtArMedOmsorgGrunnlag.minimumOmsorgsarbeid(moneder: Int, ar: Int): Boolean {
+        private fun GrunnlagOmsorgForBarnUnder6.minimumOmsorgsarbeid(moneder: Int, ar: Int): Boolean {
             return omsorgsArbeid.getAntallUtbetalingMoneder(ar) >= moneder
         }
 
-        private fun HalvtArMedOmsorgGrunnlag.omsorgsMottaker(alder: IntRange): Boolean {
+        private fun GrunnlagOmsorgForBarnUnder6.omsorgsMottaker(alder: IntRange): Boolean {
             return (omsorgsAr - omsorgsMottaker.fodselsAr!!) in alder
         }
     }

@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.GrunnlagOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Avgjorelse
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
@@ -35,7 +35,7 @@ internal class OmsorgForBarnUnder6Test {
         expectedAvgjorelse: Avgjorelse
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = HalvtArMedOmsorgGrunnlag(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
@@ -60,7 +60,7 @@ internal class OmsorgForBarnUnder6Test {
         expectedAvgjorelse: Avgjorelse
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = HalvtArMedOmsorgGrunnlag(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
@@ -85,7 +85,7 @@ internal class OmsorgForBarnUnder6Test {
         expectedAvgjorelse: Avgjorelse
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = HalvtArMedOmsorgGrunnlag(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
@@ -117,7 +117,7 @@ internal class OmsorgForBarnUnder6Test {
         expectedAvgjorelse: Avgjorelse
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = HalvtArMedOmsorgGrunnlag(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
@@ -139,7 +139,7 @@ internal class OmsorgForBarnUnder6Test {
         tom: YearMonth,
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = HalvtArMedOmsorgGrunnlag(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom, tom, Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),
@@ -175,7 +175,7 @@ internal class OmsorgForBarnUnder6Test {
         expectedAvgjorelse: Avgjorelse
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = HalvtArMedOmsorgGrunnlag(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR_OMSORGSYTER), listOf()),
                     OmsorgsArbeid(fom2, tom2, Person(fnr = FNR_OMSORGSYTER), listOf())
@@ -207,7 +207,7 @@ internal class OmsorgForBarnUnder6Test {
         expectedAvgjorelse: Avgjorelse
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = HalvtArMedOmsorgGrunnlag(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(fom1, tom1, Person(fnr = FNR_OMSORGSYTER), listOf()),
                     OmsorgsArbeid(fom2, tom2, Person(fnr = FNR_OMSORGSYTER), listOf()),
@@ -225,7 +225,7 @@ internal class OmsorgForBarnUnder6Test {
     @Test
     fun `Given no utbetalingsperioder Then halvt ar med omsorg is AVSLAG`() {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = HalvtArMedOmsorgGrunnlag(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(),
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
                 omsorgsAr = OMSORGS_AR_2020
@@ -247,7 +247,7 @@ internal class OmsorgForBarnUnder6Test {
         expectedAvgjorelse: Avgjorelse
     ) {
         val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = HalvtArMedOmsorgGrunnlag(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsArbeid(YearMonth.of(omsorgsAr, Month.JANUARY), YearMonth.of(omsorgsAr, Month.DECEMBER), Person(fnr = FNR_OMSORGSYTER), listOf())
                 ),

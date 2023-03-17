@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.OmsorgForBarnUnder6
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.GrunnlagOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.AlleVilkarsVurderinger.Companion.hentAlleVilkarsVurderinger
 
 interface VilkarsVurderingVisitor {
@@ -24,8 +24,8 @@ class AlleVilkarsVurderinger private constructor() : VilkarsVurderingVisitor {
     }
 }
 
-fun hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsVurdering: VilkarsVurdering<*>) : List<VilkarsVurdering<HalvtArMedOmsorgGrunnlag>>{
+fun hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsVurdering: VilkarsVurdering<*>) : List<VilkarsVurdering<GrunnlagOmsorgForBarnUnder6>>{
     return hentAlleVilkarsVurderinger(vilkarsVurdering)
         .filter { it.vilkar is OmsorgForBarnUnder6 }
-        .map { it as VilkarsVurdering<HalvtArMedOmsorgGrunnlag> }
+        .map { it as VilkarsVurdering<GrunnlagOmsorgForBarnUnder6> }
 }
