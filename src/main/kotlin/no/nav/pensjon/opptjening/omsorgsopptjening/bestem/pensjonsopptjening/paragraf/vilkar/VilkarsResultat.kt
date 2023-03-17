@@ -8,5 +8,5 @@ data class VilkarsResultat(
 enum class Avgjorelse {
     INVILGET,
     AVSLAG,
-    SAKSBEHANDLING
+    SAKSBEHANDLING,
 }
