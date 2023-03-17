@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.HalvtArMedOmsorgForBarnUnder6
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.OmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.input.HalvtArMedOmsorgGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Og.Companion.og
@@ -13,7 +13,7 @@ internal class HalvtArMedOmsorgVisitorTest {
 
     @Test
     fun ape() {
-        val halvtAr1 = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val halvtAr1 = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(),
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER_1, 2015),
@@ -21,7 +21,7 @@ internal class HalvtArMedOmsorgVisitorTest {
             )
         )
 
-        val halvtAr2 = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val halvtAr2 = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(),
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER_2, 2015),
@@ -29,7 +29,7 @@ internal class HalvtArMedOmsorgVisitorTest {
             )
         )
 
-        val halvtAr3 = HalvtArMedOmsorgForBarnUnder6().vilkarsVurder(
+        val halvtAr3 = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = HalvtArMedOmsorgGrunnlag(
                 omsorgsArbeid = listOf(),
                 omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER_3, 2015),
@@ -58,7 +58,7 @@ internal class HalvtArMedOmsorgVisitorTest {
         val halvtArMedOmsorgResultat = hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsvurdering)
 
         assertEquals(3, halvtArMedOmsorgResultat.size)
-        assertTrue(halvtArMedOmsorgResultat.all { it.vilkar is HalvtArMedOmsorgForBarnUnder6 })
+        assertTrue(halvtArMedOmsorgResultat.all { it.vilkar is OmsorgForBarnUnder6 })
         assertTrue(halvtArMedOmsorgResultat.map { it.grunnlag }.contains(halvtAr1.grunnlag))
         assertTrue(halvtArMedOmsorgResultat.map { it.grunnlag }.contains(halvtAr2.grunnlag))
         assertTrue(halvtArMedOmsorgResultat.map { it.grunnlag }.contains(halvtAr3.grunnlag))

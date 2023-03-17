@@ -6,7 +6,17 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsInformasjon
 
-class HalvtArMedOmsorgForBarnUnder6 : Vilkar<HalvtArMedOmsorgGrunnlag>(
+/**
+ * For barn fra 1 til og med 5 år må omsorgsgiver minst ha 7 måneder med omsorgsarbeid for barnet
+ *
+ * For barn som ikke har fylt ett år kreves ikke 7 måneder for å oppnå omsorgsopptjening
+ *
+ * Barn som ikke har fylt ett år og er født i desember vil ikke ha utbetalt barnetrygd og har ikke omsorgsarbeid for året.
+ * De har alikevel rett til full omsorgsopptjening det første året.
+ * Det betyr at vi må sjekke om omsorgsgiver har fått barnetrygd i året etter for å vite om omsorgsyter har rett til omsorgsopptjening
+ *
+ */
+class OmsorgForBarnUnder6 : Vilkar<HalvtArMedOmsorgGrunnlag>(
     vilkarsInformasjon = VilkarsInformasjon(
         beskrivelse = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn",
         begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",
