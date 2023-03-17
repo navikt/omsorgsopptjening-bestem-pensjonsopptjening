@@ -39,7 +39,7 @@ class FastsettOmsorgsOpptjening private constructor() {
                             OmsorgForBarnUnder6().vilkarsVurder(
                                 GrunnlagOmsorgForBarnUnder6(
                                     omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsgiver, it),
-                                    omsorgsMottaker = it,
+                                    omsorgsmottaker = it,
                                     omsorgsAr = snapshot.omsorgsAr
                                 )
                             )
@@ -55,7 +55,7 @@ class FastsettOmsorgsOpptjening private constructor() {
                 utfall = vilkarsVurdering.utfall,
                 omsorgsmottakereInvilget = hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsVurdering)
                     .filter { it.utfall == Utfall.INVILGET }
-                    .map { it.grunnlag.omsorgsMottaker }
+                    .map { it.grunnlag.omsorgsmottaker }
             )
         }
     }

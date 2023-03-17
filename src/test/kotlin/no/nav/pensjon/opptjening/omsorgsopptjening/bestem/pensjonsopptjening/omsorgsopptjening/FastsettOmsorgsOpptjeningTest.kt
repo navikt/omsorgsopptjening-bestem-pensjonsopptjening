@@ -16,7 +16,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsyter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
@@ -40,7 +40,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given omsorgs arbeid for less than seven months When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsyter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
@@ -74,7 +74,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
-            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsyter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
@@ -108,7 +108,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
-            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsyter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
@@ -143,7 +143,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     ) {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
-            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsyter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
@@ -167,7 +167,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given no omsorgsmottaker When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2006,
-            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsyter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2006, Month.JANUARY),
@@ -189,7 +189,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     fun `Given omsorgs arbeid for seven months When having omsorgs for more than one person Then INVILGET`() {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsYter = FNR_OMSORGSGIVER,
+            omsorgsyter = FNR_OMSORGSGIVER,
             omsorgsArbeid = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
@@ -215,14 +215,14 @@ internal class FastsettOmsorgsOpptjeningTest {
 
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: Int,
-        omsorgsYter: String,
+        omsorgsyter: String,
         omsorgsArbeid: List<OmsorgsArbeid>
     ) =
 
         OmsorgsarbeidsSnapshot(
             omsorgsAr = omsorgsAr,
             kjoreHash = "xxx",
-            omsorgsYter = Person(omsorgsYter),
+            omsorgsyter = Person(omsorgsyter),
             omsorgstype = Omsorgstype.BARNETRYGD,
             kilde = Kilde.BA,
             omsorgsArbeidSaker = listOf(

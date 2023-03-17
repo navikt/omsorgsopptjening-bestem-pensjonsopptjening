@@ -98,17 +98,17 @@ internal class OmsorgsarbeidsSnapshotKtTest {
         OmsorgsarbeidsSnapshot(
             omsorgsAr = 2010,
             kjoreHash = "xxx",
-            omsorgsYter = Person(FNR_1),
+            omsorgsyter = Person(FNR_1),
             omsorgstype = Omsorgstype.BARNETRYGD,
             kilde = Kilde.BA,
             omsorgsArbeidSaker = omsorgsArbeidSaker
         )
 
-    private fun createOmsorgsarbeid(omsorgsYter: String, fom: YearMonth, tom: YearMonth) =
+    private fun createOmsorgsarbeid(omsorgsyter: String, fom: YearMonth, tom: YearMonth) =
         OmsorgsArbeid(
             fom,
             tom,
-            omsorgsyter = Person(omsorgsYter),
+            omsorgsyter = Person(omsorgsyter),
             omsorgsmottaker = listOf()
         )
 

@@ -18,15 +18,15 @@ class OmsorgsOpptjeningService(
     fun behandlOmsorgsarbeid(key: OmsorgsArbeidKey, omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot) {
         SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $omsorgsArbeidSnapshot")
 
-        val person = personService.getPerson(omsorgsArbeidSnapshot.omsorgsYter.fnr)
+        val person = personService.getPerson(omsorgsArbeidSnapshot.omsorgsyter.fnr)
         val omsorgsmottakere = getOmsorgsmottakere(omsorgsArbeidSnapshot, person)
         val omsorgsOpptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, omsorgsmottakere)
 
         omsorgsOpptejningProducer.publiserOmsorgsopptejning(omsorgsOpptjening)
     }
 
-    private fun getOmsorgsmottakere(omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot, omsorgsYter: Person): List<Person> {
-        val omsorgsmottakere = omsorgsArbeidSnapshot.omsorgsArbeid(omsorgsYter).flatMap { barn -> barn.omsorgsmottaker.map { it.fnr }}
+    private fun getOmsorgsmottakere(omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot, omsorgsyter: Person): List<Person> {
+        val omsorgsmottakere = omsorgsArbeidSnapshot.omsorgsArbeid(omsorgsyter).flatMap { barn -> barn.omsorgsmottaker.map { it.fnr }}
         return omsorgsmottakere.toSet().map { personService.getPerson(it) }
     }
 

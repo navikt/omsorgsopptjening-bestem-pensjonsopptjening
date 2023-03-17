@@ -5,6 +5,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 
 data class GrunnlagOmsorgForBarnUnder6(
     val omsorgsArbeid: List<OmsorgsArbeid>,
-    val omsorgsMottaker: Person,
+    val omsorgsmottaker: Person,
     val omsorgsAr: Int
 )

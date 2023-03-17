@@ -16,7 +16,7 @@ internal class HalvtArMedOmsorgVisitorTest {
         val halvtAr1 = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(),
-                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER_1, 2015),
+                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER_1, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
         )
@@ -24,7 +24,7 @@ internal class HalvtArMedOmsorgVisitorTest {
         val halvtAr2 = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(),
-                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER_2, 2015),
+                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER_2, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
         )
@@ -32,7 +32,7 @@ internal class HalvtArMedOmsorgVisitorTest {
         val halvtAr3 = OmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(),
-                omsorgsMottaker = createPerson(FNR_OMSORGSMOTTAKER_3, 2015),
+                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER_3, 2015),
                 omsorgsAr = OMSORGS_AR_2020
             )
         )

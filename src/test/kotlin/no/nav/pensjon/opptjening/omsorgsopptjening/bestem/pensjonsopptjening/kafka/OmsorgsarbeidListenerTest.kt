@@ -158,7 +158,7 @@ internal class OmsorgsarbeidListenerTest {
     ): OmsorgsarbeidsSnapshot {
         val omsorgsarbeidsSnapshot =
             OmsorgsarbeidsSnapshot(
-                omsorgsYter = Person(fnr),
+                omsorgsyter = Person(fnr),
                 omsorgsAr = omsorgsAr,
                 omsorgstype = Omsorgstype.BARNETRYGD,
                 kjoreHash = "XXX",

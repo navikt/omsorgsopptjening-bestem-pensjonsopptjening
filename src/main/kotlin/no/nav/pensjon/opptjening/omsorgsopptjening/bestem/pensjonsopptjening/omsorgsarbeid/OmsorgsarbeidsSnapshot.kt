@@ -13,11 +13,11 @@ fun OmsorgsarbeidsSnapshot.omsorgsArbeid(person: Person): List<OmsorgsArbeid> =
         }
     }
 
-fun OmsorgsarbeidsSnapshot.omsorgsArbeid(person: Person, omsorgsMottaker: Person): List<OmsorgsArbeid> =
+fun OmsorgsarbeidsSnapshot.omsorgsArbeid(person: Person, omsorgsmottaker: Person): List<OmsorgsArbeid> =
     omsorgsArbeidSaker.flatMap { sak ->
         sak.omsorgsarbedUtfort.filter { omsorgsArbeid ->
             person.identifiseresAv(Fnr(fnr = omsorgsArbeid.omsorgsyter.fnr)) && omsorgsArbeid.omsorgsmottaker.any {
-                omsorgsMottaker.identifiseresAv(
+                omsorgsmottaker.identifiseresAv(
                     it.fnr
                 )
             }
