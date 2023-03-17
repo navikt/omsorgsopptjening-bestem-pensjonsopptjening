@@ -4,25 +4,24 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjeningKey
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OpptjeningAvgjorelse
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OpptjeningUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
 
 
-fun OmsorgsOpptjening.kafkaKey(): String = OmsorgsOpptjeningKey(omsorgsAr, person.gjeldendeFnr.fnr!!, mapAvgjorelse(utfall)).mapToJson()
+fun OmsorgsOpptjening.kafkaKey(): String = OmsorgsOpptjeningKey(omsorgsAr, person.gjeldendeFnr.fnr!!, mapUtfall(utfall)).mapToJson()
 
-fun OmsorgsOpptjening.kafkaValue(): String =
-    no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening(
+fun OmsorgsOpptjening.kafkaValue(): String = no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening(
         omsorgsAr = omsorgsAr,
         person = Person(person.gjeldendeFnr.fnr!!),
         omsorgsmottakereInvilget = omsorgsmottakereInvilget.map { Person(it.gjeldendeFnr.fnr!!) },
         grunnlag = grunnlag,
         omsorgsopptjeningResultater = omsorgsopptjeningResultater.mapToJson(),
-        avgjorelse = mapAvgjorelse(utfall)
+        utfall = mapUtfall(utfall)
     ).mapToJson()
 
-private fun mapAvgjorelse(utfall: Utfall): OpptjeningAvgjorelse =
+private fun mapUtfall(utfall: Utfall): OpptjeningUtfall =
     when (utfall) {
-        Utfall.INVILGET -> OpptjeningAvgjorelse.INVILGET
-        Utfall.AVSLAG -> OpptjeningAvgjorelse.AVSLAG
-        Utfall.SAKSBEHANDLING -> OpptjeningAvgjorelse.SAKSBEHANDLING
+        Utfall.INVILGET -> OpptjeningUtfall.INVILGET
+        Utfall.AVSLAG -> OpptjeningUtfall.AVSLAG
+        Utfall.SAKSBEHANDLING -> OpptjeningUtfall.SAKSBEHANDLING
     }
