@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val domeneVersion = "1.0.21"
+val domeneVersion = "1.0.22"
 val azureAdClient = "0.0.7"
 val jacksonVersion = "2.14.1"
 val logbackEncoderVersion = "7.2"
@@ -13,6 +13,7 @@ val testcontainersVersion = "1.17.6"
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.8.0"
     id("org.jetbrains.kotlin.plugin.spring") version "1.8.0"
+    //id("org.jetbrains.kotlin.plugin.jpa") version "1.8.0"
     id("org.springframework.boot") version "3.0.3"
 }
 

@@ -235,6 +235,7 @@ internal class FastsettOmsorgsOpptjeningTest {
     private fun createOmsorgsArbeid(fom: YearMonth, tom: YearMonth, omsorgsyter: String, omsorgsmottakere: List<String>) = OmsorgsArbeid(
         fom = fom,
         tom = tom,
+        prosent = 100,
         omsorgsyter = Person(omsorgsyter),
         omsorgsmottaker = omsorgsmottakere.map { Person(it) }
     )

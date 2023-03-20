@@ -169,6 +169,7 @@ internal class OmsorgsarbeidListenerTest {
                             OmsorgsArbeid(
                                 fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
+                                prosent = 100,
                                 omsorgsyter = Person(fnr),
                                 omsorgsmottaker = fnrOmsorgFor?.let{listOf(Person(fnrOmsorgFor))}?: listOf()
                             )
