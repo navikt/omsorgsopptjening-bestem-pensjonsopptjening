@@ -13,7 +13,6 @@ class OmsorgsarbeidPeriode(
     @Column(name = "OMSORGSARBEID_PERIODE_ID", nullable = false)
     var id: Long? = null,
 
-
     @Convert(converter = YearMonthDateConverter::class)
     @Column(name = "FOM", nullable = false)
     val fom: YearMonth,
