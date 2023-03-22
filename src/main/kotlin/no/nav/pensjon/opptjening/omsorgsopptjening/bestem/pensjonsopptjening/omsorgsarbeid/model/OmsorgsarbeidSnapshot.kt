@@ -1,0 +1,36 @@
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
+
+import jakarta.persistence.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
+
+
+@Entity
+@Table(name = "OMSORGSARBEID_SNAPSHOT")
+data class OmsorgsarbeidSnapshot(
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "OMSORGSARBEID_SNAPSHOT_ID", nullable = false)
+    var id: Long? = null,
+
+    @Column(name = "OMSORGS_AR", nullable = false)
+    val omsorgsAr: Int,
+
+    @OneToMany
+    @JoinColumn(name = "OMSORGSARBEID_SNAPSHOT_ID", nullable = false, referencedColumnName = "OMSORGSARBEID_SNAPSHOT_ID")
+    val omsorgsarbeidSaker: List<OmsorgsarbeidSak>,
+
+    @OneToOne
+    @JoinColumn(name = "OMSORGSYTER", nullable = false, referencedColumnName = "PERSON_ID")
+    val omsorgsyter: Person,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "OMSORGSTYPE", nullable = false)
+    val omsorgstype: Omsorgstype,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "KILDE", nullable = false)
+    val kilde: Kilde,
+
+    @Column(name = "KJORE_HASHE", nullable = false)
+    val kjoreHashe: String,
+)

@@ -13,11 +13,13 @@ val testcontainersVersion = "1.17.6"
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.8.0"
     id("org.jetbrains.kotlin.plugin.spring") version "1.8.0"
-    //id("org.jetbrains.kotlin.plugin.jpa") version "1.8.0"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.8.0"
     id("org.springframework.boot") version "3.0.3"
 }
 
 apply(plugin = "io.spring.dependency-management")
+apply(plugin = "kotlin-jpa")
+
 
 group = "no.nav.pensjon.opptjening"
 java.sourceCompatibility = JavaVersion.VERSION_17
