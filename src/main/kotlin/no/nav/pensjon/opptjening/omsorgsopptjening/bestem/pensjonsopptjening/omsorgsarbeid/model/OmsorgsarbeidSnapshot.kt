@@ -16,7 +16,11 @@ data class OmsorgsarbeidSnapshot(
     val omsorgsAr: Int,
 
     @OneToMany
-    @JoinColumn(name = "OMSORGSARBEID_SNAPSHOT_ID", nullable = false, referencedColumnName = "OMSORGSARBEID_SNAPSHOT_ID")
+    @JoinColumn(
+        name = "OMSORGSARBEID_SNAPSHOT_ID",
+        nullable = false,
+        referencedColumnName = "OMSORGSARBEID_SNAPSHOT_ID"
+    )
     val omsorgsarbeidSaker: List<OmsorgsarbeidSak>,
 
     @OneToOne
@@ -33,4 +37,18 @@ data class OmsorgsarbeidSnapshot(
 
     @Column(name = "KJORE_HASHE", nullable = false)
     val kjoreHashe: String,
-)
+) {
+
+    //TODO rename method to omsorgsarbeidPeriode
+    fun omsorgsArbeid() = omsorgsarbeidSaker.flatMap { sak -> sak.omsorgsarbeidPerioder }
+
+
+    //TODO rename method to omsorgsarbeidPeriode
+    fun omsorgsArbeid(person: Person): List<OmsorgsarbeidPeriode> =
+        omsorgsArbeid().filter { person.erSammePerson(it.omsorgsyter) }
+
+
+    //TODO rename method to omsorgsarbeidPeriode
+    fun omsorgsArbeid(person: Person, omsorgsmottaker: Person): List<OmsorgsarbeidPeriode> =
+        omsorgsArbeid(person).filter { periode -> periode.omsorgsmottakere.any { it.erSammePerson(omsorgsmottaker) } }
+}
