@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.FnrRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import org.springframework.stereotype.Service
 
@@ -16,7 +15,12 @@ class PersonService(
         // Henter person fra PDL
         val pdlPerson = pdlService.hentPerson(fnr)
 
-        // Oppdaterer DB med historiske og gjeldende identer
-         return personRepository.updatePerson(pdlPerson)
+
+        return personRepository.updatePerson(pdlPerson)
     }
+
+    fun getPersoner(fnrs: List<String>): List<Person> = fnrs
+        .map { pdlService.hentPerson(it) }
+        .distinctBy { it.gjeldendeFnr }
+        .map { personRepository.updatePerson(it) }
 }
