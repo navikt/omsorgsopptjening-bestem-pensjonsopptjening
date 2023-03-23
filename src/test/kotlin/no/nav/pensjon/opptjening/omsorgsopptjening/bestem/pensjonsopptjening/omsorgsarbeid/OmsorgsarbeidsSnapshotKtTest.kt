@@ -99,8 +99,8 @@ internal class OmsorgsarbeidsSnapshotKtTest {
             omsorgsAr = 2010,
             kjoreHash = "xxx",
             omsorgsyter = Person(FNR_1),
-            omsorgstype = Omsorgstype.BARNETRYGD,
-            kilde = Kilde.BA,
+            omsorgstype = OmsorgsarbeidsType.BARNETRYGD,
+            kilde = OmsorgsarbeidsKilde.BA,
             omsorgsArbeidSaker = omsorgsArbeidSaker
         )
 

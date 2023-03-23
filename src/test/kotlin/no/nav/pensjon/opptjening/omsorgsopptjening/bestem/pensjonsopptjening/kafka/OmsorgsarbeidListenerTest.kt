@@ -85,7 +85,7 @@ internal class OmsorgsarbeidListenerTest {
             omsorgsAr = 2020,
             fnr = "12345678910",
             fnrOmsorgFor = "22222222222",
-            omsorgstype = Omsorgstype.BARNETRYGD,
+            omsorgstype = OmsorgsarbeidsType.BARNETRYGD,
             messageType = KafkaMessageType.OMSORGSARBEID
         )
 
@@ -129,13 +129,13 @@ internal class OmsorgsarbeidListenerTest {
         sendOmsorgsarbeidsSnapshot(
             omsorgsAr = 2020,
             fnr = "12345678910",
-            omsorgstype = Omsorgstype.BARNETRYGD,
+            omsorgstype = OmsorgsarbeidsType.BARNETRYGD,
             messageType = KafkaMessageType.OMSORGSARBEID
         )
         sendOmsorgsarbeidsSnapshot(
             omsorgsAr = 2020,
             fnr = "12345678910",
-            omsorgstype = Omsorgstype.BARNETRYGD,
+            omsorgstype = OmsorgsarbeidsType.BARNETRYGD,
             messageType = KafkaMessageType.OMSORGSARBEID
         )
 
@@ -153,16 +153,16 @@ internal class OmsorgsarbeidListenerTest {
         omsorgsAr: Int,
         fnr: String,
         fnrOmsorgFor: String? = null,
-        omsorgstype: Omsorgstype,
+        omsorgstype: OmsorgsarbeidsType,
         messageType: KafkaMessageType
     ): OmsorgsarbeidsSnapshot {
         val omsorgsarbeidsSnapshot =
             OmsorgsarbeidsSnapshot(
                 omsorgsyter = Person(fnr),
                 omsorgsAr = omsorgsAr,
-                omsorgstype = Omsorgstype.BARNETRYGD,
+                omsorgstype = omsorgstype,
                 kjoreHash = "XXX",
-                kilde = Kilde.BA,
+                kilde = OmsorgsarbeidsKilde.BA,
                 omsorgsArbeidSaker = listOf(
                     OmsorgsArbeidSak(
                         omsorgsarbedUtfort = listOf(
