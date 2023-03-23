@@ -224,7 +224,7 @@ internal class FastsettOmsorgsOpptjeningTest {
             kjoreHash = "xxx",
             omsorgsyter = Person(omsorgsyter),
             omsorgstype = OmsorgsarbeidsType.BARNETRYGD,
-            kilde = OmsorgsarbeidsKilde.BA,
+            kilde = OmsorgsarbeidsKilde.BARNETRYGD,
             omsorgsArbeidSaker = listOf(
                 OmsorgsArbeidSak(
                     omsorgsarbedUtfort = omsorgsArbeid

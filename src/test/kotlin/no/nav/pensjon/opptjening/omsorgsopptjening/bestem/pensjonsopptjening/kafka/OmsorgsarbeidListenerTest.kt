@@ -162,7 +162,7 @@ internal class OmsorgsarbeidListenerTest {
                 omsorgsAr = omsorgsAr,
                 omsorgstype = omsorgstype,
                 kjoreHash = "XXX",
-                kilde = OmsorgsarbeidsKilde.BA,
+                kilde = OmsorgsarbeidsKilde.BARNETRYGD,
                 omsorgsArbeidSaker = listOf(
                     OmsorgsArbeidSak(
                         omsorgsarbedUtfort = listOf(
