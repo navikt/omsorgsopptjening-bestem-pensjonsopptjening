@@ -51,4 +51,7 @@ data class OmsorgsarbeidSnapshot(
     //TODO rename method to omsorgsarbeidPeriode
     fun omsorgsArbeid(person: Person, omsorgsmottaker: Person): List<OmsorgsarbeidPeriode> =
         omsorgsArbeid(person).filter { periode -> periode.omsorgsmottakere.any { it.erSammePerson(omsorgsmottaker) } }
+
+    fun getOmsorgsmottakere(omsorgsyter: Person): List<Person> =
+        omsorgsArbeid(omsorgsyter).flatMap { barn -> barn.omsorgsmottakere }.distinctBy { it.gjeldendeFnr }
 }
