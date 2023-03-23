@@ -116,12 +116,14 @@ internal class OmsorgsarbeidsSnapshotKtTest {
     companion object {
         const val FNR_1 = "12345678901"
         val person1 = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
-            alleFnr = mutableSetOf(Fnr(fnr = FNR_1, gjeldende = true))
+            alleFnr = mutableSetOf(Fnr(fnr = FNR_1, gjeldende = true)),
+            fodselsAr = 1988
         )
 
         const val FNR_2 = "10987654321"
         val person2 = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
-            alleFnr = mutableSetOf(Fnr(fnr = FNR_2, gjeldende = true))
+            alleFnr = mutableSetOf(Fnr(fnr = FNR_2, gjeldende = true)),
+            fodselsAr = 1988
         )
     }
 }

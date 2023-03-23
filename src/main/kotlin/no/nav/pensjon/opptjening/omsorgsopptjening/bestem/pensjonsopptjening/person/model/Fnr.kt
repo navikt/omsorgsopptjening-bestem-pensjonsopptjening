@@ -12,13 +12,13 @@ class Fnr(
     @Column(name = "FNR_ID", nullable = false)
     var id: Long? = null,
     @Column(name = "FNR", nullable = false)
-    var fnr: String? = null,
+    val fnr: String,
     @Column(name = "GJELDENDE", nullable = false)
     var gjeldende: Boolean = false,
     @ManyToOne
     @JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")
     @JsonIgnore //TODO finn en bedre løsning
-    var person: Person? = null,
+    val person: Person? = null,
     @Column(name = "TIMESTAMP", nullable = false)
     var timestamp: LocalDateTime = LocalDateTime.now()
 ) {

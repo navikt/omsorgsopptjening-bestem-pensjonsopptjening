@@ -16,7 +16,7 @@ class OmsorgsgiverOver16Ar : Vilkar<OmsorgsGiverOgOmsorgsAr>(
 ) {
     companion object {
         private val `Person er over 16 ar` = fun(input: OmsorgsGiverOgOmsorgsAr) =
-            if (input.omsorgsAr - input.omsorgsgiver.fodselsAr!! > 16) {
+            if (input.omsorgsAr - input.omsorgsgiver.fodselsAr > 16) {
                 Utfall.INVILGET
             } else {
                 Utfall.AVSLAG

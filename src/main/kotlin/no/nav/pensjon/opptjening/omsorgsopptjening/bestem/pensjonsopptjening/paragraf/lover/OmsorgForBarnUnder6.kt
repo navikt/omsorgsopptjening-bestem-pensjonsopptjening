@@ -41,7 +41,7 @@ class OmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
         }
 
         private fun GrunnlagOmsorgForBarnUnder6.omsorgsmottaker(alder: IntRange): Boolean {
-            return (omsorgsAr - omsorgsmottaker.fodselsAr!!) in alder
+            return (omsorgsAr - omsorgsmottaker.fodselsAr) in alder
         }
     }
 }

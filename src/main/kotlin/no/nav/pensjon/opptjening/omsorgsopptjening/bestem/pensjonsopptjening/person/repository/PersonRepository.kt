@@ -17,7 +17,7 @@ class PersonRepository(
 ) {
     @Transactional
     fun updatePerson(pdlPerson: PdlPerson): Person {
-        val person = findPerson(pdlPerson) ?: Person()
+        val person = findPerson(pdlPerson) ?: Person(fodselsAr = pdlPerson.fodselsAr)
         val initialFnrsInDb = person.alleFnr.toSet()
 
         val updatedPerson = person.apply {

@@ -8,12 +8,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
 
 
-fun OmsorgsOpptjening.kafkaKey(): String = OmsorgsOpptjeningKey(omsorgsAr, person.gjeldendeFnr.fnr!!, mapUtfall(utfall)).mapToJson()
+fun OmsorgsOpptjening.kafkaKey(): String = OmsorgsOpptjeningKey(omsorgsAr, person.gjeldendeFnr.fnr, mapUtfall(utfall)).mapToJson()
 
 fun OmsorgsOpptjening.kafkaValue(): String = no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening(
         omsorgsAr = omsorgsAr,
-        person = Person(person.gjeldendeFnr.fnr!!),
-        omsorgsmottakereInvilget = omsorgsmottakereInvilget.map { Person(it.gjeldendeFnr.fnr!!) },
+        person = Person(person.gjeldendeFnr.fnr),
+        omsorgsmottakereInvilget = omsorgsmottakereInvilget.map { Person(it.gjeldendeFnr.fnr) },
         grunnlag = grunnlag,
         omsorgsopptjeningResultater = omsorgsopptjeningResultater.mapToJson(),
         utfall = mapUtfall(utfall)

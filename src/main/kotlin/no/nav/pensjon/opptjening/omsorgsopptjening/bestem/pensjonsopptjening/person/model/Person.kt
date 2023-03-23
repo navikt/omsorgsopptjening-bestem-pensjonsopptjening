@@ -11,9 +11,9 @@ class Person(
     @Column(name = "PERSON_ID", nullable = false)
     var id: Long? = null,
     @OneToMany(mappedBy = "person", fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-    var alleFnr: MutableSet<Fnr> = mutableSetOf(),
+    val alleFnr: MutableSet<Fnr> = mutableSetOf(),
     @Column(name = "FODSELSAR", nullable = false)
-    var fodselsAr: Int? = null,
+    var fodselsAr: Int,
     @Column(name = "TIMESTAMP", nullable = false)
     var timestamp: LocalDateTime = LocalDateTime.now()
 ) {

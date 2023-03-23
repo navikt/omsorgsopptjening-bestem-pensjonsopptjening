@@ -58,7 +58,7 @@ internal class PersonTest {
     }
 
     @Test
-    fun `Given persons have identical fnrs When calling isSamePerson Then return true`(){
+    fun `Given persons have identical fnrs When calling isSamePerson Then return true`() {
         val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
@@ -75,7 +75,7 @@ internal class PersonTest {
     }
 
     @Test
-    fun `Given gjeldendeFnr intersect with historiskeFnr of another person When calling isSamePerson Then return true`(){
+    fun `Given gjeldendeFnr intersect with historiskeFnr of another person When calling isSamePerson Then return true`() {
         val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
@@ -92,7 +92,7 @@ internal class PersonTest {
     }
 
     @Test
-    fun `Given gjeldendeFnr intersects When calling isSamePerson Then return true`(){
+    fun `Given gjeldendeFnr intersects When calling isSamePerson Then return true`() {
         val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
@@ -109,7 +109,7 @@ internal class PersonTest {
     }
 
     @Test
-    fun `Given one historisk fnr intersects When calling isSamePerson Then return true`(){
+    fun `Given one historisk fnr intersects When calling isSamePerson Then return true`() {
         val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
@@ -126,7 +126,7 @@ internal class PersonTest {
     }
 
     @Test
-    fun `Given no fnrs intersect When calling isSamePerson Then return false`(){
+    fun `Given no fnrs intersect When calling isSamePerson Then return false`() {
         val person1: Person = createPerson(
             gjeldendeFnr = "11111111111",
             historiskeFnr = listOf("2222222222", "3333333333"),
@@ -143,42 +143,47 @@ internal class PersonTest {
     }
 
     @Test
-    fun `Given no gjeldende fnr in db for person when trying to update gjeldende fnr in DB then insert new fnr to person`(){
-        val person = Person()
-        assertEquals( 0, person.alleFnr.filter { it.gjeldende }.size)
+    fun `Given no gjeldende fnr in db for person when trying to update gjeldende fnr in DB then insert new fnr to person`() {
+        val person = Person(fodselsAr = DUMMY_AR)
+        assertEquals(0, person.alleFnr.filter { it.gjeldende }.size)
         person.oppdaterGjeldendeFnr("12345678901")
-        assertEquals( 1, person.alleFnr.filter { it.gjeldende }.size)
+        assertEquals(1, person.alleFnr.filter { it.gjeldende }.size)
     }
 
     @Test
-    fun `Given a gjeldende fnr in db for person when trying to update gjeldende fnr in DB then insert new fnr to person and make old gjeldende to historisk`(){
-        val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = true)))
+    fun `Given a gjeldende fnr in db for person when trying to update gjeldende fnr in DB then insert new fnr to person and make old gjeldende to historisk`() {
+        val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = true)), fodselsAr = DUMMY_AR)
         person.oppdaterGjeldendeFnr("12345678902")
-        assertEquals( 1, person.alleFnr.filter { it.gjeldende }.size)
+        assertEquals(1, person.alleFnr.filter { it.gjeldende }.size)
         assertEquals("12345678902", person.gjeldendeFnr.fnr)
         assertEquals("12345678901", person.historiskeFnr.first().fnr)
     }
 
     @Test
-    fun `Given no historiske fnr in db for person when trying to update historiske fnr in DB then insert new fnr to person`(){
-        val person = Person()
-        assertEquals( 0, person.alleFnr.filter { !it.gjeldende}.size)
+    fun `Given no historiske fnr in db for person when trying to update historiske fnr in DB then insert new fnr to person`() {
+        val person = Person(fodselsAr = DUMMY_AR)
+        assertEquals(0, person.alleFnr.filter { !it.gjeldende }.size)
         person.oppdaterHistoriskeFnr(listOf("12345678901"))
-        assertEquals( 1, person.alleFnr.filter { !it.gjeldende }.size)
+        assertEquals(1, person.alleFnr.filter { !it.gjeldende }.size)
         assertEquals("12345678901", person.historiskeFnr.first().fnr)
     }
 
     @Test
-    fun `Given a historiske fnr in db for person when trying to update historiske fnr in DBthen insert new fnr to person and remove old historiske fnr`(){
-        val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = false)))
+    fun `Given a historiske fnr in db for person when trying to update historiske fnr in DBthen insert new fnr to person and remove old historiske fnr`() {
+        val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = false)), fodselsAr = DUMMY_AR)
         person.oppdaterHistoriskeFnr(listOf("12345678902"))
-        assertEquals( 1, person.alleFnr.filter { !it.gjeldende }.size)
+        assertEquals(1, person.alleFnr.filter { !it.gjeldende }.size)
         assertEquals("12345678902", person.alleFnr.first().fnr)
     }
 
     private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
         Person(
-            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toMutableSet().apply { add(Fnr(fnr = gjeldendeFnr, gjeldende = true)) },
+            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toMutableSet()
+                .apply { add(Fnr(fnr = gjeldendeFnr, gjeldende = true)) },
             fodselsAr = fodselsAr
         )
+
+    companion object {
+        const val DUMMY_AR = 1988
+    }
 }
