@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.mapper.OmsorgsarbeidSnapshotMapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToJson
@@ -14,7 +15,7 @@ fun OmsorgsOpptjening.kafkaValue(): String = no.nav.pensjon.opptjening.omsorgsop
         omsorgsAr = omsorgsAr,
         person = Person(person.gjeldendeFnr.fnr),
         omsorgsmottakereInvilget = omsorgsmottakereInvilget.map { Person(it.gjeldendeFnr.fnr) },
-        grunnlag = grunnlag,
+        grunnlag = OmsorgsarbeidSnapshotMapper.map(grunnlag),
         omsorgsopptjeningResultater = omsorgsopptjeningResultater.mapToJson(),
         utfall = mapUtfall(utfall)
     ).mapToJson()
