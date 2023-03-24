@@ -40,9 +40,9 @@ class OmsorgsarbeidPeriode(
 
 
 
-fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(omsorgsAr: Int) = (getUtbetalingMoneder() begrensTilAr omsorgsAr).antall()
+fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(omsorgsAr: Int) = (getAlleUtbetalingMoneder() begrensTilAr omsorgsAr).antall()
 
-fun List<OmsorgsarbeidPeriode>.getUtbetalingMoneder(): UtbetalingMoneder {
+fun List<OmsorgsarbeidPeriode>.getAlleUtbetalingMoneder(): UtbetalingMoneder {
     val alleUtbetalingsMoneder = map{ UtbetalingMoneder(it.fom, it.tom) }
     return alleUtbetalingsMoneder.fold(initial = UtbetalingMoneder()) { acc, moneder -> acc + moneder }
 }
