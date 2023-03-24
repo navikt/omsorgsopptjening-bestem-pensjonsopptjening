@@ -10,15 +10,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.hentOmsorgForBarnUnder6VilkarsVurderinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Og.Companion.og
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 
 class FastsettOmsorgsOpptjening private constructor() {
     companion object {
-        fun fastsettOmsorgsOpptjening(
-            snapshot: OmsorgsarbeidSnapshot,
-            omsorgsmottakere: List<Person>
-        ): OmsorgsOpptjening {
+        fun fastsettOmsorgsOpptjening(snapshot: OmsorgsarbeidSnapshot): OmsorgsOpptjening {
             val omsorgsgiver = snapshot.omsorgsyter
+            val omsorgsmottakere = snapshot.getOmsorgsmottakere(omsorgsgiver)
 
             val vilkarsVurdering =
                 og(

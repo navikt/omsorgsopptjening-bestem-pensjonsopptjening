@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsOpptejningProducer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsArbeidService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeidKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 import org.slf4j.LoggerFactory
@@ -16,11 +15,12 @@ class OmsorgsOpptjeningService(
 
     fun behandlOmsorgsarbeid(key: OmsorgsArbeidKey, omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot) {
         SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $omsorgsArbeidSnapshot")
-        val omsorgsarbeidsSnapshot: OmsorgsarbeidSnapshot = omsorgsArbeidService.getOmsorgsarbeidSnapshot(omsorgsArbeidSnapshot)
-        val omsorgsmottakere = omsorgsarbeidsSnapshot.getOmsorgsmottakere(omsorgsarbeidsSnapshot.omsorgsyter)
-        val omsorgsOpptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsarbeidsSnapshot, omsorgsmottakere)
 
-        omsorgsOpptejningProducer.publiserOmsorgsopptejning(omsorgsOpptjening)
+        omsorgsOpptejningProducer.publiserOmsorgsopptejning(
+            FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(
+                omsorgsArbeidService.getOmsorgsarbeidSnapshot(omsorgsArbeidSnapshot)
+            )
+        )
     }
 
     companion object {
