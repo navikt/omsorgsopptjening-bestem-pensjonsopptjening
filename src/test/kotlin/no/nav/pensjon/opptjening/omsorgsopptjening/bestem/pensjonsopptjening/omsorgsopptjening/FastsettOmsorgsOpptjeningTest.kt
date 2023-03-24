@@ -261,12 +261,12 @@ internal class FastsettOmsorgsOpptjeningTest {
                 alleFnr = mutableSetOf(Fnr(fnr = it)),
                 fodselsAr = 1988
             )
-        } // TODO alder
+        }
     )
 
 
     private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
-        no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
+        Person(
             alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toMutableSet()
                 .apply { add(Fnr(fnr = gjeldendeFnr, gjeldende = true)) },
             fodselsAr = fodselsAr

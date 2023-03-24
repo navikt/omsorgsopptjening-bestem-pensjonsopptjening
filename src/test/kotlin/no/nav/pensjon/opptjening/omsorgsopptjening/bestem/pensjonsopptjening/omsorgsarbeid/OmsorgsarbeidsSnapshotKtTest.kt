@@ -1,7 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import org.junit.jupiter.api.Test
 import java.time.Month
 import java.time.YearMonth
@@ -12,14 +13,12 @@ internal class OmsorgsarbeidsSnapshotKtTest {
 
     @Test
     fun `Given omsorg OmsorgsArbeid on person 1 When fetching omsorg for person 1 Then return omsorgsArbeid for person 1`() {
-        val omsorgsArbeidPerson1 = createOmsorgsarbeid(FNR_1, YearMonth.of(2010, Month.JANUARY), YearMonth.of(2010, Month.AUGUST))
+        val omsorgsArbeidPerson1 = createOmsorgsarbeid(person1, YearMonth.of(2010, Month.JANUARY), YearMonth.of(2010, Month.AUGUST))
 
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
-                OmsorgsArbeidSak(
-                    omsorgsarbedUtfort = listOf(
-                        omsorgsArbeidPerson1
-                    )
+                OmsorgsarbeidSak(
+                    omsorgsarbeidPerioder = listOf(omsorgsArbeidPerson1)
                 )
             )
         )
@@ -33,14 +32,14 @@ internal class OmsorgsarbeidsSnapshotKtTest {
     @Test
     fun `Given multiple omsorg OmsorgsArbeid on person 1 When fetching omsorg for person 1 Then return omsorgsArbeid for person 1`() {
         val omsorgsArbeidPerson1 = listOf(
-            createOmsorgsarbeid(FNR_1, YearMonth.of(2010, Month.JANUARY), YearMonth.of(2010, Month.AUGUST)),
-            createOmsorgsarbeid(FNR_1, YearMonth.of(2010, Month.SEPTEMBER), YearMonth.of(2010, Month.DECEMBER)),
+            createOmsorgsarbeid(person1, YearMonth.of(2010, Month.JANUARY), YearMonth.of(2010, Month.AUGUST)),
+            createOmsorgsarbeid(person1, YearMonth.of(2010, Month.SEPTEMBER), YearMonth.of(2010, Month.DECEMBER)),
         )
 
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
-                OmsorgsArbeidSak(
-                    omsorgsarbedUtfort = omsorgsArbeidPerson1
+                OmsorgsarbeidSak(
+                    omsorgsarbeidPerioder = omsorgsArbeidPerson1
                 )
             )
         )
@@ -53,12 +52,12 @@ internal class OmsorgsarbeidsSnapshotKtTest {
 
     @Test
     fun `Given omsorg OmsorgsArbeid on person 2 When fetching omsorg for person 1 Then return zero omsorgsArbeid`() {
-        val omsorgsArbeidPerson2 = createOmsorgsarbeid(FNR_2, YearMonth.of(2010, Month.JANUARY), YearMonth.of(2010, Month.AUGUST))
+        val omsorgsArbeidPerson2 = createOmsorgsarbeid(person2, YearMonth.of(2010, Month.JANUARY), YearMonth.of(2010, Month.AUGUST))
 
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
-                OmsorgsArbeidSak(
-                    omsorgsarbedUtfort = listOf(
+                OmsorgsarbeidSak(
+                    omsorgsarbeidPerioder = listOf(
                         omsorgsArbeidPerson2
                     )
                 )
@@ -74,13 +73,13 @@ internal class OmsorgsarbeidsSnapshotKtTest {
 
     @Test
     fun `Given omsorg OmsorgsArbeid on person 1 and 2 When fetching omsorg for person 1 Then return omsorgsArbeid for person 1`() {
-        val omsorgsArbeidPerson1 = createOmsorgsarbeid(FNR_1, YearMonth.of(2010, Month.JANUARY), YearMonth.of(2010, Month.AUGUST))
-        val omsorgsArbeidPerson2 = createOmsorgsarbeid(FNR_2, YearMonth.of(2010, Month.AUGUST), YearMonth.of(2010, Month.DECEMBER))
+        val omsorgsArbeidPerson1 = createOmsorgsarbeid(person1, YearMonth.of(2010, Month.JANUARY), YearMonth.of(2010, Month.AUGUST))
+        val omsorgsArbeidPerson2 = createOmsorgsarbeid(person2, YearMonth.of(2010, Month.AUGUST), YearMonth.of(2010, Month.DECEMBER))
 
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
-                OmsorgsArbeidSak(
-                    omsorgsarbedUtfort = listOf(
+                OmsorgsarbeidSak(
+                    omsorgsarbeidPerioder = listOf(
                         omsorgsArbeidPerson1,
                         omsorgsArbeidPerson2
                     )
@@ -94,35 +93,38 @@ internal class OmsorgsarbeidsSnapshotKtTest {
         assertEquals(omsorgsArbeidPerson1, omsorgsArbeid.first())
     }
 
-    private fun creatOmsorgsArbeidSnapshot(omsorgsArbeidSaker: List<OmsorgsArbeidSak> = listOf()) =
-        OmsorgsarbeidsSnapshot(
+    private fun creatOmsorgsArbeidSnapshot(omsorgsArbeidSaker: List<OmsorgsarbeidSak> = listOf()) =
+        OmsorgsarbeidSnapshot(
             omsorgsAr = 2010,
-            kjoreHash = "xxx",
-            omsorgsyter = Person(FNR_1),
-            omsorgstype = OmsorgsarbeidsType.BARNETRYGD,
-            kilde = OmsorgsarbeidsKilde.BARNETRYGD,
-            omsorgsArbeidSaker = omsorgsArbeidSaker
+            kjoreHashe = "xxx",
+            omsorgsyter = randomPerson,
+            omsorgstype = Omsorgstype.BARNETRYGD,
+            kilde = Kilde.BARNETRYGD,
+            omsorgsarbeidSaker = omsorgsArbeidSaker
         )
 
-    private fun createOmsorgsarbeid(omsorgsyter: String, fom: YearMonth, tom: YearMonth) =
-        OmsorgsArbeid(
-            fom,
-            tom,
+    private fun createOmsorgsarbeid(omsorgsyter: Person, fom: YearMonth, tom: YearMonth) =
+        OmsorgsarbeidPeriode(
+            fom = fom,
+            tom = tom,
             prosent = 100,
-            omsorgsyter = Person(omsorgsyter),
-            omsorgsmottaker = listOf()
+            omsorgsyter = omsorgsyter,
+            omsorgsmottakere = listOf()
         )
 
     companion object {
-        const val FNR_1 = "12345678901"
-        val person1 = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
-            alleFnr = mutableSetOf(Fnr(fnr = FNR_1, gjeldende = true)),
+        val person1 = Person(
+            alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = true)),
             fodselsAr = 1988
         )
 
-        const val FNR_2 = "10987654321"
-        val person2 = no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
-            alleFnr = mutableSetOf(Fnr(fnr = FNR_2, gjeldende = true)),
+        val person2 = Person(
+            alleFnr = mutableSetOf(Fnr(fnr = "10987654321", gjeldende = true)),
+            fodselsAr = 1988
+        )
+
+        val randomPerson = Person(
+            alleFnr = mutableSetOf(Fnr(fnr = "22222222222", gjeldende = true)),
             fodselsAr = 1988
         )
     }
