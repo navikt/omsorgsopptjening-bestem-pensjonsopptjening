@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
 
 import jakarta.persistence.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.UtbetalingMoneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import java.time.YearMonth
 
@@ -36,3 +37,12 @@ class OmsorgsarbeidPeriode(
     )
     val omsorgsmottakere: List<Person>,
 )
+
+
+
+fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(omsorgsAr: Int) = (getUtbetalingMoneder() begrensTilAr omsorgsAr).antall()
+
+fun List<OmsorgsarbeidPeriode>.getUtbetalingMoneder(): UtbetalingMoneder {
+    val alleUtbetalingsMoneder = map{ UtbetalingMoneder(it.fom, it.tom) }
+    return alleUtbetalingsMoneder.fold(initial = UtbetalingMoneder()) { acc, moneder -> acc + moneder }
+}
