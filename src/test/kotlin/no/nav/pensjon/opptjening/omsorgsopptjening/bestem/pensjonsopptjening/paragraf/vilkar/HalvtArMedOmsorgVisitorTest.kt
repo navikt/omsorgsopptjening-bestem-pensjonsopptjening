@@ -5,6 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Og.Companion.og
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -13,29 +14,9 @@ internal class HalvtArMedOmsorgVisitorTest {
 
     @Test
     fun ape() {
-        val halvtAr1 = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = GrunnlagOmsorgForBarnUnder6(
-                omsorgsArbeid = listOf(),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER_1, 2015),
-                omsorgsAr = OMSORGS_AR_2020
-            )
-        )
-
-        val halvtAr2 = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = GrunnlagOmsorgForBarnUnder6(
-                omsorgsArbeid = listOf(),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER_2, 2015),
-                omsorgsAr = OMSORGS_AR_2020
-            )
-        )
-
-        val halvtAr3 = OmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = GrunnlagOmsorgForBarnUnder6(
-                omsorgsArbeid = listOf(),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER_3, 2015),
-                omsorgsAr = OMSORGS_AR_2020
-            )
-        )
+        val halvtAr1 = vilkarsvurderingOmsorgForBarnUnder6(FNR_OMSORGSMOTTAKER_1)
+        val halvtAr2 = vilkarsvurderingOmsorgForBarnUnder6(FNR_OMSORGSMOTTAKER_2)
+        val halvtAr3 = vilkarsvurderingOmsorgForBarnUnder6(FNR_OMSORGSMOTTAKER_3)
 
         val vilkarsvurdering = og(
             eller(
@@ -65,17 +46,21 @@ internal class HalvtArMedOmsorgVisitorTest {
     }
 
 
-    private fun createPerson(fnr: String, fodselsAr: Int) =
-        no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person(
-            alleFnr = mutableSetOf(Fnr(fnr = fnr)),
-            fodselsAr = fodselsAr
+    private fun vilkarsvurderingOmsorgForBarnUnder6(fnrOmsorgsmottaker: String) =
+        OmsorgForBarnUnder6().vilkarsVurder(
+            GrunnlagOmsorgForBarnUnder6(
+                omsorgsArbeid = listOf(),
+                omsorgsmottaker = createPerson(fnrOmsorgsmottaker),
+                omsorgsAr = 2020
+            )
         )
+
+    private fun createPerson(fnr: String) = Person(alleFnr = mutableSetOf(Fnr(fnr = fnr)), fodselsAr = 1988)
 
     companion object {
         const val FNR_OMSORGSMOTTAKER_1 = "1111"
         const val FNR_OMSORGSMOTTAKER_2 = "2222"
         const val FNR_OMSORGSMOTTAKER_3 = "3333"
-        const val OMSORGS_AR_2020 = 2020
 
         private val dummyVilkar = Vilkar(
             vilkarsInformasjon = VilkarsInformasjon("test", "test", "test"),
