@@ -1,7 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidPeriode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.getAntallUtbetalingMoneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -30,9 +32,11 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(OmsorgsArbeid(fom = fom, tom = tom, prosent = 100, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()))
+        val perioder = listOf(
+            OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsyter = person, omsorgsmottakere = listOf())
+        )
 
-        assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
+        assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
     }
 
     @ParameterizedTest
@@ -55,9 +59,11 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(OmsorgsArbeid(fom = fom, tom = tom, prosent = 100, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()))
+        val perioder = listOf(
+            OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsyter = person, omsorgsmottakere = listOf())
+        )
 
-        assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
+        assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
     }
 
 
@@ -77,9 +83,11 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(OmsorgsArbeid(fom = fom, tom = tom, prosent = 100, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()))
+        val perioder = listOf(
+            OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsyter = person, omsorgsmottakere = listOf())
+        )
 
-        assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
+        assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
     }
 
     @ParameterizedTest
@@ -91,9 +99,11 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         fom: YearMonth,
         tom: YearMonth,
     ) {
-        val utbetalinger = listOf(OmsorgsArbeid(fom = fom, tom = tom, prosent = 100, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()))
+        val perioder = listOf(
+            OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsyter = person, omsorgsmottakere = listOf())
+        )
 
-        assertEquals(0, utbetalinger.getAntallUtbetalingMoneder(2020))
+        assertEquals(0, perioder.getAntallUtbetalingMoneder(2020))
     }
 
     @ParameterizedTest
@@ -115,12 +125,12 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom2: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(
-            OmsorgsArbeid(fom = fom1, tom = tom1, prosent = 100, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()),
-            OmsorgsArbeid(fom = fom2, tom = tom2, prosent = 100, omsorgsyter=Person(FNR), omsorgsmottaker = listOf())
+        val perioder = listOf(
+            OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsyter = person, omsorgsmottakere = listOf()),
+            OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsyter = person, omsorgsmottakere = listOf())
         )
 
-        assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
+        assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
     }
 
     @ParameterizedTest
@@ -139,22 +149,22 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom3: YearMonth,
         expectedAmountOfMoths: Int
     ) {
-        val utbetalinger = listOf(
-            OmsorgsArbeid(fom = fom1, tom = tom1, prosent = 100, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()),
-            OmsorgsArbeid(fom = fom2, tom = tom2, prosent = 100, omsorgsyter=Person(FNR), omsorgsmottaker = listOf()),
-            OmsorgsArbeid(fom = fom3, tom = tom3, prosent = 100, omsorgsyter=Person(FNR), omsorgsmottaker = listOf())
+        val perioder = listOf(
+            OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsyter = person, omsorgsmottakere = listOf()),
+            OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsyter = person, omsorgsmottakere = listOf()),
+            OmsorgsarbeidPeriode(fom = fom3, tom = tom3, prosent = 100, omsorgsyter = person, omsorgsmottakere = listOf())
         )
 
-        assertEquals(expectedAmountOfMoths, utbetalinger.getAntallUtbetalingMoneder(2020))
+        assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
     }
 
 
     @Test
     fun `Given zero omsorgsArbeidsUtbetalinger When calling getAntallUtbetalingMoneder Then 0`() {
-        assertEquals(0, listOf<OmsorgsArbeid>().getAntallUtbetalingMoneder(2020))
+        assertEquals(0, listOf<OmsorgsarbeidPeriode>().getAntallUtbetalingMoneder(2020))
     }
 
-    companion object{
-        private const val FNR = "12345"
+    companion object {
+        private val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345", gjeldende = true)), fodselsAr = 1988)
     }
 }
