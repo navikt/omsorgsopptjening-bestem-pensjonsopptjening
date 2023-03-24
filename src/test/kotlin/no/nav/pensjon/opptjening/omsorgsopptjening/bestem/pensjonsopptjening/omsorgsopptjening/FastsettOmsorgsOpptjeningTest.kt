@@ -16,24 +16,24 @@ internal class FastsettOmsorgsOpptjeningTest {
 
     @Test
     fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
+        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1990)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2005)
+
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsyterFnr = FNR_OMSORGSGIVER,
+            omsorgsyter = omsorgsyter,
             omsorgsarbeidPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
-                    omsorgsyterFnr = FNR_OMSORGSGIVER,
+                    omsorgsyter = omsorgsyter,
                     omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
 
-        val person = createPerson(FNR_OMSORGSGIVER, 1990)
-        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2005)
-
         val opptjening =
-            FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
+            FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, listOf(omsorgsmottaker))
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
         assertEquals(Utfall.INVILGET, opptjening.utfall)
@@ -41,24 +41,23 @@ internal class FastsettOmsorgsOpptjeningTest {
 
     @Test
     fun `Given omsorgs arbeid for less than seven months When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
+        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1990)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015)
+
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsyterFnr = FNR_OMSORGSGIVER,
+            omsorgsyter = omsorgsyter,
             omsorgsarbeidPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JUNE),
-                    omsorgsyterFnr = FNR_OMSORGSGIVER,
+                    omsorgsyter = omsorgsyter,
                     omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
 
-        val person = createPerson(FNR_OMSORGSGIVER, 1990)
-        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015)
-
-        val opptjening =
-            FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, listOf(omsorgsmottaker))
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
         assertEquals(Utfall.AVSLAG, opptjening.utfall)
@@ -76,24 +75,24 @@ internal class FastsettOmsorgsOpptjeningTest {
         omsorgsAr: Int,
         expectedUtfall: Utfall
     ) {
+        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, fodselsAr)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 1995)
+
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
-            omsorgsyterFnr = FNR_OMSORGSGIVER,
+            omsorgsyter = omsorgsyter,
             omsorgsarbeidPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
-                    omsorgsyterFnr = FNR_OMSORGSGIVER,
+                    omsorgsyter = omsorgsyter,
                     omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
 
-        val person = createPerson(FNR_OMSORGSGIVER, fodselsAr)
-        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 1995)
-
         val opptjening =
-            FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
+            FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, listOf(omsorgsmottaker))
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
         assertEquals(expectedUtfall, opptjening.utfall)
@@ -111,24 +110,24 @@ internal class FastsettOmsorgsOpptjeningTest {
         fodselsAr: Int,
         expectedUtfall: Utfall
     ) {
+        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1960)
+        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, fodselsAr)
+
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
-            omsorgsyterFnr = FNR_OMSORGSGIVER,
+            omsorgsyter = omsorgsyter,
             omsorgsarbeidPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
-                    omsorgsyterFnr = FNR_OMSORGSGIVER,
+                    omsorgsyter = omsorgsyter,
                     omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER)
                 )
             )
         )
 
-        val person = createPerson(FNR_OMSORGSGIVER, 1960)
-        val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, fodselsAr)
-
         val opptjening =
-            FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf(omsorgsmottaker))
+            FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, listOf(omsorgsmottaker))
 
         assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
         assertEquals(expectedUtfall, opptjening.utfall)
@@ -147,26 +146,25 @@ internal class FastsettOmsorgsOpptjeningTest {
         fodselsArOmsorgsMottaker2: Int,
         expectedUtfall: Utfall
     ) {
+        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1960)
+        val omsorgsmottaker1 = createPerson(FNR_OMSORGSMOTTAKER, fodselsArOmsorgsMottaker1)
+        val omsorgsmottaker2 = createPerson(FNR_OMSORGSMOTTAKER_2, fodselsArOmsorgsMottaker2)
+
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
-            omsorgsyterFnr = FNR_OMSORGSGIVER,
+            omsorgsyter = omsorgsyter,
             omsorgsarbeidPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
-                    omsorgsyterFnr = FNR_OMSORGSGIVER,
+                    omsorgsyter = omsorgsyter,
                     omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER, FNR_OMSORGSMOTTAKER_2)
                 )
             )
         )
 
-        val person = createPerson(FNR_OMSORGSGIVER, 1960)
-        val omsorgsmottaker1 = createPerson(FNR_OMSORGSMOTTAKER, fodselsArOmsorgsMottaker1)
-        val omsorgsmottaker2 = createPerson(FNR_OMSORGSMOTTAKER_2, fodselsArOmsorgsMottaker2)
-
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(
             omsorgsArbeidSnapshot,
-            person,
             listOf(omsorgsmottaker1, omsorgsmottaker2)
         )
 
@@ -175,49 +173,48 @@ internal class FastsettOmsorgsOpptjeningTest {
 
     @Test
     fun `Given no omsorgsmottaker When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
+        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1960)
+
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2006,
-            omsorgsyterFnr = FNR_OMSORGSGIVER,
+            omsorgsyter = omsorgsyter,
             omsorgsarbeidPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2006, Month.JANUARY),
                     tom = YearMonth.of(2006, Month.JULY),
-                    omsorgsyterFnr = FNR_OMSORGSGIVER,
+                    omsorgsyter = omsorgsyter,
                     omsorgsmottakere = listOf()
                 )
             )
         )
 
-        val person = createPerson(FNR_OMSORGSGIVER, 1960)
-
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, person, listOf())
+        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot, listOf())
 
         assertEquals(Utfall.AVSLAG, opptjening.utfall)
     }
 
     @Test
     fun `Given omsorgs arbeid for seven months When having omsorgs for more than one person Then INVILGET`() {
+        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1990)
+        val omsorgsmottaker1 = createPerson(FNR_OMSORGSMOTTAKER, 2005)
+        val omsorgsmottaker2 = createPerson(FNR_OMSORGSMOTTAKER_2, 2007)
+        val omsorgsmottaker3 = createPerson(FNR_OMSORGSMOTTAKER_3, 1995)
+
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
-            omsorgsyterFnr = FNR_OMSORGSGIVER,
+            omsorgsyter = omsorgsyter,
             omsorgsarbeidPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
-                    omsorgsyterFnr = FNR_OMSORGSGIVER,
+                    omsorgsyter = omsorgsyter,
                     omsorgsmottakere = listOf(FNR_OMSORGSMOTTAKER, FNR_OMSORGSMOTTAKER_2, FNR_OMSORGSMOTTAKER_3)
                 )
             )
         )
 
-        val person = createPerson(FNR_OMSORGSGIVER, 1990)
-        val omsorgsmottaker1 = createPerson(FNR_OMSORGSMOTTAKER, 2005)
-        val omsorgsmottaker2 = createPerson(FNR_OMSORGSMOTTAKER_2, 2007)
-        val omsorgsmottaker3 = createPerson(FNR_OMSORGSMOTTAKER_3, 1995)
-
         val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(
             omsorgsArbeidSnapshot,
-            person,
             listOf(omsorgsmottaker1, omsorgsmottaker2, omsorgsmottaker3)
         )
 
@@ -229,14 +226,14 @@ internal class FastsettOmsorgsOpptjeningTest {
 
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: Int,
-        omsorgsyterFnr: String,
+        omsorgsyter: Person,
         omsorgsarbeidPerioder: List<OmsorgsarbeidPeriode>
     ) =
 
         OmsorgsarbeidSnapshot(
             omsorgsAr = omsorgsAr,
             kjoreHashe = "xxx",
-            omsorgsyter = Person(alleFnr = mutableSetOf(Fnr(fnr = omsorgsyterFnr)), fodselsAr = 1988),
+            omsorgsyter = omsorgsyter,
             omsorgstype = Omsorgstype.BARNETRYGD,
             kilde = Kilde.BARNETRYGD,
             omsorgsarbeidSaker = listOf(
@@ -249,13 +246,13 @@ internal class FastsettOmsorgsOpptjeningTest {
     private fun createOmsorgsArbeid(
         fom: YearMonth,
         tom: YearMonth,
-        omsorgsyterFnr: String,
+        omsorgsyter: Person,
         omsorgsmottakere: List<String>
     ) = OmsorgsarbeidPeriode(
         fom = fom,
         tom = tom,
         prosent = 100,
-        omsorgsyter = Person(alleFnr = mutableSetOf(Fnr(fnr = omsorgsyterFnr)), fodselsAr = 1988),
+        omsorgsyter =  omsorgsyter,
         omsorgsmottakere = omsorgsmottakere.map {
             Person(
                 alleFnr = mutableSetOf(Fnr(fnr = it)),
@@ -267,8 +264,7 @@ internal class FastsettOmsorgsOpptjeningTest {
 
     private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
         Person(
-            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toMutableSet()
-                .apply { add(Fnr(fnr = gjeldendeFnr, gjeldende = true)) },
+            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toMutableSet().apply { add(Fnr(fnr = gjeldendeFnr, gjeldende = true)) },
             fodselsAr = fodselsAr
         )
 

@@ -16,9 +16,10 @@ class FastsettOmsorgsOpptjening private constructor() {
     companion object {
         fun fastsettOmsorgsOpptjening(
             snapshot: OmsorgsarbeidSnapshot,
-            omsorgsgiver: Person,
             omsorgsmottakere: List<Person>
         ): OmsorgsOpptjening {
+            val omsorgsgiver = snapshot.omsorgsyter
+
             val vilkarsVurdering =
                 og(
                     OmsorgsgiverOver16Ar().vilkarsVurder(
