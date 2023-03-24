@@ -24,7 +24,7 @@ class AlleVilkarsVurderinger private constructor() : VilkarsVurderingVisitor {
     }
 }
 
-fun hentHalvtArMedOmsorgVilkarsVurderinger(vilkarsVurdering: VilkarsVurdering<*>) : List<VilkarsVurdering<GrunnlagOmsorgForBarnUnder6>>{
+fun hentOmsorgForBarnUnder6VilkarsVurderinger(vilkarsVurdering: VilkarsVurdering<*>) : List<VilkarsVurdering<GrunnlagOmsorgForBarnUnder6>>{
     return hentAlleVilkarsVurderinger(vilkarsVurdering)
         .filter { it.vilkar is OmsorgForBarnUnder6 }
         .map { it as VilkarsVurdering<GrunnlagOmsorgForBarnUnder6> }
