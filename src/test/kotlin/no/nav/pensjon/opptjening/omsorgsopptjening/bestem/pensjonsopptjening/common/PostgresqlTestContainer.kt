@@ -18,7 +18,7 @@ class PostgresqlTestContainer private constructor(image: String) : PostgreSQLCon
     }
 
     override fun stop() {
-        //do nothing, JVM handles shut down
+        //Do nothing, JVM handles shut down
     }
 
     fun removeDataFromDB() {
@@ -36,7 +36,6 @@ class PostgresqlTestContainer private constructor(image: String) : PostgreSQLCon
                     """
             )
             close()
-
         }
     }
 

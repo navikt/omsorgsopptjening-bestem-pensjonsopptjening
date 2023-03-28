@@ -21,6 +21,7 @@ import kotlin.test.assertEquals
 @SpringBootTest(classes = [App::class])
 @Import(KafkaIntegrationTestConfig::class, OmsorgsopptjeningMockListener::class)
 internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
+
     private val dbContainer = PostgresqlTestContainer.instance
 
     @Autowired
@@ -35,7 +36,7 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
     }
 
     @Test
-    fun `Given person with omsorgsopptjeningsGrunnlag when findByInvolvertePersoner then return omsorgsopptjeningsGrunnlag `() {
+    fun `Given person with omsorgsopptjeningsGrunnlag when findByInvolvertePersoner then return omsorgsopptjeningsGrunnlag`() {
         val person = personRepository.updatePerson(person1)
 
         grunnlagRepository.save(

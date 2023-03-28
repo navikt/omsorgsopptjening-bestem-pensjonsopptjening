@@ -11,9 +11,7 @@ import org.springframework.stereotype.Repository
 
 
 @Component
-class OmsorgsopptjeningsGrunnlagRepository(
-    private val jpaRepository: OmsorgsopptjeningsGrunnlagJpaRepository,
-    ) {
+class OmsorgsopptjeningsGrunnlagRepository(private val jpaRepository: OmsorgsopptjeningsGrunnlagJpaRepository) {
 
     @Autowired
     private lateinit var em: EntityManager
