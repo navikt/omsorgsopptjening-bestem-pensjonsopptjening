@@ -7,15 +7,19 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Status
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.dao.InvalidDataAccessApiUsageException
 import org.springframework.kafka.test.context.EmbeddedKafka
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @EmbeddedKafka(partitions = 1, topics = [OmsorgsarbeidListenerTest.OMSORGSOPPTJENING_TOPIC])
 @SpringBootTest(classes = [App::class])
@@ -47,7 +51,6 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
             )
         )
 
-
         val grunnlag = grunnlagRepository.findByInvolvertePersoner(person)
 
         assertEquals(1, grunnlag.size)
@@ -76,6 +79,21 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
         assertEquals(1, grunnlagPerson2.size)
         assertEquals(2, grunnlagPerson1.first().involvertePersoner.size)
         assertEquals(grunnlagPerson1.first().id, grunnlagPerson2.first().id)
+    }
+
+    @Test
+    fun `OmsorgsopptjeningsGrunnlagRepository should save unsaved persons`() {
+        val e = assertThrows<InvalidDataAccessApiUsageException> {
+            grunnlagRepository.save(
+                OmsorgsopptjeningsGrunnlag(
+                    omsorgsAr = 2020,
+                    status = Status.TRENGER_INFORMASJON,
+                    involvertePersoner = listOf(Person(fodselsAr = 2010, alleFnr = mutableSetOf()))
+                )
+            )
+        }
+
+        assertTrue(e.message!!.contains("save the transient instance before flushing"))
     }
 
     companion object {

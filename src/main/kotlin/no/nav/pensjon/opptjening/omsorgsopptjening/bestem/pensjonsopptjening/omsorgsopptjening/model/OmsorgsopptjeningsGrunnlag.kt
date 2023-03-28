@@ -19,7 +19,7 @@ data class OmsorgsopptjeningsGrunnlag(
     @Column(name = "STATUS", nullable = false)
     val status: Status,
 
-    @ManyToMany(fetch =  FetchType.EAGER, cascade = [CascadeType.ALL])
+    @ManyToMany(fetch =  FetchType.EAGER)
     @JoinTable(
         name = "INVOLVERTE_PERSONER",
         joinColumns = [JoinColumn(
