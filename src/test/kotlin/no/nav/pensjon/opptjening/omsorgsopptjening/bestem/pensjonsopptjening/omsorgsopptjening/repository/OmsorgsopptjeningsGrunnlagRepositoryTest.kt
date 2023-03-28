@@ -82,7 +82,7 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
     }
 
     @Test
-    fun `When overriding grunnlag for ar Then set old to historisk`() {
+    fun `When overriding grunnlag Then set old to historisk`() {
         val person = personRepository.updatePerson(person1)
 
         repository.save(
@@ -153,6 +153,37 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
     }
 
     @Test
+    fun `Given saved grunnlag for two different years When findBy Then historisk should be false`() {
+        val person = personRepository.updatePerson(person1)
+
+        repository.save(
+            OmsorgsopptjeningsGrunnlag(
+                omsorgsAr = `2019`,
+                status = Status.FERDIG_BEHANDLET,
+                involvertePersoner = listOf(person)
+            )
+        )
+
+        repository.save(
+            OmsorgsopptjeningsGrunnlag(
+                omsorgsAr = `2020`,
+                status = Status.TRENGER_INFORMASJON,
+                involvertePersoner = listOf(person)
+            )
+        )
+
+        val grunnlag2019 = repository.findBy(personer = listOf(person), omsorgsAr = `2019`, historisk = false)
+        val grunnlag2020 = repository.findBy(personer = listOf(person), omsorgsAr = `2020`, historisk = false)
+
+        assertEquals(1, grunnlag2019.size)
+        assertEquals(1, grunnlag2020.size)
+        assertEquals(`2019`, grunnlag2019.first().omsorgsAr)
+        assertEquals(`2020`, grunnlag2020.first().omsorgsAr)
+        assertFalse(grunnlag2019.first().historisk)
+        assertFalse(grunnlag2020.first().historisk)
+    }
+
+    @Test
     fun `OmsorgsopptjeningsGrunnlagRepository should not save unsaved persons`() {
         val e = assertThrows<InvalidDataAccessApiUsageException> {
             repository.save(
@@ -172,5 +203,6 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
         private val person2 = PdlPerson(gjeldendeFnr = "2222", historiskeFnr = listOf(), fodselsAr = 1989)
 
         private const val `2020` = 2020
+        private const val `2019` = 2019
     }
 }
