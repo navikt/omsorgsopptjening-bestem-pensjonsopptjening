@@ -6,9 +6,12 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.wait.strategy.Wait
 
 
-class PostgresqlTestContainer private constructor() : PostgreSQLContainer<PostgresqlTestContainer>(
-    IMAGE_VERSION
-) {
+class PostgresqlTestContainer private constructor(image:String) : PostgreSQLContainer<PostgresqlTestContainer>(image) {
+
+    init {
+        start()
+    }
+
     override fun start() {
         super.start()
         super.waitingFor(Wait.defaultWaitStrategy())
@@ -22,24 +25,18 @@ class PostgresqlTestContainer private constructor() : PostgreSQLContainer<Postgr
         dataSource.connection.apply {
             createStatement().execute("DELETE FROM INVOLVERTE_PERSONER")
             createStatement().execute("DELETE FROM OMSORGSOPPTJENINGSGRUNNLAG")
-
             createStatement().execute("DELETE FROM OMSORGSARBEIDSMOTTAKER")
             createStatement().execute("DELETE FROM OMSORGSARBEID_PERIODE")
             createStatement().execute("DELETE FROM OMSORGSARBEID_SAK")
             createStatement().execute("DELETE FROM OMSORGSARBEID_SNAPSHOT")
-
             createStatement().execute("DELETE FROM FNR")
             createStatement().execute("DELETE FROM PERSON")
-
             close()
         }
     }
 
     companion object {
-        private const val IMAGE_VERSION = "postgres:14.7-alpine"
-        val instance: PostgresqlTestContainer = PostgresqlTestContainer().apply {
-            start()
-        }
+        val instance: PostgresqlTestContainer = PostgresqlTestContainer("postgres:14.7-alpine")
         private val dataSource = HikariDataSource(HikariConfig().apply {
             jdbcUrl = "jdbc:tc:postgresql:14:///test"
             username = instance.username
