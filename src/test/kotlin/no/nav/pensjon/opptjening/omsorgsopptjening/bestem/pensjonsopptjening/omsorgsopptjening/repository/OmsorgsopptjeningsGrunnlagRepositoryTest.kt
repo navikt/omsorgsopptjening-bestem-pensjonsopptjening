@@ -10,6 +10,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -29,7 +30,7 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
     private val dbContainer = PostgresqlTestContainer.instance
 
     @Autowired
-    private lateinit var grunnlagRepository: OmsorgsopptjeningsGrunnlagRepository
+    private lateinit var repository: OmsorgsopptjeningsGrunnlagRepository
 
     @Autowired
     lateinit var personRepository: PersonRepository
@@ -43,15 +44,15 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
     fun `Given person with omsorgsopptjeningsGrunnlag when findByInvolvertePersoner then return omsorgsopptjeningsGrunnlag`() {
         val person = personRepository.updatePerson(person1)
 
-        grunnlagRepository.save(
+        repository.save(
             OmsorgsopptjeningsGrunnlag(
-                omsorgsAr = 2020,
+                omsorgsAr = `2020`,
                 status = Status.TRENGER_INFORMASJON,
                 involvertePersoner = listOf(person)
             )
         )
 
-        val grunnlag = grunnlagRepository.findByInvolvertePersoner(person)
+        val grunnlag = repository.findBy(personer = listOf(person), omsorgsAr = `2020`)
 
         assertEquals(1, grunnlag.size)
         assertEquals(1, grunnlag.first().involvertePersoner.size)
@@ -63,17 +64,17 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
         val person1 = personRepository.updatePerson(person1)
         val person2 = personRepository.updatePerson(person2)
 
-        grunnlagRepository.save(
+        repository.save(
             OmsorgsopptjeningsGrunnlag(
-                omsorgsAr = 2020,
+                omsorgsAr = `2020`,
                 status = Status.TRENGER_INFORMASJON,
                 involvertePersoner = listOf(person1, person2)
             )
         )
 
 
-        val grunnlagPerson1 = grunnlagRepository.findByInvolvertePersoner(person1)
-        val grunnlagPerson2 = grunnlagRepository.findByInvolvertePersoner(person2)
+        val grunnlagPerson1 = repository.findBy(personer = listOf(person1), omsorgsAr = `2020`)
+        val grunnlagPerson2 = repository.findBy(personer = listOf(person2), omsorgsAr = `2020`)
 
         assertEquals(1, grunnlagPerson1.size)
         assertEquals(1, grunnlagPerson2.size)
@@ -82,11 +83,45 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
     }
 
     @Test
+    fun `given ovverriding grunnlag for ar then set old to historisk`() {
+        val person = personRepository.updatePerson(person1)
+
+        repository.save(
+            OmsorgsopptjeningsGrunnlag(
+                omsorgsAr = `2020`,
+                status = Status.TRENGER_INFORMASJON,
+                involvertePersoner = listOf(person)
+            )
+        )
+
+        repository.save(
+            OmsorgsopptjeningsGrunnlag(
+                omsorgsAr = `2020`,
+                status = Status.FERDIG_BEHANDLET,
+                involvertePersoner = listOf(person)
+            )
+        )
+
+        val grunnlag = repository.findBy(personer = listOf(person), omsorgsAr = `2020`, historisk = false)
+
+        assertEquals(1, grunnlag.size)
+        assertEquals(1, grunnlag.first().involvertePersoner.size)
+        assertEquals(person.gjeldendeFnr, grunnlag.first().involvertePersoner.first().gjeldendeFnr)
+        assertFalse(grunnlag.first().historisk)
+
+        val historiskGrunnlag = repository.findBy(personer = listOf(person), omsorgsAr = `2020`, historisk = true)
+        assertEquals(1, historiskGrunnlag.size)
+        assertEquals(1, historiskGrunnlag.first().involvertePersoner.size)
+        assertEquals(person.gjeldendeFnr, historiskGrunnlag.first().involvertePersoner.first().gjeldendeFnr)
+        assertTrue(historiskGrunnlag.first().historisk)
+    }
+
+    @Test
     fun `OmsorgsopptjeningsGrunnlagRepository should save unsaved persons`() {
         val e = assertThrows<InvalidDataAccessApiUsageException> {
-            grunnlagRepository.save(
+            repository.save(
                 OmsorgsopptjeningsGrunnlag(
-                    omsorgsAr = 2020,
+                    omsorgsAr = `2020`,
                     status = Status.TRENGER_INFORMASJON,
                     involvertePersoner = listOf(Person(fodselsAr = 2010, alleFnr = mutableSetOf()))
                 )
@@ -99,5 +134,7 @@ internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
     companion object {
         private val person1 = PdlPerson(gjeldendeFnr = "1111", historiskeFnr = listOf(), fodselsAr = 1988)
         private val person2 = PdlPerson(gjeldendeFnr = "2222", historiskeFnr = listOf(), fodselsAr = 1989)
+
+        private const val `2020` = 2020
     }
 }

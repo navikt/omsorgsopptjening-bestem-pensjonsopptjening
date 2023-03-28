@@ -18,16 +18,31 @@ class OmsorgsopptjeningsGrunnlagRepository(private val jpaRepository: Omsorgsopp
 
     @Transactional
     fun save(omsorgsopptjeningsGrunnlag: OmsorgsopptjeningsGrunnlag): OmsorgsopptjeningsGrunnlag {
+        findBy(
+            personer = omsorgsopptjeningsGrunnlag.involvertePersoner,
+            omsorgsAr = omsorgsopptjeningsGrunnlag.omsorgsAr
+        ).forEach { it.historisk = true }
+
         return em.merge(omsorgsopptjeningsGrunnlag)
     }
 
-    fun findByInvolvertePersoner(person: Person): List<OmsorgsopptjeningsGrunnlag> {
-        return jpaRepository.findByInvolvertePersoner_id(person.id!!)
+    fun findBy(personer: List<Person>, omsorgsAr: Int, historisk: Boolean = false): List<OmsorgsopptjeningsGrunnlag> {
+        return jpaRepository.findByInvolvertePersoner_idInAndHistoriskAndOmsorgsAr(
+            personer = personer.mapNotNull { it.id },
+            ar = omsorgsAr,
+            historisk = historisk
+        )
     }
 }
 
 @Repository
 interface OmsorgsopptjeningsGrunnlagJpaRepository : JpaRepository<OmsorgsopptjeningsGrunnlag, Long> {
-    fun findByInvolvertePersoner_id(personId: Long): List<OmsorgsopptjeningsGrunnlag>
+
+    fun findByInvolvertePersoner_idInAndHistoriskAndOmsorgsAr(
+        personer: List<Long>,
+        historisk: Boolean,
+        ar: Int
+    ): List<OmsorgsopptjeningsGrunnlag>
+
 }
 

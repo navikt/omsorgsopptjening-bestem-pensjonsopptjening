@@ -16,7 +16,7 @@ data class OmsorgsopptjeningsGrunnlag(
     val omsorgsAr: Int,
 
     @Column(name = "HISTORISK", nullable = false)
-    val historisk: Boolean = false,
+    var historisk: Boolean = false,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS", nullable = false)
