@@ -6,7 +6,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.wait.strategy.Wait
 
 
-class PostgresqlTestContainer private constructor(image:String) : PostgreSQLContainer<PostgresqlTestContainer>(image) {
+class PostgresqlTestContainer private constructor(image: String) : PostgreSQLContainer<PostgresqlTestContainer>(image) {
 
     init {
         start()
@@ -23,15 +23,20 @@ class PostgresqlTestContainer private constructor(image:String) : PostgreSQLCont
 
     fun removeDataFromDB() {
         dataSource.connection.apply {
-            createStatement().execute("DELETE FROM INVOLVERTE_PERSONER")
-            createStatement().execute("DELETE FROM OMSORGSOPPTJENINGSGRUNNLAG")
-            createStatement().execute("DELETE FROM OMSORGSARBEIDSMOTTAKER")
-            createStatement().execute("DELETE FROM OMSORGSARBEID_PERIODE")
-            createStatement().execute("DELETE FROM OMSORGSARBEID_SAK")
-            createStatement().execute("DELETE FROM OMSORGSARBEID_SNAPSHOT")
-            createStatement().execute("DELETE FROM FNR")
-            createStatement().execute("DELETE FROM PERSON")
+            createStatement().execute(
+                """
+                        DELETE FROM INVOLVERTE_PERSONER;
+                        DELETE FROM OMSORGSOPPTJENINGSGRUNNLAG;
+                        DELETE FROM OMSORGSARBEIDSMOTTAKER;
+                        DELETE FROM OMSORGSARBEID_PERIODE;
+                        DELETE FROM OMSORGSARBEID_SAK;
+                        DELETE FROM OMSORGSARBEID_SNAPSHOT;
+                        DELETE FROM FNR;
+                        DELETE FROM PERSON;
+                    """
+            )
             close()
+
         }
     }
 
