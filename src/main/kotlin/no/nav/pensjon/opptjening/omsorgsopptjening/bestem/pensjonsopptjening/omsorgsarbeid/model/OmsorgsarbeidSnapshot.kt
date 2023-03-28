@@ -8,14 +8,14 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 @Table(name = "OMSORGSARBEID_SNAPSHOT")
 data class OmsorgsarbeidSnapshot(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "OMSORGSARBEID_SNAPSHOT_ID", nullable = false)
-    var id: Long? = null,
+    val id: Long? = null,
 
     @Column(name = "OMSORGS_AR", nullable = false)
     val omsorgsAr: Int,
 
-    @OneToMany
+    @OneToMany(fetch =  FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "OMSORGSARBEID_SNAPSHOT_ID",
         nullable = false,

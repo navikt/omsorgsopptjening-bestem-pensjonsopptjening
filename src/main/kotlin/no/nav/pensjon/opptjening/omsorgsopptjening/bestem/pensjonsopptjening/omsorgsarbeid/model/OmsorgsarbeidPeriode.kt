@@ -10,7 +10,7 @@ import java.time.YearMonth
 @Table(name = "OMSORGSARBEID_PERIODE")
 class OmsorgsarbeidPeriode(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "OMSORGSARBEID_PERIODE_ID", nullable = false)
     var id: Long? = null,
 
@@ -25,11 +25,11 @@ class OmsorgsarbeidPeriode(
     @Column(name = "PROSENT", nullable = false)
     val prosent: Int,
 
-    @OneToOne
+    @OneToOne(fetch =  FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(name = "OMSORGSYTER", nullable = false, referencedColumnName = "PERSON_ID")
     val omsorgsyter: Person,
 
-    @ManyToMany
+    @ManyToMany(fetch =  FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinTable(
         name = "OMSORGSARBEIDSMOTTAKER",
         joinColumns = [JoinColumn(name = "OMSORGSARBEID_PERIODE_ID", referencedColumnName = "OMSORGSARBEID_PERIODE_ID")],
@@ -37,8 +37,6 @@ class OmsorgsarbeidPeriode(
     )
     val omsorgsmottakere: List<Person>,
 )
-
-
 
 fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(omsorgsAr: Int) = (getAlleUtbetalingMoneder() begrensTilAr omsorgsAr).antall()
 

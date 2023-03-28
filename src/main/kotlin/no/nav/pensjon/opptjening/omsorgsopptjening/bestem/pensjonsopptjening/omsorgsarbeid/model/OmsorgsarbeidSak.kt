@@ -7,12 +7,16 @@ import jakarta.persistence.*
 @Table(name = "OMSORGSARBEID_SAK")
 data class OmsorgsarbeidSak(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "OMSORGSARBEID_SAK_ID", nullable = false)
-    var id: Long? = null,
+    val id: Long? = null,
 
-    @OneToMany
-    @JoinColumn(name = "OMSORGSARBEID_SAK_ID", referencedColumnName = "OMSORGSARBEID_SAK_ID")
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+    @JoinColumn(
+        name = "OMSORGSARBEID_SAK_ID",
+        nullable = false,
+        referencedColumnName = "OMSORGSARBEID_SAK_ID"
+    )
     @JsonIgnore
     val omsorgsarbeidPerioder: List<OmsorgsarbeidPeriode>,
 )

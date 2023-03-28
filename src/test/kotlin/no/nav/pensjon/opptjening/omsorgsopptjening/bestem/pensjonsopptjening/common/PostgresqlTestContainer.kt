@@ -20,6 +20,9 @@ class PostgresqlTestContainer private constructor() : PostgreSQLContainer<Postgr
 
     fun removeDataFromDB() {
         dataSource.connection.apply {
+            createStatement().execute("DELETE FROM OMSORGSARBEID_PERIODE")
+            createStatement().execute("DELETE FROM OMSORGSARBEID_SAK")
+            createStatement().execute("DELETE FROM OMSORGSARBEID_SNAPSHOT")
             createStatement().execute("DELETE FROM FNR")
             createStatement().execute("DELETE FROM PERSON")
             close()
