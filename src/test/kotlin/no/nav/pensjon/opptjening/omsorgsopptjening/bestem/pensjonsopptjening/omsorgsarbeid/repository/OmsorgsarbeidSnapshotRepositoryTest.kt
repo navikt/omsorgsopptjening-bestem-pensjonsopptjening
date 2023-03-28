@@ -1,21 +1,25 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository
 
-import jakarta.persistence.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningsGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Status
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.dao.InvalidDataAccessApiUsageException
 import org.springframework.kafka.test.context.EmbeddedKafka
 import java.time.Month
 import java.time.YearMonth
@@ -76,6 +80,53 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
         assertEquals(omsorgsYter.id, omsorgsarbeidPeriode.omsorgsyter.id)
         assertEquals(1,omsorgsarbeidPeriode.omsorgsmottakere.size)
         assertEquals(omsorgsmottaker.id,omsorgsarbeidPeriode.omsorgsmottakere.first().id)
+    }
+
+
+    @Test
+    fun `When saving unpersisted person Then throw exception`() {
+        val omsorgsYter = personRepository.updatePerson(omsorgsYter1)
+        val omsorgsmottaker = personRepository.updatePerson(omsorgsmottaker1)
+        val unpersistedPerson =  Person(fodselsAr = 2000)
+
+        val e1 = assertThrows<IllegalStateException> {
+            repository.save(
+                creatOmsorgsArbeidSnapshot(
+                    omsorgsyter = unpersistedPerson,
+                    omsorgsarbeidPerioder = listOf(
+                        createOmsorgsArbeid(omsorgsyter = omsorgsYter, omsorgsmottakere = listOf(omsorgsmottaker))
+                    ),
+                )
+            )
+        }
+
+
+        val e2 = assertThrows<IllegalStateException> {
+            repository.save(
+                creatOmsorgsArbeidSnapshot(
+                    omsorgsyter = omsorgsYter,
+                    omsorgsarbeidPerioder = listOf(
+                        createOmsorgsArbeid(omsorgsyter = unpersistedPerson, omsorgsmottakere = listOf(omsorgsmottaker))
+                    ),
+                )
+            )
+        }
+
+
+        val e3 = assertThrows<InvalidDataAccessApiUsageException> {
+            repository.save(
+                creatOmsorgsArbeidSnapshot(
+                    omsorgsyter = omsorgsYter,
+                    omsorgsarbeidPerioder = listOf(
+                        createOmsorgsArbeid(omsorgsyter = omsorgsYter, omsorgsmottakere = listOf(unpersistedPerson))
+                    ),
+                )
+            )
+        }
+
+        assertTrue(e1.message!!.contains("transient instance must be saved before current operation"))
+        assertTrue(e2.message!!.contains("transient instance must be saved before current operation"))
+        assertTrue(e3.message!!.contains("save the transient instance before flushing"))
     }
 
     private fun creatOmsorgsArbeidSnapshot(

@@ -23,13 +23,13 @@ class OmsorgsarbeidSnapshotRepository(
         return em.merge(omsorgsarbeidSnapshot)
     }
 
-    fun findByPerson(person: Person): List<OmsorgsarbeidSnapshot> {
-        return jpaRepository.findByOmsorgsyter_id(person.id!!)
+    fun findByPerson(vararg persons: Person): List<OmsorgsarbeidSnapshot> {
+        return jpaRepository.findByOmsorgsyter_idIn(persons.mapNotNull { it.id })
     }
 }
 
 @Repository
 interface OmsorgsarbeidSnapshotJpaRepository : JpaRepository<OmsorgsarbeidSnapshot, Long> {
 
-    fun findByOmsorgsyter_id(personId: Long): List<OmsorgsarbeidSnapshot>
+    fun findByOmsorgsyter_idIn(personIdList: List<Long>): List<OmsorgsarbeidSnapshot>
 }

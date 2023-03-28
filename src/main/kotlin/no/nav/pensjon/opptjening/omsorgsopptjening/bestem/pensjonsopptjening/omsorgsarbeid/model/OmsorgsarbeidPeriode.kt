@@ -25,11 +25,11 @@ class OmsorgsarbeidPeriode(
     @Column(name = "PROSENT", nullable = false)
     val prosent: Int,
 
-    @OneToOne(fetch =  FetchType.EAGER, cascade = [CascadeType.ALL])
+    @OneToOne(fetch =  FetchType.EAGER)
     @JoinColumn(name = "OMSORGSYTER", nullable = false, referencedColumnName = "PERSON_ID")
     val omsorgsyter: Person,
 
-    @ManyToMany(fetch =  FetchType.EAGER, cascade = [CascadeType.ALL])
+    @ManyToMany(fetch =  FetchType.EAGER)
     @JoinTable(
         name = "OMSORGSARBEIDSMOTTAKER",
         joinColumns = [JoinColumn(name = "OMSORGSARBEID_PERIODE_ID", referencedColumnName = "OMSORGSARBEID_PERIODE_ID")],
