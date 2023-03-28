@@ -19,11 +19,14 @@ data class OmsorgsopptjeningsGrunnlag(
     @Column(name = "STATUS", nullable = false)
     val status: Status,
 
-    @ManyToMany
+    @ManyToMany(fetch =  FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinTable(
         name = "INVOLVERTE_PERSONER",
-        joinColumns = [JoinColumn(name = "OMSORGSOPPTJENINGSGRUNNLAG_ID", referencedColumnName = "OMSORGSOPPTJENINGSGRUNNLAG_ID")],
+        joinColumns = [JoinColumn(
+            name = "OMSORGSOPPTJENINGSGRUNNLAG_ID",
+            referencedColumnName = "OMSORGSOPPTJENINGSGRUNNLAG_ID"
+        )],
         inverseJoinColumns = [JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")]
     )
-    val insvolvertePersoner: List<Person>
+    val involvertePersoner: List<Person>
 )
