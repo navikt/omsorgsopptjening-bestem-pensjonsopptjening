@@ -1,7 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository
 
 import jakarta.transaction.Transactional
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import org.slf4j.LoggerFactory
@@ -32,17 +31,12 @@ class PersonRepository(
     }
 
     fun findPerson(pdlPerson: PdlPerson): Person? {
-        val eksisterendeFnr = fnrRepository.findByFnrIn(pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr)
-        checkFnrOnlyRelatedToOnePerson(eksisterendeFnr)
-        return eksisterendeFnr.firstOrNull()?.person
-    }
-
-    private fun checkFnrOnlyRelatedToOnePerson(fnrs: List<Fnr?>) {
-        val persons = fnrs.filterNotNull().map { it.person }.toSet()
-        if (persons.size > 1) {
-            SECURE_LOG.error("Multiple persons identified by fnrs: $fnrs . Person id: ${persons.map { it?.id }}")
+        val personer = personJpaRepository.findByAlleFnr_FnrIn(pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr)
+        if (personer.size > 1) {
+            SECURE_LOG.error("Multiple persons identified by fnrs: ${pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr} . Person id: ${personer.map { it.id }}")
             throw DatabaseError("Multiple persons identified by fnrs. For more information see secure log")
         }
+        return personer.firstOrNull()
     }
 
     companion object {
@@ -51,6 +45,9 @@ class PersonRepository(
 }
 
 @Repository
-interface PersonJpaRepository : JpaRepository<Person, Long>
+interface PersonJpaRepository : JpaRepository<Person, Long> {
+
+    fun findByAlleFnr_FnrIn(personer: List<String>) : List<Person>
+}
 
 class DatabaseError(message: String) : RuntimeException(message)
