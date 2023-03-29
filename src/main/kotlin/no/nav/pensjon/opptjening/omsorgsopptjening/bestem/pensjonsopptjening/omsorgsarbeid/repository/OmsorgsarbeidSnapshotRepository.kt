@@ -20,8 +20,17 @@ class OmsorgsarbeidSnapshotRepository(
 
     @Transactional
     fun save(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot): OmsorgsarbeidSnapshot {
+        find(omsorgsarbeidSnapshot.omsorgsyter, omsorgsarbeidSnapshot.omsorgsAr).forEach { it.historisk = true }
+
         return em.merge(omsorgsarbeidSnapshot)
     }
+
+    fun find(omsorgsyter: Person, omsorgsAr: Int, historisk: Boolean = false) =
+        jpaRepository.findByOmsorgsyter_idInAndOmsorgsArAndHistorisk(
+            personIdList = omsorgsyter.id?.let { listOf(it) } ?: listOf(),
+            omsorgsAr = omsorgsAr,
+            historisk = historisk
+        )
 
     fun findByPerson(vararg persons: Person): List<OmsorgsarbeidSnapshot> {
         return jpaRepository.findByOmsorgsyter_idIn(persons.mapNotNull { it.id })
@@ -30,6 +39,12 @@ class OmsorgsarbeidSnapshotRepository(
 
 @Repository
 interface OmsorgsarbeidSnapshotJpaRepository : JpaRepository<OmsorgsarbeidSnapshot, Long> {
+
+    fun findByOmsorgsyter_idInAndOmsorgsArAndHistorisk(
+        personIdList: List<Long>,
+        omsorgsAr: Int,
+        historisk: Boolean
+    ): List<OmsorgsarbeidSnapshot>
 
     fun findByOmsorgsyter_idIn(personIdList: List<Long>): List<OmsorgsarbeidSnapshot>
 }

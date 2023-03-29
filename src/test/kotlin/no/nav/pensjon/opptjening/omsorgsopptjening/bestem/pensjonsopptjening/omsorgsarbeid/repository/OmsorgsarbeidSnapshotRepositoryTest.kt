@@ -6,13 +6,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.*
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningsGrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Status
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -82,6 +79,49 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
         assertEquals(omsorgsmottaker.id,omsorgsarbeidPeriode.omsorgsmottakere.first().id)
     }
 
+    @Test
+    fun `Given omsorgsArbeidSnapshot override When save Then set old snapshot to historisk true`() {
+        val omsorgsYter = personRepository.updatePerson(omsorgsYter1)
+        val omsorgsmottaker1 = personRepository.updatePerson(omsorgsmottaker1)
+        val omsorgsmottaker2 = personRepository.updatePerson(omsorgsmottaker2)
+
+        repository.save(
+            creatOmsorgsArbeidSnapshot(
+                omsorgsyter = omsorgsYter,
+                omsorgsarbeidPerioder = listOf(
+                    createOmsorgsArbeid(omsorgsyter = omsorgsYter, omsorgsmottakere = listOf(omsorgsmottaker1))
+                ),
+            )
+        )
+
+        repository.save(
+            creatOmsorgsArbeidSnapshot(
+                omsorgsyter = omsorgsYter,
+                omsorgsarbeidPerioder = listOf(
+                    createOmsorgsArbeid(omsorgsyter = omsorgsYter, omsorgsmottakere = listOf(omsorgsmottaker2))
+                ),
+            )
+        )
+
+        val snapshotList = repository.find(
+            omsorgsyter = omsorgsYter,
+            omsorgsAr = OMSORGS_AR_2020,
+            historisk = false
+        )
+
+        val oldSnapshotList = repository.find(
+            omsorgsyter = omsorgsYter,
+            omsorgsAr = OMSORGS_AR_2020,
+            historisk = true
+        )
+
+        assertEquals(1, snapshotList.size)
+        assertEquals(1, oldSnapshotList.size)
+        assertFalse(snapshotList.first().historisk)
+        assertTrue(oldSnapshotList.first().historisk)
+        assertNotEquals(snapshotList.first().id, oldSnapshotList.first().id)
+    }
+
 
     @Test
     fun `When saving unpersisted person Then throw exception`() {
@@ -129,6 +169,9 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
         assertTrue(e3.message!!.contains("save the transient instance before flushing"))
     }
 
+
+
+
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsyter: Person,
         omsorgsAr: Int = OMSORGS_AR_2020,
@@ -167,7 +210,8 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
 
     companion object {
         private val omsorgsYter1 = PdlPerson(gjeldendeFnr = "1111", historiskeFnr = listOf(), fodselsAr = 1988)
-        private val omsorgsmottaker1 = PdlPerson(gjeldendeFnr = "2222", historiskeFnr = listOf(), fodselsAr = 1989)
+        private val omsorgsmottaker1 = PdlPerson(gjeldendeFnr = "2222", historiskeFnr = listOf(), fodselsAr = 2017)
+        private val omsorgsmottaker2 = PdlPerson(gjeldendeFnr = "3333", historiskeFnr = listOf(), fodselsAr = 2018)
 
         private const val OMSORGS_AR_2020 = 2020
         private const val KJORE_HASHE = "dummyValue1"
