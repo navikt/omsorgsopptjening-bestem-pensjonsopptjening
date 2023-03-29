@@ -15,6 +15,9 @@ data class OmsorgsarbeidSnapshot(
     @Column(name = "OMSORGS_AR", nullable = false)
     val omsorgsAr: Int,
 
+    @Column(name = "HISTORISK", nullable = false)
+    var historisk: Boolean = false,
+
     @OneToMany(fetch =  FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "OMSORGSARBEID_SNAPSHOT_ID",
