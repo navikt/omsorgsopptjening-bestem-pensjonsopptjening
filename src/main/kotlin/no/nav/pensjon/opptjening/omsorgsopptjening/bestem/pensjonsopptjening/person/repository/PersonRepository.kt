@@ -16,28 +16,35 @@ class PersonRepository(
 ) {
     @Transactional
     fun updatePerson(pdlPerson: PdlPerson): Person {
-        val person = findPerson(pdlPerson) ?: Person(fodselsAr = pdlPerson.fodselsAr)
-        val initialFnrsInDb = person.alleFnr.toSet()
+        val persistedPerson = findPerson(pdlPerson)
 
-        val updatedPerson = person.apply {
-            fodselsAr = pdlPerson.fodselsAr
-            oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
-            oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
+        return if (persistedPerson == null) {
+            personJpaRepository.save(
+                Person(fodselsAr = pdlPerson.fodselsAr).apply {
+                    oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
+                    oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
+                }
+            )
+        } else {
+            fnrRepository.deleteFnrNotInPdl(persistedPerson, pdlPerson)
+            persistedPerson.apply {
+                if (fodselsAr != pdlPerson.fodselsAr) fodselsAr = pdlPerson.fodselsAr
+                oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
+                oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
+            }
         }
-
-        fnrRepository.deleteByFnrIn(initialFnrsInDb.filter { !updatedPerson.identifiseresAv(it) })
-
-        return personJpaRepository.save(updatedPerson)
     }
 
-    fun findPerson(pdlPerson: PdlPerson): Person? {
-        val personer = personJpaRepository.findByAlleFnr_FnrIn(pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr)
+    private fun findPerson(pdlPerson: PdlPerson): Person? {
+        val personer = personJpaRepository.findByAlleFnr_FnrIn(pdlPerson.alleFnr())
         if (personer.size > 1) {
             SECURE_LOG.error("Multiple persons identified by fnrs: ${pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr} . Person id: ${personer.map { it.id }}")
             throw DatabaseError("Multiple persons identified by fnrs. For more information see secure log")
         }
         return personer.firstOrNull()
     }
+
+    fun findPersonByFnr(fnr: String) = personJpaRepository.findByAlleFnr_FnrIn(setOf(fnr)).firstOrNull()
 
     companion object {
         private val SECURE_LOG = LoggerFactory.getLogger("secure")
@@ -47,7 +54,7 @@ class PersonRepository(
 @Repository
 interface PersonJpaRepository : JpaRepository<Person, Long> {
 
-    fun findByAlleFnr_FnrIn(personer: List<String>) : List<Person>
+    fun findByAlleFnr_FnrIn(personer: Set<String>): List<Person>
 }
 
 class DatabaseError(message: String) : RuntimeException(message)

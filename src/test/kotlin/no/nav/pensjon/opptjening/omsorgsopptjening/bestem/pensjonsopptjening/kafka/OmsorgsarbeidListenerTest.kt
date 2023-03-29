@@ -8,7 +8,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest.Companion.OMSORGSOPPTJENING_TOPIC
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.FnrRepository
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.util.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
@@ -46,7 +46,7 @@ internal class OmsorgsarbeidListenerTest {
     lateinit var omsorgsopptjeingListener: OmsorgsopptjeningMockListener
 
     @Autowired
-    lateinit var fnrRepository: FnrRepository
+    lateinit var personRepository: PersonRepository
 
 
     @BeforeEach
@@ -142,7 +142,7 @@ internal class OmsorgsarbeidListenerTest {
         assertNotNull(omsorgsopptjeingListener.removeFirstRecord(maxSeconds = 10, messageType = OMSORGSOPPTJENING))
         assertNotNull(omsorgsopptjeingListener.removeFirstRecord(maxSeconds = 10, messageType = OMSORGSOPPTJENING))
 
-        val person = fnrRepository.findPersonByFnr("12345678911")!!
+        val person = personRepository.findPersonByFnr("12345678911")!!
         assertEquals(2, person.alleFnr.size)
         assertEquals("12345678910", person.gjeldendeFnr.fnr)
         assertEquals("12345678911", person.historiskeFnr.first().fnr)

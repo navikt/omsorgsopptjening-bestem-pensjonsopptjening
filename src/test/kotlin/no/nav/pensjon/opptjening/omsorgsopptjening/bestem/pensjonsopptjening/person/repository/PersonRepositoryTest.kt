@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.test.context.EmbeddedKafka
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 
@@ -26,9 +27,6 @@ internal class PersonRepositoryTest {
 
     @Autowired
     lateinit var personRepository: PersonRepository
-
-    @Autowired
-    lateinit var fnrRepository: FnrRepository
 
     @Autowired
     lateinit var fnrJpaRepository: FnrJpaRepository
@@ -45,8 +43,10 @@ internal class PersonRepositoryTest {
             historiskeFnr = listOf("6666", "7777"),
             fodselsAr = 2000
         )
-        val person = personRepository.updatePerson(pdlPerson)
+        personRepository.updatePerson(pdlPerson)
+        val person = personRepository.findPersonByFnr("5555")
 
+        assertNotNull(person)
         assertEquals(pdlPerson.gjeldendeFnr, person.gjeldendeFnr.fnr)
         assertEquals(pdlPerson.fodselsAr, person.fodselsAr)
         assertEquals(pdlPerson.historiskeFnr.size, person.historiskeFnr.size)
@@ -69,8 +69,9 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val updatedPerson: Person = fnrRepository.findPersonByFnr("1111")!!
+        val updatedPerson = personRepository.findPersonByFnr("1111")
 
+        assertNotNull(updatedPerson)
         assertEquals(updatedPdlPerson.gjeldendeFnr, updatedPerson.gjeldendeFnr.fnr)
         assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
         assertEquals(updatedPdlPerson.historiskeFnr.size, updatedPerson.historiskeFnr.size)
@@ -93,8 +94,9 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val updatedPerson: Person = fnrRepository.findPersonByFnr("1111")!!
+        val updatedPerson= personRepository.findPersonByFnr("1111")
 
+        assertNotNull(updatedPerson)
         assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
         assertEquals(updatedPdlPerson.gjeldendeFnr, updatedPerson.gjeldendeFnr.fnr)
         assertEquals(1, updatedPerson.alleFnr.size)
@@ -102,7 +104,7 @@ internal class PersonRepositoryTest {
     }
 
     @Test
-    fun `Given saved person has only one historisk fnr in common with updated person When updatePerson with pdlPerson Then update in person`() {
+    fun `Given saved person has only one historisk fnr in common with updated person When updatePerson with pdlPerson Then update person`() {
         val initialPdlPerson = PdlPerson(
             gjeldendeFnr = "1111",
             historiskeFnr = listOf("2222", "3333"),
@@ -117,8 +119,9 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val updatedPerson: Person = fnrRepository.findPersonByFnr("4444")!!
+        val updatedPerson = personRepository.findPersonByFnr("4444")
 
+        assertNotNull(updatedPerson)
         assertEquals(initialPersonId, updatedPerson.id)
         assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
         assertEquals(updatedPdlPerson.gjeldendeFnr, updatedPerson.gjeldendeFnr.fnr)
@@ -142,8 +145,9 @@ internal class PersonRepositoryTest {
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val updatedPerson: Person = fnrRepository.findPersonByFnr("1111")!!
+        val updatedPerson = personRepository.findPersonByFnr("1111")
 
+        assertNotNull(updatedPerson)
         assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
     }
 
@@ -172,7 +176,7 @@ internal class PersonRepositoryTest {
     }
 
     private fun assertContainsOnlySameFnrs(pdlPerson: PdlPerson, person: Person) {
-        val allFnrsPdl = (pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr).toSet()
+        val allFnrsPdl: Set<String> = pdlPerson.alleFnr()
         assertTrue(allFnrsPdl.all { person.identifiseresAv(it) }, "Alle fnr fra pdl var ikke i person")
         assertEquals(person.alleFnr.size, allFnrsPdl.size, "Det er flere fnr i person enn i pdlPerson")
     }

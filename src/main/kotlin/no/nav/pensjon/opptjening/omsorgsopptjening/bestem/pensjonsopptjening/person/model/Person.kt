@@ -32,7 +32,7 @@ class Person(
      * Legg til fnr dersom fnr ikke finnes i DB fra før
      **/
     fun oppdaterGjeldendeFnr(fnr: String) {
-        alleFnr.forEach { it.gjeldende = false }
+        alleFnr.forEach { if(it.gjeldende) it.gjeldende = false }
         alleFnr.firstOrNull { it.fnr == fnr }?.let {
             it.gjeldende = true
         }?: alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))

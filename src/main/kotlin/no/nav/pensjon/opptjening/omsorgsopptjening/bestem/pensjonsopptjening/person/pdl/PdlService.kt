@@ -35,7 +35,9 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         }
 }
 
-data class PdlPerson(val gjeldendeFnr: String, val historiskeFnr: List<String>, val fodselsAr: Int)
+data class PdlPerson(val gjeldendeFnr: String, val historiskeFnr: List<String>, val fodselsAr: Int){
+    fun alleFnr() =  (historiskeFnr + gjeldendeFnr).toSet()
+}
 
 class PdlException(pdlError: PdlError?) : RuntimeException(pdlError?.message ?: "Unknown error from PDL") {
     val code: PdlErrorCode? = pdlError?.extensions?.code
