@@ -32,10 +32,10 @@ class Person(
      * Legg til fnr dersom fnr ikke finnes i DB fra før
      **/
     fun oppdaterGjeldendeFnr(fnr: String) {
-        alleFnr.forEach { if(it.gjeldende) it.gjeldende = false }
+        alleFnr.forEach { if (it.gjeldende) it.gjeldende = false }
         alleFnr.firstOrNull { it.fnr == fnr }?.let {
             it.gjeldende = true
-        }?: alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))
+        } ?: alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))
     }
 
     /**
@@ -43,18 +43,7 @@ class Person(
      * Dersom historisk fnr eksisterer i DB men ikke i PDL fjernes den fra DB
      */
     fun oppdaterHistoriskeFnr(nyeHistoriskeFnr: List<String>) {
-        val eksisterendeHistoriskeFnr: Set<Fnr> = alleFnr.filter { !it.gjeldende }.toSet()
-
-        nyeHistoriskeFnr.forEach {
-            if (!eksisterendeHistoriskeFnr.contains(Fnr(fnr = it))) {
-                alleFnr.add(Fnr(fnr = it, gjeldende = false, person = this))
-            }
-        }
-
-        eksisterendeHistoriskeFnr.forEach{ eksisterend ->
-            if (!nyeHistoriskeFnr.contains(eksisterend.fnr)) {
-                alleFnr.remove(eksisterend)
-            }
-        }
+        alleFnr.addAll(nyeHistoriskeFnr.filter { !identifiseresAv(it) }.map { Fnr(fnr = it, gjeldende = false, person = this) })
+        alleFnr.removeAll(alleFnr.filter { !nyeHistoriskeFnr.contains(it.fnr) && !it.gjeldende }.toSet())
     }
 }
