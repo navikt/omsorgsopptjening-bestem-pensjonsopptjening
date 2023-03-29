@@ -12,14 +12,12 @@ import org.springframework.stereotype.Service
 class OmsorgsOpptjeningService(
     private val omsorgsArbeidService: OmsorgsArbeidService,
     private val omsorgsOpptejningProducer: OmsorgsOpptejningProducer,
-    private val omsorgsarbeidSnapshotRepository: OmsorgsarbeidSnapshotRepository
 ) {
 
     fun behandlOmsorgsarbeid(key: OmsorgsArbeidKey, omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot) {
         SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $omsorgsArbeidSnapshot")
 
         val omsorgsArbeidSnapshotEntity = omsorgsArbeidService.getOmsorgsarbeidSnapshot(omsorgsArbeidSnapshot)
-        omsorgsarbeidSnapshotRepository.save(omsorgsArbeidSnapshotEntity)
         omsorgsOpptejningProducer.publiserOmsorgsopptejning(FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshotEntity))
     }
 
