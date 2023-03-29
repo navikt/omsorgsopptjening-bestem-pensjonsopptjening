@@ -1,6 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model
 
 import jakarta.persistence.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlFnr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import java.time.LocalDateTime
 
 @Entity
@@ -28,22 +30,16 @@ class Person(
 
     infix fun identifiseresAv(fnr: String) = alleFnr.map { it.fnr }.contains(fnr)
 
-    /**
-     * Legg til fnr dersom fnr ikke finnes i DB fra før
-     **/
-    fun oppdaterGjeldendeFnr(fnr: String) {
-        alleFnr.forEach { if (it.gjeldende) it.gjeldende = false }
-        alleFnr.firstOrNull { it.fnr == fnr }?.let {
-            it.gjeldende = true
-        } ?: alleFnr.add(Fnr(fnr = fnr, gjeldende = true, person = this))
+    fun oppdaterPerson(pdlPerson: PdlPerson) {
+        if (fodselsAr != pdlPerson.fodselsAr) fodselsAr = pdlPerson.fodselsAr
+        pdlPerson.alleFnr().forEach { oppdaterFnr(it) }
+        alleFnr.removeIf { !pdlPerson.alleFnr().any { pdlFnr -> it.fnr == pdlFnr.fnr } }
     }
 
-    /**
-     * Dersom historisk fnr fra PDL ikke eksisterer i DB legges den til
-     * Dersom historisk fnr eksisterer i DB men ikke i PDL fjernes den fra DB
-     */
-    fun oppdaterHistoriskeFnr(nyeHistoriskeFnr: List<String>) {
-        alleFnr.addAll(nyeHistoriskeFnr.filter { !identifiseresAv(it) }.map { Fnr(fnr = it, gjeldende = false, person = this) })
-        alleFnr.removeAll(alleFnr.filter { !nyeHistoriskeFnr.contains(it.fnr) && !it.gjeldende }.toSet())
-    }
+    private fun oppdaterFnr(pdlFnr: PdlFnr): Any =
+        if (identifiseresAv(pdlFnr.fnr)) {
+            alleFnr.first { it.fnr == pdlFnr.fnr }.apply { gjeldende = pdlFnr.gjeldende }
+        } else {
+            alleFnr.add(Fnr(fnr = pdlFnr.fnr, gjeldende = pdlFnr.gjeldende, person = this))
+        }
 }

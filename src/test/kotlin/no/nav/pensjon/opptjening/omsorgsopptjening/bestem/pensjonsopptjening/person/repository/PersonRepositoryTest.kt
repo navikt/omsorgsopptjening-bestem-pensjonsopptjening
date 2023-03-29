@@ -176,7 +176,7 @@ internal class PersonRepositoryTest {
     }
 
     private fun assertContainsOnlySameFnrs(pdlPerson: PdlPerson, person: Person) {
-        val allFnrsPdl: Set<String> = pdlPerson.alleFnr()
+        val allFnrsPdl: Set<String> = pdlPerson.alleFnr().map { it.fnr }.toSet()
         assertTrue(allFnrsPdl.all { person.identifiseresAv(it) }, "Alle fnr fra pdl var ikke i person")
         assertEquals(person.alleFnr.size, allFnrsPdl.size, "Det er flere fnr i person enn i pdlPerson")
     }

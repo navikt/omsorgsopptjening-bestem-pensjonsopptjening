@@ -21,22 +21,20 @@ class PersonRepository(
         return if (persistedPerson == null) {
             personJpaRepository.save(
                 Person(fodselsAr = pdlPerson.fodselsAr).apply {
-                    oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
-                    oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
+                    oppdaterPerson(pdlPerson)
                 }
             )
         } else {
             fnrRepository.deleteFnrNotInPdl(persistedPerson, pdlPerson)
             persistedPerson.apply {
                 if (fodselsAr != pdlPerson.fodselsAr) fodselsAr = pdlPerson.fodselsAr
-                oppdaterGjeldendeFnr(pdlPerson.gjeldendeFnr)
-                oppdaterHistoriskeFnr(pdlPerson.historiskeFnr)
+                oppdaterPerson(pdlPerson)
             }
         }
     }
 
     private fun findPerson(pdlPerson: PdlPerson): Person? {
-        val personer = personJpaRepository.findByAlleFnr_FnrIn(pdlPerson.alleFnr())
+        val personer = personJpaRepository.findByAlleFnr_FnrIn(pdlPerson.alleFnr().map { it.fnr })
         if (personer.size > 1) {
             SECURE_LOG.error("Multiple persons identified by fnrs: ${pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr} . Person id: ${personer.map { it.id }}")
             throw DatabaseError("Multiple persons identified by fnrs. For more information see secure log")
@@ -44,7 +42,7 @@ class PersonRepository(
         return personer.firstOrNull()
     }
 
-    fun findPersonByFnr(fnr: String) = personJpaRepository.findByAlleFnr_FnrIn(setOf(fnr)).firstOrNull()
+    fun findPersonByFnr(fnr: String) = personJpaRepository.findByAlleFnr_FnrIn(listOf(fnr)).firstOrNull()
 
     companion object {
         private val SECURE_LOG = LoggerFactory.getLogger("secure")
@@ -54,7 +52,7 @@ class PersonRepository(
 @Repository
 interface PersonJpaRepository : JpaRepository<Person, Long> {
 
-    fun findByAlleFnr_FnrIn(personer: Set<String>): List<Person>
+    fun findByAlleFnr_FnrIn(personer: List<String>): List<Person>
 }
 
 class DatabaseError(message: String) : RuntimeException(message)
