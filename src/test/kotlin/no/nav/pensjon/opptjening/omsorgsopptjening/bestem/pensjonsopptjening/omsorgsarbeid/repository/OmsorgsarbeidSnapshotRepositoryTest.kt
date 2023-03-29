@@ -169,8 +169,88 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
         assertTrue(e3.message!!.contains("save the transient instance before flushing"))
     }
 
+    @Test
+    fun `Given existing omsorgsArbeidSnapshot for more than one omsorgsyter When saving Then do not mutate other omsorgsyter snapshot`() {
+        val omsorgsYter1 = personRepository.updatePerson(omsorgsYter1)
+        val omsorgsYter2 = personRepository.updatePerson(omsorgsYter2)
 
+        val omsorgsmottaker1 = personRepository.updatePerson(omsorgsmottaker1)
+        val omsorgsmottaker2 = personRepository.updatePerson(omsorgsmottaker2)
 
+        // Saving snapshot for omsorgsyter1
+        repository.save(
+            creatOmsorgsArbeidSnapshot(
+                omsorgsyter = omsorgsYter1,
+                omsorgsarbeidPerioder = listOf(
+                    createOmsorgsArbeid(omsorgsyter = omsorgsYter1, omsorgsmottakere = listOf(omsorgsmottaker1))
+                ),
+            )
+        )
+
+        // Saving snapshot for omsorgsyter2
+        repository.save(
+            creatOmsorgsArbeidSnapshot(
+                omsorgsyter = omsorgsYter2,
+                omsorgsarbeidPerioder = listOf(
+                    createOmsorgsArbeid(omsorgsyter = omsorgsYter2, omsorgsmottakere = listOf(omsorgsmottaker2))
+                ),
+            )
+        )
+
+        // override snapshot for omsorgsyter2
+        repository.save(
+            creatOmsorgsArbeidSnapshot(
+                omsorgsyter = omsorgsYter2,
+                omsorgsarbeidPerioder = listOf(
+                    createOmsorgsArbeid(omsorgsyter = omsorgsYter2, omsorgsmottakere = listOf(omsorgsmottaker1))
+                ),
+            )
+        )
+
+        val snapshotListomsorgsYter1 = repository.find(
+            omsorgsyter = omsorgsYter1,
+            omsorgsAr = OMSORGS_AR_2020,
+            historisk = false
+        )
+
+        val oldSnapshotListomsorgsYter1 = repository.find(
+            omsorgsyter = omsorgsYter1,
+            omsorgsAr = OMSORGS_AR_2020,
+            historisk = true
+        )
+
+        // Validating historisk and not historisk snapshot for omsorgsyter1
+        assertEquals(1, snapshotListomsorgsYter1.size)
+        assertEquals("1111", snapshotListomsorgsYter1.first().omsorgsyter.gjeldendeFnr.fnr)
+        assertEquals(0, oldSnapshotListomsorgsYter1.size)
+        assertFalse(snapshotListomsorgsYter1.first().historisk)
+
+        val snapshotListOmsorgsyter2 = repository.find(
+            omsorgsyter = omsorgsYter2,
+            omsorgsAr = OMSORGS_AR_2020,
+            historisk = false
+        )
+
+        val oldsnapshotListOmsorgsyter2 = repository.find(
+            omsorgsyter = omsorgsYter2,
+            omsorgsAr = OMSORGS_AR_2020,
+            historisk = true
+        )
+
+        //Validating current snapshot for omsorgsyter2
+        assertEquals(1, snapshotListOmsorgsyter2.size)
+        assertFalse(snapshotListOmsorgsyter2.first().historisk)
+        assertEquals("12345678910",snapshotListOmsorgsyter2.first().omsorgsyter.gjeldendeFnr.fnr)
+        assertEquals(1, snapshotListOmsorgsyter2.first().omsorgsarbeidSaker.first().omsorgsarbeidPerioder.first().omsorgsmottakere.size)
+        assertEquals(omsorgsmottaker1.gjeldendeFnr.fnr, snapshotListOmsorgsyter2.first().omsorgsarbeidSaker.first().omsorgsarbeidPerioder.first().omsorgsmottakere.first().gjeldendeFnr.fnr)
+
+        //Validating historic snapshot for omsorgsyter2
+        assertEquals(1, oldsnapshotListOmsorgsyter2.size)
+        assertTrue(oldsnapshotListOmsorgsyter2.first().historisk)
+        assertEquals("12345678910",oldsnapshotListOmsorgsyter2.first().omsorgsyter.gjeldendeFnr.fnr)
+        assertEquals(1, oldsnapshotListOmsorgsyter2.first().omsorgsarbeidSaker.first().omsorgsarbeidPerioder.first().omsorgsmottakere.size)
+        assertEquals(omsorgsmottaker2.gjeldendeFnr.fnr, oldsnapshotListOmsorgsyter2.first().omsorgsarbeidSaker.first().omsorgsarbeidPerioder.first().omsorgsmottakere.first().gjeldendeFnr.fnr)
+    }
 
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsyter: Person,
@@ -210,6 +290,7 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
 
     companion object {
         private val omsorgsYter1 = PdlPerson(gjeldendeFnr = "1111", historiskeFnr = listOf(), fodselsAr = 1988)
+        private val omsorgsYter2 = PdlPerson(gjeldendeFnr = "12345678910", historiskeFnr = listOf(), fodselsAr = 1990)
         private val omsorgsmottaker1 = PdlPerson(gjeldendeFnr = "2222", historiskeFnr = listOf(), fodselsAr = 2017)
         private val omsorgsmottaker2 = PdlPerson(gjeldendeFnr = "3333", historiskeFnr = listOf(), fodselsAr = 2018)
 
