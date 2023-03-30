@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlFnr
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -147,14 +147,14 @@ internal class PersonTest {
     fun `Given no gjeldende fnr in db for person when trying to update gjeldende fnr in DB then insert new fnr to person`() {
         val person = Person(fodselsAr = DUMMY_AR)
         assertEquals(0, person.alleFnr.filter { it.gjeldende }.size)
-        person.oppdaterPerson(PdlPerson("12345678901", listOf(), DUMMY_AR))
+        person.oppdaterFnr(listOf(PdlFnr("12345678901", true)))
         assertEquals(1, person.alleFnr.filter { it.gjeldende }.size)
     }
 
     @Test
     fun `Given a gjeldende fnr in db for person when trying to update gjeldende fnr in DB then insert new fnr to person and make old gjeldende to historisk`() {
         val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = true)), fodselsAr = DUMMY_AR)
-        person.oppdaterPerson(PdlPerson("12345678902", listOf("12345678901"), DUMMY_AR))
+        person.oppdaterFnr(listOf(PdlFnr("12345678902", true), PdlFnr("12345678901", false)))
         assertEquals(1, person.alleFnr.filter { it.gjeldende }.size)
         assertEquals("12345678902", person.gjeldendeFnr.fnr)
         assertEquals("12345678901", person.historiskeFnr.first().fnr)
@@ -164,7 +164,7 @@ internal class PersonTest {
     fun `Given no historiske fnr in db for person when trying to update historiske fnr in DB then insert new fnr to person`() {
         val person = Person(fodselsAr = DUMMY_AR)
         assertEquals(0, person.alleFnr.filter { !it.gjeldende }.size)
-        person.oppdaterPerson(PdlPerson("12345678902", listOf("12345678901"), DUMMY_AR))
+        person.oppdaterFnr(listOf(PdlFnr("12345678902", true), PdlFnr("12345678901", false)))
         assertEquals(1, person.alleFnr.filter { !it.gjeldende }.size)
         assertEquals("12345678901", person.historiskeFnr.first().fnr)
     }
@@ -172,9 +172,12 @@ internal class PersonTest {
     @Test
     fun `Given a historiske fnr in db for person when trying to update historiske fnr in DBthen insert new fnr to person and remove old historiske fnr`() {
         val person = Person(alleFnr = mutableSetOf(Fnr(fnr = "12345678901", gjeldende = false)), fodselsAr = DUMMY_AR)
-        person.oppdaterPerson(PdlPerson("11111",listOf("12345678902"),DUMMY_AR))
+        person.oppdaterFnr(listOf(PdlFnr("11111", true), PdlFnr("12345678902", false)))
+
         assertEquals(1, person.alleFnr.filter { !it.gjeldende }.size)
-        assertEquals("12345678902", person.alleFnr.first().fnr)
+        assertEquals(1, person.alleFnr.filter { it.gjeldende }.size)
+        assertEquals("12345678902", person.alleFnr.first { !it.gjeldende }.fnr)
+        assertEquals("11111", person.alleFnr.first { it.gjeldende }.fnr)
     }
 
     private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =

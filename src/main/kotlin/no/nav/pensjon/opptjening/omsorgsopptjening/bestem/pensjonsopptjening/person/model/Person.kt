@@ -30,10 +30,9 @@ class Person(
 
     infix fun identifiseresAv(fnr: String) = alleFnr.map { it.fnr }.contains(fnr)
 
-    fun oppdaterPerson(pdlPerson: PdlPerson) {
-        if (fodselsAr != pdlPerson.fodselsAr) fodselsAr = pdlPerson.fodselsAr
-        pdlPerson.alleFnr().forEach { oppdaterFnr(it) }
-        alleFnr.removeIf { !pdlPerson.alleFnr().any { pdlFnr -> it.fnr == pdlFnr.fnr } }
+    fun oppdaterFnr(fnrFraPdl: List<PdlFnr>) {
+        fnrFraPdl.forEach { oppdaterFnr(it) }
+        alleFnr.removeIf { !fnrFraPdl.any { pdlFnr -> it.fnr == pdlFnr.fnr } }
     }
 
     private fun oppdaterFnr(pdlFnr: PdlFnr): Any =

@@ -21,14 +21,14 @@ class PersonRepository(
         return if (persistedPerson == null) {
             personJpaRepository.save(
                 Person(fodselsAr = pdlPerson.fodselsAr).apply {
-                    oppdaterPerson(pdlPerson)
+                    oppdaterFnr(pdlPerson.alleFnr())
                 }
             )
         } else {
             fnrRepository.deleteFnrNotInPdl(persistedPerson, pdlPerson)
             persistedPerson.apply {
                 if (fodselsAr != pdlPerson.fodselsAr) fodselsAr = pdlPerson.fodselsAr
-                oppdaterPerson(pdlPerson)
+                oppdaterFnr(pdlPerson.alleFnr())
             }
         }
     }
