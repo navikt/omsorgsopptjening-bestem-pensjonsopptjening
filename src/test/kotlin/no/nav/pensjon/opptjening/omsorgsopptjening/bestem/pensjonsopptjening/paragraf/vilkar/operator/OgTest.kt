@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.CsvSource
 internal class OgTest {
 
     @Test
-    fun `Given all vilkar is INVILGET When evaluating og Then INVILGET`() {
+    fun `Given all vilkar is INVILGET Then INVILGET`() {
         val ogVilkarsVurdering = og(
             returnUtfall.vilkarsVurder(grunnlag = Utfall.INVILGET),
             returnUtfall.vilkarsVurder(grunnlag = Utfall.INVILGET)
@@ -29,7 +29,7 @@ internal class OgTest {
         "SAKSBEHANDLING, AVSLAG",
         "AVSLAG, SAKSBEHANDLING",
     )
-    fun `Given at least one vilkar is SAKSBEHANDLING When evaluating og Then SAKSBEHANDLING`(
+    fun `Given at least one vilkar is SAKSBEHANDLING and no vilkar MANGLER_ANNEN_OMSORGSYTER Then SAKSBEHANDLING`(
         utfall1: Utfall,
         utfall2: Utfall,
     ) {
@@ -43,11 +43,31 @@ internal class OgTest {
 
     @ParameterizedTest
     @CsvSource(
+        "MANGLER_ANNEN_OMSORGSYTER, MANGLER_ANNEN_OMSORGSYTER",
+        "SAKSBEHANDLING, MANGLER_ANNEN_OMSORGSYTER",
+        "MANGLER_ANNEN_OMSORGSYTER, SAKSBEHANDLING",
+        "MANGLER_ANNEN_OMSORGSYTER, AVSLAG",
+        "AVSLAG, MANGLER_ANNEN_OMSORGSYTER",
+    )
+    fun `Given one vilkar MANGLER_ANNEN_OMSORGSYTER Then MANGLER_ANNEN_OMSORGSYTER`(
+        utfall1: Utfall,
+        utfall2: Utfall,
+    ) {
+        val ogVilkarsVurdering = og(
+            returnUtfall.vilkarsVurder(grunnlag = utfall1),
+            returnUtfall.vilkarsVurder(grunnlag = utfall2)
+        )
+
+        Assertions.assertEquals(Utfall.MANGLER_ANNEN_OMSORGSYTER, ogVilkarsVurdering.utfall)
+    }
+
+    @ParameterizedTest
+    @CsvSource(
         "AVSLAG, INVILGET",
         "INVILGET, AVSLAG",
         "AVSLAG, AVSLAG",
     )
-    fun `Given at least one vilkar with AVSLAG and no vilkar with SAKSBEHANDLING When evaluating og Then AVSLAG`(
+    fun `Given at least one vilkar with AVSLAG and no vilkar with SAKSBEHANDLING or MANGLER_ANNEN_OMSORGSYTER Then AVSLAG`(
         utfall1: Utfall,
         utfall2: Utfall,
     ) {

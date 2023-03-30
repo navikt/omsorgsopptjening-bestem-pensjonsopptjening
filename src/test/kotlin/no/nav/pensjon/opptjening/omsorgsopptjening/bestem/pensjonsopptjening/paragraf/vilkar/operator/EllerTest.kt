@@ -20,7 +20,7 @@ internal class EllerTest {
         "SAKSBEHANDLING, INVILGET",
         "INVILGET, SAKSBEHANDLING",
     )
-    fun `Given one vilkar INVILGET When evaluating eller Then INVILGET`(
+    fun `Given one vilkar INVILGET Then INVILGET`(
         utfall1: Utfall,
         utfall2: Utfall,
     ) {
@@ -34,15 +34,15 @@ internal class EllerTest {
 
     @ParameterizedTest
     @CsvSource(
-        "AVSLAG, AVSLAG, SAKSBEHANDLING, SAKSBEHANDLING",
-        "AVSLAG, SAKSBEHANDLING, AVSLAG, SAKSBEHANDLING",
-        "SAKSBEHANDLING, AVSLAG, AVSLAG, SAKSBEHANDLING",
-        "SAKSBEHANDLING, SAKSBEHANDLING, AVSLAG, SAKSBEHANDLING",
-        "SAKSBEHANDLING, AVSLAG, SAKSBEHANDLING, SAKSBEHANDLING",
-        "AVSLAG, SAKSBEHANDLING, SAKSBEHANDLING, SAKSBEHANDLING",
-        "SAKSBEHANDLING, SAKSBEHANDLING, SAKSBEHANDLING, SAKSBEHANDLING",
+        "AVSLAG, AVSLAG, SAKSBEHANDLING",
+        "AVSLAG, SAKSBEHANDLING, AVSLAG",
+        "SAKSBEHANDLING, AVSLAG, AVSLAG",
+        "SAKSBEHANDLING, SAKSBEHANDLING, AVSLAG",
+        "SAKSBEHANDLING, AVSLAG, SAKSBEHANDLING",
+        "AVSLAG, SAKSBEHANDLING, SAKSBEHANDLING",
+        "SAKSBEHANDLING, SAKSBEHANDLING, SAKSBEHANDLING",
     )
-    fun `Given at least one vilkar SAKSBEHANDLING and no vilkar INVILGET When evaluating eller Then SAKSBEHANDLING`(
+    fun `Given at least one vilkar SAKSBEHANDLING and no vilkar INVILGET or MANGLER_ANNEN_OMSORGSYTER Then SAKSBEHANDLING`(
         utfall1: Utfall,
         utfall2: Utfall,
         utfall3: Utfall,
@@ -56,8 +56,33 @@ internal class EllerTest {
         assertEquals(Utfall.SAKSBEHANDLING, vilkarsVurdering.utfall)
     }
 
+
+    @ParameterizedTest
+    @CsvSource(
+        "AVSLAG, SAKSBEHANDLING, MANGLER_ANNEN_OMSORGSYTER",
+        "SAKSBEHANDLING, MANGLER_ANNEN_OMSORGSYTER, AVSLAG",
+        "MANGLER_ANNEN_OMSORGSYTER, AVSLAG, SAKSBEHANDLING",
+        "MANGLER_ANNEN_OMSORGSYTER, MANGLER_ANNEN_OMSORGSYTER, SAKSBEHANDLING",
+        "MANGLER_ANNEN_OMSORGSYTER, SAKSBEHANDLING, MANGLER_ANNEN_OMSORGSYTER",
+        "SAKSBEHANDLING, MANGLER_ANNEN_OMSORGSYTER, MANGLER_ANNEN_OMSORGSYTER",
+        "MANGLER_ANNEN_OMSORGSYTER, MANGLER_ANNEN_OMSORGSYTER, MANGLER_ANNEN_OMSORGSYTER",
+    )
+    fun `Given at least one vilkar MANGLER_ANNEN_OMSORGSYTER and no vilkar INVILGET Then MANGLER_ANNEN_OMSORGSYTER`(
+        utfall1: Utfall,
+        utfall2: Utfall,
+        utfall3: Utfall,
+    ) {
+        val vilkarsVurdering = eller(
+            returnUtfall.vilkarsVurder(grunnlag = utfall1),
+            returnUtfall.vilkarsVurder(grunnlag = utfall2),
+            returnUtfall.vilkarsVurder(grunnlag = utfall3)
+        )
+
+        assertEquals(Utfall.MANGLER_ANNEN_OMSORGSYTER, vilkarsVurdering.utfall)
+    }
+
     @Test
-    fun `Given All vilkar AVSLAG When evaluating eller Then AVSLAG`() {
+    fun `Given All vilkar AVSLAG Then AVSLAG`() {
         val vilkarsVurdering = eller(
             returnUtfall.vilkarsVurder(grunnlag = Utfall.AVSLAG),
             returnUtfall.vilkarsVurder(grunnlag = Utfall.AVSLAG)
