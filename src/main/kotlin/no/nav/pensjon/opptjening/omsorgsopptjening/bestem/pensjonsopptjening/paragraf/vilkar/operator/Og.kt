@@ -22,6 +22,7 @@ class Og<T : VilkarsVurdering<*>> : Vilkar<List<T>>(
 
             return when {
                 utfall.all { it == Utfall.INVILGET } -> Utfall.INVILGET
+                utfall.any { it == Utfall.MANGLER_ANNEN_OMSORGSYTER } -> Utfall.MANGLER_ANNEN_OMSORGSYTER
                 utfall.any { it == Utfall.SAKSBEHANDLING } -> Utfall.SAKSBEHANDLING
                 else -> Utfall.AVSLAG
             }

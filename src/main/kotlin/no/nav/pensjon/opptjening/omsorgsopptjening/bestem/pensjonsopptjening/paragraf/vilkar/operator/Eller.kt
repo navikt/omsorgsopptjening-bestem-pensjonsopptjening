@@ -22,6 +22,7 @@ class Eller<T : VilkarsVurdering<*>> private constructor() : Vilkar<List<T>>(
             return when {
                 utfall.any { it == Utfall.INVILGET } -> Utfall.INVILGET
                 utfall.all { it == Utfall.AVSLAG } -> Utfall.AVSLAG
+                utfall.any { it == Utfall.MANGLER_ANNEN_OMSORGSYTER} -> Utfall.MANGLER_ANNEN_OMSORGSYTER
                 else -> Utfall.SAKSBEHANDLING
             }
         }

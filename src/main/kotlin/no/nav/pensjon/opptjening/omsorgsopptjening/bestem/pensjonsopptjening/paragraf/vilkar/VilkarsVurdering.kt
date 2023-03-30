@@ -17,4 +17,5 @@ enum class Utfall {
     INVILGET,
     AVSLAG,
     SAKSBEHANDLING,
+    MANGLER_ANNEN_OMSORGSYTER
 }

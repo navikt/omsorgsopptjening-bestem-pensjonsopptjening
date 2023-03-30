@@ -25,4 +25,5 @@ private fun mapUtfall(utfall: Utfall): OpptjeningUtfall =
         Utfall.INVILGET -> OpptjeningUtfall.INVILGET
         Utfall.AVSLAG -> OpptjeningUtfall.AVSLAG
         Utfall.SAKSBEHANDLING -> OpptjeningUtfall.SAKSBEHANDLING
+        Utfall.MANGLER_ANNEN_OMSORGSYTER -> OpptjeningUtfall.SAKSBEHANDLING //TODO Må endres
     }
