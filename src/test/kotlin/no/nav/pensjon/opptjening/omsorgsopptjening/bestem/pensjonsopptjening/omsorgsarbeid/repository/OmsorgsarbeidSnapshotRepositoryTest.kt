@@ -7,6 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlFnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import org.junit.jupiter.api.Assertions.*
@@ -289,10 +290,10 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
     )
 
     companion object {
-        private val omsorgsYter1 = PdlPerson(gjeldendeFnr = "1111", historiskeFnr = listOf(), fodselsAr = 1988)
-        private val omsorgsYter2 = PdlPerson(gjeldendeFnr = "12345678910", historiskeFnr = listOf(), fodselsAr = 1990)
-        private val omsorgsmottaker1 = PdlPerson(gjeldendeFnr = "2222", historiskeFnr = listOf(), fodselsAr = 2017)
-        private val omsorgsmottaker2 = PdlPerson(gjeldendeFnr = "3333", historiskeFnr = listOf(), fodselsAr = 2018)
+        private val omsorgsYter1 = PdlPerson(alleFnr = listOf(PdlFnr("1111", true)), fodselsAr = 1988)
+        private val omsorgsYter2 = PdlPerson(alleFnr = listOf(PdlFnr("12345678910", true)), fodselsAr = 1990)
+        private val omsorgsmottaker1 = PdlPerson(alleFnr = listOf(PdlFnr("2222", true)), fodselsAr = 2017)
+        private val omsorgsmottaker2 = PdlPerson(alleFnr = listOf(PdlFnr("3333", true)), fodselsAr = 2018)
 
         private const val OMSORGS_AR_2020 = 2020
         private const val KJORE_HASHE = "dummyValue1"

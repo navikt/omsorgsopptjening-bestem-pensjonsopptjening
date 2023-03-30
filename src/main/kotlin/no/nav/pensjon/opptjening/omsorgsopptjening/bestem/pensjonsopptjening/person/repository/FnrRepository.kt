@@ -10,7 +10,8 @@ import org.springframework.stereotype.Repository
 @Component
 class FnrRepository(private val jpaRepository: FnrJpaRepository) {
 
-    fun deleteFnrNotInPdl(person: Person, pdlPerson:PdlPerson) = jpaRepository.deleteByPerson_IdAndFnrNotIn(person.id!!, pdlPerson.alleFnr().map { it.fnr })
+    fun deleteFnrNotInPdl(person: Person, pdlPerson:PdlPerson) = jpaRepository.deleteByPerson_IdAndFnrNotIn(person.id!!, pdlPerson.alleFnr.map { it.fnr })
+
 }
 
 

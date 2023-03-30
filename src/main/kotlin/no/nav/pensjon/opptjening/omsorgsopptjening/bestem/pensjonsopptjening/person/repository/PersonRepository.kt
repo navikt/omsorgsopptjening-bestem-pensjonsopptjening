@@ -21,20 +21,20 @@ class PersonRepository(
         return if (persistedPerson == null) {
             personJpaRepository.save(
                 Person(fodselsAr = pdlPerson.fodselsAr).apply {
-                    oppdaterFnr(pdlPerson.alleFnr())
+                    oppdaterFnr(pdlPerson.alleFnr)
                 }
             )
         } else {
             fnrRepository.deleteFnrNotInPdl(persistedPerson, pdlPerson)
             persistedPerson.apply {
                 if (fodselsAr != pdlPerson.fodselsAr) fodselsAr = pdlPerson.fodselsAr
-                oppdaterFnr(pdlPerson.alleFnr())
+                oppdaterFnr(pdlPerson.alleFnr)
             }
         }
     }
 
     private fun findPerson(pdlPerson: PdlPerson): Person? {
-        val personer = personJpaRepository.findByAlleFnr_FnrIn(pdlPerson.alleFnr().map { it.fnr })
+        val personer = personJpaRepository.findByAlleFnr_FnrIn(pdlPerson.alleFnr.map { it.fnr })
         if (personer.size > 1) {
             SECURE_LOG.error("Multiple persons identified by fnrs: ${pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr} . Person id: ${personer.map { it.id }}")
             throw DatabaseError("Multiple persons identified by fnrs. For more information see secure log")

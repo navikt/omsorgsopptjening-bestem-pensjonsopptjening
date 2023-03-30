@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsarbeidListenerTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlFnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,8 +40,11 @@ internal class PersonRepositoryTest {
     @Test
     fun `Given updating person not in db When updatePerson Then create new person`() {
         val pdlPerson = PdlPerson(
-            gjeldendeFnr = "5555",
-            historiskeFnr = listOf("6666", "7777"),
+            alleFnr = listOf(
+                PdlFnr("5555", true),
+                PdlFnr("6666", false),
+                PdlFnr("7777", false)
+            ),
             fodselsAr = 2000
         )
         personRepository.updatePerson(pdlPerson)
@@ -56,15 +60,17 @@ internal class PersonRepositoryTest {
     @Test
     fun `Given updating saved person with more historiskeFnr When updatePerson with pdlPerson Then new fnrs should be added`() {
         val initialPdlPerson = PdlPerson(
-            gjeldendeFnr = "1111",
-            historiskeFnr = listOf(),
+            alleFnr = listOf(PdlFnr("1111", true),),
             fodselsAr = 2000
         )
         personRepository.updatePerson(initialPdlPerson)
 
         val updatedPdlPerson = PdlPerson(
-            gjeldendeFnr = "1111",
-            historiskeFnr = listOf("2222", "3333"),
+            alleFnr = listOf(
+                PdlFnr("1111", true),
+                PdlFnr("2222", false),
+                PdlFnr("3333", false)
+            ),
             fodselsAr = 2000
         )
         personRepository.updatePerson(updatedPdlPerson)
@@ -81,15 +87,17 @@ internal class PersonRepositoryTest {
     @Test
     fun `Given updating saved person with less historiskeFnr When updatePerson with pdlPerson Then remove historiskeFnr`() {
         val initialPdlPerson = PdlPerson(
-            gjeldendeFnr = "1111",
-            historiskeFnr = listOf("2222", "3333"),
+            alleFnr = listOf(
+                PdlFnr("1111", true),
+                PdlFnr("2222", false),
+                PdlFnr("3333", false)
+            ),
             fodselsAr = 2000
         )
         personRepository.updatePerson(initialPdlPerson)
 
         val updatedPdlPerson = PdlPerson(
-            gjeldendeFnr = "1111",
-            historiskeFnr = listOf(),
+            alleFnr = listOf(PdlFnr("1111", true),),
             fodselsAr = 2000
         )
         personRepository.updatePerson(updatedPdlPerson)
@@ -106,15 +114,21 @@ internal class PersonRepositoryTest {
     @Test
     fun `Given saved person has only one historisk fnr in common with updated person When updatePerson with pdlPerson Then update person`() {
         val initialPdlPerson = PdlPerson(
-            gjeldendeFnr = "1111",
-            historiskeFnr = listOf("2222", "3333"),
+            alleFnr = listOf(
+                PdlFnr("1111", true),
+                PdlFnr("2222", false),
+                PdlFnr("3333", false)
+            ),
             fodselsAr = 2000
         )
         val initialPersonId = personRepository.updatePerson(initialPdlPerson).id
 
         val updatedPdlPerson = PdlPerson(
-            gjeldendeFnr = "4444",
-            historiskeFnr = listOf("3333", "5555"),
+            alleFnr = listOf(
+                PdlFnr("4444", true),
+                PdlFnr("3333", false),
+                PdlFnr("5555", false)
+            ),
             fodselsAr = 2000
         )
         personRepository.updatePerson(updatedPdlPerson)
@@ -132,15 +146,13 @@ internal class PersonRepositoryTest {
     @Test
     fun `given updated fodselsAr When updatePerson with pdlPerson Then update fodselsAr`() {
         val initialPdlPerson = PdlPerson(
-            gjeldendeFnr = "1111",
-            historiskeFnr = listOf(),
+            alleFnr = listOf(PdlFnr("1111", true)),
             fodselsAr = 2000
         )
         personRepository.updatePerson(initialPdlPerson)
 
         val updatedPdlPerson = PdlPerson(
-            gjeldendeFnr = "1111",
-            historiskeFnr = listOf(),
+            alleFnr = listOf(PdlFnr("1111", true)),
             fodselsAr = 2010
         )
         personRepository.updatePerson(updatedPdlPerson)
@@ -154,29 +166,37 @@ internal class PersonRepositoryTest {
     @Test
     fun `given overlapping person When updatePerson with pdlPerson Then throw exception  `() {
         val pdlPerson1 = PdlPerson(
-            gjeldendeFnr = "1111",
-            historiskeFnr = listOf("2222", "3333"),
+            alleFnr = listOf(
+                PdlFnr("1111", true),
+                PdlFnr("2222", false),
+                PdlFnr("3333", false)
+            ),
             fodselsAr = 2000
         )
         personRepository.updatePerson(pdlPerson1).id
 
         val pdlPerson2 = PdlPerson(
-            gjeldendeFnr = "4444",
-            historiskeFnr = listOf("5555", "6666"),
+            alleFnr = listOf(
+                PdlFnr("4444", true),
+                PdlFnr("5555", false),
+                PdlFnr("6666", false)
+            ),
             fodselsAr = 2000
         )
         personRepository.updatePerson(pdlPerson2)
 
         val overlappingPdlPerson = PdlPerson(
-            gjeldendeFnr = "4444",
-            historiskeFnr = listOf("1111"),
+            alleFnr = listOf(
+                PdlFnr("4444", true),
+                PdlFnr("1111", false),
+            ),
             fodselsAr = 2000
         )
         assertThrows<DatabaseError> { personRepository.updatePerson(overlappingPdlPerson) }
     }
 
     private fun assertContainsOnlySameFnrs(pdlPerson: PdlPerson, person: Person) {
-        val allFnrsPdl: Set<String> = pdlPerson.alleFnr().map { it.fnr }.toSet()
+        val allFnrsPdl: Set<String> = pdlPerson.alleFnr.map { it.fnr }.toSet()
         assertTrue(allFnrsPdl.all { person.identifiseresAv(it) }, "Alle fnr fra pdl var ikke i person")
         assertEquals(person.alleFnr.size, allFnrsPdl.size, "Det er flere fnr i person enn i pdlPerson")
     }

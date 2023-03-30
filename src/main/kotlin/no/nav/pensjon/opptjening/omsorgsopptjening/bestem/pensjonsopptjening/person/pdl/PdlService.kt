@@ -10,9 +10,11 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
 
         val hentPersonQueryResponse = pdlResponse?.data?.hentPerson ?: throw PdlException(pdlResponse?.error)
 
+        val gjeldende = hentPersonQueryResponse.gjeldendeIdent()
+        val historisk = hentPersonQueryResponse.historisk().filter { it.fnr !=  gjeldende.fnr}
+
         return PdlPerson(
-            gjeldendeFnr = hentPersonQueryResponse.gjeldendeIdent(),
-            historiskeFnr = hentPersonQueryResponse.historisk(),
+            alleFnr = historisk + gjeldende,
             fodselsAr = hentPersonQueryResponse.foedselsAr()
         )
     }
@@ -20,11 +22,13 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
     private fun HentPersonQueryResponse.historisk() = folkeregisteridentifikator
         .filter { it.status == Status.OPPHOERT }
         .distinctBy { it.identifikasjonsnummer }
-        .map { it.identifikasjonsnummer }
+        .map { PdlFnr(it.identifikasjonsnummer, gjeldende = false)}
 
     private fun HentPersonQueryResponse.gjeldendeIdent() =
         folkeregisteridentifikator
-            .firstOrNull { it.status == Status.I_BRUK }?.identifikasjonsnummer ?: throw PdlMottatDataException("Fnr i bruk finnes ikke")
+            .firstOrNull { it.status == Status.I_BRUK }
+            ?.let{PdlFnr(it.identifikasjonsnummer, gjeldende = true)}
+            ?: throw PdlMottatDataException("Fnr i bruk finnes ikke")
 
 
     private fun HentPersonQueryResponse.foedselsAr(): Int =
@@ -35,9 +39,10 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         }
 }
 
-data class PdlPerson(val gjeldendeFnr: String, val historiskeFnr: List<String>, val fodselsAr: Int){
+data class PdlPerson(val alleFnr: List<PdlFnr>, val fodselsAr: Int){
 
-    fun alleFnr() = (historiskeFnr + gjeldendeFnr).toSet().map { PdlFnr(it, it == gjeldendeFnr ) }
+    val gjeldendeFnr: String get() = alleFnr.first { it.gjeldende }.fnr
+    val historiskeFnr: List<String> get() = alleFnr.filter { !it.gjeldende }.map { it.fnr }
 
 }
 

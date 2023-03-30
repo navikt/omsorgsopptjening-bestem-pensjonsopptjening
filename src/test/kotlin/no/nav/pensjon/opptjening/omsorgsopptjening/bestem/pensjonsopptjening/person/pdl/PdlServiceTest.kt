@@ -54,9 +54,10 @@ internal class PdlServiceTest {
             )
         )
         val person: PdlPerson = pdlService.hentPerson(FNR)
-        assertEquals(1, person.historiskeFnr.size)
-        assertEquals("04010012797", person.historiskeFnr.first())
-        assertEquals("04010012797", person.gjeldendeFnr)
+
+        assertEquals(1, person.alleFnr.size)
+        assertEquals("04010012797", person.alleFnr.first().fnr)
+        assertEquals(true, person.alleFnr.first().gjeldende)
     }
 
 
