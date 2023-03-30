@@ -27,6 +27,7 @@ class PostgresqlTestContainer private constructor(image: String) : PostgreSQLCon
                 """
                         DELETE FROM INVOLVERTE_PERSONER;
                         DELETE FROM OMSORGSOPPTJENINGSGRUNNLAG;
+                        DELETE FROM  OMSORGSYTER;
                         DELETE FROM OMSORGSARBEIDSMOTTAKER;
                         DELETE FROM OMSORGSARBEID_PERIODE;
                         DELETE FROM OMSORGSARBEID_SAK;

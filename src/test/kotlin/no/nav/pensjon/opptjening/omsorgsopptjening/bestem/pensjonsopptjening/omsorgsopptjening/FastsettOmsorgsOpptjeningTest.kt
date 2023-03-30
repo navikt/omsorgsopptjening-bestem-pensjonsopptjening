@@ -243,7 +243,7 @@ internal class FastsettOmsorgsOpptjeningTest {
         fom = fom,
         tom = tom,
         prosent = 100,
-        omsorgsyter =  omsorgsyter,
+        omsorgsytere =  listOf(omsorgsyter),
         omsorgsmottakere = omsorgsmottakere
     )
 

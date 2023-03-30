@@ -25,9 +25,13 @@ class OmsorgsarbeidPeriode(
     @Column(name = "PROSENT", nullable = false)
     val prosent: Int,
 
-    @OneToOne(fetch =  FetchType.EAGER)
-    @JoinColumn(name = "OMSORGSYTER", nullable = false, referencedColumnName = "PERSON_ID")
-    val omsorgsyter: Person,
+    @ManyToMany(fetch =  FetchType.EAGER)
+    @JoinTable(
+        name = "OMSORGSYTER",
+        joinColumns = [JoinColumn(name = "OMSORGSARBEID_PERIODE_ID", referencedColumnName = "OMSORGSARBEID_PERIODE_ID")],
+        inverseJoinColumns = [JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")]
+    )
+    val omsorgsytere: List<Person> = listOf(),
 
     @ManyToMany(fetch =  FetchType.EAGER)
     @JoinTable(
@@ -35,7 +39,7 @@ class OmsorgsarbeidPeriode(
         joinColumns = [JoinColumn(name = "OMSORGSARBEID_PERIODE_ID", referencedColumnName = "OMSORGSARBEID_PERIODE_ID")],
         inverseJoinColumns = [JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")]
     )
-    val omsorgsmottakere: List<Person>,
+    val omsorgsmottakere: List<Person> = listOf(),
 )
 
 fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(omsorgsAr: Int) = (getAlleUtbetalingMoneder() begrensTilAr omsorgsAr).antall()

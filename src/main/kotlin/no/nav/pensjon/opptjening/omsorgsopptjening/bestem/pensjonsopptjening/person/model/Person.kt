@@ -26,6 +26,8 @@ class Person(
 
     infix fun erSammePerson(annenPerson: Person) = (annenPerson.alleFnr intersect alleFnr).isNotEmpty()
 
+    infix fun inneholderPerson(personer: List<Person>) = personer.any { erSammePerson(it) }
+
     infix fun identifiseresAv(fnr: Fnr) = alleFnr.contains(fnr)
 
     infix fun identifiseresAv(fnr: String) = alleFnr.map { it.fnr }.contains(fnr)

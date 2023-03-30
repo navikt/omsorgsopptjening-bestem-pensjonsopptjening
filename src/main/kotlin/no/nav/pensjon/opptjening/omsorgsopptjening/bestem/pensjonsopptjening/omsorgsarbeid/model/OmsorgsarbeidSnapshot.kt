@@ -48,7 +48,7 @@ data class OmsorgsarbeidSnapshot(
 
     //TODO rename method to omsorgsarbeidPeriode
     fun omsorgsArbeid(person: Person): List<OmsorgsarbeidPeriode> =
-        omsorgsArbeid().filter { person.erSammePerson(it.omsorgsyter) }
+        omsorgsArbeid().filter { person.inneholderPerson(it.omsorgsytere) }
 
 
     //TODO rename method to omsorgsarbeidPeriode

@@ -75,7 +75,7 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
         assertEquals(JANUAR_2020, omsorgsarbeidPeriode.fom)
         assertEquals(DESEMBER_2020, omsorgsarbeidPeriode.tom)
         assertEquals(PROSENT_100, omsorgsarbeidPeriode.prosent)
-        assertEquals(omsorgsYter.id, omsorgsarbeidPeriode.omsorgsyter.id)
+        assertEquals(omsorgsYter.id, omsorgsarbeidPeriode.omsorgsytere.first().id)
         assertEquals(1,omsorgsarbeidPeriode.omsorgsmottakere.size)
         assertEquals(omsorgsmottaker.id,omsorgsarbeidPeriode.omsorgsmottakere.first().id)
     }
@@ -285,7 +285,7 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
         fom = fom,
         tom = tom,
         prosent = prosent,
-        omsorgsyter = omsorgsyter,
+        omsorgsytere = listOf(omsorgsyter),
         omsorgsmottakere = omsorgsmottakere
     )
 

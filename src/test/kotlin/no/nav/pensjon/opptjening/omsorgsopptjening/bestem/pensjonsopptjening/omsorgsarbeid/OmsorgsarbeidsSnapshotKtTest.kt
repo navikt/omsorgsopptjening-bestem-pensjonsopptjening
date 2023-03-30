@@ -108,7 +108,7 @@ internal class OmsorgsarbeidsSnapshotKtTest {
             fom = fom,
             tom = tom,
             prosent = 100,
-            omsorgsyter = omsorgsyter,
+            omsorgsytere = listOf(omsorgsyter),
             omsorgsmottakere = listOf()
         )
 
