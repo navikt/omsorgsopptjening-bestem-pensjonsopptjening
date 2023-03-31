@@ -142,7 +142,7 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
         }
 
 
-        val e2 = assertThrows<IllegalStateException> {
+        val e2 = assertThrows<InvalidDataAccessApiUsageException> {
             repository.save(
                 creatOmsorgsArbeidSnapshot(
                     omsorgsyter = omsorgsYter,
@@ -166,7 +166,7 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
         }
 
         assertTrue(e1.message!!.contains("transient instance must be saved before current operation"))
-        assertTrue(e2.message!!.contains("transient instance must be saved before current operation"))
+        assertTrue(e2.message!!.contains("save the transient instance before flushing"))
         assertTrue(e3.message!!.contains("save the transient instance before flushing"))
     }
 
