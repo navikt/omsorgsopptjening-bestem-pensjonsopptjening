@@ -2,17 +2,17 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.Utfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.hentOmsorgForBarnUnder6VilkarsVurderinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.time.Month
 import java.time.YearMonth
 
-internal class FastsettOmsorgsOpptjeningTest {
+internal class VilkarsvurderOmsorgsOpptjeningTest {
 
     @Test
     fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
@@ -32,10 +32,9 @@ internal class FastsettOmsorgsOpptjeningTest {
             )
         )
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
 
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(Utfall.INVILGET, opptjening.utfall)
+        assertEquals(Utfall.INVILGET, vilkarsVurdering.utfall)
     }
 
     @Test
@@ -56,10 +55,8 @@ internal class FastsettOmsorgsOpptjeningTest {
             )
         )
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot)
-
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(Utfall.AVSLAG, opptjening.utfall)
+        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(Utfall.AVSLAG, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -90,10 +87,8 @@ internal class FastsettOmsorgsOpptjeningTest {
             )
         )
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot)
-
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(expectedUtfall, opptjening.utfall)
+        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -124,10 +119,8 @@ internal class FastsettOmsorgsOpptjeningTest {
             )
         )
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot)
-
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(expectedUtfall, opptjening.utfall)
+        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
     @ParameterizedTest
@@ -160,9 +153,8 @@ internal class FastsettOmsorgsOpptjeningTest {
             )
         )
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot)
-
-        assertEquals(expectedUtfall, opptjening.utfall)
+        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
     @Test
@@ -182,9 +174,8 @@ internal class FastsettOmsorgsOpptjeningTest {
             )
         )
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot)
-
-        assertEquals(Utfall.AVSLAG, opptjening.utfall)
+        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(Utfall.AVSLAG, vilkarsVurdering.utfall)
     }
 
     @Test
@@ -207,12 +198,19 @@ internal class FastsettOmsorgsOpptjeningTest {
             )
         )
 
-        val opptjening = FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
 
-        assertEquals(opptjening.omsorgsmottakereInvilget.size, 2)
-        assertTrue(opptjening.omsorgsmottakereInvilget.containsAll(listOf(omsorgsmottaker1, omsorgsmottaker2)))
-        assertTrue(opptjening.person identifiseresAv Fnr(fnr = FNR_OMSORGSGIVER))
-        assertEquals(Utfall.INVILGET, opptjening.utfall)
+        val barnUnder6Invilget = hentOmsorgForBarnUnder6VilkarsVurderinger(vilkarsVurdering).filter { it.utfall == Utfall.INVILGET }
+        val barnUnder6IkkeInvilget = hentOmsorgForBarnUnder6VilkarsVurderinger(vilkarsVurdering).filter { it.utfall != Utfall.INVILGET }
+
+        assertEquals(barnUnder6Invilget.size, 2)
+        assertEquals(1, barnUnder6Invilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker1}.size)
+        assertEquals(1, barnUnder6Invilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker2}.size)
+
+        assertEquals(barnUnder6IkkeInvilget.size, 1)
+        assertEquals(1, barnUnder6IkkeInvilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker3}.size)
+
+        assertEquals(Utfall.INVILGET, vilkarsVurdering.utfall)
     }
 
     private fun creatOmsorgsArbeidSnapshot(
