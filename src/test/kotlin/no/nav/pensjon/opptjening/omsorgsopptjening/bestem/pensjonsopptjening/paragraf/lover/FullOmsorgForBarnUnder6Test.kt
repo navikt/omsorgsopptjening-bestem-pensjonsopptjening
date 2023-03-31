@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.CsvSource
 import java.time.Month
 import java.time.YearMonth
 
-internal class OmsorgForBarnUnder6Test {
+internal class FullOmsorgForBarnUnder6Test {
 
     @ParameterizedTest
     @CsvSource(
@@ -34,7 +34,7 @@ internal class OmsorgForBarnUnder6Test {
         tom: YearMonth,
         expectedUtfall: Utfall
     ) {
-        val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
@@ -59,7 +59,7 @@ internal class OmsorgForBarnUnder6Test {
         tom: YearMonth,
         expectedUtfall: Utfall
     ) {
-        val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
@@ -84,7 +84,7 @@ internal class OmsorgForBarnUnder6Test {
         tom: YearMonth,
         expectedUtfall: Utfall
     ) {
-        val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
@@ -116,7 +116,7 @@ internal class OmsorgForBarnUnder6Test {
         tom: YearMonth,
         expectedUtfall: Utfall
     ) {
-        val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
@@ -138,7 +138,7 @@ internal class OmsorgForBarnUnder6Test {
         fom: YearMonth,
         tom: YearMonth,
     ) {
-        val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
@@ -174,7 +174,7 @@ internal class OmsorgForBarnUnder6Test {
         tom2: YearMonth,
         expectedUtfall: Utfall
     ) {
-        val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf()),
@@ -206,7 +206,7 @@ internal class OmsorgForBarnUnder6Test {
         tom3: YearMonth,
         expectedUtfall: Utfall
     ) {
-        val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf()),
@@ -224,7 +224,7 @@ internal class OmsorgForBarnUnder6Test {
 
     @Test
     fun `Given no utbetalingsperioder Then halvt ar med omsorg is AVSLAG`() {
-        val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(),
                 omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
@@ -246,7 +246,7 @@ internal class OmsorgForBarnUnder6Test {
         fodselsArBarn: Int,
         expectedUtfall: Utfall
     ) {
-        val vilkarsVurdering = OmsorgForBarnUnder6().vilkarsVurder(
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(
                     OmsorgsarbeidPeriode(

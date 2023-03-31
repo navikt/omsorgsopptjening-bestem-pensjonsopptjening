@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.OmsorgForBarnUnder6
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.FullOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.lover.grunnlag.GrunnlagOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Og.Companion.og
@@ -39,7 +39,7 @@ internal class HalvtArMedOmsorgVisitorTest {
         val halvtArMedOmsorgResultat = hentOmsorgForBarnUnder6VilkarsVurderinger(vilkarsvurdering)
 
         assertEquals(3, halvtArMedOmsorgResultat.size)
-        assertTrue(halvtArMedOmsorgResultat.all { it.vilkar is OmsorgForBarnUnder6 })
+        assertTrue(halvtArMedOmsorgResultat.all { it.vilkar is FullOmsorgForBarnUnder6 })
         assertTrue(halvtArMedOmsorgResultat.map { it.grunnlag }.contains(halvtAr1.grunnlag))
         assertTrue(halvtArMedOmsorgResultat.map { it.grunnlag }.contains(halvtAr2.grunnlag))
         assertTrue(halvtArMedOmsorgResultat.map { it.grunnlag }.contains(halvtAr3.grunnlag))
@@ -47,7 +47,7 @@ internal class HalvtArMedOmsorgVisitorTest {
 
 
     private fun vilkarsvurderingOmsorgForBarnUnder6(fnrOmsorgsmottaker: String) =
-        OmsorgForBarnUnder6().vilkarsVurder(
+        FullOmsorgForBarnUnder6().vilkarsVurder(
             GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid = listOf(),
                 omsorgsmottaker = createPerson(fnrOmsorgsmottaker),
