@@ -32,11 +32,11 @@ class FastsettOmsorgsOpptjening private constructor() {
                         )
                     ),
                     eller(
-                        omsorgsmottakere.map {
+                        omsorgsmottakere.map { omsorgsmottaker ->
                             OmsorgForBarnUnder6().vilkarsVurder(
                                 GrunnlagOmsorgForBarnUnder6(
-                                    omsorgsArbeid = snapshot.omsorgsArbeid(omsorgsgiver, it),
-                                    omsorgsmottaker = it,
+                                    omsorgsArbeid = snapshot.omsorgsarbeidPeriode(omsorgsgiver, omsorgsmottaker),
+                                    omsorgsmottaker = omsorgsmottaker,
                                     omsorgsAr = snapshot.omsorgsAr
                                 )
                             )

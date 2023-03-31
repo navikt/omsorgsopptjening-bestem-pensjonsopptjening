@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import jakarta.persistence.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlFnr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import java.time.LocalDateTime
 
 @Entity
@@ -26,7 +25,7 @@ class Person(
 
     infix fun erSammePerson(annenPerson: Person) = (annenPerson.alleFnr intersect alleFnr).isNotEmpty()
 
-    infix fun inneholderPerson(personer: List<Person>) = personer.any { erSammePerson(it) }
+    infix fun isIn(personer: List<Person>) = personer.any { erSammePerson(it) }
 
     infix fun identifiseresAv(fnr: Fnr) = alleFnr.contains(fnr)
 

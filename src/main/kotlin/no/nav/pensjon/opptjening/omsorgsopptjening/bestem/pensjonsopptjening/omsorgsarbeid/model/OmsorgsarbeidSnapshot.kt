@@ -42,19 +42,19 @@ data class OmsorgsarbeidSnapshot(
     val kjoreHashe: String,
 ) {
 
-    //TODO rename method to omsorgsarbeidPeriode
-    fun omsorgsArbeid() = omsorgsarbeidSaker.flatMap { sak -> sak.omsorgsarbeidPerioder }
+    fun omsorgsarbeidPeriode(omsorgsyter: Person): List<OmsorgsarbeidPeriode> {
+        return omsorgsarbeidPeriode().filter { omsorgsyter isIn it.omsorgsytere }
+    }
 
+    fun omsorgsarbeidPeriode(omsorgsyter: Person, omsorgsmottaker: Person): List<OmsorgsarbeidPeriode> {
+        return omsorgsarbeidPeriode(omsorgsyter).filter { periode -> periode.omsorgsmottakere.any { it.erSammePerson(omsorgsmottaker) } }
+    }
 
-    //TODO rename method to omsorgsarbeidPeriode
-    fun omsorgsArbeid(person: Person): List<OmsorgsarbeidPeriode> =
-        omsorgsArbeid().filter { person.inneholderPerson(it.omsorgsytere) }
+    fun getOmsorgsmottakere(omsorgsyter: Person): List<Person> {
+        return omsorgsarbeidPeriode(omsorgsyter).flatMap { barn -> barn.omsorgsmottakere }.distinctBy { it.gjeldendeFnr }
+    }
 
-
-    //TODO rename method to omsorgsarbeidPeriode
-    fun omsorgsArbeid(person: Person, omsorgsmottaker: Person): List<OmsorgsarbeidPeriode> =
-        omsorgsArbeid(person).filter { periode -> periode.omsorgsmottakere.any { it.erSammePerson(omsorgsmottaker) } }
-
-    fun getOmsorgsmottakere(omsorgsyter: Person): List<Person> =
-        omsorgsArbeid(omsorgsyter).flatMap { barn -> barn.omsorgsmottakere }.distinctBy { it.gjeldendeFnr }
+    private fun omsorgsarbeidPeriode(): List<OmsorgsarbeidPeriode> {
+        return omsorgsarbeidSaker.flatMap { sak -> sak.omsorgsarbeidPerioder }
+    }
 }
