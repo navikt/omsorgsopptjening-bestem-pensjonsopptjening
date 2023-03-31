@@ -20,7 +20,7 @@ class OmsorgsarbeidSnapshotMapper {
                                 fom = arbeid.fom,
                                 tom = arbeid.tom,
                                 prosent = arbeid.prosent,
-                                omsorgsytere = listOf(persistertePersoner.hentPerson(arbeid.omsorgsyter.fnr)), //TODO fiks når vi har endret kafka melding
+                                omsorgsytere = arbeid.omsorgsytere.map { persistertePersoner.hentPerson(it.fnr) },
                                 omsorgsmottakere = arbeid.omsorgsmottaker.map { persistertePersoner.hentPerson(it.fnr) },
                             )
                         }
@@ -42,8 +42,8 @@ class OmsorgsarbeidSnapshotMapper {
                                 fom = periode.fom,
                                 tom = periode.tom,
                                 prosent = periode.prosent,
-                                omsorgsyter = convertPerson(periode.omsorgsytere.first()), //TODO fiks når kafka meldinger er oppdatert
-                                omsorgsmottaker = periode.omsorgsmottakere.map { convertPerson(it) },
+                                omsorgsytere = periode.omsorgsytere.map { convertPerson(it) }.toSet(),
+                                omsorgsmottaker = periode.omsorgsmottakere.map { convertPerson(it) }.toSet(),
                             )
                         }
                     )
