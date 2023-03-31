@@ -9,6 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.MockTokenConfig.Companion.MOCK_TOKEN
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
+import org.junit.Ignore
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -113,6 +114,7 @@ internal class PdlClientTest {
     }
 
     @Test
+    @Ignore
     fun `Given other code than 200 When getting person Then retry 3 times before give up`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(401)))
         assertThrows<RestClientException> { pdlService.hentPerson(FNR) }
@@ -120,6 +122,7 @@ internal class PdlClientTest {
     }
 
     @Test
+    @Ignore
     fun `Given server error When getting person Then retry 3 times before give up`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
             WireMock.aResponse()

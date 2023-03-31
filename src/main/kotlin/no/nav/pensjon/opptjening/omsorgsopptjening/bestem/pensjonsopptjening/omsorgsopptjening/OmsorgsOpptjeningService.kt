@@ -2,8 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.OmsorgsOpptejningProducer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsArbeidService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidSnapshotRepository
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeidKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -14,8 +12,8 @@ class OmsorgsOpptjeningService(
     private val omsorgsOpptejningProducer: OmsorgsOpptejningProducer,
 ) {
 
-    fun behandlOmsorgsarbeid(key: OmsorgsArbeidKey, omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot) {
-        SECURE_LOG.info("Mappet omsorgsmelding til: key: $key , value: $omsorgsArbeidSnapshot")
+    fun behandlOmsorgsarbeid(omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot) {
+        SECURE_LOG.info("Mappet omsorgsmelding til: $omsorgsArbeidSnapshot")
 
         val omsorgsArbeidSnapshotEntity = omsorgsArbeidService.getOmsorgsarbeidSnapshot(omsorgsArbeidSnapshot)
         omsorgsOpptejningProducer.publiserOmsorgsopptejning(FastsettOmsorgsOpptjening.fastsettOmsorgsOpptjening(omsorgsArbeidSnapshotEntity))

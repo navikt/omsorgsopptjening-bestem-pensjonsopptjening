@@ -32,10 +32,7 @@ class OmsorgsarbeidListener(
         SECURE_LOG.info("Konsumerer omsorgsmelding: ${consumerRecord.key()}, ${consumerRecord.value()}")
 
         if (consumerRecord.kafkaMessageType() == KafkaMessageType.OMSORGSARBEID) {
-            omsorgsOpptjeningService.behandlOmsorgsarbeid(
-                consumerRecord.getOmsorgsArbeidKey(),
-                consumerRecord.getOmsorgsarbeidsSnapshot()
-            )
+            omsorgsOpptjeningService.behandlOmsorgsarbeid(consumerRecord.getOmsorgsarbeidsSnapshot())
         }
 
         acknowledgment.acknowledge()
