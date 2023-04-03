@@ -13,6 +13,6 @@ class PersonService(
 
     fun createPersoner(fnrs: List<String>): List<Person> = fnrs
         .map { pdlService.hentPerson(it) }
-        .distinctBy { it.gjeldendeFnr }
+        .distinctBy { it.gjeldendeFnr}
         .map { personRepository.updatePerson(it) }
 }
