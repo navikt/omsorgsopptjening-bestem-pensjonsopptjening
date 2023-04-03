@@ -18,7 +18,7 @@ data class OmsorgsarbeidSnapshot(
     @Column(name = "HISTORISK", nullable = false)
     var historisk: Boolean = false,
 
-    @OneToMany(fetch =  FetchType.EAGER, cascade = [CascadeType.ALL])
+    @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(
         name = "OMSORGSARBEID_SNAPSHOT_ID",
         nullable = false,
@@ -47,16 +47,28 @@ data class OmsorgsarbeidSnapshot(
     }
 
     fun omsorgsarbeidPerioder(omsorgsyter: Person, omsorgsmottaker: Person): List<OmsorgsarbeidPeriode> {
-        return omsorgsarbeidPerioder(omsorgsyter).filter { periode -> periode.omsorgsmottakere.any { it.erSammePerson(omsorgsmottaker) } }
+        return omsorgsarbeidPerioder(omsorgsyter).filter { periode ->
+            periode.omsorgsmottakere.any {
+                it.erSammePerson(
+                    omsorgsmottaker
+                )
+            }
+        }
     }
 
     fun omsorgsarbeidPerioder(omsorgsyter: Person, omsorgsmottaker: Person, prosent: Int): List<OmsorgsarbeidPeriode> {
-        return omsorgsarbeidPerioder(omsorgsyter, omsorgsmottaker).filter { it.prosent ==  prosent}
+        return omsorgsarbeidPerioder(omsorgsyter, omsorgsmottaker).filter { it.prosent == prosent }
     }
 
     fun getOmsorgsmottakere(omsorgsyter: Person): List<Person> {
-        return omsorgsarbeidPerioder(omsorgsyter).flatMap { barn -> barn.omsorgsmottakere }.distinctBy { it.gjeldendeFnr }
+        return omsorgsarbeidPerioder(omsorgsyter).flatMap { barn -> barn.omsorgsmottakere }
+            .distinctBy { it.gjeldendeFnr }
     }
+
+    fun getRelaterteOmsorgsytere() = omsorgsarbeidPerioder(omsorgsyter)
+        .flatMap { barn -> barn.omsorgsmottakere }
+        .distinctBy { it.gjeldendeFnr }
+        .filter { !it.erSammePerson(omsorgsyter) }
 
     private fun omsorgsarbeidPerioder(): List<OmsorgsarbeidPeriode> {
         return omsorgsarbeidSaker.flatMap { sak -> sak.omsorgsarbeidPerioder }

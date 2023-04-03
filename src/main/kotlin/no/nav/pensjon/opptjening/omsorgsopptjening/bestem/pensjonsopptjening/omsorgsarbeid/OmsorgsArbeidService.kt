@@ -11,13 +11,20 @@ import org.springframework.stereotype.Service
 @Service
 class OmsorgsArbeidService(
     private val personService: PersonService,
-    private val omsorgsarbeidSnapshotRepository: OmsorgsarbeidSnapshotRepository
+    private val repository: OmsorgsarbeidSnapshotRepository
 ) {
 
-    fun createAndSaveOmsorgsarbeidSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
+    fun createOmsorgasbeidsInformasjon(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
         val persistertePersoner = personService.createPersoner(omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr })
         val omsorgsArbeidSnapshotEntity = OmsorgsarbeidSnapshotMapper.map(omsorgsarbeidsSnapshot, persistertePersoner)
 
-        return omsorgsarbeidSnapshotRepository.save(omsorgsArbeidSnapshotEntity)
+        val snapshot: OmsorgsarbeidSnapshot = repository.save(omsorgsArbeidSnapshotEntity)
+        val relaterteSnapshot = hentRelaterteSnapshot(snapshot)
+        return snapshot
     }
+
+    private fun hentRelaterteSnapshot(snapshot: OmsorgsarbeidSnapshot) =
+        snapshot.getRelaterteOmsorgsytere()
+            .flatMap { repository.find(it, snapshot.omsorgsAr) }
+
 }
