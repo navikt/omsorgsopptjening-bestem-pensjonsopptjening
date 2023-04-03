@@ -14,13 +14,14 @@ import org.springframework.stereotype.Service
 class OmsorgsOpptjeningService(
     private val omsorgsArbeidService: OmsorgsArbeidService,
     private val omsorgsOpptejningProducer: OmsorgsOpptejningProducer,
+    private val vilkarsvurdering:Vilkarsvurdering
 ) {
 
     fun behandlOmsorgsarbeid(omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot) {
         SECURE_LOG.info("Mappet omsorgsmelding til: $omsorgsArbeidSnapshot")
 
         val omsorgsArbeidSnapshot = omsorgsArbeidService.getOmsorgsarbeidSnapshot(omsorgsArbeidSnapshot)
-        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = vilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
 
         publiserOmsorgsOpptjening(omsorgsArbeidSnapshot, vilkarsVurdering)
     }

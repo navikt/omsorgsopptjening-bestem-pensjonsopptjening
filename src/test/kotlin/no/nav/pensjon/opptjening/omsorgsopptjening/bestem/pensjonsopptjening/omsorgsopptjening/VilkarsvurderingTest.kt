@@ -12,7 +12,9 @@ import org.junit.jupiter.params.provider.CsvSource
 import java.time.Month
 import java.time.YearMonth
 
-internal class VilkarsvurderOmsorgsOpptjeningTest {
+internal class VilkarsvurderingTest {
+
+    private val vilkarsvurdering: Vilkarsvurdering = Vilkarsvurdering()
 
     @Test
     fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
@@ -32,7 +34,7 @@ internal class VilkarsvurderOmsorgsOpptjeningTest {
             )
         )
 
-        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = vilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
 
         assertEquals(Utfall.INVILGET, vilkarsVurdering.utfall)
     }
@@ -55,7 +57,7 @@ internal class VilkarsvurderOmsorgsOpptjeningTest {
             )
         )
 
-        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = vilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
         assertEquals(Utfall.AVSLAG, vilkarsVurdering.utfall)
     }
 
@@ -87,7 +89,7 @@ internal class VilkarsvurderOmsorgsOpptjeningTest {
             )
         )
 
-        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = vilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
         assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
@@ -119,7 +121,7 @@ internal class VilkarsvurderOmsorgsOpptjeningTest {
             )
         )
 
-        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = vilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
         assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
@@ -153,7 +155,7 @@ internal class VilkarsvurderOmsorgsOpptjeningTest {
             )
         )
 
-        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = vilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
         assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
@@ -174,7 +176,7 @@ internal class VilkarsvurderOmsorgsOpptjeningTest {
             )
         )
 
-        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = vilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
         assertEquals(Utfall.AVSLAG, vilkarsVurdering.utfall)
     }
 
@@ -198,7 +200,7 @@ internal class VilkarsvurderOmsorgsOpptjeningTest {
             )
         )
 
-        val vilkarsVurdering = VilkarsvurderOmsorgsOpptjening.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsVurdering = vilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
 
         val barnUnder6Invilget = hentOmsorgForBarnUnder6VilkarsVurderinger(vilkarsVurdering).filter { it.utfall == Utfall.INVILGET }
         val barnUnder6IkkeInvilget = hentOmsorgForBarnUnder6VilkarsVurderinger(vilkarsVurdering).filter { it.utfall != Utfall.INVILGET }

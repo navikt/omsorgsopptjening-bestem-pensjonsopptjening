@@ -9,36 +9,37 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.minstEn
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Og.Companion.og
+import org.springframework.stereotype.Component
 
-class VilkarsvurderOmsorgsOpptjening private constructor() {
-    companion object {
-        fun vilkarsvurder(snapshot: OmsorgsarbeidSnapshot): VilkarsVurdering<*> {
-            val omsorgsyter = snapshot.omsorgsyter
-            val omsorgsmottakere = snapshot.getOmsorgsmottakere(omsorgsyter)
+@Component
+class Vilkarsvurdering {
 
-            return og(
-                OmsorgsgiverOver16Ar().vilkarsVurder(
-                    OmsorgsGiverOgOmsorgsAr(
-                        omsorgsgiver = omsorgsyter,
+    fun vilkarsvurder(snapshot: OmsorgsarbeidSnapshot): VilkarsVurdering<*> {
+        val omsorgsyter = snapshot.omsorgsyter
+        val omsorgsmottakere = snapshot.getOmsorgsmottakere(omsorgsyter)
+
+        return og(
+            OmsorgsgiverOver16Ar().vilkarsVurder(
+                OmsorgsGiverOgOmsorgsAr(
+                    omsorgsgiver = omsorgsyter,
+                    omsorgsAr = snapshot.omsorgsAr
+                )
+            ),
+            OmsorgsgiverUnder70Ar().vilkarsVurder(
+                OmsorgsGiverOgOmsorgsAr(
+                    omsorgsgiver = omsorgsyter,
+                    omsorgsAr = snapshot.omsorgsAr
+                )
+            ),
+            omsorgsmottakere.minstEn {
+                FullOmsorgForBarnUnder6().vilkarsVurder(
+                    GrunnlagOmsorgForBarnUnder6(
+                        omsorgsArbeid = snapshot.omsorgsarbeidPerioder(omsorgsyter, it, prosent = 100),
+                        omsorgsmottaker = it,
                         omsorgsAr = snapshot.omsorgsAr
                     )
-                ),
-                OmsorgsgiverUnder70Ar().vilkarsVurder(
-                    OmsorgsGiverOgOmsorgsAr(
-                        omsorgsgiver = omsorgsyter,
-                        omsorgsAr = snapshot.omsorgsAr
-                    )
-                ),
-                omsorgsmottakere.minstEn {
-                    FullOmsorgForBarnUnder6().vilkarsVurder(
-                        GrunnlagOmsorgForBarnUnder6(
-                            omsorgsArbeid = snapshot.omsorgsarbeidPerioder(omsorgsyter, it, prosent = 100),
-                            omsorgsmottaker = it,
-                            omsorgsAr = snapshot.omsorgsAr
-                        )
-                    )
-                }
-            )
-        }
+                )
+            }
+        )
     }
 }

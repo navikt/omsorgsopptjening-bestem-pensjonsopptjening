@@ -9,9 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import org.springframework.stereotype.Service
 
 @Service
-class OmsorgsArbeidService(private val personService: PersonService,
-                           private val omsorgsarbeidSnapshotRepository: OmsorgsarbeidSnapshotRepository
-) {
+class OmsorgsArbeidService(private val personService: PersonService, private val omsorgsarbeidSnapshotRepository: OmsorgsarbeidSnapshotRepository) {
 
     fun getOmsorgsarbeidSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
         val persistertePersoner = personService.getPersoner(omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr })
