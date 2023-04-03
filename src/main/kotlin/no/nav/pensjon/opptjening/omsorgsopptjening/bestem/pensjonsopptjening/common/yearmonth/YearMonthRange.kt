@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.yearmonth
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.yearmonth
 
 import java.time.YearMonth
 
