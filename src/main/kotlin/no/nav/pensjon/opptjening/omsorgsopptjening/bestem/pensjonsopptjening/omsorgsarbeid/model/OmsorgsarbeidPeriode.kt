@@ -41,7 +41,7 @@ class OmsorgsarbeidPeriode(
     val omsorgsmottakere: List<Person> = listOf(),
 )
 
-fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(omsorgsAr: Int) = (getAlleUtbetalingMoneder() begrensTilAr omsorgsAr).antall()
+fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(ar: Int) = (getAlleUtbetalingMoneder() begrensTilAr ar).antall()
 
 fun List<OmsorgsarbeidPeriode>.getAlleUtbetalingMoneder(): UtbetalingMoneder {
     val alleUtbetalingsMoneder = map{ UtbetalingMoneder(it.fom, it.tom) }

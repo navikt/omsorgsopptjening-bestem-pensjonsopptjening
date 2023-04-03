@@ -42,35 +42,33 @@ data class OmsorgsarbeidSnapshot(
     val kjoreHashe: String,
 ) {
 
-    fun omsorgsarbeidPerioder(omsorgsyter: Person): List<OmsorgsarbeidPeriode> {
-        return omsorgsarbeidPerioder().filter { omsorgsyter isIn it.omsorgsytere }
-    }
+    fun getOmsorgsmottakere(omsorgsyter: Person) =
+        getOmsorgsarbeidPerioder(omsorgsyter)
+            .flatMap { barn -> barn.omsorgsmottakere }
+            .distinctBy { it.gjeldendeFnr }
 
-    fun omsorgsarbeidPerioder(omsorgsyter: Person, omsorgsmottaker: Person): List<OmsorgsarbeidPeriode> {
-        return omsorgsarbeidPerioder(omsorgsyter).filter { periode ->
+    fun getAndreOmsorgsytere() =
+        getOmsorgsarbeidPerioder()
+            .flatMap { it.omsorgsytere }
+            .distinctBy { it.gjeldendeFnr }
+            .filter { !it.erSammePerson(omsorgsyter) }
+
+
+    fun getOmsorgsarbeidPerioder(omsorgsyter: Person, omsorgsmottaker: Person, prosent: Int) =
+        getOmsorgsarbeidPerioder(omsorgsyter, omsorgsmottaker).filter { it.prosent == prosent }
+
+    fun getOmsorgsarbeidPerioder(omsorgsyter: Person, omsorgsmottaker: Person) =
+        getOmsorgsarbeidPerioder(omsorgsyter).filter { periode ->
             periode.omsorgsmottakere.any {
-                it.erSammePerson(
-                    omsorgsmottaker
-                )
+                it.erSammePerson(omsorgsmottaker)
             }
         }
-    }
 
-    fun omsorgsarbeidPerioder(omsorgsyter: Person, omsorgsmottaker: Person, prosent: Int): List<OmsorgsarbeidPeriode> {
-        return omsorgsarbeidPerioder(omsorgsyter, omsorgsmottaker).filter { it.prosent == prosent }
-    }
+    fun getOmsorgsarbeidPerioder(omsorgsyter: Person) =
+        getOmsorgsarbeidPerioder().filter { omsorgsyter isIn it.omsorgsytere }
 
-    fun getOmsorgsmottakere(omsorgsyter: Person): List<Person> {
-        return omsorgsarbeidPerioder(omsorgsyter).flatMap { barn -> barn.omsorgsmottakere }
-            .distinctBy { it.gjeldendeFnr }
-    }
+    private fun getOmsorgsarbeidPerioder() =
+        omsorgsarbeidSaker.flatMap { sak -> sak.omsorgsarbeidPerioder }
 
-    fun getRelaterteOmsorgsytere() = omsorgsarbeidPerioder()
-        .flatMap { it.omsorgsytere }
-        .distinctBy { it.gjeldendeFnr }
-        .filter { !it.erSammePerson(omsorgsyter) }
 
-    private fun omsorgsarbeidPerioder(): List<OmsorgsarbeidPeriode> {
-        return omsorgsarbeidSaker.flatMap { sak -> sak.omsorgsarbeidPerioder }
-    }
 }

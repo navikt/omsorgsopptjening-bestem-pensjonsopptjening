@@ -21,6 +21,6 @@ class OmsorgsArbeidService(
         return  repository.save(omsorgsArbeidSnapshotEntity)
     }
 
-    fun hentRelaterteSnapshot(snapshot: OmsorgsarbeidSnapshot) = snapshot.getRelaterteOmsorgsytere().flatMap { repository.find(it, snapshot.omsorgsAr) }
+    fun hentRelaterteSnapshot(snapshot: OmsorgsarbeidSnapshot) = snapshot.getAndreOmsorgsytere().flatMap { repository.find(it, snapshot.omsorgsAr) }
 
 }
