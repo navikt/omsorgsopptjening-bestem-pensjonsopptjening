@@ -1,8 +1,10 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.listener
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.kafka.annotation.KafkaListener
@@ -32,7 +34,9 @@ class OmsorgsarbeidListener(
         SECURE_LOG.info("Konsumerer omsorgsmelding: ${consumerRecord.key()}, ${consumerRecord.value()}")
 
         if (consumerRecord.kafkaMessageType() == KafkaMessageType.OMSORGSARBEID) {
-            omsorgsOpptjeningService.behandlOmsorgsarbeid(consumerRecord.getOmsorgsarbeidsSnapshot())
+            omsorgsOpptjeningService.behandlOmsorgsarbeid(
+                consumerRecord.value().mapToClass(OmsorgsarbeidsSnapshot::class.java)
+            )
         }
 
         acknowledgment.acknowledge()

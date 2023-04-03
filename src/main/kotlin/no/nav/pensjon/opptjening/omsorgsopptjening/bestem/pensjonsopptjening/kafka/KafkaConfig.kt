@@ -17,6 +17,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.listener.ContainerProperties
+import java.io.Serializable
 import java.time.Duration
 
 
@@ -41,7 +42,7 @@ class KafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers:
         return KafkaTemplate(DefaultKafkaProducerFactory(omsorgsopptjeningProducerConfig() + kafkaSecurityConfig.securityConfigs))
     }
 
-    private fun consumerConfig() = mapOf(
+    private fun consumerConfig(): Map<String, Any> = mapOf(
         ConsumerConfig.CLIENT_ID_CONFIG to "omsorgsopptjening-konsument-omsorgsarbeid",
         ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to aivenBootstrapServers,
         ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
@@ -49,7 +50,7 @@ class KafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers:
         ConsumerConfig.MAX_POLL_RECORDS_CONFIG to 1,
     )
 
-    private fun omsorgsopptjeningProducerConfig() = mapOf(
+    private fun omsorgsopptjeningProducerConfig(): Map<String, Serializable> = mapOf(
         ProducerConfig.CLIENT_ID_CONFIG to "omsorgsopptjening-producer-omsorgsarbeid",
         ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
         ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
