@@ -9,10 +9,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.par
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Eller.Companion.minstEn
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.paragraf.vilkar.operator.Og.Companion.og
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 
-@Component
-class Vilkarsvurdering {
+@Service
+class VilkarsvurderingService {
 
     fun vilkarsvurder(snapshot: OmsorgsarbeidSnapshot): VilkarsVurdering<*> {
         val omsorgsyter = snapshot.omsorgsyter
