@@ -21,7 +21,7 @@ class OmsorgsOpptjeningService(
     fun behandlOmsorgsarbeid(incomingKafkaMessage: OmsorgsarbeidsSnapshot) {
         SECURE_LOG.info("Mappet omsorgsmelding til: $incomingKafkaMessage")
 
-        val omsorgsarbeidsInformasjon = omsorgsArbeidService.createOmsorgasbeidsInformasjon(incomingKafkaMessage)
+        val omsorgsarbeidsInformasjon = omsorgsArbeidService.createSaveOmsorgasbeidsInformasjon(incomingKafkaMessage)
         val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(omsorgsarbeidsInformasjon.omsorgsarbeidSnapshot)
 
         publiserOmsorgsOpptjening(omsorgsarbeidsInformasjon.omsorgsarbeidSnapshot, vilkarsVurdering)

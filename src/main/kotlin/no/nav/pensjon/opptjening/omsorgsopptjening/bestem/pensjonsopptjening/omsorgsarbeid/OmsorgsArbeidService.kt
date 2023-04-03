@@ -15,7 +15,7 @@ class OmsorgsArbeidService(
     private val repository: OmsorgsarbeidSnapshotRepository
 ) {
 
-    fun createOmsorgasbeidsInformasjon(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidsInformasjon {
+    fun createSaveOmsorgasbeidsInformasjon(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidsInformasjon {
         val persistertePersoner = personService.createPersoner(omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr })
         val omsorgsArbeidSnapshotEntity = OmsorgsarbeidSnapshotMapper.map(omsorgsarbeidsSnapshot, persistertePersoner)
 

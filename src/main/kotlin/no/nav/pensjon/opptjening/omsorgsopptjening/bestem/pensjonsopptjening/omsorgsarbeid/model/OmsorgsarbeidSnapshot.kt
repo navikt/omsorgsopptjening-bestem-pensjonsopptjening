@@ -65,8 +65,8 @@ data class OmsorgsarbeidSnapshot(
             .distinctBy { it.gjeldendeFnr }
     }
 
-    fun getRelaterteOmsorgsytere() = omsorgsarbeidPerioder(omsorgsyter)
-        .flatMap { barn -> barn.omsorgsmottakere }
+    fun getRelaterteOmsorgsytere() = omsorgsarbeidPerioder()
+        .flatMap { it.omsorgsytere }
         .distinctBy { it.gjeldendeFnr }
         .filter { !it.erSammePerson(omsorgsyter) }
 

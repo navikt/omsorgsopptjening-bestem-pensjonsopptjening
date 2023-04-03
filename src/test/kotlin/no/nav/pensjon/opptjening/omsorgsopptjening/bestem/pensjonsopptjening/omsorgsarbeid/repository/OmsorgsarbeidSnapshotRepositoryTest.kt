@@ -34,7 +34,7 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
     private lateinit var repository: OmsorgsarbeidSnapshotRepository
 
     @Autowired
-    lateinit var personRepository: PersonRepository
+    private lateinit var personRepository: PersonRepository
 
     @BeforeEach
     fun clearDb() {
