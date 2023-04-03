@@ -1,8 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidSnapshotRepository
-import org.junit.jupiter.api.Assertions.*
-
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
@@ -11,8 +8,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kaf
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlFnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -30,12 +27,6 @@ import java.time.YearMonth
 @Import(KafkaIntegrationTestConfig::class, OmsorgsopptjeningMockListener::class)
 internal class OmsorgsArbeidServiceTest {
     private val dbContainer = PostgresqlTestContainer.instance
-
-    @Autowired
-    private lateinit var repository: OmsorgsarbeidSnapshotRepository
-
-    @Autowired
-    private lateinit var personRepository: PersonRepository
 
     @Autowired
     private lateinit var omsorgsArbeidService: OmsorgsArbeidService
@@ -63,19 +54,17 @@ internal class OmsorgsArbeidServiceTest {
             omsorgsarbeid = listOf(
                 createKafkaOmsorgsarbeid(
                     fom = YearMonth.of(2020, Month.JANUARY),
-                    tom =  YearMonth.of(2020, Month.DECEMBER),
+                    tom = YearMonth.of(2020, Month.DECEMBER),
                     omsorgsytere = listOf(omsorgsYter1.gjeldendeFnr),
                     omsorgsmottakere = listOf(omsorgsmottaker1.gjeldendeFnr),
                 )
             )
         )
 
-        val omsorgsArbeidInformasjon = omsorgsArbeidService.createSaveOmsorgasbeidsInformasjon(kafkaMessage)
-        assertEquals(0, omsorgsArbeidInformasjon.relaterteOmsorgsarbeidSnapshot.size)
-        assertEquals(
-            omsorgsYter1.gjeldendeFnr,
-            omsorgsArbeidInformasjon.omsorgsarbeidSnapshot.omsorgsyter.gjeldendeFnr.fnr
-        )
+        val snapshot = omsorgsArbeidService.createOmsorgasbeidsSnapshot(kafkaMessage)
+
+        assertEquals(omsorgsYter1.gjeldendeFnr, snapshot.omsorgsyter.gjeldendeFnr.fnr)
+        assertEquals(0, omsorgsArbeidService.hentRelaterteSnapshot(snapshot).size)
     }
 
     @Test
@@ -87,20 +76,17 @@ internal class OmsorgsArbeidServiceTest {
             omsorgsarbeid = listOf(
                 createKafkaOmsorgsarbeid(
                     fom = YearMonth.of(OMSORGS_AR_2020, Month.JANUARY),
-                    tom =  YearMonth.of(OMSORGS_AR_2020, Month.DECEMBER),
+                    tom = YearMonth.of(OMSORGS_AR_2020, Month.DECEMBER),
                     omsorgsytere = listOf(omsorgsYter2.gjeldendeFnr),
                     omsorgsmottakere = listOf(omsorgsmottaker1.gjeldendeFnr),
                 )
             )
         )
 
-        val omsorgsArbeidInformasjon = omsorgsArbeidService.createSaveOmsorgasbeidsInformasjon(kafkaMessage)
+        val snapshot = omsorgsArbeidService.createOmsorgasbeidsSnapshot(kafkaMessage)
 
-        assertEquals(0, omsorgsArbeidInformasjon.relaterteOmsorgsarbeidSnapshot.size)
-        assertEquals(
-            omsorgsYter1.gjeldendeFnr,
-            omsorgsArbeidInformasjon.omsorgsarbeidSnapshot.omsorgsyter.gjeldendeFnr.fnr
-        )
+        assertEquals(omsorgsYter1.gjeldendeFnr, snapshot.omsorgsyter.gjeldendeFnr.fnr)
+        assertEquals(0, omsorgsArbeidService.hentRelaterteSnapshot(snapshot).size)
     }
 
     @Test
@@ -112,13 +98,12 @@ internal class OmsorgsArbeidServiceTest {
             omsorgsarbeid = listOf(
                 createKafkaOmsorgsarbeid(
                     fom = YearMonth.of(OMSORGS_AR_2020, Month.JANUARY),
-                    tom =  YearMonth.of(OMSORGS_AR_2020, Month.DECEMBER),
+                    tom = YearMonth.of(OMSORGS_AR_2020, Month.DECEMBER),
                     omsorgsytere = listOf(omsorgsYter1.gjeldendeFnr),
                     omsorgsmottakere = listOf(omsorgsmottaker1.gjeldendeFnr),
                 )
             )
         )
-        omsorgsArbeidService.createSaveOmsorgasbeidsInformasjon(kafkaMessage1)
 
         val kafkaMessage2 = createKafkaMessage(
             omsorgsAr = OMSORGS_AR_2020,
@@ -127,17 +112,22 @@ internal class OmsorgsArbeidServiceTest {
             omsorgsarbeid = listOf(
                 createKafkaOmsorgsarbeid(
                     fom = YearMonth.of(OMSORGS_AR_2020, Month.JANUARY),
-                    tom =  YearMonth.of(OMSORGS_AR_2020, Month.DECEMBER),
+                    tom = YearMonth.of(OMSORGS_AR_2020, Month.DECEMBER),
                     omsorgsytere = listOf(omsorgsYter1.gjeldendeFnr),
                     omsorgsmottakere = listOf(omsorgsmottaker1.gjeldendeFnr),
                 )
             )
         )
-        val omsorgsArbeidInformasjon = omsorgsArbeidService.createSaveOmsorgasbeidsInformasjon(kafkaMessage2)
 
-        assertEquals(1, omsorgsArbeidInformasjon.relaterteOmsorgsarbeidSnapshot.size)
-        assertEquals(omsorgsYter2.gjeldendeFnr, omsorgsArbeidInformasjon.omsorgsarbeidSnapshot.omsorgsyter.gjeldendeFnr.fnr)
-        assertEquals(omsorgsYter1.gjeldendeFnr, omsorgsArbeidInformasjon.relaterteOmsorgsarbeidSnapshot.first().omsorgsyter.gjeldendeFnr.fnr)
+        val snapshot1 = omsorgsArbeidService.createOmsorgasbeidsSnapshot(kafkaMessage1)
+        val snapshot2 = omsorgsArbeidService.createOmsorgasbeidsSnapshot(kafkaMessage2)
+        val relatedToSnapshot2 = omsorgsArbeidService.hentRelaterteSnapshot(snapshot2)
+
+        assertEquals(omsorgsYter2.gjeldendeFnr, snapshot2.omsorgsyter.gjeldendeFnr.fnr)
+        assertEquals(omsorgsYter1.gjeldendeFnr, snapshot1.omsorgsyter.gjeldendeFnr.fnr)
+
+        assertEquals(1, relatedToSnapshot2.size)
+        assertEquals(snapshot1.id, relatedToSnapshot2.first().id)
     }
 
     private fun createKafkaMessage(

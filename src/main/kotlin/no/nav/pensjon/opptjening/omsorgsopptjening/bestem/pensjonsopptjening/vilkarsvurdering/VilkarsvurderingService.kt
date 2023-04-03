@@ -14,7 +14,11 @@ import org.springframework.stereotype.Service
 @Service
 class VilkarsvurderingService {
 
-    fun vilkarsvurder(snapshot: OmsorgsarbeidSnapshot): VilkarsVurdering<*> {
+    fun vilkarsvurder(
+        snapshot: OmsorgsarbeidSnapshot,
+        relaterteSnapshot: List<OmsorgsarbeidSnapshot> = listOf()
+    ): VilkarsVurdering<*> {
+
         val omsorgsyter = snapshot.omsorgsyter
         val omsorgsmottakere = snapshot.getOmsorgsmottakere(omsorgsyter)
 

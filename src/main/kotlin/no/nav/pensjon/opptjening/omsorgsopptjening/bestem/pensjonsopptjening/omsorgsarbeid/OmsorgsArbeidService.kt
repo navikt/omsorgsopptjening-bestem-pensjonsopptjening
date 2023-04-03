@@ -3,7 +3,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.mapper.OmsorgsarbeidSnapshotMapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidsInformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidSnapshotRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.PersonService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
@@ -15,18 +14,13 @@ class OmsorgsArbeidService(
     private val repository: OmsorgsarbeidSnapshotRepository
 ) {
 
-    fun createSaveOmsorgasbeidsInformasjon(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidsInformasjon {
+    fun createOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
         val persistertePersoner = personService.createPersoner(omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr })
         val omsorgsArbeidSnapshotEntity = OmsorgsarbeidSnapshotMapper.map(omsorgsarbeidsSnapshot, persistertePersoner)
 
-        val snapshot: OmsorgsarbeidSnapshot = repository.save(omsorgsArbeidSnapshotEntity)
-        val relaterteSnapshot = hentRelaterteSnapshot(snapshot)
-
-        return OmsorgsarbeidsInformasjon(snapshot,relaterteSnapshot)
+        return  repository.save(omsorgsArbeidSnapshotEntity)
     }
 
-    private fun hentRelaterteSnapshot(snapshot: OmsorgsarbeidSnapshot) =
-        snapshot.getRelaterteOmsorgsytere()
-            .flatMap { repository.find(it, snapshot.omsorgsAr) }
+    fun hentRelaterteSnapshot(snapshot: OmsorgsarbeidSnapshot) = snapshot.getRelaterteOmsorgsytere().flatMap { repository.find(it, snapshot.omsorgsAr) }
 
 }
