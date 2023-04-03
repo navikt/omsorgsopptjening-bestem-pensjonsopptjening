@@ -11,15 +11,7 @@ class PersonService(
     private val pdlService: PdlService
 ) {
 
-    fun getPerson(fnr: String): Person {
-        // Henter person fra PDL
-        val pdlPerson = pdlService.hentPerson(fnr)
-
-
-        return personRepository.updatePerson(pdlPerson)
-    }
-
-    fun getPersoner(fnrs: List<String>): List<Person> = fnrs
+    fun createPersoner(fnrs: List<String>): List<Person> = fnrs
         .map { pdlService.hentPerson(it) }
         .distinctBy { it.gjeldendeFnr }
         .map { personRepository.updatePerson(it) }

@@ -17,10 +17,10 @@ class OmsorgsOpptjeningService(
     private val vilkarsvurderingService: VilkarsvurderingService
 ) {
 
-    fun behandlOmsorgsarbeid(omsorgsArbeidSnapshot: OmsorgsarbeidsSnapshot) {
-        SECURE_LOG.info("Mappet omsorgsmelding til: $omsorgsArbeidSnapshot")
+    fun behandlOmsorgsarbeid(incomingKafkaMessage: OmsorgsarbeidsSnapshot) {
+        SECURE_LOG.info("Mappet omsorgsmelding til: $incomingKafkaMessage")
 
-        val omsorgsArbeidSnapshot = omsorgsArbeidService.getOmsorgsarbeidSnapshot(omsorgsArbeidSnapshot)
+        val omsorgsArbeidSnapshot = omsorgsArbeidService.createAndSaveOmsorgsarbeidSnapshot(incomingKafkaMessage)
         val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(omsorgsArbeidSnapshot)
 
         publiserOmsorgsOpptjening(omsorgsArbeidSnapshot, vilkarsVurdering)

@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service
 @Service
 class OmsorgsArbeidService(private val personService: PersonService, private val omsorgsarbeidSnapshotRepository: OmsorgsarbeidSnapshotRepository) {
 
-    fun getOmsorgsarbeidSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
-        val persistertePersoner = personService.getPersoner(omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr })
+    fun createAndSaveOmsorgsarbeidSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
+        val persistertePersoner = personService.createPersoner(omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr })
         val omsorgsArbeidSnapshotEntity = OmsorgsarbeidSnapshotMapper.map(omsorgsarbeidsSnapshot, persistertePersoner)
-        omsorgsarbeidSnapshotRepository.save(omsorgsArbeidSnapshotEntity)
-        return omsorgsArbeidSnapshotEntity
+
+        return omsorgsarbeidSnapshotRepository.save(omsorgsArbeidSnapshotEntity)
     }
 }
