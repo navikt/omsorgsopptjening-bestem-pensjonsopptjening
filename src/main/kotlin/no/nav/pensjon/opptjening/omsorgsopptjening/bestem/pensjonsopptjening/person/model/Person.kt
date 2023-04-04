@@ -27,6 +27,8 @@ class Person(
 
     infix fun isIn(personer: List<Person>) = personer.any { erSammePerson(it) }
 
+    infix fun isNotInList(personer: List<Person>) = personer.none { erSammePerson(it) }
+
     infix fun identifiseresAv(fnr: Fnr) = alleFnr.contains(fnr)
 
     infix fun identifiseresAv(fnr: String) = alleFnr.map { it.fnr }.contains(fnr)

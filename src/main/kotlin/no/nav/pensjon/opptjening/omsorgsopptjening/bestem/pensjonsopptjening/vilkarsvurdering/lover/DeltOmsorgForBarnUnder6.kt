@@ -16,26 +16,34 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
     utfallsFunksjon = `Minst 7 moneder omsorg for barn under 6 ar`,
 ) {
     companion object {
-        private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: GrunnlagDeltOmsorgForBarnUnder6) =
-            grunnlag.run {
-                when {
-                    sjuMonederDeltOmsorg(ar = omsorgsAr) && alderMottaker(alder = 0..5) -> {
-                        if (andreOmsorgsGivere.all { it.harInvilgetOmsorgForUrelaterBarn }) Utfall.INVILGET else Utfall.SAKSBEHANDLING
-                    }
+        private val `Minst 7 moneder omsorg for barn under 6 ar` =
+            fun(grunnlag: GrunnlagDeltOmsorgForBarnUnder6): Utfall {
+                return grunnlag.run {
+                    when {
+                        harUtfortNokOmsorgsarbeid() -> {
+                            if (andreParter.size > 1) {
+                                Utfall.SAKSBEHANDLING
+                            } else if (manglerDataOmAnnenPart()) {
+                                Utfall.MANGLER_ANNEN_OMSORGSYTER
+                            } else if (andreParter.all { it.harInvilgetOmsorgForUrelaterBarn }) {
+                                Utfall.INVILGET
+                            } else {
+                                Utfall.SAKSBEHANDLING
+                            }
+                        }
 
-                    enMonedDeltOmsorg(ar = omsorgsAr) && alderMottaker(alder = 0..0) -> {
-                        if (andreOmsorgsGivere.all { it.harInvilgetOmsorgForUrelaterBarn }) Utfall.INVILGET else Utfall.SAKSBEHANDLING
-                    }
-
-                    enMonedDeltOmsorg(ar = omsorgsAr + 1) && alderMottaker(alder = 0..0) -> {
-                        if (andreOmsorgsGivere.all { it.harInvilgetOmsorgForUrelaterBarn }) Utfall.INVILGET else Utfall.SAKSBEHANDLING
-                    }
-
-                    else -> {
-                        Utfall.AVSLAG
+                        else -> {
+                            Utfall.AVSLAG
+                        }
                     }
                 }
             }
+
+        private fun GrunnlagDeltOmsorgForBarnUnder6.harUtfortNokOmsorgsarbeid() =
+            (sjuMonederDeltOmsorg(ar = omsorgsAr) && alderMottaker(alder = 1..5)) or
+                    (enMonedDeltOmsorg(ar = omsorgsAr) && alderMottaker(alder = 0..0)) or
+                    (enMonedDeltOmsorg(ar = omsorgsAr + 1) && alderMottaker(alder = 0..0))
+
 
         private fun GrunnlagDeltOmsorgForBarnUnder6.sjuMonederDeltOmsorg(ar: Int) =
             omsorgsArbeid50Prosent.getAntallUtbetalingMoneder(ar) >= 7
@@ -46,5 +54,20 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
         private fun GrunnlagDeltOmsorgForBarnUnder6.alderMottaker(alder: IntRange) =
             (omsorgsAr - omsorgsmottaker.fodselsAr) in alder
 
+        private fun GrunnlagDeltOmsorgForBarnUnder6.manglerDataOmAnnenPart(): Boolean {
+            val personIdFromAndreParter = andreParter
+                .map { it.omsorgsyter.id }
+                .distinctBy { it }
+
+            val personIdFromPerioder = getAndrePersonerFromPerioder()
+                .map { it.id }
+
+            return !(personIdFromPerioder.containsAll(personIdFromAndreParter) && personIdFromAndreParter.containsAll(personIdFromPerioder))
+        }
+
+        private fun GrunnlagDeltOmsorgForBarnUnder6.getAndrePersonerFromPerioder() = omsorgsArbeid50Prosent
+            .flatMap { it.omsorgsytere }
+            .filter { !it.erSammePerson(omsorgsyter) }
+            .distinctBy { it.id }
     }
 }
