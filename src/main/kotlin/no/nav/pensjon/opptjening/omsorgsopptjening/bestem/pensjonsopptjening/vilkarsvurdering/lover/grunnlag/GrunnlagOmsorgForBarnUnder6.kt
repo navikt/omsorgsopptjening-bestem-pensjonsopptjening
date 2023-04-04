@@ -4,7 +4,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 
 data class GrunnlagOmsorgForBarnUnder6(
-    val omsorgsArbeid100Prosent: List<OmsorgsarbeidPeriode>,
+    val omsorgsAr: Int,
     val omsorgsmottaker: Person,
-    val omsorgsAr: Int
+    val omsorgsArbeid100Prosent: List<OmsorgsarbeidPeriode>
 )

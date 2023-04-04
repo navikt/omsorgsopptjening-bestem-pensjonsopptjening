@@ -5,8 +5,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 
 
 data class GrunnlagDeltOmsorgForBarnUnder6(
-    val andreOmsorgsGivere: List<OmsorgsGiverDeltOmsorg>,
-    val omsorgsArbeid50Prosent: List<OmsorgsarbeidPeriode>,
+    val omsorgsAr: Int,
     val omsorgsmottaker: Person,
-    val omsorgsAr: Int
+    val omsorgsArbeid50Prosent: List<OmsorgsarbeidPeriode>,
+    val andreOmsorgsGivere: List<OmsorgsGiverDeltOmsorg>,
 )

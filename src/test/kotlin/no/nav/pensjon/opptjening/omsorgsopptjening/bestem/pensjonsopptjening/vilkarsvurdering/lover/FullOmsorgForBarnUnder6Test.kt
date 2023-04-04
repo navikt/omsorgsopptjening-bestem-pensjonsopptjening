@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.CsvSource
 import java.time.Month
 import java.time.YearMonth
 
-internal class FullOmsorgForBarnUnder6Test {
+class FullOmsorgForBarnUnder6Test {
 
     @ParameterizedTest
     @CsvSource(
@@ -37,10 +37,10 @@ internal class FullOmsorgForBarnUnder6Test {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid100Prosent = listOf(
-                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
+                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
                 ),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
-                omsorgsAr = OMSORGS_AR_2020
+                omsorgsmottaker = omsorgsmottaker_2015,
+                omsorgsAr = AR_2020
             )
         )
 
@@ -62,10 +62,10 @@ internal class FullOmsorgForBarnUnder6Test {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid100Prosent = listOf(
-                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
+                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
                 ),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2020),
-                omsorgsAr = OMSORGS_AR_2020
+                omsorgsmottaker = omsorgsmottaker_2020,
+                omsorgsAr = AR_2020
             )
         )
 
@@ -87,10 +87,10 @@ internal class FullOmsorgForBarnUnder6Test {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid100Prosent = listOf(
-                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
+                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
                 ),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2020),
-                omsorgsAr = OMSORGS_AR_2020
+                omsorgsmottaker = omsorgsmottaker_2020,
+                omsorgsAr = AR_2020
             )
         )
 
@@ -119,10 +119,10 @@ internal class FullOmsorgForBarnUnder6Test {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid100Prosent = listOf(
-                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
+                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
                 ),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
-                omsorgsAr = OMSORGS_AR_2020
+                omsorgsmottaker = omsorgsmottaker_2015,
+                omsorgsAr = AR_2020
             )
         )
 
@@ -141,10 +141,10 @@ internal class FullOmsorgForBarnUnder6Test {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid100Prosent = listOf(
-                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
+                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
                 ),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
-                omsorgsAr = OMSORGS_AR_2020
+                omsorgsmottaker = omsorgsmottaker_2015,
+                omsorgsAr = AR_2020
             )
         )
 
@@ -177,11 +177,11 @@ internal class FullOmsorgForBarnUnder6Test {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid100Prosent = listOf(
-                    OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf()),
-                    OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf())
+                    OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf()),
+                    OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
                 ),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
-                omsorgsAr = OMSORGS_AR_2020
+                omsorgsmottaker = omsorgsmottaker_2015,
+                omsorgsAr = AR_2020
             )
         )
 
@@ -209,12 +209,12 @@ internal class FullOmsorgForBarnUnder6Test {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid100Prosent = listOf(
-                    OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf()),
-                    OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf()),
-                    OmsorgsarbeidPeriode(fom = fom3, tom = tom3, prosent = 100, omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)), omsorgsmottakere = listOf()),
+                    OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf()),
+                    OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf()),
+                    OmsorgsarbeidPeriode(fom = fom3, tom = tom3, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf()),
                 ),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER,2015),
-                omsorgsAr = OMSORGS_AR_2020
+                omsorgsmottaker = omsorgsmottaker_2015,
+                omsorgsAr = AR_2020
             )
         )
 
@@ -227,8 +227,8 @@ internal class FullOmsorgForBarnUnder6Test {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsArbeid100Prosent = listOf(),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015),
-                omsorgsAr = OMSORGS_AR_2020
+                omsorgsmottaker = omsorgsmottaker_2015,
+                omsorgsAr = AR_2020
             )
         )
 
@@ -237,13 +237,12 @@ internal class FullOmsorgForBarnUnder6Test {
 
     @ParameterizedTest
     @CsvSource(
-        "2000, 2000, INVILGET",
-        "2005, 2000, INVILGET",
-        "2006, 2000, AVSLAG",
+        "2000, INVILGET",
+        "2005, INVILGET",
+        "2006, AVSLAG",
     )
     fun `Given omsorgsmottaker younger than 6 years Then halvt ar med omsorg is INVILGET`(
         omsorgsAr: Int,
-        fodselsArBarn: Int,
         expectedUtfall: Utfall
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
@@ -253,10 +252,10 @@ internal class FullOmsorgForBarnUnder6Test {
                         fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                         tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                         prosent = 100,
-                        omsorgsytere = listOf(Person(alleFnr =  mutableSetOf(Fnr(fnr = FNR_OMSORGSYTER)) , fodselsAr = 1988)),
+                        omsorgsytere = listOf(omsorgsyter_1988),
                         omsorgsmottakere = listOf()),
                 ),
-                omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, fodselsArBarn),
+                omsorgsmottaker = omsorgsmottaker_2000,
                 omsorgsAr = omsorgsAr
             )
         )
@@ -264,14 +263,13 @@ internal class FullOmsorgForBarnUnder6Test {
         assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
-    private fun createPerson(fnr: String, fodselsAr: Int) = Person(
-        alleFnr = mutableSetOf(Fnr(fnr = fnr)),
-        fodselsAr = fodselsAr
-    )
-
     companion object {
-        const val OMSORGS_AR_2020 = 2020
-        const val FNR_OMSORGSYTER = "1234"
-        const val FNR_OMSORGSMOTTAKER = "5678"
+        private const val AR_2020 = 2020
+
+        private val omsorgsyter_1988 = Person(alleFnr =  mutableSetOf(Fnr(fnr = "11111988")) , fodselsAr = 1988)
+
+        private val omsorgsmottaker_2015 = Person(alleFnr =  mutableSetOf(Fnr(fnr = "22222015")) , fodselsAr = 2015)
+        private val omsorgsmottaker_2020 = Person(alleFnr =  mutableSetOf(Fnr(fnr = "33332020")) , fodselsAr = 2020)
+        private val omsorgsmottaker_2000 = Person(alleFnr =  mutableSetOf(Fnr(fnr = "44442000")) , fodselsAr = 2000)
     }
 }
