@@ -17,31 +17,30 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
 ) {
     companion object {
         private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: GrunnlagDeltOmsorgForBarnUnder6) =
-            when {
-                grunnlag.sjuMonederDeltOmsorgsArbeid(ar = grunnlag.omsorgsAr) && grunnlag.alderMottaker(0..5) -> {
-                    if (grunnlag.andreOmsorgsGivereHarInvilgetOmsorgsOpptjening()) Utfall.INVILGET else Utfall.SAKSBEHANDLING
-                }
+            grunnlag.run {
+                when {
+                    sjuMonederDeltOmsorg(ar = omsorgsAr) && alderMottaker(alder = 0..5) -> {
+                        if (andreOmsorgsGivere.all { it.harInvilgetOmsorgForUrelaterBarn }) Utfall.INVILGET else Utfall.SAKSBEHANDLING
+                    }
 
-                grunnlag.enMonedDeltOmsorgsArbeid(ar = grunnlag.omsorgsAr) && grunnlag.alderMottaker(0..0) -> {
-                    if (grunnlag.andreOmsorgsGivereHarInvilgetOmsorgsOpptjening()) Utfall.INVILGET else Utfall.SAKSBEHANDLING
-                }
+                    enMonedDeltOmsorg(ar = omsorgsAr) && alderMottaker(alder = 0..0) -> {
+                        if (andreOmsorgsGivere.all { it.harInvilgetOmsorgForUrelaterBarn }) Utfall.INVILGET else Utfall.SAKSBEHANDLING
+                    }
 
-                grunnlag.enMonedDeltOmsorgsArbeid(ar = grunnlag.omsorgsAr + 1) && grunnlag.alderMottaker(0..0) -> {
-                    if (grunnlag.andreOmsorgsGivereHarInvilgetOmsorgsOpptjening()) Utfall.INVILGET else Utfall.SAKSBEHANDLING
-                }
+                    enMonedDeltOmsorg(ar = omsorgsAr + 1) && alderMottaker(alder = 0..0) -> {
+                        if (andreOmsorgsGivere.all { it.harInvilgetOmsorgForUrelaterBarn }) Utfall.INVILGET else Utfall.SAKSBEHANDLING
+                    }
 
-                else -> {
-                    Utfall.AVSLAG
+                    else -> {
+                        Utfall.AVSLAG
+                    }
                 }
             }
 
-        private fun GrunnlagDeltOmsorgForBarnUnder6.andreOmsorgsGivereHarInvilgetOmsorgsOpptjening() =
-            andreOmsorgsGivere.all { it.harInvilgetOmsorgForUrelaterBarn }
-
-        private fun GrunnlagDeltOmsorgForBarnUnder6.sjuMonederDeltOmsorgsArbeid(ar: Int) =
+        private fun GrunnlagDeltOmsorgForBarnUnder6.sjuMonederDeltOmsorg(ar: Int) =
             omsorgsArbeid50Prosent.getAntallUtbetalingMoneder(ar) >= 7
 
-        private fun GrunnlagDeltOmsorgForBarnUnder6.enMonedDeltOmsorgsArbeid(ar: Int) =
+        private fun GrunnlagDeltOmsorgForBarnUnder6.enMonedDeltOmsorg(ar: Int) =
             omsorgsArbeid50Prosent.getAntallUtbetalingMoneder(ar) >= 1
 
         private fun GrunnlagDeltOmsorgForBarnUnder6.alderMottaker(alder: IntRange) =
