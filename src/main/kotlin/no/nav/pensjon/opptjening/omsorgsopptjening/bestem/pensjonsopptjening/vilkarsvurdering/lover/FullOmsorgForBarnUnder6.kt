@@ -37,7 +37,7 @@ class FullOmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
             }
 
         private fun GrunnlagOmsorgForBarnUnder6.minimumOmsorgsarbeid(moneder: Int, ar: Int): Boolean {
-            return omsorgsArbeid.getAntallUtbetalingMoneder(ar = ar) >= moneder
+            return omsorgsArbeid100Prosent.getAntallUtbetalingMoneder(ar = ar) >= moneder
         }
 
         private fun GrunnlagOmsorgForBarnUnder6.omsorgsmottaker(alder: IntRange): Boolean {

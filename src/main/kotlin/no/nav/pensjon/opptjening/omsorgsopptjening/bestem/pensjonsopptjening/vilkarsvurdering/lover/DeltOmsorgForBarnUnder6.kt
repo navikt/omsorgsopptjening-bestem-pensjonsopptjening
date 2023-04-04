@@ -1,13 +1,13 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.getAntallUtbetalingMoneder
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.GrunnlagOmsorgForBarnUnder6
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.GrunnlagDeltOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Vilkar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsInformasjon
 
 
-class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
+class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
     vilkarsInformasjon = VilkarsInformasjon(
         beskrivelse = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn",
         begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",
@@ -16,23 +16,36 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
     utfallsFunksjon = `Minst 7 moneder omsorg for barn under 6 ar`,
 ) {
     companion object {
-        private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: GrunnlagOmsorgForBarnUnder6) =
-            if (grunnlag.minimumOmsorgsarbeid(moneder = 7, ar = grunnlag.omsorgsAr) && grunnlag.omsorgsmottaker(alder = 0..5)) {
-                Utfall.SAKSBEHANDLING
-            } else if (grunnlag.minimumOmsorgsarbeid(moneder = 1, ar = grunnlag.omsorgsAr) && grunnlag.omsorgsmottaker(0..0)) {
-                Utfall.SAKSBEHANDLING
-            } else if (grunnlag.minimumOmsorgsarbeid(moneder = 1, ar = grunnlag.omsorgsAr + 1) && grunnlag.omsorgsmottaker(0..0)) {
-                Utfall.SAKSBEHANDLING
-            } else {
-                Utfall.AVSLAG
+        private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: GrunnlagDeltOmsorgForBarnUnder6) =
+            when {
+                grunnlag.sjuMonederDeltOmsorgsArbeid(ar = grunnlag.omsorgsAr) && grunnlag.alderMottaker(0..5) -> {
+                    if (grunnlag.andreOmsorgsGivereHarInvilgetOmsorgsOpptjening()) Utfall.INVILGET else Utfall.SAKSBEHANDLING
+                }
+
+                grunnlag.enMonedDeltOmsorgsArbeid(ar = grunnlag.omsorgsAr) && grunnlag.alderMottaker(0..0) -> {
+                    if (grunnlag.andreOmsorgsGivereHarInvilgetOmsorgsOpptjening()) Utfall.INVILGET else Utfall.SAKSBEHANDLING
+                }
+
+                grunnlag.enMonedDeltOmsorgsArbeid(ar = grunnlag.omsorgsAr + 1) && grunnlag.alderMottaker(0..0) -> {
+                    if (grunnlag.andreOmsorgsGivereHarInvilgetOmsorgsOpptjening()) Utfall.INVILGET else Utfall.SAKSBEHANDLING
+                }
+
+                else -> {
+                    Utfall.AVSLAG
+                }
             }
 
-        private fun GrunnlagOmsorgForBarnUnder6.minimumOmsorgsarbeid(moneder: Int, ar: Int): Boolean {
-            return omsorgsArbeid.getAntallUtbetalingMoneder(ar) >= moneder
-        }
+        private fun GrunnlagDeltOmsorgForBarnUnder6.andreOmsorgsGivereHarInvilgetOmsorgsOpptjening() =
+            andreOmsorgsGivere.all { it.harInvilgetOmsorgForUrelaterBarn }
 
-        private fun GrunnlagOmsorgForBarnUnder6.omsorgsmottaker(alder: IntRange): Boolean {
-            return (omsorgsAr - omsorgsmottaker.fodselsAr) in alder
-        }
+        private fun GrunnlagDeltOmsorgForBarnUnder6.sjuMonederDeltOmsorgsArbeid(ar: Int) =
+            omsorgsArbeid50Prosent.getAntallUtbetalingMoneder(ar) >= 7
+
+        private fun GrunnlagDeltOmsorgForBarnUnder6.enMonedDeltOmsorgsArbeid(ar: Int) =
+            omsorgsArbeid50Prosent.getAntallUtbetalingMoneder(ar) >= 1
+
+        private fun GrunnlagDeltOmsorgForBarnUnder6.alderMottaker(alder: IntRange) =
+            (omsorgsAr - omsorgsmottaker.fodselsAr) in alder
+
     }
 }

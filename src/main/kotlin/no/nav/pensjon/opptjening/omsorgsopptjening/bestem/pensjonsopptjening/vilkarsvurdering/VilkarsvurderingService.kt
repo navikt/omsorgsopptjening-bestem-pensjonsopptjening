@@ -38,7 +38,7 @@ class VilkarsvurderingService {
             omsorgsmottakere.minstEn {
                 FullOmsorgForBarnUnder6().vilkarsVurder(
                     GrunnlagOmsorgForBarnUnder6(
-                        omsorgsArbeid = snapshot.getOmsorgsarbeidPerioder(omsorgsyter, it, prosent = 100),
+                        omsorgsArbeid100Prosent = snapshot.getOmsorgsarbeidPerioder(omsorgsyter, it, prosent = 100),
                         omsorgsmottaker = it,
                         omsorgsAr = snapshot.omsorgsAr
                     )

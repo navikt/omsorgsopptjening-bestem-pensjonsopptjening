@@ -49,7 +49,7 @@ internal class HalvtArMedOmsorgVisitorTest {
     private fun vilkarsvurderingOmsorgForBarnUnder6(fnrOmsorgsmottaker: String) =
         FullOmsorgForBarnUnder6().vilkarsVurder(
             GrunnlagOmsorgForBarnUnder6(
-                omsorgsArbeid = listOf(),
+                omsorgsArbeid100Prosent = listOf(),
                 omsorgsmottaker = createPerson(fnrOmsorgsmottaker),
                 omsorgsAr = 2020
             )
