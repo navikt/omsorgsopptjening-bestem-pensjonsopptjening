@@ -446,11 +446,75 @@ class DeltOmsorgForBarnUnder6Test {
         assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
+    @Test
+    fun `Given missing information about at least one party Then MANGLER_ANNEN_OMSORGSYTER`() {
+        val omsorgsAr = 2003
+        val perioder = listOf(
+            OmsorgsarbeidPeriode(
+                fom = YearMonth.of(omsorgsAr, Month.JANUARY),
+                tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
+                prosent = 50,
+                omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
+                omsorgsmottakere = listOf(omsorgsmottaker_2000)
+            )
+        )
+
+        val vilkarsVurdering = DeltOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = GrunnlagDeltOmsorgForBarnUnder6(
+                omsorgsAr = omsorgsAr,
+                omsorgsyter = omsorgsyter_1988,
+                omsorgsmottaker = omsorgsmottaker_2000,
+                omsorgsArbeid50Prosent = perioder,
+                andreParter = emptyList()
+                )
+            )
+        assertEquals(Utfall.MANGLER_ANNEN_OMSORGSYTER, vilkarsVurdering.utfall)
+    }
+
+    @Test
+    fun `Given three parents Then SAKSBEHANDLING`() {
+        val omsorgsAr = 2003
+        val perioder = listOf(
+            OmsorgsarbeidPeriode(
+                fom = YearMonth.of(omsorgsAr, Month.JANUARY),
+                tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
+                prosent = 50,
+                omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977, omsorgsyter_1966),
+                omsorgsmottakere = listOf(omsorgsmottaker_2000)
+            )
+        )
+
+        val vilkarsVurdering = DeltOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = GrunnlagDeltOmsorgForBarnUnder6(
+                omsorgsAr = omsorgsAr,
+                omsorgsyter = omsorgsyter_1988,
+                omsorgsmottaker = omsorgsmottaker_2000,
+                omsorgsArbeid50Prosent = perioder,
+                andreParter = listOf(
+                    AnnenPart(
+                        omsorgsyter = omsorgsyter_1977,
+                        omsorgsArbeid50Prosent = perioder,
+                        harInvilgetOmsorgForUrelaterBarn = true
+                    ),
+                    AnnenPart(
+                        omsorgsyter = omsorgsyter_1966,
+                        omsorgsArbeid50Prosent = perioder,
+                        harInvilgetOmsorgForUrelaterBarn = true
+                    )
+                )
+            )
+        )
+        assertEquals(Utfall.SAKSBEHANDLING, vilkarsVurdering.utfall)
+    }
+
+
     companion object {
         private const val AR_2020 = 2020
 
         private val omsorgsyter_1988 = Person(alleFnr = mutableSetOf(Fnr(fnr = "11111988", gjeldende = true)), fodselsAr = 1988)
         private val omsorgsyter_1977 = Person(alleFnr = mutableSetOf(Fnr(fnr = "11111977", gjeldende = true)), fodselsAr = 1977)
+        private val omsorgsyter_1966 = Person(alleFnr = mutableSetOf(Fnr(fnr = "11111966", gjeldende = true)), fodselsAr = 1966)
+
 
         private val omsorgsmottaker_2015 = Person(alleFnr = mutableSetOf(Fnr(fnr = "22222015", gjeldende = true)), fodselsAr = 2015)
         private val omsorgsmottaker_2020 = Person(alleFnr = mutableSetOf(Fnr(fnr = "33332020", gjeldende = true)), fodselsAr = 2020)

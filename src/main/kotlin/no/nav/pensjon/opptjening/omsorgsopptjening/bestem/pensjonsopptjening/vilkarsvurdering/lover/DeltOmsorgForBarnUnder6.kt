@@ -69,5 +69,7 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
             .flatMap { it.omsorgsytere }
             .filter { !it.erSammePerson(omsorgsyter) }
             .distinctBy { it.id }
+
+        //TODO Hvis ingen av de andre partene har krav på opptjening så resulterer det i avslag isteden for saksbehandling
     }
 }
