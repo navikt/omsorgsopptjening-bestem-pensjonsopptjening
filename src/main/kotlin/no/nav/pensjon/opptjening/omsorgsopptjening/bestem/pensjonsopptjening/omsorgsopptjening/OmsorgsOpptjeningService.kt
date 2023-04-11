@@ -8,7 +8,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.hentOmsorgForBarnUnder6VilkarsVurderinger
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -20,17 +19,11 @@ class OmsorgsOpptjeningService(
     private val sammenstiltVilkarsvurdering: SammenstiltVilkarsvurdering
 ) {
 
-    fun behandlOmsorgsarbeid(incomingKafkaMessage: OmsorgsarbeidsSnapshot) {
-        SECURE_LOG.info("Mappet omsorgsmelding til: $incomingKafkaMessage")
+    fun behandlOmsorgsarbeid(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot) {
+        val relaterteOmsorgsarbeidSnapshot = omsorgsArbeidService.relaterteSnapshot(omsorgsarbeidSnapshot)
 
-        val omsorgsarbeidSnapshot = omsorgsArbeidService.createOmsorgasbeidsSnapshot(incomingKafkaMessage)
-        val relaterteOmsorgsarbeidSnapshot = omsorgsArbeidService.hentRelaterteSnapshot(omsorgsarbeidSnapshot)
-
-        val individuellVilkarsvurderinger = (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot)
+        val individuellVurderinger = (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot)
             .map { individuellVilkarsvurdering.vilkarsvurder(omsorgsarbeidSnapshot) }
-
-
-
 
 
         val vilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(omsorgsarbeidSnapshot)
@@ -38,7 +31,13 @@ class OmsorgsOpptjeningService(
         publiserOmsorgsOpptjening(omsorgsarbeidSnapshot, vilkarsVurdering.vilkarsvurdering)
     }
 
-    private fun publiserOmsorgsOpptjening(omsorgsArbeidSnapshot: OmsorgsarbeidSnapshot, vilkarsVurdering: VilkarsVurdering<*>) =
+
+
+
+    private fun publiserOmsorgsOpptjening(
+        omsorgsArbeidSnapshot: OmsorgsarbeidSnapshot,
+        vilkarsVurdering: VilkarsVurdering<*>
+    ) =
         omsorgsOpptejningProducer.publiserOmsorgsopptejning(
             OmsorgsOpptjening(
                 omsorgsAr = omsorgsArbeidSnapshot.omsorgsAr,
@@ -51,14 +50,4 @@ class OmsorgsOpptjeningService(
                     .map { it.grunnlag.omsorgsmottaker }
             )
         )
-
-    private fun hent(){
-
-
-    }
-
-    companion object {
-        private val SECURE_LOG = LoggerFactory.getLogger("secure")
-    }
-
 }

@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ka
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.mapToClass
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsArbeidService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Component
 @Component
 class OmsorgsarbeidListener(
     registry: MeterRegistry,
-    private val omsorgsOpptjeningService: OmsorgsOpptjeningService
+    private val omsorgsOpptjeningService: OmsorgsOpptjeningService,
+    private val omsorgsArbeidService: OmsorgsArbeidService,
 ) {
 
     private val antallLesteMeldinger = registry.counter("omsorgsArbeidListener", "antall", "lest")
@@ -34,13 +36,17 @@ class OmsorgsarbeidListener(
         SECURE_LOG.info("Konsumerer omsorgsmelding: ${consumerRecord.key()}, ${consumerRecord.value()}")
 
         if (consumerRecord.kafkaMessageType() == KafkaMessageType.OMSORGSARBEID) {
+            SECURE_LOG.info("Behandler: ${consumerRecord.value()}")
+
             omsorgsOpptjeningService.behandlOmsorgsarbeid(
-                consumerRecord.value().mapToClass(OmsorgsarbeidsSnapshot::class.java)
+                omsorgsArbeidService.createAndSaveOmsorgasbeidsSnapshot(map(consumerRecord.value()))
             )
         }
 
         acknowledgment.acknowledge()
     }
+
+    private fun map(kafkaMessage: String) = kafkaMessage.mapToClass(OmsorgsarbeidsSnapshot::class.java)
 
     companion object {
         private val SECURE_LOG = LoggerFactory.getLogger("secure")

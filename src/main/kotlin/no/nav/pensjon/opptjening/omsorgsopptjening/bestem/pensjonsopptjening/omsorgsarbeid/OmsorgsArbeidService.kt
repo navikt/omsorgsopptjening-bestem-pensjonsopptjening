@@ -14,13 +14,14 @@ class OmsorgsArbeidService(
     private val repository: OmsorgsarbeidSnapshotRepository
 ) {
 
-    fun createOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
+    fun createAndSaveOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
         val persistertePersoner = personService.createPersoner(omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr })
         val omsorgsArbeidSnapshotEntity = OmsorgsarbeidSnapshotMapper.map(omsorgsarbeidsSnapshot, persistertePersoner)
 
-        return  repository.save(omsorgsArbeidSnapshotEntity)
+        return repository.save(omsorgsArbeidSnapshotEntity)
     }
 
-    fun hentRelaterteSnapshot(snapshot: OmsorgsarbeidSnapshot) = snapshot.getAndreOmsorgsytere().flatMap { repository.find(it, snapshot.omsorgsAr) }
-
+    fun relaterteSnapshot(snapshot: OmsorgsarbeidSnapshot) = snapshot
+        .getAndreOmsorgsytere()
+        .flatMap { repository.find(it, snapshot.omsorgsAr) }
 }

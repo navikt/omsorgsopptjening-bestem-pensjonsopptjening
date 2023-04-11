@@ -61,10 +61,10 @@ internal class OmsorgsArbeidServiceTest {
             )
         )
 
-        val snapshot = omsorgsArbeidService.createOmsorgasbeidsSnapshot(kafkaMessage)
+        val snapshot = omsorgsArbeidService.createAndSaveOmsorgasbeidsSnapshot(kafkaMessage)
 
         assertEquals(omsorgsYter1.gjeldendeFnr, snapshot.omsorgsyter.gjeldendeFnr.fnr)
-        assertEquals(0, omsorgsArbeidService.hentRelaterteSnapshot(snapshot).size)
+        assertEquals(0, omsorgsArbeidService.relaterteSnapshot(snapshot).size)
     }
 
     @Test
@@ -83,10 +83,10 @@ internal class OmsorgsArbeidServiceTest {
             )
         )
 
-        val snapshot = omsorgsArbeidService.createOmsorgasbeidsSnapshot(kafkaMessage)
+        val snapshot = omsorgsArbeidService.createAndSaveOmsorgasbeidsSnapshot(kafkaMessage)
 
         assertEquals(omsorgsYter1.gjeldendeFnr, snapshot.omsorgsyter.gjeldendeFnr.fnr)
-        assertEquals(0, omsorgsArbeidService.hentRelaterteSnapshot(snapshot).size)
+        assertEquals(0, omsorgsArbeidService.relaterteSnapshot(snapshot).size)
     }
 
     @Test
@@ -119,9 +119,9 @@ internal class OmsorgsArbeidServiceTest {
             )
         )
 
-        val snapshot1 = omsorgsArbeidService.createOmsorgasbeidsSnapshot(kafkaMessage1)
-        val snapshot2 = omsorgsArbeidService.createOmsorgasbeidsSnapshot(kafkaMessage2)
-        val relatedToSnapshot2 = omsorgsArbeidService.hentRelaterteSnapshot(snapshot2)
+        val snapshot1 = omsorgsArbeidService.createAndSaveOmsorgasbeidsSnapshot(kafkaMessage1)
+        val snapshot2 = omsorgsArbeidService.createAndSaveOmsorgasbeidsSnapshot(kafkaMessage2)
+        val relatedToSnapshot2 = omsorgsArbeidService.relaterteSnapshot(snapshot2)
 
         assertEquals(omsorgsYter2.gjeldendeFnr, snapshot2.omsorgsyter.gjeldendeFnr.fnr)
         assertEquals(omsorgsYter1.gjeldendeFnr, snapshot1.omsorgsyter.gjeldendeFnr.fnr)
