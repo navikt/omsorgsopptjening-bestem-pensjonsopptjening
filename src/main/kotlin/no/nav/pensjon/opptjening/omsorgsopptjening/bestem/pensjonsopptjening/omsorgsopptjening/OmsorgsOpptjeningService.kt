@@ -3,7 +3,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.producer.OmsorgsOpptejningProducer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsArbeidService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.VilkarsvurderingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.IndividuellVilkarsvurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.SammenstiltVilkarsvurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.hentOmsorgForBarnUnder6VilkarsVurderinger
@@ -15,7 +16,8 @@ import org.springframework.stereotype.Service
 class OmsorgsOpptjeningService(
     private val omsorgsArbeidService: OmsorgsArbeidService,
     private val omsorgsOpptejningProducer: OmsorgsOpptejningProducer,
-    private val vilkarsvurderingService: VilkarsvurderingService
+    private val individuellVilkarsvurdering: IndividuellVilkarsvurdering,
+    private val sammenstiltVilkarsvurdering: SammenstiltVilkarsvurdering
 ) {
 
     fun behandlOmsorgsarbeid(incomingKafkaMessage: OmsorgsarbeidsSnapshot) {
@@ -24,12 +26,16 @@ class OmsorgsOpptjeningService(
         val omsorgsarbeidSnapshot = omsorgsArbeidService.createOmsorgasbeidsSnapshot(incomingKafkaMessage)
         val relaterteOmsorgsarbeidSnapshot = omsorgsArbeidService.hentRelaterteSnapshot(omsorgsarbeidSnapshot)
 
-        val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(
-            omsorgsarbeidSnapshot,
-            relaterteOmsorgsarbeidSnapshot
-        )
+        val individuellVilkarsvurderinger = (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot)
+            .map { individuellVilkarsvurdering.vilkarsvurder(omsorgsarbeidSnapshot) }
 
-        publiserOmsorgsOpptjening(omsorgsarbeidSnapshot, vilkarsVurdering)
+
+
+
+
+        val vilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(omsorgsarbeidSnapshot)
+
+        publiserOmsorgsOpptjening(omsorgsarbeidSnapshot, vilkarsVurdering.vilkarsvurdering)
     }
 
     private fun publiserOmsorgsOpptjening(omsorgsArbeidSnapshot: OmsorgsarbeidSnapshot, vilkarsVurdering: VilkarsVurdering<*>) =
@@ -45,6 +51,11 @@ class OmsorgsOpptjeningService(
                     .map { it.grunnlag.omsorgsmottaker }
             )
         )
+
+    private fun hent(){
+
+
+    }
 
     companion object {
         private val SECURE_LOG = LoggerFactory.getLogger("secure")

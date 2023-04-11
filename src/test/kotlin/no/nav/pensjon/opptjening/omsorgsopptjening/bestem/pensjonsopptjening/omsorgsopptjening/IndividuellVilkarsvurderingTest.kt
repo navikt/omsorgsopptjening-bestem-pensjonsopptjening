@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.hentOmsorgForBarnUnder6VilkarsVurderinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.VilkarsvurderingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.IndividuellVilkarsvurdering
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -13,9 +13,9 @@ import org.junit.jupiter.params.provider.CsvSource
 import java.time.Month
 import java.time.YearMonth
 
-internal class VilkarsvurderingServiceTest {
+internal class IndividuellVilkarsvurderingTest {
 
-    private val vilkarsvurderingService: VilkarsvurderingService = VilkarsvurderingService()
+    private val individuellVilkarsvurdering: IndividuellVilkarsvurdering = IndividuellVilkarsvurdering()
 
     @Test
     fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
@@ -35,9 +35,9 @@ internal class VilkarsvurderingServiceTest {
             )
         )
 
-        val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(omsorgsArbeidSnapshot)
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
 
-        assertEquals(Utfall.INVILGET, vilkarsVurdering.utfall)
+        assertEquals(Utfall.INVILGET, individueltVilkarsResultat.vilkarsvurdering.utfall)
     }
 
     @Test
@@ -58,8 +58,8 @@ internal class VilkarsvurderingServiceTest {
             )
         )
 
-        val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(omsorgsArbeidSnapshot)
-        assertEquals(Utfall.AVSLAG, vilkarsVurdering.utfall)
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(Utfall.AVSLAG, individueltVilkarsResultat.vilkarsvurdering.utfall)
     }
 
     @ParameterizedTest
@@ -90,8 +90,8 @@ internal class VilkarsvurderingServiceTest {
             )
         )
 
-        val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(omsorgsArbeidSnapshot)
-        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(expectedUtfall, individueltVilkarsResultat.vilkarsvurdering.utfall)
     }
 
     @ParameterizedTest
@@ -122,8 +122,8 @@ internal class VilkarsvurderingServiceTest {
             )
         )
 
-        val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(omsorgsArbeidSnapshot)
-        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(expectedUtfall, individueltVilkarsResultat.vilkarsvurdering.utfall)
     }
 
     @ParameterizedTest
@@ -156,8 +156,8 @@ internal class VilkarsvurderingServiceTest {
             )
         )
 
-        val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(omsorgsArbeidSnapshot)
-        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(expectedUtfall, individueltVilkarsResultat.vilkarsvurdering.utfall)
     }
 
     @Test
@@ -177,8 +177,8 @@ internal class VilkarsvurderingServiceTest {
             )
         )
 
-        val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(omsorgsArbeidSnapshot)
-        assertEquals(Utfall.AVSLAG, vilkarsVurdering.utfall)
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        assertEquals(Utfall.AVSLAG, individueltVilkarsResultat.vilkarsvurdering.utfall)
     }
 
     @Test
@@ -201,10 +201,10 @@ internal class VilkarsvurderingServiceTest {
             )
         )
 
-        val vilkarsVurdering = vilkarsvurderingService.vilkarsvurder(omsorgsArbeidSnapshot)
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
 
-        val barnUnder6Invilget = hentOmsorgForBarnUnder6VilkarsVurderinger(vilkarsVurdering).filter { it.utfall == Utfall.INVILGET }
-        val barnUnder6IkkeInvilget = hentOmsorgForBarnUnder6VilkarsVurderinger(vilkarsVurdering).filter { it.utfall != Utfall.INVILGET }
+        val barnUnder6Invilget = hentOmsorgForBarnUnder6VilkarsVurderinger(individueltVilkarsResultat.vilkarsvurdering).filter { it.utfall == Utfall.INVILGET }
+        val barnUnder6IkkeInvilget = hentOmsorgForBarnUnder6VilkarsVurderinger(individueltVilkarsResultat.vilkarsvurdering).filter { it.utfall != Utfall.INVILGET }
 
         assertEquals(barnUnder6Invilget.size, 2)
         assertEquals(1, barnUnder6Invilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker1}.size)
@@ -213,7 +213,7 @@ internal class VilkarsvurderingServiceTest {
         assertEquals(barnUnder6IkkeInvilget.size, 1)
         assertEquals(1, barnUnder6IkkeInvilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker3}.size)
 
-        assertEquals(Utfall.INVILGET, vilkarsVurdering.utfall)
+        assertEquals(Utfall.INVILGET, individueltVilkarsResultat.vilkarsvurdering.utfall)
     }
 
     private fun creatOmsorgsArbeidSnapshot(
