@@ -72,6 +72,8 @@ private fun List<OmsorgsarbeidSnapshot>.createAndreParter(omsorgsmottaker: Perso
         AnnenPart(
             omsorgsyter = it.omsorgsyter,
             omsorgsArbeid50Prosent = it.getOmsorgsarbeidPerioder(it.omsorgsyter, omsorgsmottaker, prosent = 50),
-            harInvilgetOmsorgForUrelaterBarn = false,
+            harInvilgetOmsorgForUrelaterBarn = false, // TODO
         )
     }.filter { it.omsorgsArbeid50Prosent.isNotEmpty() }
+
+//TODO Hent ut getOmsorgsarbeidPerioder for gitt år
