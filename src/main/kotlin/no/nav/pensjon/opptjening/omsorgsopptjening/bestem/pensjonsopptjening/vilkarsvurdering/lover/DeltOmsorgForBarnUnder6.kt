@@ -21,12 +21,12 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
                 return grunnlag.run {
                     when {
                         harUtfortNokOmsorgsarbeid() -> {
-                            if (andreParter.size > 1) {
+                            if (andreParter.isNotEmpty() && andreParter.all { it.harInvilgetOmsorgForUrelaterBarn }) {
+                                Utfall.INVILGET
+                            } else if (andreParter.size > 1) {
                                 Utfall.SAKSBEHANDLING
                             } else if (manglerDataOmAnnenPart()) {
                                 Utfall.MANGLER_ANNEN_OMSORGSYTER
-                            } else if (andreParter.all { it.harInvilgetOmsorgForUrelaterBarn }) {
-                                Utfall.INVILGET
                             } else {
                                 Utfall.SAKSBEHANDLING
                             }
@@ -62,14 +62,14 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
             val personIdFromPerioder = getAndrePersonerFromPerioder()
                 .map { it.id }
 
-            return !(personIdFromPerioder.containsAll(personIdFromAndreParter) && personIdFromAndreParter.containsAll(personIdFromPerioder))
+            return !(personIdFromPerioder.containsAll(personIdFromAndreParter) && personIdFromAndreParter.containsAll(
+                personIdFromPerioder
+            ))
         }
 
         private fun GrunnlagDeltOmsorgForBarnUnder6.getAndrePersonerFromPerioder() = omsorgsArbeid50Prosent
             .flatMap { it.omsorgsytere }
             .filter { !it.erSammePerson(omsorgsyter) }
             .distinctBy { it.id }
-
-        //TODO Hvis ingen av de andre partene har krav på opptjening så resulterer det i avslag isteden for saksbehandling
     }
 }

@@ -6,5 +6,5 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 data class AnnenPart(
     val omsorgsyter: Person,
     val omsorgsArbeid50Prosent: List<OmsorgsarbeidPeriode>,
-    val harInvilgetOmsorgForUrelaterBarn: Boolean
+    val harInvilgetOmsorgForUrelaterBarn: Boolean,
 )

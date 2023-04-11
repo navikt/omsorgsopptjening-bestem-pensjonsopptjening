@@ -472,7 +472,7 @@ class DeltOmsorgForBarnUnder6Test {
     }
 
     @Test
-    fun `Given three parents Then SAKSBEHANDLING`() {
+    fun `Given three parents and all other parents has omsorgsopptjening for unrelated child Then INVILGET`() {
         val omsorgsAr = 2003
         val perioder = listOf(
             OmsorgsarbeidPeriode(
@@ -500,6 +500,42 @@ class DeltOmsorgForBarnUnder6Test {
                         omsorgsyter = omsorgsyter_1966,
                         omsorgsArbeid50Prosent = perioder,
                         harInvilgetOmsorgForUrelaterBarn = true
+                    )
+                )
+            )
+        )
+        assertEquals(Utfall.INVILGET, vilkarsVurdering.utfall)
+    }
+
+    @Test
+    fun `Given three parents Then SAKSBEHANDLING`() {
+        val omsorgsAr = 2003
+        val perioder = listOf(
+            OmsorgsarbeidPeriode(
+                fom = YearMonth.of(omsorgsAr, Month.JANUARY),
+                tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
+                prosent = 50,
+                omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977, omsorgsyter_1966),
+                omsorgsmottakere = listOf(omsorgsmottaker_2000)
+            )
+        )
+
+        val vilkarsVurdering = DeltOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = GrunnlagDeltOmsorgForBarnUnder6(
+                omsorgsAr = omsorgsAr,
+                omsorgsyter = omsorgsyter_1988,
+                omsorgsmottaker = omsorgsmottaker_2000,
+                omsorgsArbeid50Prosent = perioder,
+                andreParter = listOf(
+                    AnnenPart(
+                        omsorgsyter = omsorgsyter_1977,
+                        omsorgsArbeid50Prosent = perioder,
+                        harInvilgetOmsorgForUrelaterBarn = false
+                    ),
+                    AnnenPart(
+                        omsorgsyter = omsorgsyter_1966,
+                        omsorgsArbeid50Prosent = perioder,
+                        harInvilgetOmsorgForUrelaterBarn = false
                     )
                 )
             )
