@@ -23,7 +23,7 @@ internal class OmsorgsarbeidsSnapshotKtTest {
             )
         )
 
-        val omsorgsArbeid = snapshot.getOmsorgsarbeidPerioder(person1)
+        val omsorgsArbeid = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(person1)
 
         assertEquals(1, omsorgsArbeid.size)
         assertEquals(omsorgsArbeidPerson1, omsorgsArbeid.first())
@@ -44,7 +44,7 @@ internal class OmsorgsarbeidsSnapshotKtTest {
             )
         )
 
-        val omsorgsArbeid = snapshot.getOmsorgsarbeidPerioder(person1)
+        val omsorgsArbeid = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(person1)
 
         assertEquals(omsorgsArbeidPerson1.size, omsorgsArbeid.size)
         assertTrue(omsorgsArbeidPerson1.containsAll(omsorgsArbeidPerson1))
@@ -64,8 +64,8 @@ internal class OmsorgsarbeidsSnapshotKtTest {
             )
         )
 
-        val omsorgsArbeid1 = snapshot.getOmsorgsarbeidPerioder(person1)
-        val omsorgsArbeid2 = snapshot.getOmsorgsarbeidPerioder(person2)
+        val omsorgsArbeid1 = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(person1)
+        val omsorgsArbeid2 = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(person2)
 
         assertEquals(0, omsorgsArbeid1.size)
         assertEquals(1, omsorgsArbeid2.size)
@@ -87,7 +87,7 @@ internal class OmsorgsarbeidsSnapshotKtTest {
             )
         )
 
-        val omsorgsArbeid = snapshot.getOmsorgsarbeidPerioder(person1)
+        val omsorgsArbeid = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(person1)
 
         assertEquals(1, omsorgsArbeid.size)
         assertEquals(omsorgsArbeidPerson1, omsorgsArbeid.first())

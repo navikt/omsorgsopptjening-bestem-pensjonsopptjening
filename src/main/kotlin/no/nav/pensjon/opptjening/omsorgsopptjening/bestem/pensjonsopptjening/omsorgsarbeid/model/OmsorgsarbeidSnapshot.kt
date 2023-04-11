@@ -43,31 +43,33 @@ data class OmsorgsarbeidSnapshot(
 ) {
 
     fun getOmsorgsmottakere(omsorgsyter: Person) =
-        getOmsorgsarbeidPerioder(omsorgsyter)
+        getOmsorgsarbeidPerioderForRelevanteAr(omsorgsyter)
             .flatMap { barn -> barn.omsorgsmottakere }
             .distinctBy { it.gjeldendeFnr }
 
     fun getAndreOmsorgsytere() =
-        getOmsorgsarbeidPerioder()
+        getOmsorgsarbeidPerioderForRelevanteAr()
             .flatMap { it.omsorgsytere }
             .distinctBy { it.gjeldendeFnr }
             .filter { !it.erSammePerson(omsorgsyter) }
 
 
-    fun getOmsorgsarbeidPerioder(omsorgsyter: Person, omsorgsmottaker: Person, prosent: Int) =
-        getOmsorgsarbeidPerioder(omsorgsyter, omsorgsmottaker).filter { it.prosent == prosent }
+    fun getOmsorgsarbeidPerioderForRelevanteAr(omsorgsyter: Person, omsorgsmottaker: Person, prosent: Int) =
+        getOmsorgsarbeidPerioderForRelevanteAr(omsorgsyter, omsorgsmottaker).filter { it.prosent == prosent }
 
-    fun getOmsorgsarbeidPerioder(omsorgsyter: Person, omsorgsmottaker: Person) =
-        getOmsorgsarbeidPerioder(omsorgsyter).filter { periode ->
+    fun getOmsorgsarbeidPerioderForRelevanteAr(omsorgsyter: Person, omsorgsmottaker: Person) =
+        getOmsorgsarbeidPerioderForRelevanteAr(omsorgsyter).filter { periode ->
             periode.omsorgsmottakere.any {
                 it.erSammePerson(omsorgsmottaker)
             }
         }
 
-    fun getOmsorgsarbeidPerioder(omsorgsyter: Person) =
-        getOmsorgsarbeidPerioder().filter { omsorgsyter isIn it.omsorgsytere }
+    fun getOmsorgsarbeidPerioderForRelevanteAr(omsorgsyter: Person) =
+        getOmsorgsarbeidPerioderForRelevanteAr()
+            .filter { omsorgsyter isIn it.omsorgsytere }
+            .filter { Periode(it.fom, it.tom).overlapper(omsorgsAr, omsorgsAr + 1) }
 
-    private fun getOmsorgsarbeidPerioder() =
+    private fun getOmsorgsarbeidPerioderForRelevanteAr() =
         omsorgsarbeidSaker.flatMap { sak -> sak.omsorgsarbeidPerioder }
 
 

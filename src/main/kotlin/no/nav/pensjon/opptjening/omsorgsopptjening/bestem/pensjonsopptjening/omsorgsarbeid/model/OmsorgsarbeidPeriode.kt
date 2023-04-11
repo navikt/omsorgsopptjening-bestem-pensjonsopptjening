@@ -24,26 +24,33 @@ class OmsorgsarbeidPeriode(
     @Column(name = "PROSENT", nullable = false)
     val prosent: Int,
 
-    @ManyToMany(fetch =  FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "OMSORGSYTER",
-        joinColumns = [JoinColumn(name = "OMSORGSARBEID_PERIODE_ID", referencedColumnName = "OMSORGSARBEID_PERIODE_ID")],
+        joinColumns = [JoinColumn(
+            name = "OMSORGSARBEID_PERIODE_ID",
+            referencedColumnName = "OMSORGSARBEID_PERIODE_ID"
+        )],
         inverseJoinColumns = [JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")]
     )
     val omsorgsytere: List<Person> = listOf(),
 
-    @ManyToMany(fetch =  FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "OMSORGSARBEIDSMOTTAKER",
-        joinColumns = [JoinColumn(name = "OMSORGSARBEID_PERIODE_ID", referencedColumnName = "OMSORGSARBEID_PERIODE_ID")],
+        joinColumns = [JoinColumn(
+            name = "OMSORGSARBEID_PERIODE_ID",
+            referencedColumnName = "OMSORGSARBEID_PERIODE_ID"
+        )],
         inverseJoinColumns = [JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")]
     )
     val omsorgsmottakere: List<Person> = listOf(),
 )
 
-fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(ar: Int) = (getAlleUtbetalingMoneder() begrensTilAr ar).antall()
+fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(ar: Int) =
+    (mergeAllePerioder() begrensTilAr ar).antallMoneder()
 
-fun List<OmsorgsarbeidPeriode>.getAlleUtbetalingMoneder(): UtbetalingMoneder {
-    val alleUtbetalingsMoneder = map{ UtbetalingMoneder(it.fom, it.tom) }
-    return alleUtbetalingsMoneder.fold(initial = UtbetalingMoneder()) { acc, moneder -> acc + moneder }
+fun List<OmsorgsarbeidPeriode>.mergeAllePerioder(): Periode {
+    val alleUtbetalingsPeriode = map { Periode(it.fom, it.tom) }
+    return alleUtbetalingsPeriode.fold(initial = Periode()) { accPeriod, newPeriode -> accPeriod + newPeriode }
 }

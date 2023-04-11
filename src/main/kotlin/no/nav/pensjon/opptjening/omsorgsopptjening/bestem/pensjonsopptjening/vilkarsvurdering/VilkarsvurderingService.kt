@@ -47,7 +47,7 @@ class VilkarsvurderingService {
                         GrunnlagOmsorgForBarnUnder6(
                             omsorgsAr = omsorgsAr,
                             omsorgsmottaker = it,
-                            omsorgsArbeid100Prosent = snapshot.getOmsorgsarbeidPerioder(omsorgsyter, it, prosent = 100),
+                            omsorgsArbeid100Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(omsorgsyter, it, prosent = 100),
                         )
                     )
                 },
@@ -57,7 +57,7 @@ class VilkarsvurderingService {
                             omsorgsAr = omsorgsAr,
                             omsorgsyter = snapshot.omsorgsyter,
                             omsorgsmottaker = it,
-                            omsorgsArbeid50Prosent = snapshot.getOmsorgsarbeidPerioder(omsorgsyter, it, prosent = 50),
+                            omsorgsArbeid50Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(omsorgsyter, it, prosent = 50),
                             andreParter = relaterteSnapshot.createAndreParter(it),
                         )
                     )
@@ -71,7 +71,7 @@ private fun List<OmsorgsarbeidSnapshot>.createAndreParter(omsorgsmottaker: Perso
     map {
         AnnenPart(
             omsorgsyter = it.omsorgsyter,
-            omsorgsArbeid50Prosent = it.getOmsorgsarbeidPerioder(it.omsorgsyter, omsorgsmottaker, prosent = 50),
+            omsorgsArbeid50Prosent = it.getOmsorgsarbeidPerioderForRelevanteAr(it.omsorgsyter, omsorgsmottaker, prosent = 50),
             harInvilgetOmsorgForUrelaterBarn = false, // TODO
         )
     }.filter { it.omsorgsArbeid50Prosent.isNotEmpty() }
