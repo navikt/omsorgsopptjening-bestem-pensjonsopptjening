@@ -7,7 +7,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.SammenstiltVilkarsvurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.SamletVilkarsresultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.hentOmsorgForBarnUnder6VilkarsVurderinger
 import org.springframework.stereotype.Service
 
@@ -22,20 +21,27 @@ class OmsorgsOpptjeningService(
     fun behandlOmsorgsarbeid(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot) {
         val relaterteOmsorgsarbeidSnapshot = omsorgsArbeidService.relaterteSnapshot(omsorgsarbeidSnapshot)
 
-        val individuellVurderinger: List<SamletVilkarsresultat> = (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot).map { individuellVilkarsvurdering.vilkarsvurder(omsorgsarbeidSnapshot) }
+        val samledeVilkarsresultat =
+            (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot).map { SamletVilkarsresultat(snapshot = it) }
 
-        val vilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(omsorgsarbeidSnapshot)
+        samledeVilkarsresultat.forEach {
+            it.individueltVilkarsresultat = individuellVilkarsvurdering.vilkarsvurder(it.snapshot)
+        }
 
-        individuellVurderinger.forEach {
-            publiserOmsorgsOpptjening(it.snapshot, it.individueltVilkarsresultat!!)
+        //TODO samlet vilkarsvurdering
+
+
+        samledeVilkarsresultat.forEach {
+            publiserOmsorgsOpptjening(it)
         }
     }
 
 
-    private fun publiserOmsorgsOpptjening(
-        omsorgsArbeidSnapshot: OmsorgsarbeidSnapshot,
-        vilkarsVurdering: VilkarsVurdering<*>
-    ) =
+    private fun publiserOmsorgsOpptjening(samletVilkarsresultat: SamletVilkarsresultat) {
+        //TODO legg in sammenstilt opplegg i omsorgsopptjening!!
+        val omsorgsArbeidSnapshot = samletVilkarsresultat.snapshot
+        val vilkarsVurdering = samletVilkarsresultat.individueltVilkarsresultat!!
+
         omsorgsOpptejningProducer.publiserOmsorgsopptejning(
             OmsorgsOpptjening(
                 omsorgsAr = omsorgsArbeidSnapshot.omsorgsAr,
@@ -48,4 +54,5 @@ class OmsorgsOpptjeningService(
                     .map { it.grunnlag.omsorgsmottaker }
             )
         )
+    }
 }

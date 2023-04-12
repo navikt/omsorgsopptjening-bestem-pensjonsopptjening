@@ -6,7 +6,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.OmsorgsgiverUnder70Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.GrunnlagOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.OmsorgsGiverOgOmsorgsAr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.SamletVilkarsresultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Eller.Companion.minstEn
@@ -16,41 +15,38 @@ import org.springframework.stereotype.Service
 @Service
 class IndividuellVilkarsvurdering {
 
-    fun vilkarsvurder(snapshot: OmsorgsarbeidSnapshot): SamletVilkarsresultat {
+    fun vilkarsvurder(snapshot: OmsorgsarbeidSnapshot): VilkarsVurdering<*> {
         val omsorgsAr = snapshot.omsorgsAr
         val omsorgsyter = snapshot.omsorgsyter
         val omsorgsmottakere = snapshot.getOmsorgsmottakere(omsorgsyter)
 
-        return SamletVilkarsresultat(
-            snapshot = snapshot,
-            individueltVilkarsresultat = og(
-                OmsorgsgiverOver16Ar().vilkarsVurder(
-                    OmsorgsGiverOgOmsorgsAr(
-                        omsorgsAr = omsorgsAr,
-                        omsorgsgiver = omsorgsyter
-                    )
-                ),
-                OmsorgsgiverUnder70Ar().vilkarsVurder(
-                    OmsorgsGiverOgOmsorgsAr(
-                        omsorgsAr = omsorgsAr,
-                        omsorgsgiver = omsorgsyter
-                    )
-                ),
-                eller(
-                    omsorgsmottakere.minstEn {
-                        FullOmsorgForBarnUnder6().vilkarsVurder(
-                            GrunnlagOmsorgForBarnUnder6(
-                                omsorgsAr = omsorgsAr,
-                                omsorgsmottaker = it,
-                                omsorgsArbeid100Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
-                                    omsorgsyter,
-                                    it,
-                                    prosent = 100
-                                ),
-                            )
-                        )
-                    }
+        return og(
+            OmsorgsgiverOver16Ar().vilkarsVurder(
+                OmsorgsGiverOgOmsorgsAr(
+                    omsorgsAr = omsorgsAr,
+                    omsorgsgiver = omsorgsyter
                 )
+            ),
+            OmsorgsgiverUnder70Ar().vilkarsVurder(
+                OmsorgsGiverOgOmsorgsAr(
+                    omsorgsAr = omsorgsAr,
+                    omsorgsgiver = omsorgsyter
+                )
+            ),
+            eller(
+                omsorgsmottakere.minstEn {
+                    FullOmsorgForBarnUnder6().vilkarsVurder(
+                        GrunnlagOmsorgForBarnUnder6(
+                            omsorgsAr = omsorgsAr,
+                            omsorgsmottaker = it,
+                            omsorgsArbeid100Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
+                                omsorgsyter,
+                                it,
+                                prosent = 100
+                            ),
+                        )
+                    )
+                }
             )
         )
     }
