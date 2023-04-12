@@ -29,17 +29,17 @@ class SammenstiltVilkarsvurdering {
                     omsorgsyter = snapshot.omsorgsyter,
                     omsorgsmottaker = it,
                     omsorgsArbeid50Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
-                        omsorgsyter,
-                        it,
+                        omsorgsyter = omsorgsyter,
+                        omsorgsmottaker = it,
                         prosent = 50
                     ),
-                    andreParter = involverteVilkarsresultat.createAndreParter(it),
+                    andreParter = involverteVilkarsresultat.mapToAndreParter(it),
                 )
             )
         }
     }
 
-    private fun List<Vilkarsresultat>.createAndreParter(omsorgsmottaker: Person) =
+    private fun List<Vilkarsresultat>.mapToAndreParter(omsorgsmottaker: Person) =
         map {
             AnnenPart(
                 omsorgsyter = it.snapshot.omsorgsyter,
