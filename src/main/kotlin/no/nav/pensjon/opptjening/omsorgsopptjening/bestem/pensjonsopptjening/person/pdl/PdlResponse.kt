@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
+import com.fasterxml.jackson.annotation.JsonFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class PdlResponse(val data: PdlData, private val errors: List<PdlError>? = null) {
@@ -28,7 +30,10 @@ data class Foedsel(
     val folkeregistermetadata: Folkeregistermetadata? = null,
 )
 
-data class Doedsfall(val doedsdato: String)
+data class Doedsfall(
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    val doedsdato: LocalDate
+)
 
 data class Metadata(val historisk: Boolean, val master: String, val endringer: List<Endring> = emptyList())
 

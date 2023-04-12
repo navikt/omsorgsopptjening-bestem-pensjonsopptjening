@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: PdlClient) {
@@ -15,10 +16,14 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
 
         return PdlPerson(
             alleFnr = historisk + gjeldende,
-            fodselsAr = hentPersonQueryResponse.foedselsAr()
+            fodselsAr = hentPersonQueryResponse.foedselsAr(),
+            doedsdato = bestemDoedsdato(pdlResponse.data.hentPerson.doedsfall)
         )
     }
 
+    private fun bestemDoedsdato(doedsfall: List<Doedsfall?>): LocalDate? {
+        return doedsfall.firstOrNull()?.doedsdato
+    }
     private fun HentPersonQueryResponse.historisk() = folkeregisteridentifikator
         .filter { it.status == Status.OPPHOERT }
         .distinctBy { it.identifikasjonsnummer }
@@ -39,7 +44,7 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         }
 }
 
-data class PdlPerson(val alleFnr: List<PdlFnr>, val fodselsAr: Int){
+data class PdlPerson(val alleFnr: List<PdlFnr>, val fodselsAr: Int, val doedsdato: LocalDate? = null){
 
     val gjeldendeFnr: String get() = alleFnr.first { it.gjeldende }.fnr
     val historiskeFnr: List<String> get() = alleFnr.filter { !it.gjeldende }.map { it.fnr }
