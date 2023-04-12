@@ -16,7 +16,7 @@ fun OmsorgsOpptjening.kafkaValue(): String = no.nav.pensjon.opptjening.omsorgsop
         person = Person(person.gjeldendeFnr.fnr),
         omsorgsmottakereInvilget = omsorgsmottakereInvilget.map { Person(it.gjeldendeFnr.fnr) },
         grunnlag = OmsorgsarbeidSnapshotMapper.map(grunnlag),
-        omsorgsopptjeningResultater = omsorgsopptjeningResultater.mapToJson(),
+        omsorgsopptjeningResultater = vilkarsResultat.mapToJson(),
         utfall = mapUtfall(utfall)
     ).mapToJson()
 

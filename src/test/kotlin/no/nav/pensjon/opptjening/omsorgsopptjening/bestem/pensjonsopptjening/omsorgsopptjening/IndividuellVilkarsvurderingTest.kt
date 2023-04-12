@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.hentOmsorgForBarnUnder6VilkarsVurderinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.hentVilkarsVurderingerFullOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.IndividuellVilkarsvurdering
@@ -203,8 +203,8 @@ internal class IndividuellVilkarsvurderingTest {
 
         val individuellVilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
 
-        val barnUnder6Invilget = hentOmsorgForBarnUnder6VilkarsVurderinger(individuellVilkarsVurdering).filter { it.utfall == Utfall.INVILGET }
-        val barnUnder6IkkeInvilget = hentOmsorgForBarnUnder6VilkarsVurderinger(individuellVilkarsVurdering).filter { it.utfall != Utfall.INVILGET }
+        val barnUnder6Invilget = individuellVilkarsVurdering.hentVilkarsVurderingerFullOmsorgForBarnUnder6().filter { it.utfall == Utfall.INVILGET }
+        val barnUnder6IkkeInvilget = individuellVilkarsVurdering.hentVilkarsVurderingerFullOmsorgForBarnUnder6().filter { it.utfall != Utfall.INVILGET }
 
         assertEquals(barnUnder6Invilget.size, 2)
         assertEquals(1, barnUnder6Invilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker1}.size)
