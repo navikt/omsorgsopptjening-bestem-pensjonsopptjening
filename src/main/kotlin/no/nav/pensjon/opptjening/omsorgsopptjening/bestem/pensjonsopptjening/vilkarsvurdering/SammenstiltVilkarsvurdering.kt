@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.DeltOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.AnnenPart
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.GrunnlagDeltOmsorgForBarnUnder6
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.SamletVilkarsresultat
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Vilkarsresultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Eller.Companion.minstEn
@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service
 @Service
 class SammenstiltVilkarsvurdering {
     fun vilkarsvurder(
-        aktuelleSamletVilkarsresultat: SamletVilkarsresultat,
-        involverteSamletVilkarsresultat: List<SamletVilkarsresultat>
+        behandledeVilkarsresultat: Vilkarsresultat,
+        involverteVilkarsresultat: List<Vilkarsresultat>
     ): VilkarsVurdering<*> {
-        val snapshot: OmsorgsarbeidSnapshot = aktuelleSamletVilkarsresultat.snapshot
+        val snapshot: OmsorgsarbeidSnapshot = behandledeVilkarsresultat.snapshot
         val omsorgsAr: Int = snapshot.omsorgsAr
         val omsorgsyter: Person = snapshot.omsorgsyter
         val omsorgsmottakere: List<Person> = snapshot.getOmsorgsmottakere(omsorgsyter)
@@ -33,13 +33,13 @@ class SammenstiltVilkarsvurdering {
                         it,
                         prosent = 50
                     ),
-                    andreParter = involverteSamletVilkarsresultat.createAndreParter(it),
+                    andreParter = involverteVilkarsresultat.createAndreParter(it),
                 )
             )
         }
     }
 
-    private fun List<SamletVilkarsresultat>.createAndreParter(omsorgsmottaker: Person) =
+    private fun List<Vilkarsresultat>.createAndreParter(omsorgsmottaker: Person) =
         map {
             AnnenPart(
                 omsorgsyter = it.snapshot.omsorgsyter,
@@ -48,7 +48,7 @@ class SammenstiltVilkarsvurdering {
                     omsorgsmottaker,
                     prosent = 50
                 ),
-                harInvilgetOmsorgForUrelaterBarn = it.individueltVilkarsresultat!!.utfall == Utfall.INVILGET,
+                harInvilgetOmsorgForUrelaterBarn = it.individueltVilkarsVurdering!!.utfall == Utfall.INVILGET,
             )
         }.filter { it.omsorgsArbeid50Prosent.isNotEmpty() }
 }

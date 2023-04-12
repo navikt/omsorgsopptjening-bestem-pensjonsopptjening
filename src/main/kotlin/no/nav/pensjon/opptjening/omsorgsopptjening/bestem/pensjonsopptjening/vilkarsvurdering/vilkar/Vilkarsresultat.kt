@@ -2,8 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vi
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
 
-data class SamletVilkarsresultat(
+data class Vilkarsresultat(
     val snapshot: OmsorgsarbeidSnapshot,
-    var individueltVilkarsresultat: VilkarsVurdering<*>? = null,
-    var sammenstiltVilkarsresultat: VilkarsVurdering<*>? = null,
+    var individueltVilkarsVurdering: VilkarsVurdering<*>? = null,
+    var sammenstiltVilkarsVurdering: VilkarsVurdering<*>? = null,
 )

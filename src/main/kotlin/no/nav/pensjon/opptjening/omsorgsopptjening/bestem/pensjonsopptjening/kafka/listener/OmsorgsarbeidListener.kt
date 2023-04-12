@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ka
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsArbeidService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsOpptjeningService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsopptjeningsService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 @Component
 class OmsorgsarbeidListener(
     registry: MeterRegistry,
-    private val omsorgsOpptjeningService: OmsorgsOpptjeningService,
+    private val omsorgsopptjeningsService: OmsorgsopptjeningsService,
     private val omsorgsArbeidService: OmsorgsArbeidService,
 ) {
 
@@ -38,7 +38,7 @@ class OmsorgsarbeidListener(
         if (consumerRecord.kafkaMessageType() == KafkaMessageType.OMSORGSARBEID) {
             SECURE_LOG.info("Behandler: ${consumerRecord.value()}")
 
-            omsorgsOpptjeningService.behandlOmsorgsarbeid(
+            omsorgsopptjeningsService.behandlOmsorgsarbeid(
                 omsorgsArbeidService.createAndSaveOmsorgasbeidsSnapshot(map(consumerRecord.value()))
             )
         }
