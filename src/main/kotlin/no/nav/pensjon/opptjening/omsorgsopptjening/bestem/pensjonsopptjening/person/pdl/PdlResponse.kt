@@ -11,6 +11,7 @@ data class PdlData(val hentPerson: HentPersonQueryResponse?)
 data class HentPersonQueryResponse(
     val folkeregisteridentifikator: List<Folkeregisteridentifikator>,
     val foedsel: List<Foedsel>,
+    val doedsfall: List<Doedsfall>
 )
 
 data class Folkeregisteridentifikator(
@@ -26,6 +27,8 @@ data class Foedsel(
     val metadata: Metadata,
     val folkeregistermetadata: Folkeregistermetadata? = null,
 )
+
+data class Doedsfall(val doedsdato: String)
 
 data class Metadata(val historisk: Boolean, val master: String, val endringer: List<Endring> = emptyList())
 

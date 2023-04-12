@@ -17,6 +17,10 @@ query pdlPerson($ident: ID!) {
                 }
             }
         }
+         doedsfall {
+            doedsdato
+        }
+
         folkeregisteridentifikator(historikk: true) {
             identifikasjonsnummer
             status
