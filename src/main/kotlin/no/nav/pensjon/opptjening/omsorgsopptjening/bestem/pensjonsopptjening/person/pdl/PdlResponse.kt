@@ -11,7 +11,7 @@ data class PdlData(val hentPerson: HentPersonQueryResponse?)
 data class HentPersonQueryResponse(
     val folkeregisteridentifikator: List<Folkeregisteridentifikator>,
     val foedsel: List<Foedsel>,
-    val doedsfall: List<Doedsfall>
+    val doedsfall: List<Doedsfall?>
 )
 
 data class Folkeregisteridentifikator(

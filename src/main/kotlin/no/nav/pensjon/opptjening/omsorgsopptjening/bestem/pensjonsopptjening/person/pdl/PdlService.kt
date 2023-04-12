@@ -9,7 +9,7 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         val pdlResponse = pdlClient.hentPerson(graphqlQuery = graphqlQuery.getPersonFodselsaarQuery(), fnr = fnr)
 
         //TODO remove this!
-        println("Doedsfall: ${pdlResponse?.data?.hentPerson?.doedsfall?.forEach { it.doedsdato }}")
+        println("Doedsfall: ${pdlResponse?.data?.hentPerson?.doedsfall?.forEach { it?.doedsdato }}")
 
         val hentPersonQueryResponse = pdlResponse?.data?.hentPerson ?: throw PdlException(pdlResponse?.error)
 
