@@ -21,21 +21,30 @@ class OmsorgsOpptjeningService(
     fun behandlOmsorgsarbeid(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot) {
         val relaterteOmsorgsarbeidSnapshot = omsorgsArbeidService.relaterteSnapshot(omsorgsarbeidSnapshot)
 
-        val samledeVilkarsresultat =
-            (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot).map { SamletVilkarsresultat(snapshot = it) }
+        (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot)
+            .map { SamletVilkarsresultat(snapshot = it) }
+            .utforIndividuellVilkarsvurdering()
+            .utforSammenstiltVilkarsvurdering()
+            .publiserOmsorgsOpptjening()
 
-        samledeVilkarsresultat.forEach {
-            it.individueltVilkarsresultat = individuellVilkarsvurdering.vilkarsvurder(it.snapshot)
-        }
+    }
 
-        //TODO samlet vilkarsvurdering
-
-
-        samledeVilkarsresultat.forEach {
-            publiserOmsorgsOpptjening(it)
+    private fun List<SamletVilkarsresultat>.utforIndividuellVilkarsvurdering() = map {
+        it.apply {
+            individueltVilkarsresultat = individuellVilkarsvurdering.vilkarsvurder(it.snapshot)
         }
     }
 
+    private fun List<SamletVilkarsresultat>.utforSammenstiltVilkarsvurdering() = map {
+        it.apply {
+            sammenstiltVilkarsresultat = sammenstiltVilkarsvurdering.vilkarsvurder(
+                aktuelleSamletVilkarsresultat = it,
+                involverteSamletVilkarsresultat = filter { involverte -> involverte.snapshot.omsorgsyter.erSammePerson(it.snapshot.omsorgsyter) }
+            )
+        }
+    }
+
+    private fun List<SamletVilkarsresultat>.publiserOmsorgsOpptjening() = forEach { publiserOmsorgsOpptjening(it) }
 
     private fun publiserOmsorgsOpptjening(samletVilkarsresultat: SamletVilkarsresultat) {
         //TODO legg in sammenstilt opplegg i omsorgsopptjening!!
@@ -56,3 +65,5 @@ class OmsorgsOpptjeningService(
         )
     }
 }
+
+
