@@ -5,10 +5,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.IndividuellVilkarsvurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.SammenstiltVilkarsvurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.SamletVilkarsresultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.hentOmsorgForBarnUnder6VilkarsVurderinger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,16 +22,14 @@ class OmsorgsOpptjeningService(
     fun behandlOmsorgsarbeid(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot) {
         val relaterteOmsorgsarbeidSnapshot = omsorgsArbeidService.relaterteSnapshot(omsorgsarbeidSnapshot)
 
-        val individuellVurderinger = (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot)
-            .map { individuellVilkarsvurdering.vilkarsvurder(omsorgsarbeidSnapshot) }
-
+        val individuellVurderinger: List<SamletVilkarsresultat> = (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot).map { individuellVilkarsvurdering.vilkarsvurder(omsorgsarbeidSnapshot) }
 
         val vilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(omsorgsarbeidSnapshot)
 
-        publiserOmsorgsOpptjening(omsorgsarbeidSnapshot, vilkarsVurdering.vilkarsvurdering)
+        individuellVurderinger.forEach {
+            publiserOmsorgsOpptjening(it.snapshot, it.individueltVilkarsresultat!!)
+        }
     }
-
-
 
 
     private fun publiserOmsorgsOpptjening(

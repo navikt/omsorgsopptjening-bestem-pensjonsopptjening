@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.OmsorgsgiverUnder70Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.GrunnlagOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.OmsorgsGiverOgOmsorgsAr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.SamletVilkarsresultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Eller.Companion.minstEn
@@ -15,14 +16,14 @@ import org.springframework.stereotype.Service
 @Service
 class IndividuellVilkarsvurdering {
 
-    fun vilkarsvurder(snapshot: OmsorgsarbeidSnapshot): IndividueltVilkarsresultat {
+    fun vilkarsvurder(snapshot: OmsorgsarbeidSnapshot): SamletVilkarsresultat {
         val omsorgsAr = snapshot.omsorgsAr
         val omsorgsyter = snapshot.omsorgsyter
         val omsorgsmottakere = snapshot.getOmsorgsmottakere(omsorgsyter)
 
-        return IndividueltVilkarsresultat(
+        return SamletVilkarsresultat(
             snapshot = snapshot,
-            vilkarsvurdering = og(
+            individueltVilkarsresultat = og(
                 OmsorgsgiverOver16Ar().vilkarsVurder(
                     OmsorgsGiverOgOmsorgsAr(
                         omsorgsAr = omsorgsAr,
@@ -54,5 +55,3 @@ class IndividuellVilkarsvurdering {
         )
     }
 }
-
-data class IndividueltVilkarsresultat(val snapshot: OmsorgsarbeidSnapshot, val vilkarsvurdering: VilkarsVurdering<*>)
