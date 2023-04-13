@@ -20,7 +20,7 @@ class OmsorgsopptjeningMockListener {
         topics = ["\${OMSORGSOPPTJENING_TOPIC}"],
         groupId = "TEST"
     )
-    fun consumeOmsorgPGodskriving(hendelse: String, record: ConsumerRecord<String, String>, ack: Acknowledgment) {
+    private fun consumeOmsorgPGodskriving(hendelse: String, record: ConsumerRecord<String, String>, ack: Acknowledgment) {
         records.add(record)
         ack.acknowledge()
     }
