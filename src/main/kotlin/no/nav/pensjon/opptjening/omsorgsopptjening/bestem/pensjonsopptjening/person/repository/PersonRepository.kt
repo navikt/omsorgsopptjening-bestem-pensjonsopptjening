@@ -20,7 +20,7 @@ class PersonRepository(
 
         return if (persistedPerson == null) {
             personJpaRepository.save(
-                Person(fodselsAr = pdlPerson.fodselsAr).apply {
+                Person(fodselsAr = pdlPerson.fodselsAr, doedsdato = pdlPerson.doedsdato).apply {
                     oppdaterFnr(pdlPerson.alleFnr)
                 }
             )
@@ -28,6 +28,7 @@ class PersonRepository(
             fnrRepository.deleteFnrNotInPdl(persistedPerson, pdlPerson)
             persistedPerson.apply {
                 if (fodselsAr != pdlPerson.fodselsAr) fodselsAr = pdlPerson.fodselsAr
+                if (doedsdato != pdlPerson.doedsdato) doedsdato = pdlPerson.doedsdato
                 oppdaterFnr(pdlPerson.alleFnr)
             }
         }

@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import jakarta.persistence.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlFnr
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity
@@ -15,6 +16,8 @@ class Person(
     val alleFnr: MutableSet<Fnr> = mutableSetOf(),
     @Column(name = "FODSELSAR", nullable = false)
     var fodselsAr: Int,
+    @Column(name = "DOEDSDATO")
+    var doedsdato: LocalDate? = null,
     @Column(name = "TIMESTAMP", nullable = false)
     var timestamp: LocalDateTime = LocalDateTime.now()
 ) {

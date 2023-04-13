@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.LocalDateConverter
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.listener.OmsorgsarbeidListenerTest
@@ -11,10 +12,14 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.converter.ConvertWith
+import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.test.context.EmbeddedKafka
+import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -60,7 +65,7 @@ internal class PersonRepositoryTest {
     @Test
     fun `Given updating saved person with more historiskeFnr When updatePerson with pdlPerson Then new fnrs should be added`() {
         val initialPdlPerson = PdlPerson(
-            alleFnr = listOf(PdlFnr("1111", true),),
+            alleFnr = listOf(PdlFnr("1111", true)),
             fodselsAr = 2000
         )
         personRepository.updatePerson(initialPdlPerson)
@@ -84,6 +89,44 @@ internal class PersonRepositoryTest {
         assertContainsOnlySameFnrs(updatedPdlPerson, updatedPerson)
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        value = [
+            "2018-12-25, 2018-10-10",
+            "2018-12-25, null",
+            "null, 2018-12-25",
+        ],
+        nullValues = ["null"],
+    )
+    fun `Given updating saved person When person now has doedsdato Then doedsdato should be added`(
+        @ConvertWith(LocalDateConverter::class) initialDoedsdato: LocalDate?,
+        @ConvertWith(LocalDateConverter::class) finalDoedsdato: LocalDate?
+    ) {
+        val fnr = listOf(PdlFnr("1111", true))
+
+        val initialPdlPerson = PdlPerson(
+            alleFnr = fnr,
+            fodselsAr = 2000,
+            doedsdato = initialDoedsdato,
+        )
+
+        val updatedPdlPerson = PdlPerson(
+            alleFnr = fnr,
+            fodselsAr = 2000,
+            doedsdato = finalDoedsdato
+        )
+
+        personRepository.updatePerson(initialPdlPerson)
+        personRepository.updatePerson(updatedPdlPerson)
+
+        val updatedPerson = personRepository.findPersonByFnr("1111")
+
+        assertNotNull(updatedPerson)
+        assertEquals(updatedPdlPerson.gjeldendeFnr, updatedPerson.gjeldendeFnr.fnr)
+        assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
+        assertEquals(updatedPdlPerson.doedsdato, finalDoedsdato)
+    }
+
     @Test
     fun `Given updating saved person with less historiskeFnr When updatePerson with pdlPerson Then remove historiskeFnr`() {
         val initialPdlPerson = PdlPerson(
@@ -97,12 +140,12 @@ internal class PersonRepositoryTest {
         personRepository.updatePerson(initialPdlPerson)
 
         val updatedPdlPerson = PdlPerson(
-            alleFnr = listOf(PdlFnr("1111", true),),
+            alleFnr = listOf(PdlFnr("1111", true)),
             fodselsAr = 2000
         )
         personRepository.updatePerson(updatedPdlPerson)
 
-        val updatedPerson= personRepository.findPersonByFnr("1111")
+        val updatedPerson = personRepository.findPersonByFnr("1111")
 
         assertNotNull(updatedPerson)
         assertEquals(updatedPdlPerson.fodselsAr, updatedPerson.fodselsAr)
@@ -201,11 +244,14 @@ internal class PersonRepositoryTest {
         assertEquals(person.alleFnr.size, allFnrsPdl.size, "Det er flere fnr i person enn i pdlPerson")
     }
 
-    private fun assertOnlyFnrsFromPdlPersonExistsInDb(pdlPerson: PdlPerson){
+    private fun assertOnlyFnrsFromPdlPersonExistsInDb(pdlPerson: PdlPerson) {
         val allFnrsInDb = fnrJpaRepository.findAll().toSet()
         val allFnrsFromPdl = (pdlPerson.historiskeFnr + pdlPerson.gjeldendeFnr).toSet()
 
-        assertTrue(allFnrsFromPdl.all { allFnrsInDb.map {dbFnr ->  dbFnr.fnr }.contains(it)}, "Alle fnr fra pdl var ikke i database")
+        assertTrue(
+            allFnrsFromPdl.all { allFnrsInDb.map { dbFnr -> dbFnr.fnr }.contains(it) },
+            "Alle fnr fra pdl var ikke i database"
+        )
         assertEquals(allFnrsFromPdl.size, allFnrsInDb.size, "Det er flere fnr i db enn i pdlPerson")
     }
 }
