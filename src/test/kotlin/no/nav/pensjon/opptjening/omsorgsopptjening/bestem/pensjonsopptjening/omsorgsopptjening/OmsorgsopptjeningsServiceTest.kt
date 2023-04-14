@@ -5,7 +5,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.mapToClass
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.listener.OmsorgsarbeidListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.listener.OmsorgsarbeidListenerTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidSnapshotRepository
@@ -15,7 +14,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,7 +40,7 @@ class OmsorgsopptjeningsServiceTest {
     private lateinit var omsorgsopptjeningsService: OmsorgsopptjeningsService
 
     @Autowired
-    private lateinit var omsorgsopptjeningMockListener : OmsorgsopptjeningMockListener
+    private lateinit var omsorgsopptjeningMockListener: OmsorgsopptjeningMockListener
 
     @BeforeEach
     fun clearDb() {
@@ -73,12 +71,14 @@ class OmsorgsopptjeningsServiceTest {
 
         val snapshotOmsorgsyter1 = creatOmsorgsArbeidSnapshot(
             omsorgsyter = omsorgsYter1,
-            omsorgsArbeidSaker = listOf(OmsorgsarbeidSak(omsorgsarbeidPerioder = listOf(omsorgsPeriode1)))
+            omsorgsArbeidSaker = listOf(OmsorgsarbeidSak(omsorgsarbeidPerioder = listOf(omsorgsPeriode1))),
+            omsorgsAr = OMSORGS_AR_2020
         )
 
         val snapshotOmsorgsyter2 = creatOmsorgsArbeidSnapshot(
             omsorgsyter = omsorgsYter2,
-            omsorgsArbeidSaker = listOf(OmsorgsarbeidSak(omsorgsarbeidPerioder = listOf(omsorgsPeriode2)))
+            omsorgsArbeidSaker = listOf(OmsorgsarbeidSak(omsorgsarbeidPerioder = listOf(omsorgsPeriode2))),
+            omsorgsAr = OMSORGS_AR_2020
         )
 
         omsorgsarbeidRepository.save(snapshotOmsorgsyter1)
@@ -106,7 +106,7 @@ class OmsorgsopptjeningsServiceTest {
 
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsyter: Person,
-        omsorgsAr: Int = OMSORGS_AR_2020,
+        omsorgsAr: Int,
         kjoreHashe: String = KJORE_HASHE,
         omsorgstype: Omsorgstype = TYPE_BARNETRYGD,
         kilde: Kilde = KILDE_BARNETRYGD,

@@ -31,7 +31,7 @@ class VilkarsVurderingsService(
         it.apply {
             sammenstiltVilkarsVurdering = sammenstiltVilkarsvurdering.vilkarsvurder(
                 behandledeVilkarsresultat = it,
-                involverteVilkarsresultat = filter { involverte -> involverte.snapshot.omsorgsyter.erSammePerson(it.snapshot.omsorgsyter) }
+                involverteVilkarsresultat = filter { involverte -> !involverte.snapshot.omsorgsyter.erSammePerson(it.snapshot.omsorgsyter) }
             )
         }
     }
