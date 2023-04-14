@@ -8,7 +8,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 
 class OmsorgsOpptjening(
     val omsorgsAr: Int,
-    val person: Person,
+    val omsorgsyter: Person,
     val grunnlag: OmsorgsarbeidSnapshot,
     val vilkarsResultat: Vilkarsresultat,
     val utfall: Utfall,

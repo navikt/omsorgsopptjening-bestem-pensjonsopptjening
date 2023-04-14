@@ -13,15 +13,15 @@ class OmsorgsarbeidSnapshotMapper {
                 omsorgstype = convertToOmsorgstype(omsorgsarbeidsSnapshot.omsorgstype),
                 kilde = convertToKilde(omsorgsarbeidsSnapshot.kilde),
                 kjoreHashe = omsorgsarbeidsSnapshot.kjoreHash,
-                omsorgsarbeidSaker = omsorgsarbeidsSnapshot.omsorgsArbeidSaker.map { sak ->
+                omsorgsarbeidSaker = omsorgsarbeidsSnapshot.omsorgsarbeidSaker.map { sak ->
                     OmsorgsarbeidSak(
-                        omsorgsarbeidPerioder = sak.omsorgsarbedUtfort.map { arbeid ->
+                        omsorgsarbeidPerioder = sak.omsorgsarbeidPerioder.map { arbeid ->
                             OmsorgsarbeidPeriode(
                                 fom = arbeid.fom,
                                 tom = arbeid.tom,
                                 prosent = arbeid.prosent,
                                 omsorgsytere = arbeid.omsorgsytere.map { persistertePersoner.hentPerson(it.fnr) },
-                                omsorgsmottakere = arbeid.omsorgsmottaker.map { persistertePersoner.hentPerson(it.fnr) },
+                                omsorgsmottakere = arbeid.omsorgsmottakere.map { persistertePersoner.hentPerson(it.fnr) },
                             )
                         }
                     )
@@ -35,15 +35,15 @@ class OmsorgsarbeidSnapshotMapper {
                 omsorgstype = convertToOmsorgsarbeidsType(omsorgsarbeidSnapshot.omsorgstype),
                 kjoreHash = omsorgsarbeidSnapshot.kjoreHashe,
                 kilde = convertToOmsorgsarbeidsKilde(omsorgsarbeidSnapshot.kilde),
-                omsorgsArbeidSaker = omsorgsarbeidSnapshot.omsorgsarbeidSaker.map { sak ->
+                omsorgsarbeidSaker = omsorgsarbeidSnapshot.omsorgsarbeidSaker.map { sak ->
                     OmsorgsArbeidSak(
-                        omsorgsarbedUtfort = sak.omsorgsarbeidPerioder.map { periode ->
+                        omsorgsarbeidPerioder = sak.omsorgsarbeidPerioder.map { periode ->
                             OmsorgsArbeid(
                                 fom = periode.fom,
                                 tom = periode.tom,
                                 prosent = periode.prosent,
                                 omsorgsytere = periode.omsorgsytere.map { convertPerson(it) }.toSet(),
-                                omsorgsmottaker = periode.omsorgsmottakere.map { convertPerson(it) }.toSet(),
+                                omsorgsmottakere = periode.omsorgsmottakere.map { convertPerson(it) }.toSet(),
                             )
                         }
                     )

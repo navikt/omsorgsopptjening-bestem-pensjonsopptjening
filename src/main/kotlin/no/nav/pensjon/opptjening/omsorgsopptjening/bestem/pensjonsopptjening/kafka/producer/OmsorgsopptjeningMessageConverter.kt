@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.producer
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.mapper.OmsorgsarbeidSnapshotMapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsOpptjening
@@ -9,14 +9,18 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
 
 
-fun OmsorgsOpptjening.kafkaKey(): String = OmsorgsOpptjeningKey(omsorgsAr, person.gjeldendeFnr.fnr, mapUtfall(utfall)).mapToJson()
+fun OmsorgsOpptjening.kafkaKey(): String = OmsorgsOpptjeningKey(
+    omsorgsAr = omsorgsAr,
+    omsorgsyter = omsorgsyter.gjeldendeFnr.fnr,
+    utfall = mapUtfall(utfall)
+).mapToJson()
 
 fun OmsorgsOpptjening.kafkaValue(): String = no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening(
         omsorgsAr = omsorgsAr,
-        person = Person(person.gjeldendeFnr.fnr),
+        omsorgsyter = Person(omsorgsyter.gjeldendeFnr.fnr),
         omsorgsmottakereInvilget = omsorgsmottakereInvilget.map { Person(it.gjeldendeFnr.fnr) },
         grunnlag = OmsorgsarbeidSnapshotMapper.map(grunnlag),
-        omsorgsopptjeningResultater = vilkarsResultat.mapToJson(),
+        vilkarsResultat = vilkarsResultat.mapToJson(),
         utfall = mapUtfall(utfall)
     ).mapToJson()
 
@@ -25,5 +29,5 @@ private fun mapUtfall(utfall: Utfall): OpptjeningUtfall =
         Utfall.INVILGET -> OpptjeningUtfall.INVILGET
         Utfall.AVSLAG -> OpptjeningUtfall.AVSLAG
         Utfall.SAKSBEHANDLING -> OpptjeningUtfall.SAKSBEHANDLING
-        Utfall.MANGLER_ANNEN_OMSORGSYTER -> OpptjeningUtfall.SAKSBEHANDLING //TODO Må endres
+        Utfall.MANGLER_ANNEN_OMSORGSYTER -> OpptjeningUtfall.MANGLER_INFORMASJON_OM_ANNEN_OMSORGSYTER
     }

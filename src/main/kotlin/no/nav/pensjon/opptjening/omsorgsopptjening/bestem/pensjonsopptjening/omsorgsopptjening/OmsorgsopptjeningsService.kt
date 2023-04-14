@@ -22,7 +22,7 @@ class OmsorgsopptjeningsService(
         omsorgsOpptejningProducer.publiserOmsorgsopptejning(
             OmsorgsOpptjening(
                 omsorgsAr = vilkarsresultat.getOmsorgsAr(),
-                person = vilkarsresultat.getOmsorgsyter(),
+                omsorgsyter = vilkarsresultat.getOmsorgsyter(),
                 grunnlag = vilkarsresultat.snapshot,
                 vilkarsResultat = vilkarsresultat,
                 utfall = vilkarsresultat.getUtfall(),

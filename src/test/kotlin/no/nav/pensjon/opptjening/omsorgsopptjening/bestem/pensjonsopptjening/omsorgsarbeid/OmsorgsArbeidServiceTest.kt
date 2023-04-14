@@ -142,8 +142,8 @@ internal class OmsorgsArbeidServiceTest {
             omsorgstype = omsorgstype,
             kjoreHash = "XXX",
             kilde = OmsorgsarbeidsKilde.BARNETRYGD,
-            omsorgsArbeidSaker = listOf(
-                OmsorgsArbeidSak(omsorgsarbedUtfort = omsorgsarbeid)
+            omsorgsarbeidSaker = listOf(
+                OmsorgsArbeidSak(omsorgsarbeidPerioder = omsorgsarbeid)
             )
         )
     }
@@ -158,7 +158,7 @@ internal class OmsorgsArbeidServiceTest {
         tom = tom,
         prosent = 100,
         omsorgsytere = omsorgsytere.map { Person(it) }.toSet(),
-        omsorgsmottaker = omsorgsmottakere.map { Person(it) }.toSet()
+        omsorgsmottakere = omsorgsmottakere.map { Person(it) }.toSet()
     )
 
 

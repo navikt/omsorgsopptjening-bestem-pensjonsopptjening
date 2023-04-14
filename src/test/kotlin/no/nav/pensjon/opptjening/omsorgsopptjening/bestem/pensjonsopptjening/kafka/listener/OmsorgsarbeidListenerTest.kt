@@ -94,10 +94,10 @@ internal class OmsorgsarbeidListenerTest {
 
         assertEquals(OpptjeningUtfall.INVILGET, omsorgsOpptjening.utfall)
         assertEquals(2020, omsorgsOpptjening.omsorgsAr)
-        assertEquals("12345678910", omsorgsOpptjening.person.fnr)
+        assertEquals("12345678910", omsorgsOpptjening.omsorgsyter.fnr)
         assertEquals("22222222222", omsorgsOpptjening.omsorgsmottakereInvilget.first().fnr)
         assertNotNull(omsorgsOpptjening.grunnlag)
-        assertNotNull(omsorgsOpptjening.omsorgsopptjeningResultater)
+        assertNotNull(omsorgsOpptjening.vilkarsResultat)
     }
 
     @Test
@@ -163,15 +163,15 @@ internal class OmsorgsarbeidListenerTest {
                 omsorgstype = omsorgstype,
                 kjoreHash = "XXX",
                 kilde = OmsorgsarbeidsKilde.BARNETRYGD,
-                omsorgsArbeidSaker = listOf(
+                omsorgsarbeidSaker = listOf(
                     OmsorgsArbeidSak(
-                        omsorgsarbedUtfort = listOf(
+                        omsorgsarbeidPerioder = listOf(
                             OmsorgsArbeid(
                                 fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                                 prosent = 100,
                                 omsorgsytere = setOf(Person(fnr)),
-                                omsorgsmottaker = fnrOmsorgFor?.let{setOf(Person(fnrOmsorgFor))}?: setOf()
+                                omsorgsmottakere = fnrOmsorgFor?.let{setOf(Person(fnrOmsorgFor))}?: setOf()
                             )
                         )
                     )

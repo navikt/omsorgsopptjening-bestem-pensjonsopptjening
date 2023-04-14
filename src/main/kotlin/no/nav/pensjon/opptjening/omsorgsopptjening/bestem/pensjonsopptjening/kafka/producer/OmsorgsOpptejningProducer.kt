@@ -1,7 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.producer
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.kafkaKey
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.kafkaValue
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
