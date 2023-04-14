@@ -20,10 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.dao.InvalidDataAccessApiUsageException
 import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.test.context.ActiveProfiles
 
-@EmbeddedKafka(partitions = 1, topics = [OmsorgsarbeidListenerTest.OMSORGSOPPTJENING_TOPIC])
 @SpringBootTest(classes = [App::class])
-@Import(KafkaIntegrationTestConfig::class, OmsorgsopptjeningMockListener::class)
+@ActiveProfiles("no-kafka")
 internal class OmsorgsopptjeningsGrunnlagRepositoryTest {
 
     private val dbContainer = PostgresqlTestContainer.instance

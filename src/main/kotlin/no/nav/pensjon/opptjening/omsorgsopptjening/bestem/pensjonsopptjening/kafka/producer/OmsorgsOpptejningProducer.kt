@@ -6,10 +6,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMess
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.header.internals.RecordHeader
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
+@Profile("!no-kafka")
 @Component
 class OmsorgsOpptejningProducer(
     @Value("\${OMSORGSOPPTJENING_TOPIC}") private val omsorgsOpptjeningTopic: String,

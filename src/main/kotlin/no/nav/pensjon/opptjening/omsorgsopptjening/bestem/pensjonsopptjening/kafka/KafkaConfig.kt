@@ -23,6 +23,7 @@ import java.time.Duration
 
 @EnableKafka
 @Configuration
+@Profile("!no-kafka")
 class KafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers: String) {
 
     @Bean
@@ -58,7 +59,6 @@ class KafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers:
     )
 
     @Profile("dev-gcp", "prod-gcp")
-    @Bean
     fun securityConfig(
         @Value("\${kafka.keystore.path}") keystorePath: String,
         @Value("\${kafka.credstore.password}") credstorePassword: String,

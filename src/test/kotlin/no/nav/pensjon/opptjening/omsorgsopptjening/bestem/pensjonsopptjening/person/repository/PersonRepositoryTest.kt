@@ -19,15 +19,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 
-@EmbeddedKafka(partitions = 1, topics = [OmsorgsarbeidListenerTest.OMSORGSOPPTJENING_TOPIC])
 @SpringBootTest(classes = [App::class])
-@Import(KafkaIntegrationTestConfig::class, OmsorgsopptjeningMockListener::class)
+@ActiveProfiles("no-kafka")
 internal class PersonRepositoryTest {
     private val dbContainer = PostgresqlTestContainer.instance
 

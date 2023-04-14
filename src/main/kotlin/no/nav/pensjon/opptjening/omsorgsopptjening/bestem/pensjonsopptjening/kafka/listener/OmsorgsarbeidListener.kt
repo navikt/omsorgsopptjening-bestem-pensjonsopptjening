@@ -8,10 +8,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMess
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
 
+@Profile("!no-kafka")
 @Component
 class OmsorgsarbeidListener(
     registry: MeterRegistry,
