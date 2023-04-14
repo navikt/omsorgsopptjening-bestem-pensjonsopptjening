@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
 
@@ -263,13 +264,39 @@ class FullOmsorgForBarnUnder6Test {
         assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        "2020-01, 2023-01, INVILGET",
+        "2020-01, 2021-01, AVSLAG",
+        )
+    fun `Given at least 1 months of omsorgsarbeid when child has deceased Then omsorg is INVILGET`(
+        fom: YearMonth,
+        tom: YearMonth,
+        expectedUtfall: Utfall
+    ) {
+        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsArbeid100Prosent = listOf(
+                    OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
+                ),
+                omsorgsmottaker = omsorgsmottaker_deceased_2023,
+                omsorgsAr = AR_2023
+            )
+        )
+
+        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
+    }
+
+
     companion object {
         private const val AR_2020 = 2020
+        private const val AR_2023 = 2023
 
         private val omsorgsyter_1988 = Person(alleFnr =  mutableSetOf(Fnr(fnr = "11111988")) , fodselsAr = 1988)
 
         private val omsorgsmottaker_2015 = Person(alleFnr =  mutableSetOf(Fnr(fnr = "22222015")) , fodselsAr = 2015)
         private val omsorgsmottaker_2020 = Person(alleFnr =  mutableSetOf(Fnr(fnr = "33332020")) , fodselsAr = 2020)
+        private val omsorgsmottaker_deceased_2023 = Person(alleFnr =  mutableSetOf(Fnr(fnr = "33332020")) , fodselsAr = 2020, doedsdato = LocalDate.of(2023,1,1))
         private val omsorgsmottaker_2000 = Person(alleFnr =  mutableSetOf(Fnr(fnr = "44442000")) , fodselsAr = 2000)
     }
 }

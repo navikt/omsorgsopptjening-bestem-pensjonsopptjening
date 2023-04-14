@@ -27,22 +27,27 @@ class FullOmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
     companion object {
         private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: GrunnlagOmsorgForBarnUnder6) =
             grunnlag.run {
-                if (sjuMonederDeltOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..5)) {
+                if (mottakerDoedeI(ar = omsorgsAr) && alderMottaker(mellom = 0..5) && enMonedOmsorg(ar = omsorgsAr)) {
                     Utfall.INVILGET
-                } else if (enMonedDeltOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..0)) {
+                } else if (sjuMonederOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..5)) {
                     Utfall.INVILGET
-                } else if (enMonedDeltOmsorg(ar = omsorgsAr + 1) && alderMottaker(mellom = 0..0)) {
+                } else if (enMonedOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..0)) {
+                    Utfall.INVILGET
+                } else if (enMonedOmsorg(ar = omsorgsAr + 1) && alderMottaker(mellom = 0..0)) {
                     Utfall.INVILGET
                 } else {
                     Utfall.AVSLAG
                 }
             }
 
+        private fun GrunnlagOmsorgForBarnUnder6.mottakerDoedeI(ar: Int) =
+            omsorgsmottaker.doedsdato?.let { it.year == ar } ?: false
 
-        private fun GrunnlagOmsorgForBarnUnder6.sjuMonederDeltOmsorg(ar: Int) =
+
+        private fun GrunnlagOmsorgForBarnUnder6.sjuMonederOmsorg(ar: Int) =
             omsorgsArbeid100Prosent.getAntallUtbetalingMoneder(ar) >= 7
 
-        private fun GrunnlagOmsorgForBarnUnder6.enMonedDeltOmsorg(ar: Int) =
+        private fun GrunnlagOmsorgForBarnUnder6.enMonedOmsorg(ar: Int) =
             omsorgsArbeid100Prosent.getAntallUtbetalingMoneder(ar) >= 1
 
         private fun GrunnlagOmsorgForBarnUnder6.alderMottaker(mellom: IntRange) =
