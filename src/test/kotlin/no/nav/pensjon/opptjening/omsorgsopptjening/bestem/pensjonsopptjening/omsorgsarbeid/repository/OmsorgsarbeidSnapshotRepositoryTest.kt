@@ -286,7 +286,8 @@ internal class OmsorgsarbeidSnapshotRepositoryTest {
         tom = tom,
         prosent = prosent,
         omsorgsytere = listOf(omsorgsyter),
-        omsorgsmottakere = omsorgsmottakere
+        omsorgsmottakere = omsorgsmottakere,
+        landstilknytning = Landstilknytning.NASJONAL
     )
 
     companion object {

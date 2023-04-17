@@ -211,7 +211,8 @@ internal class VilkarsVurderingsServiceTest {
             tom = tom,
             prosent = prosent,
             omsorgsytere = omsorgsytere,
-            omsorgsmottakere = omsorgsMottakere
+            omsorgsmottakere = omsorgsMottakere,
+            landstilknytning = Landstilknytning.NASJONAL
         )
 
     fun List<Vilkarsresultat>.hentResultat(person: Person) =

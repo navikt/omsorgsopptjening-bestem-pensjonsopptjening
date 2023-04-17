@@ -109,7 +109,8 @@ internal class OmsorgsarbeidsSnapshotKtTest {
             tom = tom,
             prosent = 100,
             omsorgsytere = listOf(omsorgsyter),
-            omsorgsmottakere = listOf()
+            omsorgsmottakere = listOf(),
+            landstilknytning = Landstilknytning.NASJONAL
         )
 
     companion object {

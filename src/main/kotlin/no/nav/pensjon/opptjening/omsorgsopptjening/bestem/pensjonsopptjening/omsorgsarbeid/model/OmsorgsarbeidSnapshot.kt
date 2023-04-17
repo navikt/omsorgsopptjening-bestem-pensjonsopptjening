@@ -40,6 +40,7 @@ data class OmsorgsarbeidSnapshot(
 
     @Column(name = "KJORE_HASHE", nullable = false)
     val kjoreHashe: String,
+
 ) {
 
     fun getOmsorgsmottakere(omsorgsyter: Person) =

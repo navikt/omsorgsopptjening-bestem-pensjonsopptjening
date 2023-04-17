@@ -24,6 +24,10 @@ class OmsorgsarbeidPeriode(
     @Column(name = "PROSENT", nullable = false)
     val prosent: Int,
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "LANDSTILKNYTNING", nullable = false)
+    val landstilknytning: Landstilknytning,
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "OMSORGSYTER",

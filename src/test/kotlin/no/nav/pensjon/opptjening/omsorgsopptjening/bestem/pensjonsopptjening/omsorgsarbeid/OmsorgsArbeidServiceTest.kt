@@ -158,7 +158,8 @@ internal class OmsorgsArbeidServiceTest {
         tom = tom,
         prosent = 100,
         omsorgsytere = omsorgsytere.map { Person(it) }.toSet(),
-        omsorgsmottakere = omsorgsmottakere.map { Person(it) }.toSet()
+        omsorgsmottakere = omsorgsmottakere.map { Person(it) }.toSet(),
+        landstilknytning = Landstilknytning.NASJONAL
     )
 
 

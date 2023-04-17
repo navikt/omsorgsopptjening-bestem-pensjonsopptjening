@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidPeriode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
@@ -42,7 +43,8 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = tom,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 
@@ -85,7 +87,8 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = tom,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 
@@ -128,7 +131,8 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = tom,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 
@@ -179,7 +183,8 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = tom,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 
@@ -219,7 +224,8 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = tom,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 
@@ -273,14 +279,16 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = tom1,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             ),
             OmsorgsarbeidPeriode(
                 fom = fom2,
                 tom = tom2,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 
@@ -329,21 +337,24 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = tom1,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             ),
             OmsorgsarbeidPeriode(
                 fom = fom2,
                 tom = tom2,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             ),
             OmsorgsarbeidPeriode(
                 fom = fom3,
                 tom = tom3,
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf()
+                omsorgsmottakere = listOf(),
+                landstilknytning = Landstilknytning.NASJONAL
             ),
         )
 
@@ -402,7 +413,8 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf(omsorgsmottaker_2000)
+                omsorgsmottakere = listOf(omsorgsmottaker_2000),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 
@@ -448,7 +460,8 @@ class DeltOmsorgForBarnUnder6Test {
                         tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                         prosent = 50,
                         omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                        omsorgsmottakere = listOf(omsorgsmottaker_2000)
+                        omsorgsmottakere = listOf(omsorgsmottaker_2000),
+                        landstilknytning = Landstilknytning.NASJONAL
                     )
                 ),
                 andreParter = listOf(
@@ -474,7 +487,8 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977),
-                omsorgsmottakere = listOf(omsorgsmottaker_2000)
+                omsorgsmottakere = listOf(omsorgsmottaker_2000),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 
@@ -500,7 +514,8 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977, omsorgsyter_1966),
-                omsorgsmottakere = listOf(omsorgsmottaker_2000)
+                omsorgsmottakere = listOf(omsorgsmottaker_2000),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 
@@ -539,7 +554,8 @@ class DeltOmsorgForBarnUnder6Test {
                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                 prosent = 50,
                 omsorgsytere = listOf(omsorgsyter_1988, omsorgsyter_1977, omsorgsyter_1966),
-                omsorgsmottakere = listOf(omsorgsmottaker_2000)
+                omsorgsmottakere = listOf(omsorgsmottaker_2000),
+                landstilknytning = Landstilknytning.NASJONAL
             )
         )
 

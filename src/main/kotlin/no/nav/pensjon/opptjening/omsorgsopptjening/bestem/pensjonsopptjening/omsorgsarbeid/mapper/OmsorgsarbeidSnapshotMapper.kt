@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.mapper
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
 
@@ -22,6 +23,7 @@ class OmsorgsarbeidSnapshotMapper {
                                 prosent = arbeid.prosent,
                                 omsorgsytere = arbeid.omsorgsytere.map { persistertePersoner.hentPerson(it.fnr) },
                                 omsorgsmottakere = arbeid.omsorgsmottakere.map { persistertePersoner.hentPerson(it.fnr) },
+                                landstilknytning = convertLandstilknytning(arbeid.landstilknytning)
                             )
                         }
                     )
@@ -44,6 +46,7 @@ class OmsorgsarbeidSnapshotMapper {
                                 prosent = periode.prosent,
                                 omsorgsytere = periode.omsorgsytere.map { convertPerson(it) }.toSet(),
                                 omsorgsmottakere = periode.omsorgsmottakere.map { convertPerson(it) }.toSet(),
+                                landstilknytning = convertLandstilknytning(periode.landstilknytning)
                             )
                         }
                     )
@@ -80,5 +83,17 @@ class OmsorgsarbeidSnapshotMapper {
             Kilde.BARNETRYGD -> OmsorgsarbeidsKilde.BARNETRYGD
             Kilde.INFOTRYGD -> OmsorgsarbeidsKilde.INFOTRYGD
         }
+
+        private fun convertLandstilknytning(tilknytning : Landstilknytning) =
+            when(tilknytning){
+                Landstilknytning.EOS -> no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Landstilknytning.EØS
+                Landstilknytning.NASJONAL -> no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Landstilknytning.NASJONAL
+            }
+
+        private fun convertLandstilknytning(tilknytning : no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Landstilknytning) =
+            when(tilknytning){
+                no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Landstilknytning.EØS -> Landstilknytning.EOS
+                no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Landstilknytning.NASJONAL -> Landstilknytning.NASJONAL
+            }
     }
 }

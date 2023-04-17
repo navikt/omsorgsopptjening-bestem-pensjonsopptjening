@@ -171,7 +171,8 @@ internal class OmsorgsarbeidListenerTest {
                                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                                 prosent = 100,
                                 omsorgsytere = setOf(Person(fnr)),
-                                omsorgsmottakere = fnrOmsorgFor?.let{setOf(Person(fnrOmsorgFor))}?: setOf()
+                                omsorgsmottakere = fnrOmsorgFor?.let{setOf(Person(fnrOmsorgFor))}?: setOf(),
+                                landstilknytning = Landstilknytning.NASJONAL
                             )
                         )
                     )

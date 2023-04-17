@@ -279,7 +279,8 @@ internal class IndividuellVilkarsvurderingTest {
         tom = tom,
         prosent = 100,
         omsorgsytere = listOf(omsorgsyter),
-        omsorgsmottakere = omsorgsmottakere
+        omsorgsmottakere = omsorgsmottakere,
+        landstilknytning = Landstilknytning.NASJONAL
     )
 
 
