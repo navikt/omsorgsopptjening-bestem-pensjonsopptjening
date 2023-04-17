@@ -27,7 +27,9 @@ class FullOmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
     companion object {
         private val `Minst 7 moneder omsorg for barn under 6 ar` = fun(grunnlag: GrunnlagOmsorgForBarnUnder6) =
             grunnlag.run {
-                if (mottakerDoedeI(ar = omsorgsAr) && alderMottaker(mellom = 0..5) && enMonedOmsorg(ar = omsorgsAr)) {
+                if(utfallAbsolutteKrav == Utfall.AVSLAG){
+                    Utfall.AVSLAG
+                } else if (mottakerDoedeI(ar = omsorgsAr) && alderMottaker(mellom = 0..5) && enMonedOmsorg(ar = omsorgsAr)) {
                     Utfall.INVILGET
                 } else if (sjuMonederOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..5)) {
                     Utfall.INVILGET

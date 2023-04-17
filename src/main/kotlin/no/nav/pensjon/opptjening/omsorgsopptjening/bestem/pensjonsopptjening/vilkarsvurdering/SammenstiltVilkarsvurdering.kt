@@ -7,9 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.GrunnlagDeltOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Eller.Companion.minstEn
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Og.Companion.og
 import org.springframework.stereotype.Component
-import org.springframework.stereotype.Service
 
 @Component
 class SammenstiltVilkarsvurdering {
@@ -22,24 +20,22 @@ class SammenstiltVilkarsvurdering {
         val omsorgsyter: Person = snapshot.omsorgsyter
         val omsorgsmottakere: List<Person> = snapshot.getOmsorgsmottakere(omsorgsyter)
 
-        return og(
-            behandledeVilkarsresultat.vilkarsvurderingAvAbsolutteKrav!!,
-            omsorgsmottakere.minstEn {
-                DeltOmsorgForBarnUnder6().vilkarsVurder(
-                    GrunnlagDeltOmsorgForBarnUnder6(
-                        omsorgsAr = omsorgsAr,
-                        omsorgsyter = snapshot.omsorgsyter,
+        return omsorgsmottakere.minstEn {
+            DeltOmsorgForBarnUnder6().vilkarsVurder(
+                GrunnlagDeltOmsorgForBarnUnder6(
+                    omsorgsAr = omsorgsAr,
+                    omsorgsyter = snapshot.omsorgsyter,
+                    omsorgsmottaker = it,
+                    utfallAbsolutteKrav = behandledeVilkarsresultat.vilkarsvurderingAvAbsolutteKrav!!.utfall,
+                    omsorgsArbeid50Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
+                        omsorgsyter = omsorgsyter,
                         omsorgsmottaker = it,
-                        omsorgsArbeid50Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
-                            omsorgsyter = omsorgsyter,
-                            omsorgsmottaker = it,
-                            prosent = 50
-                        ),
-                        andreParter = involverteVilkarsresultat.mapToAndreParter(it),
-                    )
+                        prosent = 50
+                    ),
+                    andreParter = involverteVilkarsresultat.mapToAndreParter(it),
                 )
-            }
-        )
+            )
+        }
     }
 
     private fun List<Vilkarsresultat>.mapToAndreParter(omsorgsmottaker: Person) =
@@ -52,8 +48,7 @@ class SammenstiltVilkarsvurdering {
                     prosent = 50
                 ),
                 harInvilgetOmsorgForUrelaterBarn = it.individueltVilkarsVurdering!!.utfall == Utfall.INVILGET,
-                erOver17Ar = it.individueltVilkarsVurdering!!.hentOmsorgsgiverOver16().utfall == Utfall.INVILGET,
-                erUnder70 = it.individueltVilkarsVurdering!!.hentOmsorgsgiverUnder70().utfall == Utfall.INVILGET
+                utfallAbsolutteKrav = it.vilkarsvurderingAvAbsolutteKrav!!.utfall,
             )
         }.filter { it.omsorgsArbeid50Prosent.isNotEmpty() }
 }

@@ -37,11 +37,13 @@ class FullOmsorgForBarnUnder6Test {
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsAr = AR_2020,
+                omsorgsmottaker = omsorgsmottaker_2015,
+                utfallAbsolutteKrav = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
                 ),
-                omsorgsmottaker = omsorgsmottaker_2015,
-                omsorgsAr = AR_2020
+
             )
         )
 
@@ -62,12 +64,14 @@ class FullOmsorgForBarnUnder6Test {
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsAr = AR_2020,
+                omsorgsmottaker = omsorgsmottaker_2020,
+                utfallAbsolutteKrav = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
-                ),
-                omsorgsmottaker = omsorgsmottaker_2020,
-                omsorgsAr = AR_2020
+                )
             )
+
         )
 
         assertEquals(expectedUtfall, vilkarsVurdering.utfall)
@@ -87,11 +91,12 @@ class FullOmsorgForBarnUnder6Test {
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsAr = AR_2020,
+                omsorgsmottaker = omsorgsmottaker_2020,
+                utfallAbsolutteKrav = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
-                ),
-                omsorgsmottaker = omsorgsmottaker_2020,
-                omsorgsAr = AR_2020
+                )
             )
         )
 
@@ -119,11 +124,12 @@ class FullOmsorgForBarnUnder6Test {
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsAr = AR_2020,
+                omsorgsmottaker = omsorgsmottaker_2015,
+                utfallAbsolutteKrav = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
                 ),
-                omsorgsmottaker = omsorgsmottaker_2015,
-                omsorgsAr = AR_2020
             )
         )
 
@@ -141,11 +147,12 @@ class FullOmsorgForBarnUnder6Test {
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsAr = AR_2020,
+                omsorgsmottaker = omsorgsmottaker_2015,
+                utfallAbsolutteKrav = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
-                ),
-                omsorgsmottaker = omsorgsmottaker_2015,
-                omsorgsAr = AR_2020
+                )
             )
         )
 
@@ -177,12 +184,13 @@ class FullOmsorgForBarnUnder6Test {
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsAr = AR_2020,
+                omsorgsmottaker = omsorgsmottaker_2015,
+                utfallAbsolutteKrav = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf()),
                     OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
-                ),
-                omsorgsmottaker = omsorgsmottaker_2015,
-                omsorgsAr = AR_2020
+                )
             )
         )
 
@@ -209,13 +217,14 @@ class FullOmsorgForBarnUnder6Test {
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsAr = AR_2020,
+                omsorgsmottaker = omsorgsmottaker_2015,
+                utfallAbsolutteKrav = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf()),
                     OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf()),
                     OmsorgsarbeidPeriode(fom = fom3, tom = tom3, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf()),
-                ),
-                omsorgsmottaker = omsorgsmottaker_2015,
-                omsorgsAr = AR_2020
+                )
             )
         )
 
@@ -227,9 +236,10 @@ class FullOmsorgForBarnUnder6Test {
     fun `Given no utbetalingsperioder Then halvt ar med omsorg is AVSLAG`() {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
-                omsorgsArbeid100Prosent = listOf(),
+                omsorgsAr = AR_2020,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                omsorgsAr = AR_2020
+                utfallAbsolutteKrav = Utfall.INVILGET,
+                omsorgsArbeid100Prosent = listOf(),
             )
         )
 
@@ -248,6 +258,9 @@ class FullOmsorgForBarnUnder6Test {
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsAr = omsorgsAr,
+                omsorgsmottaker = omsorgsmottaker_2000,
+                utfallAbsolutteKrav = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(
                         fom = YearMonth.of(omsorgsAr, Month.JANUARY),
@@ -256,8 +269,6 @@ class FullOmsorgForBarnUnder6Test {
                         omsorgsytere = listOf(omsorgsyter_1988),
                         omsorgsmottakere = listOf()),
                 ),
-                omsorgsmottaker = omsorgsmottaker_2000,
-                omsorgsAr = omsorgsAr
             )
         )
 
@@ -276,11 +287,12 @@ class FullOmsorgForBarnUnder6Test {
     ) {
         val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
             grunnlag = GrunnlagOmsorgForBarnUnder6(
+                omsorgsAr = AR_2023,
+                omsorgsmottaker = omsorgsmottaker_deceased_2023,
+                utfallAbsolutteKrav = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf())
-                ),
-                omsorgsmottaker = omsorgsmottaker_deceased_2023,
-                omsorgsAr = AR_2023
+                )
             )
         )
 

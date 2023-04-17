@@ -202,10 +202,7 @@ internal class IndividuellVilkarsvurderingTest {
             )
         )
 
-        val vilkarsresultat = lagVilkarsResultat(
-            snapshot = omsorgsArbeidSnapshot,
-            utfallAbsolutteKrav = Utfall.INVILGET
-        )
+        val vilkarsresultat = Vilkarsresultat(snapshot = omsorgsArbeidSnapshot)
 
         val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(vilkarsresultat)
         assertEquals(Utfall.AVSLAG, individueltVilkarsResultat.utfall)

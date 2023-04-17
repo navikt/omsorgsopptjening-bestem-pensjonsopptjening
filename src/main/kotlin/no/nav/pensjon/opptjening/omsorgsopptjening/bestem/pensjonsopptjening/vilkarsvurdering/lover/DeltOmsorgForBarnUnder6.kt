@@ -20,8 +20,8 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
             fun(grunnlag: GrunnlagDeltOmsorgForBarnUnder6): Utfall {
                 return grunnlag.run {
                     when {
-                        harUtfortNokOmsorgsarbeid() -> {
-                            if (andreParter.isNotEmpty() && andreParter.all { it.harInvilgetOmsorgForUrelaterBarn || !it.erOver17Ar || !it.erUnder70 }) {
+                        harUtfortNokOmsorgsarbeid() && utfallAbsolutteKrav == Utfall.INVILGET -> {
+                            if (andreParter.isNotEmpty() && andreParter.all { it.harInvilgetOmsorgForUrelaterBarn || it.utfallAbsolutteKrav == Utfall.AVSLAG }) {
                                 Utfall.INVILGET
                             } else if (andreParter.size > 1) {
                                 Utfall.SAKSBEHANDLING
