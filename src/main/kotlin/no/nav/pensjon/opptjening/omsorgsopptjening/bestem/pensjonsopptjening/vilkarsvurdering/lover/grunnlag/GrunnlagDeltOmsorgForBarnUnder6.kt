@@ -10,4 +10,4 @@ data class GrunnlagDeltOmsorgForBarnUnder6(
     val omsorgsmottaker: Person,
     val omsorgsArbeid50Prosent: List<OmsorgsarbeidPeriode>,
     val andreParter: List<AnnenPart>,
-) {}
+)

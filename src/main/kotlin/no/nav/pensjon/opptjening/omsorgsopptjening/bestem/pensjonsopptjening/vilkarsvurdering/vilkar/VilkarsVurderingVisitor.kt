@@ -1,6 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.FullOmsorgForBarnUnder6
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.OmsorgsgiverOver16Ar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.OmsorgsgiverUnder70Ar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.GrunnlagOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.AlleVilkarsVurderinger.Companion.hentAlleVilkarsVurderinger
 
@@ -29,3 +31,7 @@ fun VilkarsVurdering<*>.hentVilkarsVurderingerFullOmsorgForBarnUnder6() : List<V
         .filter { it.vilkar is FullOmsorgForBarnUnder6 }
         .map { it as VilkarsVurdering<GrunnlagOmsorgForBarnUnder6> }
 }
+
+fun VilkarsVurdering<*>.hentOmsorgsgiverOver16() = hentAlleVilkarsVurderinger(this).first { it.vilkar is OmsorgsgiverOver16Ar }
+
+fun VilkarsVurdering<*>.hentOmsorgsgiverUnder70() = hentAlleVilkarsVurderinger(this).first { it.vilkar is OmsorgsgiverUnder70Ar }

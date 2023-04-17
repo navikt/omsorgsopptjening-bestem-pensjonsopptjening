@@ -7,4 +7,6 @@ data class AnnenPart(
     val omsorgsyter: Person,
     val omsorgsArbeid50Prosent: List<OmsorgsarbeidPeriode>,
     val harInvilgetOmsorgForUrelaterBarn: Boolean,
+    val erOver17Ar:Boolean,
+    val erUnder70:Boolean
 )

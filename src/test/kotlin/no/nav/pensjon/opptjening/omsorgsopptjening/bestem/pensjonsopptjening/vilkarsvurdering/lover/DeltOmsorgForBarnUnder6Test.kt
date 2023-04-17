@@ -57,6 +57,8 @@ class DeltOmsorgForBarnUnder6Test {
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
                         harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )
@@ -98,6 +100,8 @@ class DeltOmsorgForBarnUnder6Test {
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
                         harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )
@@ -139,6 +143,8 @@ class DeltOmsorgForBarnUnder6Test {
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
                         harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
 
@@ -188,6 +194,8 @@ class DeltOmsorgForBarnUnder6Test {
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
                         harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )
@@ -226,6 +234,8 @@ class DeltOmsorgForBarnUnder6Test {
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
                         harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )
@@ -285,6 +295,8 @@ class DeltOmsorgForBarnUnder6Test {
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
                         harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )
@@ -347,6 +359,8 @@ class DeltOmsorgForBarnUnder6Test {
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
                         harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )
@@ -402,6 +416,8 @@ class DeltOmsorgForBarnUnder6Test {
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
                         harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )
@@ -437,7 +453,9 @@ class DeltOmsorgForBarnUnder6Test {
                     AnnenPart(
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = listOf(),
-                        harInvilgetOmsorgForUrelaterBarn = true
+                        harInvilgetOmsorgForUrelaterBarn = true,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )
@@ -494,12 +512,16 @@ class DeltOmsorgForBarnUnder6Test {
                     AnnenPart(
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
-                        harInvilgetOmsorgForUrelaterBarn = true
+                        harInvilgetOmsorgForUrelaterBarn = true,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     ),
                     AnnenPart(
                         omsorgsyter = omsorgsyter_1966,
                         omsorgsArbeid50Prosent = perioder,
-                        harInvilgetOmsorgForUrelaterBarn = true
+                        harInvilgetOmsorgForUrelaterBarn = true,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )
@@ -530,12 +552,16 @@ class DeltOmsorgForBarnUnder6Test {
                     AnnenPart(
                         omsorgsyter = omsorgsyter_1977,
                         omsorgsArbeid50Prosent = perioder,
-                        harInvilgetOmsorgForUrelaterBarn = false
+                        harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     ),
                     AnnenPart(
                         omsorgsyter = omsorgsyter_1966,
                         omsorgsArbeid50Prosent = perioder,
-                        harInvilgetOmsorgForUrelaterBarn = false
+                        harInvilgetOmsorgForUrelaterBarn = false,
+                        erOver17Ar = true,
+                        erUnder70 = true
                     )
                 )
             )

@@ -21,7 +21,7 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
                 return grunnlag.run {
                     when {
                         harUtfortNokOmsorgsarbeid() -> {
-                            if (andreParter.isNotEmpty() && andreParter.all { it.harInvilgetOmsorgForUrelaterBarn }) {
+                            if (andreParter.isNotEmpty() && andreParter.all { it.harInvilgetOmsorgForUrelaterBarn || !it.erOver17Ar || !it.erUnder70 }) {
                                 Utfall.INVILGET
                             } else if (andreParter.size > 1) {
                                 Utfall.SAKSBEHANDLING

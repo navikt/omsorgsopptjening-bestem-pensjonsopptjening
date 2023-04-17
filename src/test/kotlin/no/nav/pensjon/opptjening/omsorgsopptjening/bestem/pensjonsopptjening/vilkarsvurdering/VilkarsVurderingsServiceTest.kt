@@ -9,8 +9,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
-import org.junit.jupiter.api.Assertions.assertTrue
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Vilkarsresultat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles
 import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 
 @SpringBootTest(classes = [App::class])
@@ -46,7 +48,7 @@ internal class VilkarsVurderingsServiceTest {
         "2020-01, 2020-07, SAKSBEHANDLING",
         "2020-01, 2020-06, AVSLAG",
     )
-    fun `Given shared omsorg When seven months of shared omsorg Then utfall equals SAKSBEHANDLING`(
+    fun `Given shared omsorg When seven months shared omsorg Then utfall equals SAKSBEHANDLING`(
         fom: YearMonth,
         tom: YearMonth,
         expectedUtfall: Utfall
@@ -93,12 +95,62 @@ internal class VilkarsVurderingsServiceTest {
         assertEquals(expectedUtfall, vilkarsresultater[1].getUtfall())
     }
 
+    @Test
+    fun `Given shared omsorg and other omsorgsyter is younger than 17 When seven months shared omsorg Then utfall equals INVILGET`() {
+        val omsorgsYter = personRepository.updatePerson(omsorgsYter1988)
+        val omsorgsYterYoungerThan17 = personRepository.updatePerson(omsorgsYter2004)
+        val omsorgsmottaker1 = personRepository.updatePerson(omsorgsmottaker2017)
+
+        val omsorgsPeriode1 = createOmsorgsarbeidPeriode(
+            fom = JANUAR_2020,
+            tom = DESEMBER_2020,
+            prosent = PROSENT_50,
+            omsorgsytere = listOf(omsorgsYter, omsorgsYterYoungerThan17),
+            omsorgsMottakere = listOf(omsorgsmottaker1)
+        )
+
+        val omsorgsPeriode2 = createOmsorgsarbeidPeriode(
+            fom = JANUAR_2020,
+            tom = DESEMBER_2020,
+            prosent = PROSENT_50,
+            omsorgsytere = listOf(omsorgsYter, omsorgsYterYoungerThan17),
+            omsorgsMottakere = listOf(omsorgsmottaker1)
+        )
+
+        val snapshotOmsorgsyter = creatOmsorgsArbeidSnapshot(
+            omsorgsyter = omsorgsYter,
+            omsorgsArbeidSaker = listOf(OmsorgsarbeidSak(omsorgsarbeidPerioder = listOf(omsorgsPeriode1))),
+            omsorgsAr = OMSORGS_AR_2020
+        )
+
+        val snapshotOmsorgsyterYungerThan17 = creatOmsorgsArbeidSnapshot(
+            omsorgsyter = omsorgsYterYoungerThan17,
+            omsorgsArbeidSaker = listOf(OmsorgsarbeidSak(omsorgsarbeidPerioder = listOf(omsorgsPeriode2))),
+            omsorgsAr = OMSORGS_AR_2020
+        )
+
+
+        omsorgsarbeidRepository.save(snapshotOmsorgsyter)
+        omsorgsarbeidRepository.save(snapshotOmsorgsyterYungerThan17)
+
+        val vilkarsresultater = vilkarsVurderingsService.vilkarsVurder(snapshotOmsorgsyter)
+
+        val vilkarsresultat = vilkarsresultater.hentResultat(omsorgsYter)
+        val vilkarsresultatYungerThan17 = vilkarsresultater.hentResultat(omsorgsYterYoungerThan17)
+
+        assertEquals(2, vilkarsresultater.size)
+        assertNotNull(vilkarsresultat)
+        assertNotNull(vilkarsresultatYungerThan17)
+        assertEquals(Utfall.INVILGET, vilkarsresultat.getUtfall())
+        //TODO assertEquals(Utfall.AVSLAG, vilkarsresultatYungerThan17.getUtfall())
+    }
+
     @ParameterizedTest
     @CsvSource(
         "2020-01, 2020-07, MANGLER_ANNEN_OMSORGSYTER",
         "2020-01, 2020-06, AVSLAG",
     )
-    fun `Given missing information about other parties When seven months of shared omsorg Then utfall equals MANGLER_ANNEN_OMSORGSYTER`(
+    fun `Given missing information about other parties When seven months shared omsorg Then utfall equals MANGLER_ANNEN_OMSORGSYTER`(
         fom: YearMonth,
         tom: YearMonth,
         expectedUtfall: Utfall
@@ -162,11 +214,14 @@ internal class VilkarsVurderingsServiceTest {
             omsorgsmottakere = omsorgsMottakere
         )
 
+    fun List<Vilkarsresultat>.hentResultat(person: Person) =
+        filter { it.getOmsorgsyter().erSammePerson(person) }.firstOrNull()
+
 
     companion object {
-        private val omsorgsYter1988 = PdlPerson(alleFnr = listOf(PdlFnr("1111", true)), fodselsAr = 1988)
-        private val omsorgsYter1987 = PdlPerson(alleFnr = listOf(PdlFnr("2222", true)), fodselsAr = 1987)
-        private val omsorgsYter1986 = PdlPerson(alleFnr = listOf(PdlFnr("2222", true)), fodselsAr = 1986)
+        private val omsorgsYter1988 = PdlPerson(alleFnr = listOf(PdlFnr("11111988", true)), fodselsAr = 1988)
+        private val omsorgsYter1987 = PdlPerson(alleFnr = listOf(PdlFnr("22221987", true)), fodselsAr = 1987)
+        private val omsorgsYter2004 = PdlPerson(alleFnr = listOf(PdlFnr("33332004", true)), fodselsAr = 2004)
         private val omsorgsmottaker2017 = PdlPerson(alleFnr = listOf(PdlFnr("6666", true)), fodselsAr = 2017)
         private val omsorgsmottaker2018 = PdlPerson(alleFnr = listOf(PdlFnr("7777", true)), fodselsAr = 2018)
 
