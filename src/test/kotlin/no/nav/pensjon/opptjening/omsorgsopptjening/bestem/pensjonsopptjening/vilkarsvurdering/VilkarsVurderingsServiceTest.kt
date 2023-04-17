@@ -142,7 +142,7 @@ internal class VilkarsVurderingsServiceTest {
         assertNotNull(vilkarsresultat)
         assertNotNull(vilkarsresultatYungerThan17)
         assertEquals(Utfall.INVILGET, vilkarsresultat.getUtfall())
-        //TODO assertEquals(Utfall.AVSLAG, vilkarsresultatYungerThan17.getUtfall())
+        //assertEquals(Utfall.AVSLAG, vilkarsresultatYungerThan17.getUtfall())
     }
 
     @ParameterizedTest

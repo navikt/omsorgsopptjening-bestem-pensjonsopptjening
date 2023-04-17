@@ -1,21 +1,31 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.*
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.hentVilkarsVurderingerFullOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.IndividuellVilkarsvurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Vilkarsresultat
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.hentVilkarsVurderingerFullOmsorgForBarnUnder6
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.junit.jupiter.MockitoExtension
 import java.time.Month
 import java.time.YearMonth
 
+@ExtendWith(MockitoExtension::class)
 internal class IndividuellVilkarsvurderingTest {
 
-    private val individuellVilkarsvurdering: IndividuellVilkarsvurdering = IndividuellVilkarsvurdering()
+    private val individuellVilkarsvurdering = IndividuellVilkarsvurdering()
+
+    @Mock
+    private lateinit var mockVilkarsVurdering: VilkarsVurdering<*>
 
     @Test
     fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
@@ -35,7 +45,12 @@ internal class IndividuellVilkarsvurderingTest {
             )
         )
 
-        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsresultat = lagVilkarsResultat(
+            snapshot = omsorgsArbeidSnapshot,
+            utfallAbsolutteKrav = Utfall.INVILGET
+        )
+
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(vilkarsresultat)
 
         assertEquals(Utfall.INVILGET, individueltVilkarsResultat.utfall)
     }
@@ -58,40 +73,40 @@ internal class IndividuellVilkarsvurderingTest {
             )
         )
 
-        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsresultat = lagVilkarsResultat(
+            snapshot = omsorgsArbeidSnapshot,
+            utfallAbsolutteKrav = Utfall.INVILGET
+        )
+
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(vilkarsresultat)
         assertEquals(Utfall.AVSLAG, individueltVilkarsResultat.utfall)
     }
 
-    @ParameterizedTest
-    @CsvSource(
-        "1984, 2000, AVSLAG",
-        "1983, 2000, INVILGET",
-        "1931, 2000, INVILGET",
-        "1930, 2000, AVSLAG",
-    )
-    fun `Given person over 16 and under 70 When calling fastsettOmsorgsOpptjening Then INVILGET`(
-        fodselsAr: Int,
-        omsorgsAr: Int,
-        expectedUtfall: Utfall
-    ) {
-        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, fodselsAr)
+    @Test
+    fun `Given utfallAbsolutteKrav is avslag Then AVSLAG`() {
+        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1983)
         val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 1995)
 
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
-            omsorgsAr = omsorgsAr,
+            omsorgsAr = 2000,
             omsorgsyter = omsorgsyter,
             omsorgsarbeidPerioder = listOf(
                 createOmsorgsArbeid(
-                    fom = YearMonth.of(omsorgsAr, Month.JANUARY),
-                    tom = YearMonth.of(omsorgsAr, Month.JULY),
+                    fom = YearMonth.of(2000, Month.JANUARY),
+                    tom = YearMonth.of(2000, Month.JULY),
                     omsorgsyter = omsorgsyter,
                     omsorgsmottakere = listOf(omsorgsmottaker)
                 )
             )
         )
 
-        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
-        assertEquals(expectedUtfall, individueltVilkarsResultat.utfall)
+        val vilkarsresultat = lagVilkarsResultat(
+            snapshot = omsorgsArbeidSnapshot,
+            utfallAbsolutteKrav = Utfall.AVSLAG
+        )
+
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(vilkarsresultat)
+        assertEquals(Utfall.AVSLAG, individueltVilkarsResultat.utfall)
     }
 
     @ParameterizedTest
@@ -122,7 +137,12 @@ internal class IndividuellVilkarsvurderingTest {
             )
         )
 
-        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsresultat = lagVilkarsResultat(
+            snapshot = omsorgsArbeidSnapshot,
+            utfallAbsolutteKrav = Utfall.INVILGET
+        )
+
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(vilkarsresultat)
         assertEquals(expectedUtfall, individueltVilkarsResultat.utfall)
     }
 
@@ -156,7 +176,12 @@ internal class IndividuellVilkarsvurderingTest {
             )
         )
 
-        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsresultat = lagVilkarsResultat(
+            snapshot = omsorgsArbeidSnapshot,
+            utfallAbsolutteKrav = Utfall.INVILGET
+        )
+
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(vilkarsresultat)
         assertEquals(expectedUtfall, individueltVilkarsResultat.utfall)
     }
 
@@ -177,7 +202,12 @@ internal class IndividuellVilkarsvurderingTest {
             )
         )
 
-        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsresultat = lagVilkarsResultat(
+            snapshot = omsorgsArbeidSnapshot,
+            utfallAbsolutteKrav = Utfall.INVILGET
+        )
+
+        val individueltVilkarsResultat = individuellVilkarsvurdering.vilkarsvurder(vilkarsresultat)
         assertEquals(Utfall.AVSLAG, individueltVilkarsResultat.utfall)
     }
 
@@ -201,17 +231,24 @@ internal class IndividuellVilkarsvurderingTest {
             )
         )
 
-        val individuellVilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(omsorgsArbeidSnapshot)
+        val vilkarsresultat = lagVilkarsResultat(
+            snapshot = omsorgsArbeidSnapshot,
+            utfallAbsolutteKrav = Utfall.INVILGET
+        )
 
-        val barnUnder6Invilget = individuellVilkarsVurdering.hentVilkarsVurderingerFullOmsorgForBarnUnder6().filter { it.utfall == Utfall.INVILGET }
-        val barnUnder6IkkeInvilget = individuellVilkarsVurdering.hentVilkarsVurderingerFullOmsorgForBarnUnder6().filter { it.utfall != Utfall.INVILGET }
+        val individuellVilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(vilkarsresultat)
+
+        val barnUnder6Invilget = individuellVilkarsVurdering.hentVilkarsVurderingerFullOmsorgForBarnUnder6()
+            .filter { it.utfall == Utfall.INVILGET }
+        val barnUnder6IkkeInvilget = individuellVilkarsVurdering.hentVilkarsVurderingerFullOmsorgForBarnUnder6()
+            .filter { it.utfall != Utfall.INVILGET }
 
         assertEquals(barnUnder6Invilget.size, 2)
-        assertEquals(1, barnUnder6Invilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker1}.size)
-        assertEquals(1, barnUnder6Invilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker2}.size)
+        assertEquals(1, barnUnder6Invilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker1 }.size)
+        assertEquals(1, barnUnder6Invilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker2 }.size)
 
         assertEquals(barnUnder6IkkeInvilget.size, 1)
-        assertEquals(1, barnUnder6IkkeInvilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker3}.size)
+        assertEquals(1, barnUnder6IkkeInvilget.filter { it.grunnlag.omsorgsmottaker == omsorgsmottaker3 }.size)
 
         assertEquals(Utfall.INVILGET, individuellVilkarsVurdering.utfall)
     }
@@ -244,16 +281,25 @@ internal class IndividuellVilkarsvurderingTest {
         fom = fom,
         tom = tom,
         prosent = 100,
-        omsorgsytere =  listOf(omsorgsyter),
+        omsorgsytere = listOf(omsorgsyter),
         omsorgsmottakere = omsorgsmottakere
     )
 
 
     private fun createPerson(gjeldendeFnr: String, fodselsAr: Int, historiskeFnr: List<String> = listOf()) =
         Person(
-            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toMutableSet().apply { add(Fnr(fnr = gjeldendeFnr, gjeldende = true)) },
+            alleFnr = historiskeFnr.map { Fnr(fnr = it) }.toMutableSet()
+                .apply { add(Fnr(fnr = gjeldendeFnr, gjeldende = true)) },
             fodselsAr = fodselsAr
         )
+
+    private fun lagVilkarsResultat(snapshot: OmsorgsarbeidSnapshot, utfallAbsolutteKrav: Utfall): Vilkarsresultat {
+        Mockito.`when`(mockVilkarsVurdering.utfall).thenReturn(utfallAbsolutteKrav)
+        return Vilkarsresultat(
+            snapshot = snapshot,
+            vilkarsvurderingAvAbsolutteKrav = mockVilkarsVurdering
+        )
+    }
 
     companion object {
         const val FNR_OMSORGSGIVER: String = "12345678902"

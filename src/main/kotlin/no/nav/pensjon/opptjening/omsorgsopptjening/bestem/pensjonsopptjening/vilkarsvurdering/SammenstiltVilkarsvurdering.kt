@@ -7,9 +7,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.GrunnlagDeltOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Eller.Companion.minstEn
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Og.Companion.og
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 
-@Service
+@Component
 class SammenstiltVilkarsvurdering {
     fun vilkarsvurder(
         behandledeVilkarsresultat: Vilkarsresultat,
@@ -20,21 +22,24 @@ class SammenstiltVilkarsvurdering {
         val omsorgsyter: Person = snapshot.omsorgsyter
         val omsorgsmottakere: List<Person> = snapshot.getOmsorgsmottakere(omsorgsyter)
 
-        return omsorgsmottakere.minstEn {
-            DeltOmsorgForBarnUnder6().vilkarsVurder(
-                GrunnlagDeltOmsorgForBarnUnder6(
-                    omsorgsAr = omsorgsAr,
-                    omsorgsyter = snapshot.omsorgsyter,
-                    omsorgsmottaker = it,
-                    omsorgsArbeid50Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
-                        omsorgsyter = omsorgsyter,
+        return og(
+            behandledeVilkarsresultat.vilkarsvurderingAvAbsolutteKrav!!,
+            omsorgsmottakere.minstEn {
+                DeltOmsorgForBarnUnder6().vilkarsVurder(
+                    GrunnlagDeltOmsorgForBarnUnder6(
+                        omsorgsAr = omsorgsAr,
+                        omsorgsyter = snapshot.omsorgsyter,
                         omsorgsmottaker = it,
-                        prosent = 50
-                    ),
-                    andreParter = involverteVilkarsresultat.mapToAndreParter(it),
+                        omsorgsArbeid50Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
+                            omsorgsyter = omsorgsyter,
+                            omsorgsmottaker = it,
+                            prosent = 50
+                        ),
+                        andreParter = involverteVilkarsresultat.mapToAndreParter(it),
+                    )
                 )
-            )
-        }
+            }
+        )
     }
 
     private fun List<Vilkarsresultat>.mapToAndreParter(omsorgsmottaker: Person) =

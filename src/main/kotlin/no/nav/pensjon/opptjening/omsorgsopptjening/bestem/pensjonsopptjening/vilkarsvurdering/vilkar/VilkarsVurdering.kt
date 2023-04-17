@@ -5,7 +5,7 @@ open class VilkarsVurdering<Grunnlag : Any>(
     val grunnlag: Grunnlag
 ) {
 
-    val utfall = vilkar.utfallsFunksjon(grunnlag)
+    open val utfall = vilkar.utfallsFunksjon(grunnlag)
 
     fun accept(vilkarsVurderingVisitor: VilkarsVurderingVisitor) {
         vilkarsVurderingVisitor.visit(this)

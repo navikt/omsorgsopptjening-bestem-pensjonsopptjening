@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service
 @Service
 class VilkarsVurderingsService(
     private val omsorgsArbeidService: OmsorgsArbeidService,
+    private val vilkarsvurderingAbsolutteKrav: VilkarsvurderingAvAbsolutteKrav,
     private val individuellVilkarsvurdering: IndividuellVilkarsvurdering,
     private val sammenstiltVilkarsvurdering: SammenstiltVilkarsvurdering
 ) {
@@ -17,13 +18,20 @@ class VilkarsVurderingsService(
 
         return (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot)
             .map { Vilkarsresultat(snapshot = it) }
+            .utforVilkarsvurderingAvAbsolutteKrav()
             .utforIndividuellVilkarsvurdering()
             .utforSammenstiltVilkarsvurdering()
     }
 
+    private fun List<Vilkarsresultat>.utforVilkarsvurderingAvAbsolutteKrav() = map {
+        it.apply {
+            vilkarsvurderingAvAbsolutteKrav = vilkarsvurderingAbsolutteKrav.vilkarsvurder(it)
+        }
+    }
+
     private fun List<Vilkarsresultat>.utforIndividuellVilkarsvurdering() = map {
         it.apply {
-            individueltVilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(it.snapshot)
+            individueltVilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(it)
         }
     }
 
