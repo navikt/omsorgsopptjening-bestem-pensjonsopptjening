@@ -19,14 +19,14 @@ class OmsorgsarbeidSnapshotMapper {
                 kjoreHashe = omsorgsarbeidsSnapshot.kjoreHash,
                 omsorgsarbeidSaker = omsorgsarbeidsSnapshot.omsorgsarbeidSaker.map { sak ->
                     OmsorgsarbeidSak(
-                        omsorgsarbeidPerioder = sak.omsorgsarbeidPerioder.map { arbeid ->
+                        omsorgsarbeidPerioder = sak.omsorgsarbeidPerioder.map { periode ->
                             OmsorgsarbeidPeriode(
-                                fom = arbeid.fom,
-                                tom = arbeid.tom,
-                                prosent = arbeid.prosent,
-                                omsorgsytere = arbeid.omsorgsytere.map { persistertePersoner.hentPerson(it.fnr) },
-                                omsorgsmottakere = arbeid.omsorgsmottakere.map { persistertePersoner.hentPerson(it.fnr) },
-                                landstilknytning = convertLandstilknytning(arbeid.landstilknytning)
+                                fom = periode.fom,
+                                tom = periode.tom,
+                                prosent = periode.prosent,
+                                omsorgsytere = periode.omsorgsytere.map { persistertePersoner.hentPerson(it.fnr) },
+                                omsorgsmottakere = periode.omsorgsmottakere.map { persistertePersoner.hentPerson(it.fnr) },
+                                landstilknytning = convertLandstilknytning(periode.landstilknytning)
                             )
                         }
                     )
