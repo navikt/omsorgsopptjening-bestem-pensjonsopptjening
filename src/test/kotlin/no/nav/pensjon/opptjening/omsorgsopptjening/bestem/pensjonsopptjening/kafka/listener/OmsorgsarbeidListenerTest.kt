@@ -30,6 +30,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSnapshot as KafkaSnapshot
 
 
 @EmbeddedKafka(partitions = 1, topics = [OMSORGSOPPTJENING_TOPIC])
@@ -85,14 +86,14 @@ internal class OmsorgsarbeidListenerTest {
             omsorgsAr = 2020,
             fnr = "12345678910",
             fnrOmsorgFor = "22222222222",
-            omsorgstype = OmsorgsarbeidsType.BARNETRYGD,
+            omsorgstype = Omsorgstype.BARNETRYGD,
             messageType = KafkaMessageType.OMSORGSARBEID
         )
 
         val record = omsorgsopptjeingListener.removeFirstRecord(maxSeconds = 10, messageType = OMSORGSOPPTJENING)
         val omsorgsOpptjening = record!!.value().mapToClass(OmsorgsOpptjening::class.java)
 
-        assertEquals(OpptjeningUtfall.INVILGET, omsorgsOpptjening.utfall)
+        assertEquals(Utfall.INVILGET, omsorgsOpptjening.utfall)
         assertEquals(2020, omsorgsOpptjening.omsorgsAr)
         assertEquals("12345678910", omsorgsOpptjening.omsorgsyter.fnr)
         assertEquals("22222222222", omsorgsOpptjening.omsorgsmottakereInvilget.first().fnr)
@@ -129,13 +130,13 @@ internal class OmsorgsarbeidListenerTest {
         sendOmsorgsarbeidsSnapshot(
             omsorgsAr = 2020,
             fnr = "12345678910",
-            omsorgstype = OmsorgsarbeidsType.BARNETRYGD,
+            omsorgstype = Omsorgstype.BARNETRYGD,
             messageType = KafkaMessageType.OMSORGSARBEID
         )
         sendOmsorgsarbeidsSnapshot(
             omsorgsAr = 2020,
             fnr = "12345678910",
-            omsorgstype = OmsorgsarbeidsType.BARNETRYGD,
+            omsorgstype = Omsorgstype.BARNETRYGD,
             messageType = KafkaMessageType.OMSORGSARBEID
         )
 
@@ -153,20 +154,20 @@ internal class OmsorgsarbeidListenerTest {
         omsorgsAr: Int,
         fnr: String,
         fnrOmsorgFor: String? = null,
-        omsorgstype: OmsorgsarbeidsType,
+        omsorgstype: Omsorgstype,
         messageType: KafkaMessageType
-    ): OmsorgsarbeidsSnapshot {
+    ): KafkaSnapshot {
         val omsorgsarbeidsSnapshot =
-            OmsorgsarbeidsSnapshot(
+            KafkaSnapshot(
                 omsorgsyter = Person(fnr),
                 omsorgsAr = omsorgsAr,
                 omsorgstype = omsorgstype,
                 kjoreHash = "XXX",
-                kilde = OmsorgsarbeidsKilde.BARNETRYGD,
+                kilde = Kilde.BARNETRYGD,
                 omsorgsarbeidSaker = listOf(
-                    OmsorgsArbeidSak(
+                    OmsorgsarbeidSak(
                         omsorgsarbeidPerioder = listOf(
-                            OmsorgsArbeid(
+                            OmsorgsarbeidPeriode(
                                 fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                                 prosent = 100,

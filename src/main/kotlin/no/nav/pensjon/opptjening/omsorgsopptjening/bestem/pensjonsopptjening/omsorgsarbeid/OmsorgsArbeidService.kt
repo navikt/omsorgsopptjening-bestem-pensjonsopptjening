@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidSnapshotRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.PersonService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSnapshot as KafkaSnapshot
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,13 +17,13 @@ class OmsorgsArbeidService(
         .getAndreOmsorgsytere()
         .flatMap { omsorgsarbeidSnapshotRepository.find(it, snapshot.omsorgsAr) }
 
-    fun createAndSaveOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
+    fun createAndSaveOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: KafkaSnapshot): OmsorgsarbeidSnapshot {
         val personer = personService.createPersoner(hentFnr(omsorgsarbeidsSnapshot))
 
         return omsorgsarbeidSnapshotRepository.save(mapKafkaMessageToDomain(omsorgsarbeidsSnapshot, personer))
     }
 
-    private fun hentFnr(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot) = omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr }
+    private fun hentFnr(omsorgsarbeidsSnapshot: KafkaSnapshot) = omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr }
 
-    private fun mapKafkaMessageToDomain(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot, personer: List<Person>) = OmsorgsarbeidSnapshotMapper.map(omsorgsarbeidsSnapshot, personer)
+    private fun mapKafkaMessageToDomain(omsorgsarbeidsSnapshot: KafkaSnapshot, personer: List<Person>) = OmsorgsarbeidSnapshotMapper.map(omsorgsarbeidsSnapshot, personer)
 }

@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsArbeidService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsopptjeningsService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSnapshot
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -48,7 +48,7 @@ class OmsorgsarbeidListener(
         acknowledgment.acknowledge()
     }
 
-    private fun map(kafkaMessage: String) = kafkaMessage.mapToClass(OmsorgsarbeidsSnapshot::class.java)
+    private fun map(kafkaMessage: String) = kafkaMessage.mapToClass(OmsorgsarbeidSnapshot::class.java)
 
     companion object {
         private val SECURE_LOG = LoggerFactory.getLogger("secure")
