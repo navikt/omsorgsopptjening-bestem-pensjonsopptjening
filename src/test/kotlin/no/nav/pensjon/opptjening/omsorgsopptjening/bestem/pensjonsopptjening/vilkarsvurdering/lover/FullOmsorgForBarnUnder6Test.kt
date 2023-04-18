@@ -40,7 +40,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = AR_2020,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
                 ),
@@ -67,7 +67,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = AR_2020,
                 omsorgsmottaker = omsorgsmottaker_2020,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
                 )
@@ -94,7 +94,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = AR_2020,
                 omsorgsmottaker = omsorgsmottaker_2020,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
                 )
@@ -127,7 +127,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = AR_2020,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
                 ),
@@ -150,7 +150,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = AR_2020,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
                 )
@@ -187,7 +187,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = AR_2020,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL),
                     OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
@@ -220,7 +220,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = AR_2020,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL),
                     OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL),
@@ -239,7 +239,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = AR_2020,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(),
             )
         )
@@ -261,7 +261,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker_2000,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(
                         fom = YearMonth.of(omsorgsAr, Month.JANUARY),
@@ -293,7 +293,7 @@ class FullOmsorgForBarnUnder6Test {
             grunnlag = GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = AR_2023,
                 omsorgsmottaker = omsorgsmottaker_deceased_2023,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(
                     OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
                 )

@@ -16,15 +16,15 @@ class IndividuellVilkarsvurdering {
         val omsorgsyter = snapshot.omsorgsyter
         val omsorgsmottakere = snapshot.getOmsorgsmottakere(omsorgsyter)
 
-        return omsorgsmottakere.minstEn {
+        return omsorgsmottakere.minstEn { omsorgsmottaker ->
             FullOmsorgForBarnUnder6().vilkarsVurder(
                 GrunnlagOmsorgForBarnUnder6(
                     omsorgsAr = omsorgsAr,
-                    omsorgsmottaker = it,
-                    utfallAbsolutteKrav = vilkarsresultat.personVilkarsvurdering!!.utfall,
+                    omsorgsmottaker = omsorgsmottaker,
+                    utfallPersonVilkarsvurdering = vilkarsresultat.personVilkarsvurdering!!.utfall,
                     omsorgsArbeid100Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
                         omsorgsyter,
-                        it,
+                        omsorgsmottaker,
                         prosent = 100
                     )
                 )

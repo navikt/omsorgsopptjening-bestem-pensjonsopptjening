@@ -9,7 +9,7 @@ data class GrunnlagDeltOmsorgForBarnUnder6(
     val omsorgsAr: Int,
     val omsorgsyter: Person,
     val omsorgsmottaker: Person,
-    val utfallAbsolutteKrav: Utfall,
+    val utfallPersonVilkarsvurdering: Utfall,
     val omsorgsArbeid50Prosent: List<OmsorgsarbeidPeriode>,
     val andreParter: List<AnnenPart>,
 )

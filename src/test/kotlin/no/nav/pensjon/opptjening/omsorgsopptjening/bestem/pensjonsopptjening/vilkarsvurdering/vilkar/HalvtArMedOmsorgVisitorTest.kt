@@ -51,7 +51,7 @@ internal class HalvtArMedOmsorgVisitorTest {
             GrunnlagOmsorgForBarnUnder6(
                 omsorgsAr = 2020,
                 omsorgsmottaker = createPerson(fnrOmsorgsmottaker),
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid100Prosent = listOf(),
             )
         )

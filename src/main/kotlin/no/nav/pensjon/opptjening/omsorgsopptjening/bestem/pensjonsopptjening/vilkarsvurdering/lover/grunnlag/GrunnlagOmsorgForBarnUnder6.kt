@@ -7,6 +7,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 data class GrunnlagOmsorgForBarnUnder6(
     val omsorgsAr: Int,
     val omsorgsmottaker: Person,
-    val utfallAbsolutteKrav: Utfall,
+    val utfallPersonVilkarsvurdering: Utfall,
     val omsorgsArbeid100Prosent: List<OmsorgsarbeidPeriode>,
 )

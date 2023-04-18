@@ -53,7 +53,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = AR_2020,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(
@@ -97,7 +97,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = AR_2020,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2020,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(
@@ -141,7 +141,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = AR_2020,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2020,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(
@@ -193,7 +193,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = AR_2020,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(
@@ -234,7 +234,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = AR_2020,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(
@@ -297,7 +297,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = AR_2020,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(
@@ -364,7 +364,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = AR_2020,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(
@@ -388,7 +388,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = AR_2020,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2015,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = listOf(),
                 andreParter = listOf()
             )
@@ -423,7 +423,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = omsorgsAr,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2000,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(
@@ -453,7 +453,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = omsorgsAr,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2000,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = listOf(
                     OmsorgsarbeidPeriode(
                         fom = YearMonth.of(omsorgsAr, Month.JANUARY),
@@ -497,7 +497,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = omsorgsAr,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2000,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = emptyList()
                 )
@@ -524,7 +524,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = omsorgsAr,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2000,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(
@@ -564,7 +564,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsAr = omsorgsAr,
                 omsorgsyter = omsorgsyter_1988,
                 omsorgsmottaker = omsorgsmottaker_2000,
-                utfallAbsolutteKrav = Utfall.INVILGET,
+                utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = perioder,
                 andreParter = listOf(
                     AnnenPart(

@@ -20,35 +20,35 @@ class SammenstiltVilkarsvurdering {
         val omsorgsyter: Person = snapshot.omsorgsyter
         val omsorgsmottakere: List<Person> = snapshot.getOmsorgsmottakere(omsorgsyter)
 
-        return omsorgsmottakere.minstEn {
+        return omsorgsmottakere.minstEn { omsorgsmottaker ->
             DeltOmsorgForBarnUnder6().vilkarsVurder(
                 GrunnlagDeltOmsorgForBarnUnder6(
                     omsorgsAr = omsorgsAr,
-                    omsorgsyter = snapshot.omsorgsyter,
-                    omsorgsmottaker = it,
-                    utfallAbsolutteKrav = behandledeVilkarsresultat.personVilkarsvurdering!!.utfall,
+                    omsorgsyter = omsorgsyter,
+                    omsorgsmottaker = omsorgsmottaker,
+                    utfallPersonVilkarsvurdering = behandledeVilkarsresultat.personVilkarsvurdering!!.utfall,
                     omsorgsArbeid50Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
                         omsorgsyter = omsorgsyter,
-                        omsorgsmottaker = it,
+                        omsorgsmottaker = omsorgsmottaker,
                         prosent = 50
                     ),
-                    andreParter = involverteVilkarsresultat.mapToAndreParter(it),
+                    andreParter = involverteVilkarsresultat.mapToAndreParter(omsorgsmottaker),
                 )
             )
         }
     }
 
     private fun List<Vilkarsresultat>.mapToAndreParter(omsorgsmottaker: Person) =
-        map {
+        map { annenPartsVilkarsresultat ->
             AnnenPart(
-                omsorgsyter = it.snapshot.omsorgsyter,
-                omsorgsArbeid50Prosent = it.snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
-                    it.snapshot.omsorgsyter,
+                omsorgsyter = annenPartsVilkarsresultat.snapshot.omsorgsyter,
+                omsorgsArbeid50Prosent = annenPartsVilkarsresultat.snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
+                    annenPartsVilkarsresultat.snapshot.omsorgsyter,
                     omsorgsmottaker,
                     prosent = 50
                 ),
-                harInvilgetOmsorgForUrelaterBarn = it.individueltVilkarsVurdering!!.utfall == Utfall.INVILGET,
-                utfallAbsolutteKrav = it.personVilkarsvurdering!!.utfall,
+                harInvilgetOmsorgForUrelaterBarn = annenPartsVilkarsresultat.individueltVilkarsVurdering!!.utfall == Utfall.INVILGET,
+                utfallAbsolutteKrav = annenPartsVilkarsresultat.personVilkarsvurdering!!.utfall,
             )
         }.filter { it.omsorgsArbeid50Prosent.isNotEmpty() }
 }
