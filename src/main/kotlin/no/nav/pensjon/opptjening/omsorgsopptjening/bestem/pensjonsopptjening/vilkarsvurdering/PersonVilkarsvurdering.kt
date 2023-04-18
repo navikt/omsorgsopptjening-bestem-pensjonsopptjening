@@ -9,7 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import org.springframework.stereotype.Component
 
 @Component
-class VilkarsvurderingAvAbsolutteKrav {
+class PersonVilkarsvurdering {
     fun vilkarsvurder(vilkarsResultat: Vilkarsresultat): VilkarsVurdering<List<VilkarsVurdering<*>>> {
         val snapshot = vilkarsResultat.snapshot
         val omsorgsAr = snapshot.omsorgsAr

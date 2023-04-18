@@ -295,7 +295,7 @@ internal class IndividuellVilkarsvurderingTest {
         Mockito.`when`(mockVilkarsVurdering.utfall).thenReturn(utfallAbsolutteKrav)
         return Vilkarsresultat(
             snapshot = snapshot,
-            vilkarsvurderingAvAbsolutteKrav = mockVilkarsVurdering
+            personVilkarsvurdering = mockVilkarsVurdering
         )
     }
 

@@ -6,7 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 
 data class Vilkarsresultat(
     val snapshot: OmsorgsarbeidSnapshot,
-    var vilkarsvurderingAvAbsolutteKrav: VilkarsVurdering<*>? = null,
+    var personVilkarsvurdering: VilkarsVurdering<*>? = null,
     var individueltVilkarsVurdering: VilkarsVurdering<*>? = null,
     var sammenstiltVilkarsVurdering: VilkarsVurdering<*>? = null,
 ) {
@@ -16,7 +16,7 @@ data class Vilkarsresultat(
     fun getOmsorgsAr() = snapshot.omsorgsAr
 
     fun getUtfall() = og(
-        vilkarsvurderingAvAbsolutteKrav!!,
+        personVilkarsvurdering!!,
         eller(individueltVilkarsVurdering!!, sammenstiltVilkarsVurdering!!)
     ).utfall
 

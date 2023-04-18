@@ -5,23 +5,26 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidSnapshotRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.PersonService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidsSnapshot
 import org.springframework.stereotype.Service
 
 @Service
 class OmsorgsArbeidService(
     private val personService: PersonService,
-    private val repository: OmsorgsarbeidSnapshotRepository
+    private val omsorgsarbeidSnapshotRepository: OmsorgsarbeidSnapshotRepository
 ) {
-
-    fun createAndSaveOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
-        val persistertePersoner = personService.createPersoner(omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr })
-        val omsorgsArbeidSnapshotEntity = OmsorgsarbeidSnapshotMapper.map(omsorgsarbeidsSnapshot, persistertePersoner)
-
-        return repository.save(omsorgsArbeidSnapshotEntity)
-    }
-
     fun relaterteSnapshot(snapshot: OmsorgsarbeidSnapshot) = snapshot
         .getAndreOmsorgsytere()
-        .flatMap { repository.find(it, snapshot.omsorgsAr) }
+        .flatMap { omsorgsarbeidSnapshotRepository.find(it, snapshot.omsorgsAr) }
+
+    fun createAndSaveOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot): OmsorgsarbeidSnapshot {
+        val personer = personService.createPersoner(hentFnr(omsorgsarbeidsSnapshot))
+
+        return omsorgsarbeidSnapshotRepository.save(mapKafkaMessageToDomain(omsorgsarbeidsSnapshot, personer))
+    }
+
+    private fun hentFnr(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot) = omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr }
+
+    private fun mapKafkaMessageToDomain(omsorgsarbeidsSnapshot: OmsorgsarbeidsSnapshot, personer: List<Person>) = OmsorgsarbeidSnapshotMapper.map(omsorgsarbeidsSnapshot, personer)
 }

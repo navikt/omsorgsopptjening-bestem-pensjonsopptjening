@@ -21,7 +21,7 @@ class IndividuellVilkarsvurdering {
                 GrunnlagOmsorgForBarnUnder6(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = it,
-                    utfallAbsolutteKrav = vilkarsresultat.vilkarsvurderingAvAbsolutteKrav!!.utfall,
+                    utfallAbsolutteKrav = vilkarsresultat.personVilkarsvurdering!!.utfall,
                     omsorgsArbeid100Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
                         omsorgsyter,
                         it,

@@ -26,7 +26,7 @@ class SammenstiltVilkarsvurdering {
                     omsorgsAr = omsorgsAr,
                     omsorgsyter = snapshot.omsorgsyter,
                     omsorgsmottaker = it,
-                    utfallAbsolutteKrav = behandledeVilkarsresultat.vilkarsvurderingAvAbsolutteKrav!!.utfall,
+                    utfallAbsolutteKrav = behandledeVilkarsresultat.personVilkarsvurdering!!.utfall,
                     omsorgsArbeid50Prosent = snapshot.getOmsorgsarbeidPerioderForRelevanteAr(
                         omsorgsyter = omsorgsyter,
                         omsorgsmottaker = it,
@@ -48,7 +48,7 @@ class SammenstiltVilkarsvurdering {
                     prosent = 50
                 ),
                 harInvilgetOmsorgForUrelaterBarn = it.individueltVilkarsVurdering!!.utfall == Utfall.INVILGET,
-                utfallAbsolutteKrav = it.vilkarsvurderingAvAbsolutteKrav!!.utfall,
+                utfallAbsolutteKrav = it.personVilkarsvurdering!!.utfall,
             )
         }.filter { it.omsorgsArbeid50Prosent.isNotEmpty() }
 }
