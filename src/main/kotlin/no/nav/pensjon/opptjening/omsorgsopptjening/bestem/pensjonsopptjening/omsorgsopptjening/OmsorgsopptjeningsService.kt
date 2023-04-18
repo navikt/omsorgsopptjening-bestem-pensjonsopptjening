@@ -25,7 +25,7 @@ class OmsorgsopptjeningsService(
             OmsorgsOpptjening(
                 omsorgsAr = vilkarsresultat.getOmsorgsAr(),
                 omsorgsyter = vilkarsresultat.getOmsorgsyter(),
-                grunnlag = vilkarsresultat.snapshot,
+                omsorgsarbeidSnapshot = vilkarsresultat.snapshot,
                 vilkarsResultat = vilkarsresultat,
                 utfall = vilkarsresultat.getUtfall(),
                 omsorgsmottakereInvilget = vilkarsresultat.hentVilkarsVurderingerFullOmsorgForBarnUnder6()
