@@ -24,20 +24,20 @@ class VilkarsVurderingsService(
     }
 
     private fun List<Vilkarsresultat>.utforPersonVilkarsvurdering() = map {
-        it.apply {
-            personVilkarsvurdering = personVilkarsvurdering.vilkarsvurder(it)
+        it.also {
+            it.personVilkarsvurdering = personVilkarsvurdering.vilkarsvurder(it)
         }
     }
 
     private fun List<Vilkarsresultat>.utforIndividuellVilkarsvurdering() = map {
-        it.apply {
-            individueltVilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(it)
+        it.also {
+            it.individueltVilkarsVurdering = individuellVilkarsvurdering.vilkarsvurder(it)
         }
     }
 
     private fun List<Vilkarsresultat>.utforSammenstiltVilkarsvurdering() = map {
-        it.apply {
-            sammenstiltVilkarsVurdering = sammenstiltVilkarsvurdering.vilkarsvurder(
+        it.also {
+            it.sammenstiltVilkarsVurdering = sammenstiltVilkarsvurdering.vilkarsvurder(
                 behandledeVilkarsresultat = it,
                 involverteVilkarsresultat = filter { involverte -> !involverte.snapshot.omsorgsyter.erSammePerson(it.snapshot.omsorgsyter) }
             )
