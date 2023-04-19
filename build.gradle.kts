@@ -2,12 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val domeneVersion = "1.0.38"
 val azureAdClient = "0.0.7"
-val jacksonVersion = "2.14.1"
-val logbackEncoderVersion = "7.2"
-val postgresqlVersion = "42.5.1"
-val flywayCoreVersion = "9.15.1"
-val springKafkaTestVersion = "3.0.4"
-val springCloudContractVersion = "4.0.1"
+val jacksonVersion = "2.14.2"
+val logbackEncoderVersion = "7.3"
+val postgresqlVersion = "42.5.4"
+val flywayCoreVersion = "9.16.1"
+val springKafkaTestVersion = "3.0.5"
+val springCloudContractVersion = "4.0.2"
 val testcontainersVersion = "1.17.6"
 
 plugins {
