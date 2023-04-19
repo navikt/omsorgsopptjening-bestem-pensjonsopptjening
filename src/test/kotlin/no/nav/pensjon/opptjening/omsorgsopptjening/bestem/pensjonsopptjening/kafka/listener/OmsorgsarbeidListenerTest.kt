@@ -31,6 +31,7 @@ import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSnapshot as KafkaSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidVedtak as KafkaOmsorgsarbeidVedtak
 
 
 @EmbeddedKafka(partitions = 1, topics = [OMSORGSOPPTJENING_TOPIC])
@@ -166,8 +167,8 @@ internal class OmsorgsarbeidListenerTest {
                 kilde = Kilde.BARNETRYGD,
                 omsorgsarbeidSaker = listOf(
                     OmsorgsarbeidSak(
-                        omsorgsarbeidPerioder = listOf(
-                            OmsorgsarbeidPeriode(
+                        omsorgsarbeidVedtak = listOf(
+                            KafkaOmsorgsarbeidVedtak(
                                 fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                                 prosent = 100,

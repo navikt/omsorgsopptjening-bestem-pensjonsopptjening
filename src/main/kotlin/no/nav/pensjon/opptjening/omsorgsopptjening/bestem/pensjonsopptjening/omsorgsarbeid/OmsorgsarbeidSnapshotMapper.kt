@@ -19,7 +19,7 @@ class OmsorgsarbeidSnapshotMapper {
                 kjoreHashe = omsorgsarbeidsSnapshot.kjoreHash,
                 omsorgsarbeidSaker = omsorgsarbeidsSnapshot.omsorgsarbeidSaker.map { sak ->
                     OmsorgsarbeidSak(
-                        omsorgsarbeidPerioder = sak.omsorgsarbeidPerioder.map { periode ->
+                        omsorgsarbeidPerioder = sak.omsorgsarbeidVedtak.map { periode ->
                             OmsorgsarbeidPeriode(
                                 fom = periode.fom,
                                 tom = periode.tom,

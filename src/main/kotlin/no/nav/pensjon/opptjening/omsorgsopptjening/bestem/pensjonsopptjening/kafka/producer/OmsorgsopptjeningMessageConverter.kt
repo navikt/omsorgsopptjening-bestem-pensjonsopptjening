@@ -10,7 +10,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjeningKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Landstilknytning as KafkaLandstilknytning
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidPeriode as KafkaOmsorgsarbeidPerioder
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidVedtak as KafkaOmsorgsarbeidVedtak
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSak as KafkaOmsorgsarbeidSak
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening as KafkaOmsorgsOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde as KafkaKilde
@@ -52,8 +52,8 @@ fun map(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot): KafkaOmsorgsarbeidsSnapsh
         kilde = convertToOmsorgsarbeidsKilde(omsorgsarbeidSnapshot.kilde),
         omsorgsarbeidSaker = omsorgsarbeidSnapshot.omsorgsarbeidSaker.map { sak ->
             KafkaOmsorgsarbeidSak(
-                omsorgsarbeidPerioder = sak.omsorgsarbeidPerioder.map { periode ->
-                    KafkaOmsorgsarbeidPerioder(
+                omsorgsarbeidVedtak = sak.omsorgsarbeidPerioder.map { periode ->
+                    KafkaOmsorgsarbeidVedtak(
                         fom = periode.fom,
                         tom = periode.tom,
                         prosent = periode.prosent,

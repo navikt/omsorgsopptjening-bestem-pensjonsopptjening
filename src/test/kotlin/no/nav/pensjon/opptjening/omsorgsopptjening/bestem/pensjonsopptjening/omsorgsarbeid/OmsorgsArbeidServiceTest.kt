@@ -21,6 +21,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 import java.time.Month
 import java.time.YearMonth
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSnapshot as KafkaSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidVedtak as KafkaOmsorgsarbeidVedtak
 
 
 @EmbeddedKafka(partitions = 1, topics = [OmsorgsarbeidListenerTest.OMSORGSOPPTJENING_TOPIC])
@@ -52,7 +53,7 @@ internal class OmsorgsArbeidServiceTest {
             omsorgsAr = 2020,
             omsorgsyter = omsorgsYter1.gjeldendeFnr,
             omsorgstype = Omsorgstype.BARNETRYGD,
-            omsorgsarbeid = listOf(
+            omsorgsarbeidVedtak = listOf(
                 createKafkaOmsorgsarbeid(
                     fom = YearMonth.of(2020, Month.JANUARY),
                     tom = YearMonth.of(2020, Month.DECEMBER),
@@ -74,7 +75,7 @@ internal class OmsorgsArbeidServiceTest {
             omsorgsAr = OMSORGS_AR_2020,
             omsorgsyter = omsorgsYter1.gjeldendeFnr,
             omsorgstype = Omsorgstype.BARNETRYGD,
-            omsorgsarbeid = listOf(
+            omsorgsarbeidVedtak = listOf(
                 createKafkaOmsorgsarbeid(
                     fom = YearMonth.of(OMSORGS_AR_2020, Month.JANUARY),
                     tom = YearMonth.of(OMSORGS_AR_2020, Month.DECEMBER),
@@ -96,7 +97,7 @@ internal class OmsorgsArbeidServiceTest {
             omsorgsAr = OMSORGS_AR_2020,
             omsorgsyter = omsorgsYter1.gjeldendeFnr,
             omsorgstype = Omsorgstype.BARNETRYGD,
-            omsorgsarbeid = listOf(
+            omsorgsarbeidVedtak = listOf(
                 createKafkaOmsorgsarbeid(
                     fom = YearMonth.of(OMSORGS_AR_2020, Month.JANUARY),
                     tom = YearMonth.of(OMSORGS_AR_2020, Month.DECEMBER),
@@ -110,7 +111,7 @@ internal class OmsorgsArbeidServiceTest {
             omsorgsAr = OMSORGS_AR_2020,
             omsorgsyter = omsorgsYter2.gjeldendeFnr,
             omsorgstype = Omsorgstype.BARNETRYGD,
-            omsorgsarbeid = listOf(
+            omsorgsarbeidVedtak = listOf(
                 createKafkaOmsorgsarbeid(
                     fom = YearMonth.of(OMSORGS_AR_2020, Month.JANUARY),
                     tom = YearMonth.of(OMSORGS_AR_2020, Month.DECEMBER),
@@ -135,7 +136,7 @@ internal class OmsorgsArbeidServiceTest {
         omsorgsAr: Int,
         omsorgsyter: String,
         omsorgstype: Omsorgstype,
-        omsorgsarbeid: List<OmsorgsarbeidPeriode>
+        omsorgsarbeidVedtak: List<KafkaOmsorgsarbeidVedtak>
     ): KafkaSnapshot {
         return KafkaSnapshot(
             omsorgsyter = Person(omsorgsyter),
@@ -144,7 +145,7 @@ internal class OmsorgsArbeidServiceTest {
             kjoreHash = "XXX",
             kilde = Kilde.BARNETRYGD,
             omsorgsarbeidSaker = listOf(
-                OmsorgsarbeidSak(omsorgsarbeidPerioder = omsorgsarbeid)
+                OmsorgsarbeidSak(omsorgsarbeidVedtak = omsorgsarbeidVedtak)
             )
         )
     }
@@ -154,7 +155,7 @@ internal class OmsorgsArbeidServiceTest {
         tom: YearMonth,
         omsorgsytere: List<String>,
         omsorgsmottakere: List<String>,
-    ) = OmsorgsarbeidPeriode(
+    ) = KafkaOmsorgsarbeidVedtak(
         fom = fom,
         tom = tom,
         prosent = 100,
