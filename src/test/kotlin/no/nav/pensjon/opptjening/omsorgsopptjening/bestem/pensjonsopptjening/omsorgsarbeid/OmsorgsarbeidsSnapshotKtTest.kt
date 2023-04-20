@@ -17,8 +17,8 @@ internal class OmsorgsarbeidsSnapshotKtTest {
 
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
-                OmsorgsarbeidSak(
-                    omsorgsarbeidPerioder = listOf(omsorgsArbeidPerson1)
+                OmsorgsSak(
+                    omsorgVedtakPerioder = listOf(omsorgsArbeidPerson1)
                 )
             )
         )
@@ -38,8 +38,8 @@ internal class OmsorgsarbeidsSnapshotKtTest {
 
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
-                OmsorgsarbeidSak(
-                    omsorgsarbeidPerioder = omsorgsArbeidPerson1
+                OmsorgsSak(
+                    omsorgVedtakPerioder = omsorgsArbeidPerson1
                 )
             )
         )
@@ -56,8 +56,8 @@ internal class OmsorgsarbeidsSnapshotKtTest {
 
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
-                OmsorgsarbeidSak(
-                    omsorgsarbeidPerioder = listOf(
+                OmsorgsSak(
+                    omsorgVedtakPerioder = listOf(
                         omsorgsArbeidPerson2
                     )
                 )
@@ -78,8 +78,8 @@ internal class OmsorgsarbeidsSnapshotKtTest {
 
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
-                OmsorgsarbeidSak(
-                    omsorgsarbeidPerioder = listOf(
+                OmsorgsSak(
+                    omsorgVedtakPerioder = listOf(
                         omsorgsArbeidPerson1,
                         omsorgsArbeidPerson2
                     )
@@ -93,18 +93,18 @@ internal class OmsorgsarbeidsSnapshotKtTest {
         assertEquals(omsorgsArbeidPerson1, omsorgsArbeid.first())
     }
 
-    private fun creatOmsorgsArbeidSnapshot(omsorgsArbeidSaker: List<OmsorgsarbeidSak> = listOf()) =
-        OmsorgsarbeidSnapshot(
+    private fun creatOmsorgsArbeidSnapshot(omsorgsArbeidSaker: List<OmsorgsSak> = listOf()) =
+        OmsorgsGrunnlag(
             omsorgsAr = 2010,
             kjoreHashe = "xxx",
             omsorgsyter = randomPerson,
             omsorgstype = Omsorgstype.BARNETRYGD,
             kilde = Kilde.BARNETRYGD,
-            omsorgsarbeidSaker = omsorgsArbeidSaker
+            omsorgsSaker = omsorgsArbeidSaker
         )
 
     private fun createOmsorgsarbeid(omsorgsyter: Person, fom: YearMonth, tom: YearMonth) =
-        OmsorgsarbeidPeriode(
+        OmsorgVedtakPeriode(
             fom = fom,
             tom = tom,
             prosent = 100,

@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ka
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Landstilknytning
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Omsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.OmsorgsOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
@@ -30,7 +30,7 @@ fun OmsorgsOpptjening.createKafkaValue(): String = KafkaOmsorgsOpptjening(
     omsorgsAr = omsorgsAr,
     omsorgsyter = KafkaPerson(omsorgsyter.gjeldendeFnr.fnr),
     omsorgsmottakereInvilget = omsorgsmottakereInvilget.map { KafkaPerson(it.gjeldendeFnr.fnr) },
-    grunnlag = map(omsorgsarbeidSnapshot),
+    grunnlag = map(omsorgsGrunnlag),
     vilkarsResultat = vilkarsResultat.mapToJson(),
     utfall = mapToKafkaUtfall(utfall)
 ).mapToJson()
@@ -43,16 +43,16 @@ private fun mapToKafkaUtfall(utfall: Utfall): KafkaUtfall =
         Utfall.MANGLER_ANNEN_OMSORGSYTER -> KafkaUtfall.MANGLER_ANNEN_OMSORGSYTER
     }
 
-fun map(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot): KafkaOmsorgsarbeidsSnapshot {
+fun map(omsorgsGrunnlag: OmsorgsGrunnlag): KafkaOmsorgsarbeidsSnapshot {
     return KafkaOmsorgsarbeidsSnapshot(
-        omsorgsyter = convertPerson(omsorgsarbeidSnapshot.omsorgsyter),
-        omsorgsAr = omsorgsarbeidSnapshot.omsorgsAr,
-        omsorgstype = convertToOmsorgsarbeidsType(omsorgsarbeidSnapshot.omsorgstype),
-        kjoreHash = omsorgsarbeidSnapshot.kjoreHashe,
-        kilde = convertToOmsorgsarbeidsKilde(omsorgsarbeidSnapshot.kilde),
-        omsorgsSaker = omsorgsarbeidSnapshot.omsorgsarbeidSaker.map { sak ->
+        omsorgsyter = convertPerson(omsorgsGrunnlag.omsorgsyter),
+        omsorgsAr = omsorgsGrunnlag.omsorgsAr,
+        omsorgstype = convertToOmsorgsarbeidsType(omsorgsGrunnlag.omsorgstype),
+        kjoreHash = omsorgsGrunnlag.kjoreHashe,
+        kilde = convertToOmsorgsarbeidsKilde(omsorgsGrunnlag.kilde),
+        omsorgsSaker = omsorgsGrunnlag.omsorgsSaker.map { sak ->
             KafkaOmsorgsSak(
-                omsorgVedtakPeriode = sak.omsorgsarbeidPerioder.map { periode ->
+                omsorgVedtakPeriode = sak.omsorgVedtakPerioder.map { periode ->
                     KafkaOmsorgVedtakPeriode(
                         fom = periode.fom,
                         tom = periode.tom,

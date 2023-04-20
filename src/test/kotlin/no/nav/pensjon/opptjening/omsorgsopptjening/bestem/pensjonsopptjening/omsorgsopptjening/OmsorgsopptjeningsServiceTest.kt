@@ -71,13 +71,13 @@ class OmsorgsopptjeningsServiceTest {
 
         val snapshotOmsorgsyter1 = creatOmsorgsArbeidSnapshot(
             omsorgsyter = omsorgsYter1,
-            omsorgsArbeidSaker = listOf(OmsorgsarbeidSak(omsorgsarbeidPerioder = listOf(omsorgsPeriode1))),
+            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgVedtakPerioder = listOf(omsorgsPeriode1))),
             omsorgsAr = OMSORGS_AR_2020
         )
 
         val snapshotOmsorgsyter2 = creatOmsorgsArbeidSnapshot(
             omsorgsyter = omsorgsYter2,
-            omsorgsArbeidSaker = listOf(OmsorgsarbeidSak(omsorgsarbeidPerioder = listOf(omsorgsPeriode2))),
+            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgVedtakPerioder = listOf(omsorgsPeriode2))),
             omsorgsAr = OMSORGS_AR_2020
         )
 
@@ -110,15 +110,15 @@ class OmsorgsopptjeningsServiceTest {
         kjoreHashe: String = KJORE_HASHE,
         omsorgstype: Omsorgstype = TYPE_BARNETRYGD,
         kilde: Kilde = KILDE_BARNETRYGD,
-        omsorgsArbeidSaker: List<OmsorgsarbeidSak> = listOf()
+        omsorgsArbeidSaker: List<OmsorgsSak> = listOf()
     ) =
-        OmsorgsarbeidSnapshot(
+        OmsorgsGrunnlag(
             omsorgsAr = omsorgsAr,
             kjoreHashe = kjoreHashe,
             omsorgsyter = omsorgsyter,
             omsorgstype = omsorgstype,
             kilde = kilde,
-            omsorgsarbeidSaker = omsorgsArbeidSaker
+            omsorgsSaker = omsorgsArbeidSaker
         )
 
     private fun createOmsorgsarbeidPeriode(
@@ -128,7 +128,7 @@ class OmsorgsopptjeningsServiceTest {
         omsorgsytere: List<Person>,
         omsorgsMottakere: List<Person>
     ) =
-        OmsorgsarbeidPeriode(
+        OmsorgVedtakPeriode(
             fom = fom,
             tom = tom,
             prosent = prosent,

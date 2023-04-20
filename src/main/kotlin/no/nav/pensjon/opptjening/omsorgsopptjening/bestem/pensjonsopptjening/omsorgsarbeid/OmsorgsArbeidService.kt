@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid
 
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidSnapshotRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.PersonService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
@@ -13,11 +13,11 @@ class OmsorgsArbeidService(
     private val personService: PersonService,
     private val omsorgsarbeidSnapshotRepository: OmsorgsarbeidSnapshotRepository
 ) {
-    fun relaterteSnapshot(snapshot: OmsorgsarbeidSnapshot) = snapshot
+    fun relaterteSnapshot(snapshot: OmsorgsGrunnlag) = snapshot
         .getAndreOmsorgsytere()
         .flatMap { omsorgsarbeidSnapshotRepository.find(it, snapshot.omsorgsAr) }
 
-    fun createAndSaveOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: KafkaSnapshot): OmsorgsarbeidSnapshot {
+    fun createAndSaveOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: KafkaSnapshot): OmsorgsGrunnlag {
         val personer = personService.createPersoner(hentFnr(omsorgsarbeidsSnapshot))
 
         return omsorgsarbeidSnapshotRepository.save(mapKafkaMessageToDomain(omsorgsarbeidsSnapshot, personer))

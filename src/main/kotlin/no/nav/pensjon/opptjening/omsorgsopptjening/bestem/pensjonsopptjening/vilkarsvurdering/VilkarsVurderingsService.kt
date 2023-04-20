@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsArbeidService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Vilkarsresultat
 import org.springframework.stereotype.Service
 
@@ -13,10 +13,10 @@ class VilkarsVurderingsService(
     private val sammenstiltVilkarsvurdering: SammenstiltVilkarsvurdering
 ) {
 
-    fun vilkarsVurder(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot): List<Vilkarsresultat> {
-        val relaterteOmsorgsarbeidSnapshot = omsorgsArbeidService.relaterteSnapshot(omsorgsarbeidSnapshot)
+    fun vilkarsVurder(omsorgsGrunnlag: OmsorgsGrunnlag): List<Vilkarsresultat> {
+        val relaterteOmsorgsarbeidSnapshot = omsorgsArbeidService.relaterteSnapshot(omsorgsGrunnlag)
 
-        return (relaterteOmsorgsarbeidSnapshot + omsorgsarbeidSnapshot)
+        return (relaterteOmsorgsarbeidSnapshot + omsorgsGrunnlag)
             .map { Vilkarsresultat(snapshot = it) }
             .utforPersonVilkarsvurdering()
             .utforIndividuellVilkarsvurdering()

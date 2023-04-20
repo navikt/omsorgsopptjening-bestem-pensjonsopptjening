@@ -6,7 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 
 @Entity
 @Table(name = "OMSORGSARBEID_SNAPSHOT")
-data class OmsorgsarbeidSnapshot(
+data class OmsorgsGrunnlag(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "OMSORGSARBEID_SNAPSHOT_ID", nullable = false)
@@ -24,7 +24,7 @@ data class OmsorgsarbeidSnapshot(
         nullable = false,
         referencedColumnName = "OMSORGSARBEID_SNAPSHOT_ID"
     )
-    val omsorgsarbeidSaker: List<OmsorgsarbeidSak>,
+    val omsorgsSaker: List<OmsorgsSak>,
 
     @OneToOne
     @JoinColumn(name = "OMSORGSYTER", nullable = false, referencedColumnName = "PERSON_ID")
@@ -41,7 +41,7 @@ data class OmsorgsarbeidSnapshot(
     @Column(name = "KJORE_HASHE", nullable = false)
     val kjoreHashe: String,
 
-) {
+    ) {
 
     fun getOmsorgsmottakere(omsorgsyter: Person) =
         getOmsorgsarbeidPerioderForRelevanteAr(omsorgsyter)
@@ -71,7 +71,7 @@ data class OmsorgsarbeidSnapshot(
             .filter { Periode(it.fom, it.tom).overlapper(omsorgsAr, omsorgsAr + 1) }
 
     private fun getOmsorgsarbeidPerioderForRelevanteAr() =
-        omsorgsarbeidSaker.flatMap { sak -> sak.omsorgsarbeidPerioder }
+        omsorgsSaker.flatMap { sak -> sak.omsorgVedtakPerioder }
 
 
 }

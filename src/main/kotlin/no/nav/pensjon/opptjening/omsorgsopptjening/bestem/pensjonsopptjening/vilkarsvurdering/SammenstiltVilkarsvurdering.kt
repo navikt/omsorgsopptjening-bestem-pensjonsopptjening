@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.DeltOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.AnnenPart
@@ -15,7 +15,7 @@ class SammenstiltVilkarsvurdering {
         behandledeVilkarsresultat: Vilkarsresultat,
         involverteVilkarsresultat: List<Vilkarsresultat>
     ): VilkarsVurdering<*> {
-        val snapshot: OmsorgsarbeidSnapshot = behandledeVilkarsresultat.snapshot
+        val snapshot: OmsorgsGrunnlag = behandledeVilkarsresultat.snapshot
         val omsorgsAr: Int = snapshot.omsorgsAr
         val omsorgsyter: Person = snapshot.omsorgsyter
         val omsorgsmottakere: List<Person> = snapshot.getOmsorgsmottakere(omsorgsyter)

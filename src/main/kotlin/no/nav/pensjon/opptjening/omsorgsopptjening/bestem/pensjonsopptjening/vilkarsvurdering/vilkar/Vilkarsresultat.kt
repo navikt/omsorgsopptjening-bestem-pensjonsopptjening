@@ -1,11 +1,11 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Eller.Companion.eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Og.Companion.og
 
 data class Vilkarsresultat(
-    val snapshot: OmsorgsarbeidSnapshot,
+    val snapshot: OmsorgsGrunnlag,
     var personVilkarsvurdering: VilkarsVurdering<*>? = null,
     var individueltVilkarsVurdering: VilkarsVurdering<*>? = null,
     var sammenstiltVilkarsVurdering: VilkarsVurdering<*>? = null,

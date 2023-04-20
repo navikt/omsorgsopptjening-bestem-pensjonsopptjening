@@ -35,7 +35,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsyter = omsorgsyter,
-            omsorgsarbeidPerioder = listOf(
+            omsorgVedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
@@ -63,7 +63,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsyter = omsorgsyter,
-            omsorgsarbeidPerioder = listOf(
+            omsorgVedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JUNE),
@@ -90,7 +90,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2000,
             omsorgsyter = omsorgsyter,
-            omsorgsarbeidPerioder = listOf(
+            omsorgVedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2000, Month.JANUARY),
                     tom = YearMonth.of(2000, Month.JULY),
@@ -127,7 +127,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
             omsorgsyter = omsorgsyter,
-            omsorgsarbeidPerioder = listOf(
+            omsorgVedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
@@ -166,7 +166,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
             omsorgsyter = omsorgsyter,
-            omsorgsarbeidPerioder = listOf(
+            omsorgVedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
@@ -192,7 +192,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2006,
             omsorgsyter = omsorgsyter,
-            omsorgsarbeidPerioder = listOf(
+            omsorgVedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2006, Month.JANUARY),
                     tom = YearMonth.of(2006, Month.JULY),
@@ -218,7 +218,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsyter = omsorgsyter,
-            omsorgsarbeidPerioder = listOf(
+            omsorgVedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
@@ -253,18 +253,18 @@ internal class IndividuellVilkarsvurderingTest {
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: Int,
         omsorgsyter: Person,
-        omsorgsarbeidPerioder: List<OmsorgsarbeidPeriode>
+        omsorgVedtakPerioder: List<OmsorgVedtakPeriode>
     ) =
 
-        OmsorgsarbeidSnapshot(
+        OmsorgsGrunnlag(
             omsorgsAr = omsorgsAr,
             kjoreHashe = "xxx",
             omsorgsyter = omsorgsyter,
             omsorgstype = Omsorgstype.BARNETRYGD,
             kilde = Kilde.BARNETRYGD,
-            omsorgsarbeidSaker = listOf(
-                OmsorgsarbeidSak(
-                    omsorgsarbeidPerioder = omsorgsarbeidPerioder
+            omsorgsSaker = listOf(
+                OmsorgsSak(
+                    omsorgVedtakPerioder = omsorgVedtakPerioder
                 )
             )
         )
@@ -274,7 +274,7 @@ internal class IndividuellVilkarsvurderingTest {
         tom: YearMonth,
         omsorgsyter: Person,
         omsorgsmottakere: List<Person>
-    ) = OmsorgsarbeidPeriode(
+    ) = OmsorgVedtakPeriode(
         fom = fom,
         tom = tom,
         prosent = 100,
@@ -291,7 +291,7 @@ internal class IndividuellVilkarsvurderingTest {
             fodselsAr = fodselsAr
         )
 
-    private fun lagVilkarsResultat(snapshot: OmsorgsarbeidSnapshot, utfallAbsolutteKrav: Utfall): Vilkarsresultat {
+    private fun lagVilkarsResultat(snapshot: OmsorgsGrunnlag, utfallAbsolutteKrav: Utfall): Vilkarsresultat {
         Mockito.`when`(mockVilkarsVurdering.utfall).thenReturn(utfallAbsolutteKrav)
         return Vilkarsresultat(
             snapshot = snapshot,

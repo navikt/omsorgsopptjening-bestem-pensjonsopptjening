@@ -11,16 +11,16 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 class OmsorgsarbeidSnapshotMapper {
     companion object {
         fun map(omsorgsarbeidsSnapshot: KafkaOmsorgsGrunnlag, persistertePersoner: List<Person>) =
-            OmsorgsarbeidSnapshot(
+            OmsorgsGrunnlag(
                 omsorgsAr = omsorgsarbeidsSnapshot.omsorgsAr,
                 omsorgsyter = persistertePersoner.hentPerson(omsorgsarbeidsSnapshot.omsorgsyter.fnr),
                 omsorgstype = convertToOmsorgstype(omsorgsarbeidsSnapshot.omsorgstype),
                 kilde = convertToKilde(omsorgsarbeidsSnapshot.kilde),
                 kjoreHashe = omsorgsarbeidsSnapshot.kjoreHash,
-                omsorgsarbeidSaker = omsorgsarbeidsSnapshot.omsorgsSaker.map { sak ->
-                    OmsorgsarbeidSak(
-                        omsorgsarbeidPerioder = sak.omsorgVedtakPeriode.map { periode ->
-                            OmsorgsarbeidPeriode(
+                omsorgsSaker = omsorgsarbeidsSnapshot.omsorgsSaker.map { sak ->
+                    OmsorgsSak(
+                        omsorgVedtakPerioder = sak.omsorgVedtakPeriode.map { periode ->
+                            OmsorgVedtakPeriode(
                                 fom = periode.fom,
                                 tom = periode.tom,
                                 prosent = periode.prosent,

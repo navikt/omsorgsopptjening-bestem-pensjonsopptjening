@@ -5,7 +5,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "OMSORGSARBEID_SAK")
-data class OmsorgsarbeidSak(
+data class OmsorgsSak(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "OMSORGSARBEID_SAK_ID", nullable = false)
@@ -18,5 +18,5 @@ data class OmsorgsarbeidSak(
         referencedColumnName = "OMSORGSARBEID_SAK_ID"
     )
     @JsonIgnore
-    val omsorgsarbeidPerioder: List<OmsorgsarbeidPeriode>,
+    val omsorgVedtakPerioder: List<OmsorgVedtakPeriode>,
 )

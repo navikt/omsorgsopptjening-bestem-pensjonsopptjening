@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.jpa.repository.JpaRepository
@@ -19,10 +19,10 @@ class OmsorgsarbeidSnapshotRepository(
     private lateinit var em: EntityManager
 
     @Transactional
-    fun save(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot): OmsorgsarbeidSnapshot {
-        find(omsorgsarbeidSnapshot.omsorgsyter, omsorgsarbeidSnapshot.omsorgsAr).forEach { it.historisk = true }
+    fun save(omsorgsGrunnlag: OmsorgsGrunnlag): OmsorgsGrunnlag {
+        find(omsorgsGrunnlag.omsorgsyter, omsorgsGrunnlag.omsorgsAr).forEach { it.historisk = true }
 
-        return em.merge(omsorgsarbeidSnapshot)
+        return em.merge(omsorgsGrunnlag)
     }
 
     fun find(omsorgsyter: Person, omsorgsAr: Int, historisk: Boolean = false) =
@@ -32,19 +32,19 @@ class OmsorgsarbeidSnapshotRepository(
             historisk = historisk
         )
 
-    fun findByPerson(vararg persons: Person): List<OmsorgsarbeidSnapshot> {
+    fun findByPerson(vararg persons: Person): List<OmsorgsGrunnlag> {
         return jpaRepository.findByOmsorgsyter_idIn(persons.mapNotNull { it.id })
     }
 }
 
 @Repository
-interface OmsorgsarbeidSnapshotJpaRepository : JpaRepository<OmsorgsarbeidSnapshot, Long> {
+interface OmsorgsarbeidSnapshotJpaRepository : JpaRepository<OmsorgsGrunnlag, Long> {
 
     fun findByOmsorgsyter_idInAndOmsorgsArAndHistorisk(
         personIdList: List<Long>,
         omsorgsAr: Int,
         historisk: Boolean
-    ): List<OmsorgsarbeidSnapshot>
+    ): List<OmsorgsGrunnlag>
 
-    fun findByOmsorgsyter_idIn(personIdList: List<Long>): List<OmsorgsarbeidSnapshot>
+    fun findByOmsorgsyter_idIn(personIdList: List<Long>): List<OmsorgsGrunnlag>
 }

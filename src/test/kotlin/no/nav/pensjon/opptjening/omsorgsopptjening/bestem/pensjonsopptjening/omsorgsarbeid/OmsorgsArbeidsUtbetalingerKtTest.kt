@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Landstilknytning
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidPeriode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgVedtakPeriode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.getAntallUtbetalingMoneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
@@ -34,7 +34,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         expectedAmountOfMoths: Int
     ) {
         val perioder = listOf(
-            OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
+            OmsorgVedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
         )
 
         assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
@@ -61,7 +61,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         expectedAmountOfMoths: Int
     ) {
         val perioder = listOf(
-            OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
+            OmsorgVedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
         )
 
         assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
@@ -85,7 +85,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         expectedAmountOfMoths: Int
     ) {
         val perioder = listOf(
-            OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
+            OmsorgVedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
         )
 
         assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
@@ -101,7 +101,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         tom: YearMonth,
     ) {
         val perioder = listOf(
-            OmsorgsarbeidPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
+            OmsorgVedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
         )
 
         assertEquals(0, perioder.getAntallUtbetalingMoneder(2020))
@@ -127,8 +127,8 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         expectedAmountOfMoths: Int
     ) {
         val perioder = listOf(
-            OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL),
-            OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
+            OmsorgVedtakPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL),
+            OmsorgVedtakPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
         )
 
         assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
@@ -151,9 +151,9 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
         expectedAmountOfMoths: Int
     ) {
         val perioder = listOf(
-            OmsorgsarbeidPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL),
-            OmsorgsarbeidPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL),
-            OmsorgsarbeidPeriode(fom = fom3, tom = tom3, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
+            OmsorgVedtakPeriode(fom = fom1, tom = tom1, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL),
+            OmsorgVedtakPeriode(fom = fom2, tom = tom2, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL),
+            OmsorgVedtakPeriode(fom = fom3, tom = tom3, prosent = 100, omsorgsytere = listOf(person), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
         )
 
         assertEquals(expectedAmountOfMoths, perioder.getAntallUtbetalingMoneder(2020))
@@ -162,7 +162,7 @@ internal class OmsorgsArbeidsUtbetalingerKtTest {
 
     @Test
     fun `Given zero omsorgsArbeidsUtbetalinger When calling getAntallUtbetalingMoneder Then 0`() {
-        assertEquals(0, listOf<OmsorgsarbeidPeriode>().getAntallUtbetalingMoneder(2020))
+        assertEquals(0, listOf<OmsorgVedtakPeriode>().getAntallUtbetalingMoneder(2020))
     }
 
     companion object {

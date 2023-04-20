@@ -7,7 +7,7 @@ import java.time.YearMonth
 
 @Entity
 @Table(name = "OMSORGSARBEID_PERIODE")
-class OmsorgsarbeidPeriode(
+class OmsorgVedtakPeriode(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "OMSORGSARBEID_PERIODE_ID", nullable = false)
@@ -51,10 +51,10 @@ class OmsorgsarbeidPeriode(
     val omsorgsmottakere: List<Person> = listOf(),
 )
 
-fun List<OmsorgsarbeidPeriode>.getAntallUtbetalingMoneder(ar: Int) =
+fun List<OmsorgVedtakPeriode>.getAntallUtbetalingMoneder(ar: Int) =
     (mergeAllePerioder() begrensTilAr ar).antallMoneder()
 
-fun List<OmsorgsarbeidPeriode>.mergeAllePerioder(): Periode {
+fun List<OmsorgVedtakPeriode>.mergeAllePerioder(): Periode {
     val alleUtbetalingsPeriode = map { Periode(it.fom, it.tom) }
     return alleUtbetalingsPeriode.fold(initial = Periode()) { accPeriod, newPeriode -> accPeriod + newPeriode }
 }

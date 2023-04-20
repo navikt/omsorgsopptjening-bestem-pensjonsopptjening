@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.producer.OmsorgsOpptejningProducer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.VilkarsVurderingsService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Vilkarsresultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
@@ -15,8 +15,8 @@ class OmsorgsopptjeningsService(
     private val omsorgsOpptejningProducer: OmsorgsOpptejningProducer,
 ) {
 
-    fun behandlOmsorgsarbeid(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot){
-        vilkarsVurderingsService.vilkarsVurder(omsorgsarbeidSnapshot)
+    fun behandlOmsorgsarbeid(omsorgsGrunnlag: OmsorgsGrunnlag){
+        vilkarsVurderingsService.vilkarsVurder(omsorgsGrunnlag)
             .forEach { publiserOmsorgsOpptjening(it) }
     }
 
@@ -25,7 +25,7 @@ class OmsorgsopptjeningsService(
             OmsorgsOpptjening(
                 omsorgsAr = vilkarsresultat.getOmsorgsAr(),
                 omsorgsyter = vilkarsresultat.getOmsorgsyter(),
-                omsorgsarbeidSnapshot = vilkarsresultat.snapshot,
+                omsorgsGrunnlag = vilkarsresultat.snapshot,
                 vilkarsResultat = vilkarsresultat,
                 utfall = vilkarsresultat.getUtfall(),
                 omsorgsmottakereInvilget = vilkarsresultat.hentVilkarsVurderingerFullOmsorgForBarnUnder6()
