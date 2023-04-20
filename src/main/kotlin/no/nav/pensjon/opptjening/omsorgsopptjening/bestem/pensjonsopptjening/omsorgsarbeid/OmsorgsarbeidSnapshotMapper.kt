@@ -5,21 +5,21 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Landstilknytning as KafkaLandstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde as KafkaKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSnapshot as KafkaOmsorgsarbeidsSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag as KafkaOmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Omsorgstype as KafkaOmsorgstype
 
 class OmsorgsarbeidSnapshotMapper {
     companion object {
-        fun map(omsorgsarbeidsSnapshot: KafkaOmsorgsarbeidsSnapshot, persistertePersoner: List<Person>) =
+        fun map(omsorgsarbeidsSnapshot: KafkaOmsorgsGrunnlag, persistertePersoner: List<Person>) =
             OmsorgsarbeidSnapshot(
                 omsorgsAr = omsorgsarbeidsSnapshot.omsorgsAr,
                 omsorgsyter = persistertePersoner.hentPerson(omsorgsarbeidsSnapshot.omsorgsyter.fnr),
                 omsorgstype = convertToOmsorgstype(omsorgsarbeidsSnapshot.omsorgstype),
                 kilde = convertToKilde(omsorgsarbeidsSnapshot.kilde),
                 kjoreHashe = omsorgsarbeidsSnapshot.kjoreHash,
-                omsorgsarbeidSaker = omsorgsarbeidsSnapshot.omsorgsarbeidSaker.map { sak ->
+                omsorgsarbeidSaker = omsorgsarbeidsSnapshot.omsorgsSaker.map { sak ->
                     OmsorgsarbeidSak(
-                        omsorgsarbeidPerioder = sak.omsorgsarbeidVedtak.map { periode ->
+                        omsorgsarbeidPerioder = sak.omsorgVedtakPeriode.map { periode ->
                             OmsorgsarbeidPeriode(
                                 fom = periode.fom,
                                 tom = periode.tom,

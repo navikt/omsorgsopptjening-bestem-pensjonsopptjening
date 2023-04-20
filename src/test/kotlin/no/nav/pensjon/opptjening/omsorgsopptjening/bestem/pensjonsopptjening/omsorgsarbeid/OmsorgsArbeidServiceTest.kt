@@ -8,7 +8,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kaf
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlFnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlPerson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlService
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Landstilknytning
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Omsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,8 +23,9 @@ import org.springframework.context.annotation.Import
 import org.springframework.kafka.test.context.EmbeddedKafka
 import java.time.Month
 import java.time.YearMonth
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSnapshot as KafkaSnapshot
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidVedtak as KafkaOmsorgsarbeidVedtak
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode as KafkaOmsorgVedtakPeriode
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag as KafkaOmsorgsGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsSak as KafkaOmsorgsSak
 
 
 @EmbeddedKafka(partitions = 1, topics = [OmsorgsarbeidListenerTest.OMSORGSOPPTJENING_TOPIC])
@@ -136,16 +140,16 @@ internal class OmsorgsArbeidServiceTest {
         omsorgsAr: Int,
         omsorgsyter: String,
         omsorgstype: Omsorgstype,
-        omsorgsarbeidVedtak: List<KafkaOmsorgsarbeidVedtak>
-    ): KafkaSnapshot {
-        return KafkaSnapshot(
+        omsorgsarbeidVedtak: List<KafkaOmsorgVedtakPeriode>
+    ): KafkaOmsorgsGrunnlag {
+        return KafkaOmsorgsGrunnlag(
             omsorgsyter = Person(omsorgsyter),
             omsorgsAr = omsorgsAr,
             omsorgstype = omsorgstype,
             kjoreHash = "XXX",
             kilde = Kilde.BARNETRYGD,
-            omsorgsarbeidSaker = listOf(
-                OmsorgsarbeidSak(omsorgsarbeidVedtak = omsorgsarbeidVedtak)
+            omsorgsSaker = listOf(
+                KafkaOmsorgsSak(omsorgVedtakPeriode = omsorgsarbeidVedtak)
             )
         )
     }
@@ -155,7 +159,7 @@ internal class OmsorgsArbeidServiceTest {
         tom: YearMonth,
         omsorgsytere: List<String>,
         omsorgsmottakere: List<String>,
-    ) = KafkaOmsorgsarbeidVedtak(
+    ) = KafkaOmsorgVedtakPeriode(
         fom = fom,
         tom = tom,
         prosent = 100,

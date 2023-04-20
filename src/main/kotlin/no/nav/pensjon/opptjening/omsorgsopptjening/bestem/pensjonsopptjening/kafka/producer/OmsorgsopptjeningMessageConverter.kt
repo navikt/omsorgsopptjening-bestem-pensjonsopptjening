@@ -10,11 +10,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Utfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjeningKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Landstilknytning as KafkaLandstilknytning
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidVedtak as KafkaOmsorgsarbeidVedtak
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSak as KafkaOmsorgsarbeidSak
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode as KafkaOmsorgVedtakPeriode
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsSak as KafkaOmsorgsSak
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening as KafkaOmsorgsOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde as KafkaKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSnapshot as KafkaOmsorgsarbeidsSnapshot
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag as KafkaOmsorgsarbeidsSnapshot
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Omsorgstype as KafkaOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Utfall as KafkaUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Person as KafkaPerson
@@ -40,7 +40,7 @@ private fun mapToKafkaUtfall(utfall: Utfall): KafkaUtfall =
         Utfall.INVILGET -> KafkaUtfall.INVILGET
         Utfall.AVSLAG -> KafkaUtfall.AVSLAG
         Utfall.SAKSBEHANDLING -> KafkaUtfall.SAKSBEHANDLING
-        Utfall.MANGLER_ANNEN_OMSORGSYTER -> KafkaUtfall.MANGLER_INFORMASJON_OM_ANNEN_OMSORGSYTER
+        Utfall.MANGLER_ANNEN_OMSORGSYTER -> KafkaUtfall.MANGLER_ANNEN_OMSORGSYTER
     }
 
 fun map(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot): KafkaOmsorgsarbeidsSnapshot {
@@ -50,10 +50,10 @@ fun map(omsorgsarbeidSnapshot: OmsorgsarbeidSnapshot): KafkaOmsorgsarbeidsSnapsh
         omsorgstype = convertToOmsorgsarbeidsType(omsorgsarbeidSnapshot.omsorgstype),
         kjoreHash = omsorgsarbeidSnapshot.kjoreHashe,
         kilde = convertToOmsorgsarbeidsKilde(omsorgsarbeidSnapshot.kilde),
-        omsorgsarbeidSaker = omsorgsarbeidSnapshot.omsorgsarbeidSaker.map { sak ->
-            KafkaOmsorgsarbeidSak(
-                omsorgsarbeidVedtak = sak.omsorgsarbeidPerioder.map { periode ->
-                    KafkaOmsorgsarbeidVedtak(
+        omsorgsSaker = omsorgsarbeidSnapshot.omsorgsarbeidSaker.map { sak ->
+            KafkaOmsorgsSak(
+                omsorgVedtakPeriode = sak.omsorgsarbeidPerioder.map { periode ->
+                    KafkaOmsorgVedtakPeriode(
                         fom = periode.fom,
                         tom = periode.tom,
                         prosent = periode.prosent,

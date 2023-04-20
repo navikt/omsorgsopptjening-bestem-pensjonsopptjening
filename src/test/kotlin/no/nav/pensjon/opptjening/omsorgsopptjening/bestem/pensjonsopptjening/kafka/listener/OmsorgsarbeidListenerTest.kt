@@ -4,13 +4,9 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.listener.OmsorgsarbeidListenerTest.Companion.OMSORGSOPPTJENING_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.repository.PersonRepository
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.mapToClass
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType.OMSORGSOPPTJENING
@@ -30,8 +26,9 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidSnapshot as KafkaSnapshot
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsarbeidVedtak as KafkaOmsorgsarbeidVedtak
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode as KafkaOmsorgVedtakPeriode
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag as KafkaOmsorgsGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsSak as KafkaOmsorgsSak
 
 
 @EmbeddedKafka(partitions = 1, topics = [OMSORGSOPPTJENING_TOPIC])
@@ -157,23 +154,23 @@ internal class OmsorgsarbeidListenerTest {
         fnrOmsorgFor: String? = null,
         omsorgstype: Omsorgstype,
         messageType: KafkaMessageType
-    ): KafkaSnapshot {
+    ): KafkaOmsorgsGrunnlag {
         val omsorgsarbeidsSnapshot =
-            KafkaSnapshot(
+            KafkaOmsorgsGrunnlag(
                 omsorgsyter = Person(fnr),
                 omsorgsAr = omsorgsAr,
                 omsorgstype = omsorgstype,
                 kjoreHash = "XXX",
                 kilde = Kilde.BARNETRYGD,
-                omsorgsarbeidSaker = listOf(
-                    OmsorgsarbeidSak(
-                        omsorgsarbeidVedtak = listOf(
-                            KafkaOmsorgsarbeidVedtak(
+                omsorgsSaker = listOf(
+                    KafkaOmsorgsSak(
+                        omsorgVedtakPeriode = listOf(
+                            KafkaOmsorgVedtakPeriode(
                                 fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                                 prosent = 100,
                                 omsorgsytere = setOf(Person(fnr)),
-                                omsorgsmottakere = fnrOmsorgFor?.let{setOf(Person(fnrOmsorgFor))}?: setOf(),
+                                omsorgsmottakere = fnrOmsorgFor?.let { setOf(Person(fnrOmsorgFor)) } ?: setOf(),
                                 landstilknytning = Landstilknytning.NASJONAL
                             )
                         )
