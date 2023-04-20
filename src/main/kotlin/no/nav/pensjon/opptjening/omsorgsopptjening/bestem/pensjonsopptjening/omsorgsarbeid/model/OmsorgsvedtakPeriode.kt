@@ -6,11 +6,11 @@ import java.time.YearMonth
 
 
 @Entity
-@Table(name = "OMSORGSARBEID_PERIODE")
-class OmsorgVedtakPeriode(
+@Table(name = "OMSORGSVEDTAK_PERIODE")
+class OmsorgsvedtakPeriode(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "OMSORGSARBEID_PERIODE_ID", nullable = false)
+    @Column(name = "OMSORGSVEDTAK_PERIODE_ID", nullable = false)
     var id: Long? = null,
 
     @Convert(converter = YearMonthDateConverter::class)
@@ -32,8 +32,8 @@ class OmsorgVedtakPeriode(
     @JoinTable(
         name = "OMSORGSYTER",
         joinColumns = [JoinColumn(
-            name = "OMSORGSARBEID_PERIODE_ID",
-            referencedColumnName = "OMSORGSARBEID_PERIODE_ID"
+            name = "OMSORGSVEDTAK_PERIODE_ID",
+            referencedColumnName = "OMSORGSVEDTAK_PERIODE_ID"
         )],
         inverseJoinColumns = [JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")]
     )
@@ -43,18 +43,18 @@ class OmsorgVedtakPeriode(
     @JoinTable(
         name = "OMSORGSARBEIDSMOTTAKER",
         joinColumns = [JoinColumn(
-            name = "OMSORGSARBEID_PERIODE_ID",
-            referencedColumnName = "OMSORGSARBEID_PERIODE_ID"
+            name = "OMSORGSVEDTAK_PERIODE_ID",
+            referencedColumnName = "OMSORGSVEDTAK_PERIODE_ID"
         )],
         inverseJoinColumns = [JoinColumn(name = "PERSON_ID", referencedColumnName = "PERSON_ID")]
     )
     val omsorgsmottakere: List<Person> = listOf(),
 )
 
-fun List<OmsorgVedtakPeriode>.getAntallUtbetalingMoneder(ar: Int) =
+fun List<OmsorgsvedtakPeriode>.getAntallUtbetalingMoneder(ar: Int) =
     (mergeAllePerioder() begrensTilAr ar).antallMoneder()
 
-fun List<OmsorgVedtakPeriode>.mergeAllePerioder(): Periode {
+fun List<OmsorgsvedtakPeriode>.mergeAllePerioder(): Periode {
     val alleUtbetalingsPeriode = map { Periode(it.fom, it.tom) }
     return alleUtbetalingsPeriode.fold(initial = Periode()) { accPeriod, newPeriode -> accPeriod + newPeriode }
 }

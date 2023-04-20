@@ -75,13 +75,13 @@ internal class VilkarsVurderingsServiceTest {
 
         val snapshotOmsorgsyter1 = creatOmsorgsArbeidSnapshot(
             omsorgsyter = omsorgsYter1,
-            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgVedtakPerioder = listOf(omsorgsPeriode1))),
+            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgsvedtakPerioder = listOf(omsorgsPeriode1))),
             omsorgsAr = OMSORGS_AR_2020
         )
 
         val snapshotOmsorgsyter2 = creatOmsorgsArbeidSnapshot(
             omsorgsyter = omsorgsYter2,
-            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgVedtakPerioder = listOf(omsorgsPeriode2))),
+            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgsvedtakPerioder = listOf(omsorgsPeriode2))),
             omsorgsAr = OMSORGS_AR_2020
         )
 
@@ -119,13 +119,13 @@ internal class VilkarsVurderingsServiceTest {
 
         val snapshotOmsorgsyter = creatOmsorgsArbeidSnapshot(
             omsorgsyter = omsorgsYter,
-            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgVedtakPerioder = listOf(omsorgsPeriode1))),
+            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgsvedtakPerioder = listOf(omsorgsPeriode1))),
             omsorgsAr = OMSORGS_AR_2020
         )
 
         val snapshotOmsorgsyterYungerThan17 = creatOmsorgsArbeidSnapshot(
             omsorgsyter = omsorgsYterYoungerThan17,
-            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgVedtakPerioder = listOf(omsorgsPeriode2))),
+            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgsvedtakPerioder = listOf(omsorgsPeriode2))),
             omsorgsAr = OMSORGS_AR_2020
         )
 
@@ -170,7 +170,7 @@ internal class VilkarsVurderingsServiceTest {
 
         val snapshotOmsorgsyter1 = creatOmsorgsArbeidSnapshot(
             omsorgsyter = omsorgsYter1,
-            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgVedtakPerioder = listOf(omsorgsPeriode1))),
+            omsorgsArbeidSaker = listOf(OmsorgsSak(omsorgsvedtakPerioder = listOf(omsorgsPeriode1))),
             omsorgsAr = OMSORGS_AR_2020
         )
 
@@ -206,7 +206,7 @@ internal class VilkarsVurderingsServiceTest {
         omsorgsytere: List<Person>,
         omsorgsMottakere: List<Person>
     ) =
-        OmsorgVedtakPeriode(
+        OmsorgsvedtakPeriode(
             fom = fom,
             tom = tom,
             prosent = prosent,

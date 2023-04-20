@@ -5,11 +5,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 
 
 @Entity
-@Table(name = "OMSORGSARBEID_SNAPSHOT")
+@Table(name = "OMSORGS_GRUNNLAG")
 data class OmsorgsGrunnlag(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "OMSORGSARBEID_SNAPSHOT_ID", nullable = false)
+    @Column(name = "OMSORGS_GRUNNLAG_ID", nullable = false)
     val id: Long? = null,
 
     @Column(name = "OMSORGS_AR", nullable = false)
@@ -20,9 +20,9 @@ data class OmsorgsGrunnlag(
 
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(
-        name = "OMSORGSARBEID_SNAPSHOT_ID",
+        name = "OMSORGS_GRUNNLAG_ID",
         nullable = false,
-        referencedColumnName = "OMSORGSARBEID_SNAPSHOT_ID"
+        referencedColumnName = "OMSORGS_GRUNNLAG_ID"
     )
     val omsorgsSaker: List<OmsorgsSak>,
 
@@ -71,7 +71,7 @@ data class OmsorgsGrunnlag(
             .filter { Periode(it.fom, it.tom).overlapper(omsorgsAr, omsorgsAr + 1) }
 
     private fun getOmsorgsarbeidPerioderForRelevanteAr() =
-        omsorgsSaker.flatMap { sak -> sak.omsorgVedtakPerioder }
+        omsorgsSaker.flatMap { sak -> sak.omsorgsvedtakPerioder }
 
 
 }

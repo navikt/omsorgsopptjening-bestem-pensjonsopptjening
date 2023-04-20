@@ -18,7 +18,7 @@ internal class OmsorgsarbeidsSnapshotKtTest {
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
                 OmsorgsSak(
-                    omsorgVedtakPerioder = listOf(omsorgsArbeidPerson1)
+                    omsorgsvedtakPerioder = listOf(omsorgsArbeidPerson1)
                 )
             )
         )
@@ -39,7 +39,7 @@ internal class OmsorgsarbeidsSnapshotKtTest {
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
                 OmsorgsSak(
-                    omsorgVedtakPerioder = omsorgsArbeidPerson1
+                    omsorgsvedtakPerioder = omsorgsArbeidPerson1
                 )
             )
         )
@@ -57,7 +57,7 @@ internal class OmsorgsarbeidsSnapshotKtTest {
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
                 OmsorgsSak(
-                    omsorgVedtakPerioder = listOf(
+                    omsorgsvedtakPerioder = listOf(
                         omsorgsArbeidPerson2
                     )
                 )
@@ -79,7 +79,7 @@ internal class OmsorgsarbeidsSnapshotKtTest {
         val snapshot = creatOmsorgsArbeidSnapshot(
             omsorgsArbeidSaker = listOf(
                 OmsorgsSak(
-                    omsorgVedtakPerioder = listOf(
+                    omsorgsvedtakPerioder = listOf(
                         omsorgsArbeidPerson1,
                         omsorgsArbeidPerson2
                     )
@@ -104,7 +104,7 @@ internal class OmsorgsarbeidsSnapshotKtTest {
         )
 
     private fun createOmsorgsarbeid(omsorgsyter: Person, fom: YearMonth, tom: YearMonth) =
-        OmsorgVedtakPeriode(
+        OmsorgsvedtakPeriode(
             fom = fom,
             tom = tom,
             prosent = 100,

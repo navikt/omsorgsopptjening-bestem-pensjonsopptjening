@@ -35,7 +35,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsyter = omsorgsyter,
-            omsorgVedtakPerioder = listOf(
+            omsorgsvedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
@@ -63,7 +63,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsyter = omsorgsyter,
-            omsorgVedtakPerioder = listOf(
+            omsorgsvedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JUNE),
@@ -90,7 +90,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2000,
             omsorgsyter = omsorgsyter,
-            omsorgVedtakPerioder = listOf(
+            omsorgsvedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2000, Month.JANUARY),
                     tom = YearMonth.of(2000, Month.JULY),
@@ -127,7 +127,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
             omsorgsyter = omsorgsyter,
-            omsorgVedtakPerioder = listOf(
+            omsorgsvedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
@@ -166,7 +166,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = omsorgsAr,
             omsorgsyter = omsorgsyter,
-            omsorgVedtakPerioder = listOf(
+            omsorgsvedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                     tom = YearMonth.of(omsorgsAr, Month.JULY),
@@ -192,7 +192,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2006,
             omsorgsyter = omsorgsyter,
-            omsorgVedtakPerioder = listOf(
+            omsorgsvedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2006, Month.JANUARY),
                     tom = YearMonth.of(2006, Month.JULY),
@@ -218,7 +218,7 @@ internal class IndividuellVilkarsvurderingTest {
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2010,
             omsorgsyter = omsorgsyter,
-            omsorgVedtakPerioder = listOf(
+            omsorgsvedtakPerioder = listOf(
                 createOmsorgsArbeid(
                     fom = YearMonth.of(2010, Month.JANUARY),
                     tom = YearMonth.of(2010, Month.JULY),
@@ -253,7 +253,7 @@ internal class IndividuellVilkarsvurderingTest {
     private fun creatOmsorgsArbeidSnapshot(
         omsorgsAr: Int,
         omsorgsyter: Person,
-        omsorgVedtakPerioder: List<OmsorgVedtakPeriode>
+        omsorgsvedtakPerioder: List<OmsorgsvedtakPeriode>
     ) =
 
         OmsorgsGrunnlag(
@@ -264,7 +264,7 @@ internal class IndividuellVilkarsvurderingTest {
             kilde = Kilde.BARNETRYGD,
             omsorgsSaker = listOf(
                 OmsorgsSak(
-                    omsorgVedtakPerioder = omsorgVedtakPerioder
+                    omsorgsvedtakPerioder = omsorgsvedtakPerioder
                 )
             )
         )
@@ -274,7 +274,7 @@ internal class IndividuellVilkarsvurderingTest {
         tom: YearMonth,
         omsorgsyter: Person,
         omsorgsmottakere: List<Person>
-    ) = OmsorgVedtakPeriode(
+    ) = OmsorgsvedtakPeriode(
         fom = fom,
         tom = tom,
         prosent = 100,

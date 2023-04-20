@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Landstilknytning
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgVedtakPeriode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsvedtakPeriode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Fnr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.AnnenPart
@@ -38,7 +38,7 @@ class DeltOmsorgForBarnUnder6Test {
         expectedUtfall: Utfall
     ) {
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom,
                 tom = tom,
                 prosent = 50,
@@ -82,7 +82,7 @@ class DeltOmsorgForBarnUnder6Test {
         expectedUtfall: Utfall
     ) {
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom,
                 tom = tom,
                 prosent = 50,
@@ -126,7 +126,7 @@ class DeltOmsorgForBarnUnder6Test {
         expectedUtfall: Utfall
     ) {
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom,
                 tom = tom,
                 prosent = 50,
@@ -178,7 +178,7 @@ class DeltOmsorgForBarnUnder6Test {
         expectedUtfall: Utfall
     ) {
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom,
                 tom = tom,
                 prosent = 50,
@@ -219,7 +219,7 @@ class DeltOmsorgForBarnUnder6Test {
         tom: YearMonth,
     ) {
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom,
                 tom = tom,
                 prosent = 50,
@@ -274,7 +274,7 @@ class DeltOmsorgForBarnUnder6Test {
         expectedUtfall: Utfall
     ) {
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom1,
                 tom = tom1,
                 prosent = 50,
@@ -282,7 +282,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsmottakere = listOf(),
                 landstilknytning = Landstilknytning.NASJONAL
             ),
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom2,
                 tom = tom2,
                 prosent = 50,
@@ -332,7 +332,7 @@ class DeltOmsorgForBarnUnder6Test {
         expectedUtfall: Utfall
     ) {
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom1,
                 tom = tom1,
                 prosent = 50,
@@ -340,7 +340,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsmottakere = listOf(),
                 landstilknytning = Landstilknytning.NASJONAL
             ),
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom2,
                 tom = tom2,
                 prosent = 50,
@@ -348,7 +348,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsmottakere = listOf(),
                 landstilknytning = Landstilknytning.NASJONAL
             ),
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = fom3,
                 tom = tom3,
                 prosent = 50,
@@ -408,7 +408,7 @@ class DeltOmsorgForBarnUnder6Test {
         expectedUtfall: Utfall
     ) {
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                 prosent = 50,
@@ -455,7 +455,7 @@ class DeltOmsorgForBarnUnder6Test {
                 omsorgsmottaker = omsorgsmottaker_2000,
                 utfallPersonVilkarsvurdering = Utfall.INVILGET,
                 omsorgsArbeid50Prosent = listOf(
-                    OmsorgVedtakPeriode(
+                    OmsorgsvedtakPeriode(
                         fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                         tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                         prosent = 50,
@@ -482,7 +482,7 @@ class DeltOmsorgForBarnUnder6Test {
     fun `Given missing information about at least one party Then MANGLER_ANNEN_OMSORGSYTER`() {
         val omsorgsAr = 2003
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                 prosent = 50,
@@ -509,7 +509,7 @@ class DeltOmsorgForBarnUnder6Test {
     fun `Given three parents and all other parents has omsorgsopptjening for unrelated child Then INVILGET`() {
         val omsorgsAr = 2003
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                 prosent = 50,
@@ -549,7 +549,7 @@ class DeltOmsorgForBarnUnder6Test {
     fun `Given three parents Then SAKSBEHANDLING`() {
         val omsorgsAr = 2003
         val perioder = listOf(
-            OmsorgVedtakPeriode(
+            OmsorgsvedtakPeriode(
                 fom = YearMonth.of(omsorgsAr, Month.JANUARY),
                 tom = YearMonth.of(omsorgsAr, Month.DECEMBER),
                 prosent = 50,

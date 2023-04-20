@@ -4,19 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "OMSORGSARBEID_SAK")
+@Table(name = "OMSORGS_SAK")
 data class OmsorgsSak(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "OMSORGSARBEID_SAK_ID", nullable = false)
+    @Column(name = "OMSORGS_SAK_ID", nullable = false)
     val id: Long? = null,
 
     @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
     @JoinColumn(
-        name = "OMSORGSARBEID_SAK_ID",
+        name = "OMSORGS_SAK_ID",
         nullable = false,
-        referencedColumnName = "OMSORGSARBEID_SAK_ID"
+        referencedColumnName = "OMSORGS_SAK_ID"
     )
     @JsonIgnore
-    val omsorgVedtakPerioder: List<OmsorgVedtakPeriode>,
+    val omsorgsvedtakPerioder: List<OmsorgsvedtakPeriode>,
 )

@@ -52,7 +52,7 @@ fun map(omsorgsGrunnlag: OmsorgsGrunnlag): KafkaOmsorgsarbeidsSnapshot {
         kilde = convertToOmsorgsarbeidsKilde(omsorgsGrunnlag.kilde),
         omsorgsSaker = omsorgsGrunnlag.omsorgsSaker.map { sak ->
             KafkaOmsorgsSak(
-                omsorgVedtakPeriode = sak.omsorgVedtakPerioder.map { periode ->
+                omsorgVedtakPeriode = sak.omsorgsvedtakPerioder.map { periode ->
                     KafkaOmsorgVedtakPeriode(
                         fom = periode.fom,
                         tom = periode.tom,

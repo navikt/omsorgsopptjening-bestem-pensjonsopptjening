@@ -44,7 +44,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
         repository.save(
             creatOmsorgsArbeidSnapshot(
                 omsorgsyter = omsorgsYter,
-                omsorgVedtakPerioder = listOf(
+                omsorgsvedtakPerioder = listOf(
                     createOmsorgsArbeid(omsorgsyter = omsorgsYter, omsorgsmottakere = listOf(omsorgsmottaker))
                 ),
             )
@@ -63,8 +63,8 @@ internal class OmsorgsGrunnlagRepositoryTest {
         assertEquals(1, grunnlagList.first().omsorgsSaker.size)
         val omsorgsSak: OmsorgsSak = grunnlagList.first().omsorgsSaker.first()
 
-        assertEquals(1, omsorgsSak.omsorgVedtakPerioder.size)
-        val omsorgVedtakPeriode: OmsorgVedtakPeriode = omsorgsSak.omsorgVedtakPerioder.first()
+        assertEquals(1, omsorgsSak.omsorgsvedtakPerioder.size)
+        val omsorgVedtakPeriode: OmsorgsvedtakPeriode = omsorgsSak.omsorgsvedtakPerioder.first()
 
         assertNotNull(omsorgVedtakPeriode.id)
         assertEquals(JANUAR_2020, omsorgVedtakPeriode.fom)
@@ -84,7 +84,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
         repository.save(
             creatOmsorgsArbeidSnapshot(
                 omsorgsyter = omsorgsYter,
-                omsorgVedtakPerioder = listOf(
+                omsorgsvedtakPerioder = listOf(
                     createOmsorgsArbeid(omsorgsyter = omsorgsYter, omsorgsmottakere = listOf(omsorgsmottaker1))
                 ),
             )
@@ -93,7 +93,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
         repository.save(
             creatOmsorgsArbeidSnapshot(
                 omsorgsyter = omsorgsYter,
-                omsorgVedtakPerioder = listOf(
+                omsorgsvedtakPerioder = listOf(
                     createOmsorgsArbeid(omsorgsyter = omsorgsYter, omsorgsmottakere = listOf(omsorgsmottaker2))
                 ),
             )
@@ -129,7 +129,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
             repository.save(
                 creatOmsorgsArbeidSnapshot(
                     omsorgsyter = unpersistedPerson,
-                    omsorgVedtakPerioder = listOf(
+                    omsorgsvedtakPerioder = listOf(
                         createOmsorgsArbeid(omsorgsyter = omsorgsYter, omsorgsmottakere = listOf(omsorgsmottaker))
                     ),
                 )
@@ -141,7 +141,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
             repository.save(
                 creatOmsorgsArbeidSnapshot(
                     omsorgsyter = omsorgsYter,
-                    omsorgVedtakPerioder = listOf(
+                    omsorgsvedtakPerioder = listOf(
                         createOmsorgsArbeid(omsorgsyter = unpersistedPerson, omsorgsmottakere = listOf(omsorgsmottaker))
                     ),
                 )
@@ -153,7 +153,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
             repository.save(
                 creatOmsorgsArbeidSnapshot(
                     omsorgsyter = omsorgsYter,
-                    omsorgVedtakPerioder = listOf(
+                    omsorgsvedtakPerioder = listOf(
                         createOmsorgsArbeid(omsorgsyter = omsorgsYter, omsorgsmottakere = listOf(unpersistedPerson))
                     ),
                 )
@@ -177,7 +177,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
         repository.save(
             creatOmsorgsArbeidSnapshot(
                 omsorgsyter = omsorgsYter1,
-                omsorgVedtakPerioder = listOf(
+                omsorgsvedtakPerioder = listOf(
                     createOmsorgsArbeid(omsorgsyter = omsorgsYter1, omsorgsmottakere = listOf(omsorgsmottaker1))
                 ),
             )
@@ -187,7 +187,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
         repository.save(
             creatOmsorgsArbeidSnapshot(
                 omsorgsyter = omsorgsYter2,
-                omsorgVedtakPerioder = listOf(
+                omsorgsvedtakPerioder = listOf(
                     createOmsorgsArbeid(omsorgsyter = omsorgsYter2, omsorgsmottakere = listOf(omsorgsmottaker2))
                 ),
             )
@@ -197,7 +197,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
         repository.save(
             creatOmsorgsArbeidSnapshot(
                 omsorgsyter = omsorgsYter2,
-                omsorgVedtakPerioder = listOf(
+                omsorgsvedtakPerioder = listOf(
                     createOmsorgsArbeid(omsorgsyter = omsorgsYter2, omsorgsmottakere = listOf(omsorgsmottaker1))
                 ),
             )
@@ -237,15 +237,15 @@ internal class OmsorgsGrunnlagRepositoryTest {
         assertEquals(1, snapshotListOmsorgsyter2.size)
         assertFalse(snapshotListOmsorgsyter2.first().historisk)
         assertEquals("12345678910",snapshotListOmsorgsyter2.first().omsorgsyter.gjeldendeFnr.fnr)
-        assertEquals(1, snapshotListOmsorgsyter2.first().omsorgsSaker.first().omsorgVedtakPerioder.first().omsorgsmottakere.size)
-        assertEquals(omsorgsmottaker1.gjeldendeFnr.fnr, snapshotListOmsorgsyter2.first().omsorgsSaker.first().omsorgVedtakPerioder.first().omsorgsmottakere.first().gjeldendeFnr.fnr)
+        assertEquals(1, snapshotListOmsorgsyter2.first().omsorgsSaker.first().omsorgsvedtakPerioder.first().omsorgsmottakere.size)
+        assertEquals(omsorgsmottaker1.gjeldendeFnr.fnr, snapshotListOmsorgsyter2.first().omsorgsSaker.first().omsorgsvedtakPerioder.first().omsorgsmottakere.first().gjeldendeFnr.fnr)
 
         //Validating historic snapshot for omsorgsyter2
         assertEquals(1, oldsnapshotListOmsorgsyter2.size)
         assertTrue(oldsnapshotListOmsorgsyter2.first().historisk)
         assertEquals("12345678910",oldsnapshotListOmsorgsyter2.first().omsorgsyter.gjeldendeFnr.fnr)
-        assertEquals(1, oldsnapshotListOmsorgsyter2.first().omsorgsSaker.first().omsorgVedtakPerioder.first().omsorgsmottakere.size)
-        assertEquals(omsorgsmottaker2.gjeldendeFnr.fnr, oldsnapshotListOmsorgsyter2.first().omsorgsSaker.first().omsorgVedtakPerioder.first().omsorgsmottakere.first().gjeldendeFnr.fnr)
+        assertEquals(1, oldsnapshotListOmsorgsyter2.first().omsorgsSaker.first().omsorgsvedtakPerioder.first().omsorgsmottakere.size)
+        assertEquals(omsorgsmottaker2.gjeldendeFnr.fnr, oldsnapshotListOmsorgsyter2.first().omsorgsSaker.first().omsorgsvedtakPerioder.first().omsorgsmottakere.first().gjeldendeFnr.fnr)
     }
 
     private fun creatOmsorgsArbeidSnapshot(
@@ -254,7 +254,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
         kjoreHashe: String = KJORE_HASHE,
         omsorgstype: Omsorgstype = TYPE_BARNETRYGD,
         kilde: Kilde = KILDE_BARNETRYGD,
-        omsorgVedtakPerioder: List<OmsorgVedtakPeriode>
+        omsorgsvedtakPerioder: List<OmsorgsvedtakPeriode>
     ) =
 
         OmsorgsGrunnlag(
@@ -265,7 +265,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
             kilde = kilde,
             omsorgsSaker = listOf(
                 OmsorgsSak(
-                    omsorgVedtakPerioder = omsorgVedtakPerioder
+                    omsorgsvedtakPerioder = omsorgsvedtakPerioder
                 )
             )
         )
@@ -276,7 +276,7 @@ internal class OmsorgsGrunnlagRepositoryTest {
         prosent: Int = PROSENT_100,
         omsorgsyter: Person,
         omsorgsmottakere: List<Person>
-    ) = OmsorgVedtakPeriode(
+    ) = OmsorgsvedtakPeriode(
         fom = fom,
         tom = tom,
         prosent = prosent,
