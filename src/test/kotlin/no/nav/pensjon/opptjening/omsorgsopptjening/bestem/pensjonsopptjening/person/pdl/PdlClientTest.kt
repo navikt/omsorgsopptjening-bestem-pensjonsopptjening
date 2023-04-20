@@ -4,22 +4,13 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.containing
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.listener.OmsorgsarbeidListenerTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.KafkaIntegrationTestConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.MockTokenConfig.Companion.MOCK_TOKEN
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningMockListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
-import org.junit.Ignore
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.WireMockSpring
-import org.springframework.context.annotation.Import
-import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.client.RestClientException
 import kotlin.test.assertEquals
@@ -114,7 +105,7 @@ internal class PdlClientTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     fun `Given other code than 200 When getting person Then retry 3 times before give up`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(401)))
         assertThrows<RestClientException> { pdlService.hentPerson(FNR) }
@@ -122,13 +113,15 @@ internal class PdlClientTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     fun `Given server error When getting person Then retry 3 times before give up`() {
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
-            WireMock.aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBodyFile("error_server_error.json")
-        ))
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("error_server_error.json")
+            )
+        )
 
         val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
         assertEquals(PdlErrorCode.SERVER_ERROR, error.code)
@@ -137,11 +130,13 @@ internal class PdlClientTest {
 
     @Test
     fun `Given not found When calling pdl Then throw PdlException`() {
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
-            WireMock.aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBodyFile("error_not_found.json")
-        ))
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("error_not_found.json")
+            )
+        )
 
         val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
         assertEquals(PdlErrorCode.NOT_FOUND, error.code)
@@ -150,11 +145,13 @@ internal class PdlClientTest {
 
     @Test
     fun `Given unauthenticated When calling pdl Then throw PdlException`() {
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
-            WireMock.aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBodyFile("error_unauthenticated.json")
-        ))
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("error_unauthenticated.json")
+            )
+        )
 
         val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
         assertEquals(PdlErrorCode.UNAUTHENTICATED, error.code)
@@ -163,11 +160,13 @@ internal class PdlClientTest {
 
     @Test
     fun `Given unauthorized When calling pdl Then throw PdlException`() {
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
-            WireMock.aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBodyFile("error_unauthorized.json")
-        ))
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("error_unauthorized.json")
+            )
+        )
 
         val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
         assertEquals(PdlErrorCode.UNAUTHORIZED, error.code)
@@ -176,11 +175,13 @@ internal class PdlClientTest {
 
     @Test
     fun `Given bad request When calling pdl Then throw PdlException`() {
-        wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
-            WireMock.aResponse()
-                .withHeader("Content-Type", "application/json")
-                .withBodyFile("error_bad_request.json")
-        ))
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("error_bad_request.json")
+            )
+        )
 
         val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
         assertEquals(PdlErrorCode.BAD_REQUEST, error.code)
