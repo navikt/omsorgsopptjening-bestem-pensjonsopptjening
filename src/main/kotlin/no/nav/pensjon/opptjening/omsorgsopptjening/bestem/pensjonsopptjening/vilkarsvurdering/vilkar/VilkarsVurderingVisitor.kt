@@ -32,6 +32,12 @@ fun VilkarsVurdering<*>.hentVilkarsVurderingerFullOmsorgForBarnUnder6() : List<V
         .map { it as VilkarsVurdering<GrunnlagOmsorgForBarnUnder6> }
 }
 
+fun VilkarsVurdering<*>.hentVilkarsVurderingerFullOmsorgForBarnUnder6(vararg forUtfall: Utfall) : List<VilkarsVurdering<GrunnlagOmsorgForBarnUnder6>>{
+    return hentVilkarsVurderingerFullOmsorgForBarnUnder6()
+        .filter { forUtfall.contains(it.utfall) }
+}
+
+
 fun VilkarsVurdering<*>.hentOmsorgsgiverOver16() = hentAlleVilkarsVurderinger(this).first { it.vilkar is OmsorgsgiverOver16Ar }
 
 fun VilkarsVurdering<*>.hentOmsorgsgiverUnder70() = hentAlleVilkarsVurderinger(this).first { it.vilkar is OmsorgsgiverUnder70Ar }

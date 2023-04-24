@@ -16,4 +16,6 @@ class Periode private constructor(private val months: Set<YearMonth> = setOf()) 
     infix fun begrensTilAr(ar: Int): Periode = Periode(months.filter { it.year == ar }.toSet())
 
     operator fun plus(other: Periode) = Periode(this.months + other.months)
+
+    operator fun minus(other: Periode) = Periode(this.months - other.months)
 }
