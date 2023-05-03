@@ -36,7 +36,7 @@ spec:
     enabled: true
   image: {{ image }}
   ingresses:
-    - https://omsorgsopptjening-bestem-pensjonsopptjening.dev.intern.nav.no
+    - https://omsorgsopptjening-bestem-pensjonsopptjening.intern.dev.nav.no
   liveness:
     path: /actuator/health/liveness
     port: 8080
