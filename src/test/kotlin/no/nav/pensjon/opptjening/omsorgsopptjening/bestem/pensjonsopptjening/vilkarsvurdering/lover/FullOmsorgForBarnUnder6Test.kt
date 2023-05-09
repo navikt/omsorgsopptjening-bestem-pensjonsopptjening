@@ -278,29 +278,29 @@ class FullOmsorgForBarnUnder6Test {
         assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
-    @ParameterizedTest
-    @CsvSource(
-        "2020-01, 2023-01, INVILGET",
-        "2020-01, 2021-01, AVSLAG",
-        )
-    fun `Given at least 1 months of omsorgsarbeid when child has deceased Then omsorg is INVILGET`(
-        fom: YearMonth,
-        tom: YearMonth,
-        expectedUtfall: Utfall
-    ) {
-        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = GrunnlagOmsorgForBarnUnder6(
-                omsorgsAr = AR_2023,
-                omsorgsmottaker = omsorgsmottaker_deceased_2023,
-                utfallPersonVilkarsvurdering = Utfall.INVILGET,
-                omsorgsArbeid100Prosent = listOf(
-                    OmsorgsvedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
-                )
-            )
-        )
-
-        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
-    }
+//    @ParameterizedTest
+//    @CsvSource(
+//        "2020-01, 2023-01, INVILGET",
+//        "2020-01, 2021-01, AVSLAG",
+//        )
+//    fun `Given at least 1 months of omsorgsarbeid when child has deceased Then omsorg is INVILGET`(
+//        fom: YearMonth,
+//        tom: YearMonth,
+//        expectedUtfall: Utfall
+//    ) {
+//        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
+//            grunnlag = GrunnlagOmsorgForBarnUnder6(
+//                omsorgsAr = AR_2023,
+//                omsorgsmottaker = omsorgsmottaker_deceased_2023,
+//                utfallPersonVilkarsvurdering = Utfall.INVILGET,
+//                omsorgsArbeid100Prosent = listOf(
+//                    OmsorgsvedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
+//                )
+//            )
+//        )
+//
+//        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
+//    }
 
 
     companion object {

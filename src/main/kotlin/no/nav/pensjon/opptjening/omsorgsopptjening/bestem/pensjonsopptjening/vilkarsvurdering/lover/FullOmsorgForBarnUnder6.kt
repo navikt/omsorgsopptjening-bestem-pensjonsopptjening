@@ -29,9 +29,11 @@ class FullOmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
             grunnlag.run {
                 if(utfallPersonVilkarsvurdering == Utfall.AVSLAG){
                     Utfall.AVSLAG
-                } else if (mottakerDoedeI(ar = omsorgsAr) && alderMottaker(mellom = 0..5) && enMonedOmsorg(ar = omsorgsAr)) {
-                    Utfall.INVILGET
-                } else if (seksMonederOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..5)) {
+                }
+//                else if (mottakerDoedeI(ar = omsorgsAr) && alderMottaker(mellom = 0..5) && enMonedOmsorg(ar = omsorgsAr)) {
+//                    Utfall.INVILGET
+//                }
+                else if (seksMonederOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..5)) {
                     Utfall.INVILGET
                 }
 //                } else if (enMonedOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..0)) {
