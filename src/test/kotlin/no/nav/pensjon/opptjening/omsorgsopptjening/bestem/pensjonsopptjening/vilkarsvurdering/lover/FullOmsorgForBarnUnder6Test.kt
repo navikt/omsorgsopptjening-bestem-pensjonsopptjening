@@ -23,7 +23,6 @@ class FullOmsorgForBarnUnder6Test {
         "2020-01, 2020-03, AVSLAG",
         "2020-01, 2020-04, AVSLAG",
         "2020-01, 2020-05, AVSLAG",
-        "2020-01, 2020-06, AVSLAG",
         "2020-01, 2020-07, INVILGET",
         "2020-01, 2020-08, INVILGET",
         "2020-01, 2020-09, INVILGET",
@@ -31,7 +30,7 @@ class FullOmsorgForBarnUnder6Test {
         "2020-01, 2020-11, INVILGET",
         "2020-01, 2020-12, INVILGET",
     )
-    fun `Given 7 months of omsorgsarbeid Then halvt ar med omsorg is INVILGET`(
+    fun `Given 6 months of omsorgsarbeid Then halvt ar med omsorg is INVILGET`(
         fom: YearMonth,
         tom: YearMonth,
         expectedUtfall: Utfall
@@ -51,66 +50,66 @@ class FullOmsorgForBarnUnder6Test {
         assertEquals(expectedUtfall, vilkarsVurdering.utfall)
     }
 
-    @ParameterizedTest
-    @CsvSource(
-        "2020-01, 2020-01, INVILGET",
-        "2020-12, 2020-12, INVILGET",
-        "2020-01, 2020-12, INVILGET",
-        "2020-07, 2020-12, INVILGET",
-    )
-    fun `Given at least 1 months of omsorgsarbeid when child is 0 year old Then omsorg is INVILGET`(
-        fom: YearMonth,
-        tom: YearMonth,
-        expectedUtfall: Utfall
-    ) {
-        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = GrunnlagOmsorgForBarnUnder6(
-                omsorgsAr = AR_2020,
-                omsorgsmottaker = omsorgsmottaker_2020,
-                utfallPersonVilkarsvurdering = Utfall.INVILGET,
-                omsorgsArbeid100Prosent = listOf(
-                    OmsorgsvedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
-                )
-            )
+//    @ParameterizedTest
+//    @CsvSource(
+//        "2020-01, 2020-01, INVILGET",
+//        "2020-12, 2020-12, INVILGET",
+//        "2020-01, 2020-12, INVILGET",
+//        "2020-07, 2020-12, INVILGET",
+//    )
+//    fun `Given at least 1 months of omsorgsarbeid when child is 0 year old Then omsorg is INVILGET`(
+//        fom: YearMonth,
+//        tom: YearMonth,
+//        expectedUtfall: Utfall
+//    ) {
+//        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
+//            grunnlag = GrunnlagOmsorgForBarnUnder6(
+//                omsorgsAr = AR_2020,
+//                omsorgsmottaker = omsorgsmottaker_2020,
+//                utfallPersonVilkarsvurdering = Utfall.INVILGET,
+//                omsorgsArbeid100Prosent = listOf(
+//                    OmsorgsvedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
+//                )
+//            )
+//
+//        )
+//
+//        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
+//    }
 
-        )
-
-        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
-    }
-
-    @ParameterizedTest
-    @CsvSource(
-        "2021-01, 2021-01, INVILGET",
-        "2021-12, 2021-12, INVILGET",
-        "2021-01, 2021-12, INVILGET",
-        "2021-07, 2021-12, INVILGET",
-    )
-    fun `Given months of omsorgsarbeid is 0 in omsorgsAr and 1 in omsorgsAr + 1 when omsorgsmottaker is born in omsorgsAr Then INVILGET`(
-        fom: YearMonth,
-        tom: YearMonth,
-        expectedUtfall: Utfall
-    ) {
-        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = GrunnlagOmsorgForBarnUnder6(
-                omsorgsAr = AR_2020,
-                omsorgsmottaker = omsorgsmottaker_2020,
-                utfallPersonVilkarsvurdering = Utfall.INVILGET,
-                omsorgsArbeid100Prosent = listOf(
-                    OmsorgsvedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
-                )
-            )
-        )
-
-        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
-    }
+//    @ParameterizedTest
+//    @CsvSource(
+//        "2021-01, 2021-01, INVILGET",
+//        "2021-12, 2021-12, INVILGET",
+//        "2021-01, 2021-12, INVILGET",
+//        "2021-07, 2021-12, INVILGET",
+//    )
+//    fun `Given months of omsorgsarbeid is 0 in omsorgsAr and 1 in omsorgsAr + 1 when omsorgsmottaker is born in omsorgsAr Then INVILGET`(
+//        fom: YearMonth,
+//        tom: YearMonth,
+//        expectedUtfall: Utfall
+//    ) {
+//        val vilkarsVurdering = FullOmsorgForBarnUnder6().vilkarsVurder(
+//            grunnlag = GrunnlagOmsorgForBarnUnder6(
+//                omsorgsAr = AR_2020,
+//                omsorgsmottaker = omsorgsmottaker_2020,
+//                utfallPersonVilkarsvurdering = Utfall.INVILGET,
+//                omsorgsArbeid100Prosent = listOf(
+//                    OmsorgsvedtakPeriode(fom = fom, tom = tom, prosent = 100, omsorgsytere = listOf(omsorgsyter_1988), omsorgsmottakere = listOf(), landstilknytning = Landstilknytning.NASJONAL)
+//                )
+//            )
+//        )
+//
+//        assertEquals(expectedUtfall, vilkarsVurdering.utfall)
+//    }
 
 
     @ParameterizedTest
     @CsvSource(
         "2019-12, 2020-01, AVSLAG",
         "2020-12, 2021-01, AVSLAG",
-        "2019-11, 2020-06, AVSLAG",
-        "2020-07, 2021-02, AVSLAG",
+        "2019-11, 2020-05, AVSLAG",
+        "2020-08, 2021-02, AVSLAG",
         "2019-02, 2021-02, INVILGET",
         "2019-12, 2021-01, INVILGET",
         "2019-02, 2020-07, INVILGET",
@@ -118,7 +117,7 @@ class FullOmsorgForBarnUnder6Test {
         "2020-06, 2021-07, INVILGET",
         "2020-06, 2021-01, INVILGET",
     )
-    fun `Given 7 months of omsorgsarbeid When fom or tom overlap with omsorgsar Then halvt ar med omsorg is INVILGET`(
+    fun `Given 6 months of omsorgsarbeid When fom or tom overlap with omsorgsar Then halvt ar med omsorg is INVILGET`(
         fom: YearMonth,
         tom: YearMonth,
         expectedUtfall: Utfall
@@ -167,16 +166,16 @@ class FullOmsorgForBarnUnder6Test {
         "2020-01, 2020-06, 2020-07, 2020-12, INVILGET",
         "2020-01, 2020-07, 2021-02, 2022-12, INVILGET",
         "2019-01, 2019-06, 2020-06, 2020-12, INVILGET",
-        "2019-12, 2020-02, 2020-08, 2021-01, INVILGET",
+        "2019-12, 2020-01, 2020-08, 2021-01, INVILGET",
         "2019-01, 2019-12, 2021-01, 2019-12, AVSLAG",
         "2019-01, 2019-06, 2021-06, 2019-12, AVSLAG",
-        "2019-01, 2020-05, 2020-12, 2021-12, AVSLAG",
-        "2019-01, 2020-04, 2020-11, 2021-12, AVSLAG",
-        "2019-01, 2020-03, 2020-10, 2021-12, AVSLAG",
-        "2019-01, 2020-02, 2020-09, 2021-12, AVSLAG",
-        "2019-01, 2020-01, 2020-08, 2021-12, AVSLAG",
+        "2019-01, 2020-04, 2020-12, 2021-12, AVSLAG",
+        "2019-01, 2020-03, 2020-11, 2021-12, AVSLAG",
+        "2019-01, 2020-02, 2020-10, 2021-12, AVSLAG",
+        "2019-01, 2020-01, 2020-09, 2021-12, AVSLAG",
+        "2019-01, 2020-01, 2020-08, 2020-11, AVSLAG",
     )
-    fun `Given 7 months of omsorgsarbeid When two utbetalings periodes Then halvt ar med omsorg is INVILGET`(
+    fun `Given 6 months of omsorgsarbeid When two utbetalings periodes Then halvt ar med omsorg is INVILGET`(
         fom1: YearMonth,
         tom1: YearMonth,
         fom2: YearMonth,
@@ -204,10 +203,10 @@ class FullOmsorgForBarnUnder6Test {
         "2020-06, 2020-12, 2020-06, 2020-12, 2020-07, 2020-12, INVILGET",
         "2019-01, 2020-01, 2020-03, 2020-05, 2020-10, 2020-12, INVILGET",
         "2020-01, 2020-04, 2020-06, 2020-06, 2020-11, 2021-12, INVILGET",
-        "2019-01, 2020-02, 2020-04, 2020-04, 2020-10, 2021-12, AVSLAG",
+        "2019-01, 2020-02, 2020-04, 2020-04, 2020-10, 2021-12, INVILGET",
         "2012-01, 2012-06, 2019-01, 2019-12, 2021-01, 2021-01, AVSLAG",
     )
-    fun `Given 7 months of omsorgsarbeid When three utbetalings periodes Then halvt ar med omsorg is INVILGET`(
+    fun `Given 6 months of omsorgsarbeid When three utbetalings periodes Then halvt ar med omsorg is INVILGET`(
         fom1: YearMonth,
         tom1: YearMonth,
         fom2: YearMonth,
