@@ -46,7 +46,7 @@ internal class VilkarsVurderingsServiceTest {
     @ParameterizedTest
     @CsvSource(
         "2020-01, 2020-07, SAKSBEHANDLING",
-        "2020-01, 2020-06, AVSLAG",
+        "2020-01, 2020-05, AVSLAG",
     )
     fun `Given shared omsorg When seven months shared omsorg Then utfall equals SAKSBEHANDLING`(
         fom: YearMonth,
@@ -148,7 +148,7 @@ internal class VilkarsVurderingsServiceTest {
     @ParameterizedTest
     @CsvSource(
         "2020-01, 2020-07, MANGLER_ANNEN_OMSORGSYTER",
-        "2020-01, 2020-06, AVSLAG",
+        "2020-01, 2020-05, AVSLAG",
     )
     fun `Given missing information about other parties When seven months shared omsorg Then utfall equals MANGLER_ANNEN_OMSORGSYTER`(
         fom: YearMonth,

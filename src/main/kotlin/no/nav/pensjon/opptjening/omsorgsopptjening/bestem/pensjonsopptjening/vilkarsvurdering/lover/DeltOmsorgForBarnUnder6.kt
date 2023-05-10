@@ -13,10 +13,10 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
         begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",
         begrunnelseForInnvilgelse = "Medlemmet har et halve år med daglig omsorgen for et barn",
     ),
-    utfallsFunksjon = `Minst 7 moneder omsorg for barn under 6 ar`,
+    utfallsFunksjon = `Minst 6 moneder omsorg for barn under 6 ar`,
 ) {
     companion object {
-        private val `Minst 7 moneder omsorg for barn under 6 ar` =
+        private val `Minst 6 moneder omsorg for barn under 6 ar` =
             fun(grunnlag: GrunnlagDeltOmsorgForBarnUnder6): Utfall {
                 return grunnlag.run {
                     when {
@@ -46,7 +46,7 @@ class DeltOmsorgForBarnUnder6 : Vilkar<GrunnlagDeltOmsorgForBarnUnder6>(
 
 
         private fun GrunnlagDeltOmsorgForBarnUnder6.sjuMonederDeltOmsorg(ar: Int) =
-            omsorgsArbeid50Prosent.getAntallUtbetalingMoneder(ar) >= 7
+            omsorgsArbeid50Prosent.getAntallUtbetalingMoneder(ar) >= 6
 
         private fun GrunnlagDeltOmsorgForBarnUnder6.enMonedDeltOmsorg(ar: Int) =
             omsorgsArbeid50Prosent.getAntallUtbetalingMoneder(ar) >= 1

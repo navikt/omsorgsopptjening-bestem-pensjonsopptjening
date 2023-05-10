@@ -7,9 +7,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsInformasjon
 
 /**
- * For barn fra 1 til og med 5 år må omsorgsgiver minst ha 7 måneder med omsorgsarbeid for barnet
+ * For barn fra 1 til og med 5 år må omsorgsgiver minst ha 6 måneder med omsorgsarbeid for barnet
  *
- * For barn som ikke har fylt ett år kreves ikke 7 måneder for å oppnå omsorgsopptjening
+ * For barn som ikke har fylt ett år kreves ikke 6 måneder for å oppnå omsorgsopptjening
  *
  * Barn som ikke har fylt ett år og er født i desember vil ikke ha utbetalt barnetrygd og har ikke omsorgsarbeid for året.
  * De har alikevel rett til full omsorgsopptjening det første året.
