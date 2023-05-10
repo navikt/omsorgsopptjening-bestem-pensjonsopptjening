@@ -15,10 +15,8 @@ data class Vilkarsresultat(
 
     fun getOmsorgsAr() = snapshot.omsorgsAr
 
-    fun getUtfall() = og(
-        personVilkarsvurdering!!,
-        eller(individueltVilkarsVurdering!!, sammenstiltVilkarsVurdering!!)
-    ).utfall
+    fun getUtfall() = eller(og(personVilkarsvurdering!!, eller(individueltVilkarsVurdering!!, sammenstiltVilkarsVurdering!!)), )
+        .utfall
 
     fun hentVilkarsVurderingerFullOmsorgForBarnUnder6() =
         individueltVilkarsVurdering!!.hentVilkarsVurderingerFullOmsorgForBarnUnder6()

@@ -29,7 +29,7 @@ internal class IndividuellVilkarsvurderingTest {
 
     @Test
     fun `Given omsorgs arbeid for seven months When calling fastsettOmsorgsOpptjening Then INVILGET`() {
-        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1990)
+        val omsorgsyter = createPerson(FNR_OMSORGYTER, 1990)
         val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2005)
 
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
@@ -57,7 +57,7 @@ internal class IndividuellVilkarsvurderingTest {
 
     @Test
     fun `Given omsorgs arbeid for less than seven months When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
-        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1990)
+        val omsorgsyter = createPerson(FNR_OMSORGYTER, 1990)
         val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 2015)
 
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
@@ -84,7 +84,7 @@ internal class IndividuellVilkarsvurderingTest {
 
     @Test
     fun `Given utfallAbsolutteKrav is avslag Then AVSLAG`() {
-        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1983)
+        val omsorgsyter = createPerson(FNR_OMSORGYTER, 1983)
         val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, 1995)
 
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
@@ -121,7 +121,7 @@ internal class IndividuellVilkarsvurderingTest {
         fodselsAr: Int,
         expectedUtfall: Utfall
     ) {
-        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1960)
+        val omsorgsyter = createPerson(FNR_OMSORGYTER, 1960)
         val omsorgsmottaker = createPerson(FNR_OMSORGSMOTTAKER, fodselsAr)
 
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
@@ -159,7 +159,7 @@ internal class IndividuellVilkarsvurderingTest {
         fodselsArOmsorgsMottaker2: Int,
         expectedUtfall: Utfall
     ) {
-        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1960)
+        val omsorgsyter = createPerson(FNR_OMSORGYTER, 1960)
         val omsorgsmottaker1 = createPerson(FNR_OMSORGSMOTTAKER, fodselsArOmsorgsMottaker1)
         val omsorgsmottaker2 = createPerson(FNR_OMSORGSMOTTAKER_2, fodselsArOmsorgsMottaker2)
 
@@ -187,7 +187,7 @@ internal class IndividuellVilkarsvurderingTest {
 
     @Test
     fun `Given no omsorgsmottaker When calling fastsettOmsorgsOpptjening Then AVSLAG`() {
-        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1960)
+        val omsorgsyter = createPerson(FNR_OMSORGYTER, 1960)
 
         val omsorgsArbeidSnapshot = creatOmsorgsArbeidSnapshot(
             omsorgsAr = 2006,
@@ -210,7 +210,7 @@ internal class IndividuellVilkarsvurderingTest {
 
     @Test
     fun `Given omsorgs arbeid for seven months When having omsorgs for more than one person Then INVILGET`() {
-        val omsorgsyter = createPerson(FNR_OMSORGSGIVER, 1990)
+        val omsorgsyter = createPerson(FNR_OMSORGYTER, 1990)
         val omsorgsmottaker1 = createPerson(FNR_OMSORGSMOTTAKER, 2005)
         val omsorgsmottaker2 = createPerson(FNR_OMSORGSMOTTAKER_2, 2007)
         val omsorgsmottaker3 = createPerson(FNR_OMSORGSMOTTAKER_3, 1995)
@@ -300,7 +300,7 @@ internal class IndividuellVilkarsvurderingTest {
     }
 
     companion object {
-        const val FNR_OMSORGSGIVER: String = "12345678902"
+        const val FNR_OMSORGYTER: String = "12345678902"
         const val FNR_OMSORGSMOTTAKER: String = "55555555555"
         const val FNR_OMSORGSMOTTAKER_2: String = "6666666666"
         const val FNR_OMSORGSMOTTAKER_3: String = "4444444444"

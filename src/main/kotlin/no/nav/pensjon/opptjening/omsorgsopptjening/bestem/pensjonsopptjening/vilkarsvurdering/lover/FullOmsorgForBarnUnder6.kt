@@ -7,13 +7,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vil
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsInformasjon
 
 /**
- * For barn fra 1 til og med 5 år må omsorgsgiver minst ha 6 måneder med omsorgsarbeid for barnet
+ * For barn fra 1 til og med 5 år må omsorgsyter minst ha 6 måneder med omsorgsarbeid for barnet
  *
  * For barn som ikke har fylt ett år kreves ikke 6 måneder for å oppnå omsorgsopptjening
  *
  * Barn som ikke har fylt ett år og er født i desember vil ikke ha utbetalt barnetrygd og har ikke omsorgsarbeid for året.
  * De har alikevel rett til full omsorgsopptjening det første året.
- * Det betyr at vi må sjekke om omsorgsgiver har fått barnetrygd i året etter for å vite om omsorgsyter har rett til omsorgsopptjening
+ * Det betyr at vi må sjekke om omsorgsyter har fått barnetrygd i året etter for å vite om omsorgsyter har rett til omsorgsopptjening
  *
  */
 class FullOmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
@@ -30,21 +30,18 @@ class FullOmsorgForBarnUnder6 : Vilkar<GrunnlagOmsorgForBarnUnder6>(
                 if(utfallPersonVilkarsvurdering == Utfall.AVSLAG){
                     Utfall.AVSLAG
                 }
-//                else if (mottakerDoedeI(ar = omsorgsAr) && alderMottaker(mellom = 0..5) && enMonedOmsorg(ar = omsorgsAr)) {
-//                    Utfall.INVILGET
-//                }
                 else if (seksMonederOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..5)) {
                     Utfall.INVILGET
+                } else if(fodtIOmsorgsAr(omsorgsAr, grunnlag.omsorgsmottaker.fodselsAr)) {
+                    Utfall.INVILGET
                 }
-//                } else if (enMonedOmsorg(ar = omsorgsAr) && alderMottaker(mellom = 0..0)) {
-//                    Utfall.INVILGET
-//                } else if (enMonedOmsorg(ar = omsorgsAr + 1) && alderMottaker(mellom = 0..0)) {
-//                    Utfall.INVILGET
-//                }
                 else {
                     Utfall.AVSLAG
                 }
             }
+
+        private fun fodtIOmsorgsAr(omsorgsAr: Int, fodselsAr: Int): Boolean =
+            omsorgsAr == fodselsAr
 
         private fun GrunnlagOmsorgForBarnUnder6.mottakerDoedeI(ar: Int) =
             omsorgsmottaker.doedsdato?.let { it.year == ar } ?: false

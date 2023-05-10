@@ -1,8 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.OmsorgsgiverOver16Ar
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.OmsorgsgiverUnder70Ar
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.OmsorgsGiverOgOmsorgsAr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.OmsorgsYterOver16Ar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.OmsorgsyterUnder70Ar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.lover.grunnlag.OmsorgsYterOgOmsorgsAr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.VilkarsVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.Vilkarsresultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.vilkarsvurdering.vilkar.operator.Og.Companion.og
@@ -17,16 +17,16 @@ class PersonVilkarsvurdering {
         val omsorgsyter = vilkarsResultat.snapshot.omsorgsyter
 
         return og(
-            OmsorgsgiverOver16Ar().vilkarsVurder(
-                OmsorgsGiverOgOmsorgsAr(
+            OmsorgsYterOver16Ar().vilkarsVurder(
+                OmsorgsYterOgOmsorgsAr(
                     omsorgsAr = omsorgsAr,
-                    omsorgsgiver = omsorgsyter
+                    omsorgsyter = omsorgsyter
                 )
             ),
-            OmsorgsgiverUnder70Ar().vilkarsVurder(
-                OmsorgsGiverOgOmsorgsAr(
+            OmsorgsyterUnder70Ar().vilkarsVurder(
+                OmsorgsYterOgOmsorgsAr(
                     omsorgsAr = omsorgsAr,
-                    omsorgsgiver = omsorgsyter
+                    omsorgsyter = omsorgsyter
                 )
             )
         )
