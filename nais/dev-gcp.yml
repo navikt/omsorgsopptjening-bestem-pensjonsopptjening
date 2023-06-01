@@ -19,6 +19,8 @@ spec:
       value: dev-fss.pdl.pdl-api
     - name: BESTEMSAK_URL
       value: https://pensjon-pen-q2.nais.preprod.local/pen/api/bestemsak/v1
+    - name: OPPGAVE_OPPGAVER_URL
+      value: https://oppgave.dev-fss-pub.nais.io/api/v1/oppgaver
   kafka:
     pool: nav-dev
   gcp:

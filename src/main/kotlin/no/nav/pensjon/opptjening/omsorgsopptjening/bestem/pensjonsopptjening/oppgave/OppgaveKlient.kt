@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.mapAnyToJson
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
@@ -14,7 +15,8 @@ import java.time.format.DateTimeFormatter
  * Swagger: https://oppgave.dev.intern.nav.no/
  */
 @Component
-class OppgaveKlient(val restTemplate: RestTemplate)
+class OppgaveKlient(@Value("\${OPPGAVE_URL}") private val oppgaveUrl: String,
+                    val restTemplate: RestTemplate)
 {
     private val logger = LoggerFactory.getLogger(OppgaveKlient::class.java)
 
@@ -40,7 +42,7 @@ class OppgaveKlient(val restTemplate: RestTemplate)
                 logger.info("Oppretter oppgave: $requestBody")
 
                 val httpEntity = HttpEntity(requestBody)
-                restTemplate.exchange("/", HttpMethod.POST, httpEntity, String::class.java)
+                restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, String::class.java)
 
                 logger.info("Opprettet kravoppgave for sakId: $sakId")
             } catch(ex: HttpStatusCodeException) {
