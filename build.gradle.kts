@@ -25,6 +25,7 @@ group = "no.nav.pensjon.opptjening"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven("https://maven.pkg.github.com/navikt/maven-release") {
         credentials {
@@ -57,6 +58,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$springCloudContractVersion")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
+    testImplementation("org.skyscreamer:jsonassert:1.5.1")
 }
 
 tasks.test {
@@ -71,6 +73,7 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<Test> {
+    maxParallelForks = 1 //Disable parallell execution due to shared resources (db/wiremock)
     useJUnitPlatform()
     testLogging {
         events(

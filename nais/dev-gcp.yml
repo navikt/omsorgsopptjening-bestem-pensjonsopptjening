@@ -9,6 +9,8 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev-gcp
+    - name: OMSORGSARBEID_TOPIC
+      value: pensjonopptjening.omsorgsarbeid
     - name: OMSORGSOPPTJENING_TOPIC
       value: pensjonopptjening.omsorgsopptjening
     - name: OMSORGSOPPTJENING_BESTEM_GROUP_ID

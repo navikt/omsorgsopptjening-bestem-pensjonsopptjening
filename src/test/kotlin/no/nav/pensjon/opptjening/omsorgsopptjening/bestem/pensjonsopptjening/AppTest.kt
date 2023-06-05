@@ -1,0 +1,112 @@
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
+
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsSak
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsopptjeningInnvilget
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsopptjeningInnvilgetKey
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Omsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToClass
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.springframework.beans.factory.annotation.Autowired
+import java.time.Month
+import java.time.YearMonth
+import kotlin.test.assertEquals
+
+internal class AppTest : SpringContextTest() {
+
+    @Autowired
+    private lateinit var behandlingRepo: BehandlingRepo
+
+    companion object {
+        @RegisterExtension
+        val wiremock = WireMockExtension.newInstance()
+            .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
+            .build()!!
+    }
+
+    @Test
+    fun `consume, process and send innvilget`() {
+        stubPdl(
+            listOf(
+                PdlScenario(body = "fnr_1bruk.json", setState = "hent barn"),
+                PdlScenario(inState = "hent barn", body = "fnr_barn_2ar_2020.json")
+            )
+        )
+
+        sendOmsorgsgrunnlagKafka(
+            omsorgsGrunnlag = OmsorgsGrunnlag(
+                omsorgsyter = "12345678910",
+                omsorgsAr = 2020,
+                omsorgstype = Omsorgstype.BARNETRYGD,
+                kjoreHash = "xxx",
+                kilde = Kilde.BARNETRYGD,
+                omsorgsSaker = listOf(
+                    OmsorgsSak(
+                        omsorgsyter = "12345678910",
+                        omsorgVedtakPeriode = listOf(
+                            OmsorgVedtakPeriode(
+                                fom = YearMonth.of(2020, Month.JANUARY),
+                                tom = YearMonth.of(2020, Month.DECEMBER),
+                                prosent = 100,
+                                omsorgsmottaker = "22222222222"
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        omsorgsopptjeningListener.removeFirstRecord(maxSeconds = 10)
+            .let { record ->
+                record.key().mapToClass(OmsorgsopptjeningInnvilgetKey::class.java).let {
+                    assertEquals(
+                        OmsorgsopptjeningInnvilgetKey(
+                            omsorgsAr = 2020,
+                            omsorgsyter = "12345678910"
+                        ),
+                        it
+                    )
+                }
+                record.value().mapToClass(OmsorgsopptjeningInnvilget::class.java).let {
+                    assertEquals(
+                        OmsorgsopptjeningInnvilget(
+                            omsorgsAr = 2020,
+                            omsorgsyter = "12345678910",
+                            omsorgsmottaker = "22222222222",
+                            kilde = Kilde.BARNETRYGD,
+                            omsorgstype = Omsorgstype.BARNETRYGD
+                        ),
+                        it
+                    )
+                }
+            }
+
+        assertEquals(1, behandlingRepo.findAll("12345678910").count())
+    }
+
+    fun stubPdl(scenario: List<PdlScenario>) {
+        val name = scenario.sumOf { it.hashCode() }
+        scenario.forEach {
+            wiremock.stubFor(
+                WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                    .inScenario(name.toString())
+                    .whenScenarioStateIs(it.inState)
+                    .willReturn(
+                        WireMock.aResponse()
+                            .withStatus(200)
+                            .withHeader("Content-Type", "application/json")
+                            .withBodyFile(it.body)
+                    )
+                    .willSetStateTo(it.setState)
+            )
+        }
+    }
+}

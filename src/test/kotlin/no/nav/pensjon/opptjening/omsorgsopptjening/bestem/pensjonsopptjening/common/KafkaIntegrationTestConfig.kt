@@ -14,5 +14,5 @@ import org.springframework.kafka.annotation.EnableKafka
 @Profile("!no-kafka")
 class KafkaIntegrationTestConfig {
     @Bean
-    fun securityConfig() = KafkaSecurityConfig(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "PLAINTEXT")
+    fun securityConfig() = KafkaSecurityConfig.Common(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "PLAINTEXT")
 }
