@@ -4,6 +4,8 @@ kafka:
   brokers: ${spring.embedded.kafka.brokers}
 
 PDL_URL: http://localhost:9991/graphql
+BESTEMSAK_URL: https://localhost:9991/pen/api/bestemsak/v1
+OPPGAVE_URL: https://localhost:9991/api/v1/oppgaver
 
 spring.datasource:
   driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
