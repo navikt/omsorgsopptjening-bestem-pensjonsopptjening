@@ -21,6 +21,15 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         )
     }
 
+    fun hentAktorId(fnr: String): String {
+        val pdlResponse = pdlClient.hentAktorId(graphqlQuery = graphqlQuery.getAktorIdQuery(), fnr = fnr)
+        return pdlResponse?.data?.hentIdenter?.identer
+            ?.firstOrNull { it.gruppe == IdentGruppe.AKTORID }
+            ?.let { it.ident }
+            ?: throw java.lang.RuntimeException("Fant ingen aktørId")
+
+    }
+
     private fun bestemDoedsdato(doedsfall: List<Doedsfall?>): LocalDate? {
         return doedsfall.firstOrNull()?.doedsdato
     }

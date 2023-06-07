@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service
 
 @Service
 class PersonService(
-    private val personRepository: PersonRepository,
+   // private val personRepository: PersonRepository,
     private val pdlService: PdlService
 ) {
 
-    fun createPersoner(fnrs: List<String>): List<Person> = fnrs
-        .map { pdlService.hentPerson(it) }
-        .distinctBy { it.gjeldendeFnr}
-        .map { personRepository.updatePerson(it) }
+//    fun createPersoner(fnrs: List<String>): List<Person> = fnrs
+//        .map { pdlService.hentPerson(it) }
+//        .distinctBy { it.gjeldendeFnr}
+//        .map { personRepository.updatePerson(it) }
 }

@@ -6,9 +6,18 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class GraphqlQuery(@Value("classpath:pdl/folkeregisteridentifikator.graphql") private val hentPersonQuery: Resource) {
+class GraphqlQuery(
+    @Value("classpath:pdl/folkeregisteridentifikator.graphql")
+    private val hentPersonQuery: Resource,
+    @Value("classpath:pdl/hentAktorId.graphql")
+    private val hentAktorIdQuery: Resource
+) {
     fun getPersonFodselsaarQuery(): String {
         return String(hentPersonQuery.inputStream.readBytes()).replace("[\n\r]", "")
+    }
+
+    fun getAktorIdQuery(): String {
+        return String(hentAktorIdQuery.inputStream.readBytes()).replace("[\n\r]", "")
     }
 }
 

@@ -40,9 +40,9 @@ class OmsorgsarbeidListener(
         if (consumerRecord.kafkaMessageType() == KafkaMessageType.OMSORGSARBEID) {
             SECURE_LOG.info("Behandler: ${consumerRecord.value()}")
 
-            omsorgsopptjeningsService.behandlOmsorgsarbeid(
-                omsorgsArbeidService.createAndSaveOmsorgasbeidsSnapshot(map(consumerRecord.value()))
-            )
+//            omsorgsopptjeningsService.behandlOmsorgsarbeid(
+//                omsorgsArbeidService.createAndSaveOmsorgasbeidsSnapshot(map(consumerRecord.value()))
+//            )
         }
 
         acknowledgment.acknowledge()

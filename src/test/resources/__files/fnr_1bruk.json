@@ -1,5 +1,13 @@
 {
   "data": {
+    "hentIdenter": {
+      "identer": [
+        {
+          "ident": "1234567891234",
+          "gruppe": "AKTORID"
+        }
+      ]
+    },
     "hentPerson": {
       "folkeregisteridentifikator": [
         {

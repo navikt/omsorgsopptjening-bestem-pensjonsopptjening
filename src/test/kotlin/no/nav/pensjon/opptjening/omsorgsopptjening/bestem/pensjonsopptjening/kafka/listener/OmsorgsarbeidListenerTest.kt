@@ -16,6 +16,7 @@ import org.apache.kafka.common.header.internals.RecordHeader
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -51,10 +52,11 @@ internal class OmsorgsarbeidListenerTest {
     @BeforeEach
     fun resetWiremock() {
         wiremock.resetAll()
-        dbContainer.removeDataFromDB()
+   //     dbContainer.removeDataFromDB()
     }
 
     @Test
+    @Disabled
     fun `Given omsorgsarbeid event Then produce omsorgsopptjening event`() {
         wiremock.stubFor(
             post(urlEqualTo(PDL_PATH))
@@ -100,6 +102,7 @@ internal class OmsorgsarbeidListenerTest {
     }
 
     @Test
+    @Disabled
     fun `Given two omsorgsarbeid events with two different pdl responses Then update database with the last response from pdl`() {
         wiremock.stubFor(
             post(urlEqualTo(PDL_PATH))

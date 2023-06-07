@@ -17,11 +17,12 @@ class OmsorgsArbeidService(
         .getAndreOmsorgsytere()
         .flatMap { omsorgsarbeidSnapshotRepository.find(it, snapshot.omsorgsAr) }
 
-    fun createAndSaveOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: KafkaSnapshot): OmsorgsGrunnlag {
-        val personer = personService.createPersoner(hentFnr(omsorgsarbeidsSnapshot))
-
-        return omsorgsarbeidSnapshotRepository.save(mapKafkaMessageToDomain(omsorgsarbeidsSnapshot, personer))
-    }
+//    fun createAndSaveOmsorgasbeidsSnapshot(omsorgsarbeidsSnapshot: KafkaSnapshot): OmsorgsGrunnlag {
+//        val personer = personService.createPersoner(hentFnr(omsorgsarbeidsSnapshot))
+//
+//        return omsorgsarbeidSnapshotRepository.save(mapKafkaMessageToDomain(omsorgsarbeidsSnapshot, personer)
+//          )
+//    }
 
     private fun hentFnr(omsorgsarbeidsSnapshot: KafkaSnapshot) = omsorgsarbeidsSnapshot.hentPersoner().map { it.fnr }
 

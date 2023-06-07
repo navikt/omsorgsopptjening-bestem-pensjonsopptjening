@@ -28,7 +28,7 @@ internal class PdlServiceTest {
     @BeforeEach
     fun resetWiremock() {
         wiremock.resetAll()
-        dbContainer.removeDataFromDB()
+   //     dbContainer.removeDataFromDB()
     }
 
     @Test

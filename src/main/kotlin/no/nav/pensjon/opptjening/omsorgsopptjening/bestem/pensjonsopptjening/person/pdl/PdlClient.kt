@@ -31,4 +31,17 @@ class PdlClient(
 
         return response
     }
+
+    internal fun hentAktorId(graphqlQuery: String, fnr: String): IdenterResponse? {
+        val response = restTemplate.postForEntity(
+            pdlUrl,
+            PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
+            IdenterResponse::class.java
+        ).body
+
+        response?.error?.extensions?.code?.also {
+            if (it == PdlErrorCode.SERVER_ERROR) throw PdlException(response.error)
+        }
+        return response
+    }
 }

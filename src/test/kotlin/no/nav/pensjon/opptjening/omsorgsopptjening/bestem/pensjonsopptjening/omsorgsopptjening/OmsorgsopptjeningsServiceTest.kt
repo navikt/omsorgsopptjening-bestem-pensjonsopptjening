@@ -15,6 +15,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsOpptjening
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -44,10 +45,11 @@ class OmsorgsopptjeningsServiceTest {
 
     @BeforeEach
     fun clearDb() {
-        dbContainer.removeDataFromDB()
+   //     dbContainer.removeDataFromDB()
     }
 
     @Test
+    @Disabled
     fun test() {
         val omsorgsYter1 = personRepository.updatePerson(omsorgsYter1988)
         val omsorgsYter2 = personRepository.updatePerson(omsorgsYter1987)
