@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
+import java.time.Month
 
 /**
  * For barn fra 1 til og med 5 år må omsorgsyter minst ha 6 måneder med omsorgsarbeid for barnet
@@ -18,36 +19,74 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
         begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",
         begrunnelseForInnvilgelse = "Medlemmet har et halve år med daglig omsorgen for et barn",
     ),
-    utfallsFunksjon = `Minst 6 moneder omsorg for barn under 6 ar`,
+    utfallsFunksjon = vurderUtfall,
 ) {
     companion object {
-        private val `Minst 6 moneder omsorg for barn under 6 ar` =
+        private val vurderUtfall =
             fun Vilkar<FullOmsorgForBarnUnder6Grunnlag>.(grunnlag: FullOmsorgForBarnUnder6Grunnlag): VilkårsvurderingUtfall {
                 return this.let { vilkar ->
-                    grunnlag.run {
-                        val tilstrekkeligAntallMnd = grunnlag.antallMånederFullOmsorg > 6
-                        val alderMottakerMellom1og5 = alderMottaker(mellom = 1..5)
+                    when (grunnlag) {
+                        is OmsorgsmottakerFødtIOmsorgsårGrunnlag -> {
+                            val alderMottaker0 = grunnlag.alderMottaker(mellom = 0..0)
+                            if (grunnlag.minstEnMånedFullOmsorg && alderMottaker0) {
+                                FullOmsorgForBarnUnder6Innvilget(
+                                    årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
+                                    omsorgsmottaker = grunnlag.omsorgsmottaker
+                                )
+                            } else {
+                                FullOmsorgForBarnUnder6Avslag(
+                                    årsaker = mutableListOf<AvslagÅrsak>().let {
+                                        if (!grunnlag.minstEnMånedFullOmsorg) it.add(AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG)
+                                        if (!alderMottaker0) it.add(AvslagÅrsak.ALDER_IKKE_0)
+                                        it.toList()
+                                    }
+                                )
+                            }
+                        }
 
-                        if (tilstrekkeligAntallMnd && alderMottakerMellom1og5) {
-                            FullOmsorgForBarnUnder6Innvilget(
-                                årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
-                                omsorgsmottaker = this.omsorgsmottaker
-                            )
-                        } else {
-                            FullOmsorgForBarnUnder6Avslag(
-                                årsaker = mutableListOf<AvslagÅrsak>().let {
-                                    if (!tilstrekkeligAntallMnd) it.add(AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG)
-                                    if (!alderMottakerMellom1og5) it.add(AvslagÅrsak.BARN_IKKE_MELLOM_1_OG_5)
-                                    it.toList()
-                                }
-                            )
+                        is OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag -> {
+                            val alderMottakerMellom1og5 = grunnlag.alderMottaker(mellom = 1..5)
+
+                            if (grunnlag.minstSeksMånederFullOmsorg && alderMottakerMellom1og5) {
+                                FullOmsorgForBarnUnder6Innvilget(
+                                    årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
+                                    omsorgsmottaker = grunnlag.omsorgsmottaker
+                                )
+                            } else {
+                                FullOmsorgForBarnUnder6Avslag(
+                                    årsaker = mutableListOf<AvslagÅrsak>().let {
+                                        if (!grunnlag.minstSeksMånederFullOmsorg) it.add(AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG)
+                                        if (!alderMottakerMellom1og5) it.add(AvslagÅrsak.BARN_IKKE_MELLOM_1_OG_5)
+                                        it.toList()
+                                    }
+                                )
+                            }
+                        }
+
+                        is OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag -> {
+                            val alderMottaker0 = grunnlag.alderMottaker(mellom = 0..0)
+                            if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel && alderMottaker0) {
+                                FullOmsorgForBarnUnder6Innvilget(
+                                    årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
+                                    omsorgsmottaker = grunnlag.omsorgsmottaker
+                                )
+                            } else {
+                                FullOmsorgForBarnUnder6Avslag(
+                                    årsaker = mutableListOf<AvslagÅrsak>().let {
+                                        if (!grunnlag.minstEnMånedOmsorgÅretEtterFødsel) it.add(AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL)
+                                        if (!alderMottaker0) it.add(AvslagÅrsak.ALDER_IKKE_0)
+                                        it.toList()
+                                    }
+                                )
+                            }
                         }
                     }
                 }
             }
 
-        private fun FullOmsorgForBarnUnder6Grunnlag.alderMottaker(mellom: IntRange) =
-            omsorgsmottaker.alder(omsorgsAr) in mellom
+        private fun FullOmsorgForBarnUnder6Grunnlag.alderMottaker(mellom: IntRange): Boolean {
+            return omsorgsmottaker.alder(omsorgsAr) in mellom
+        }
     }
 
     override fun vilkarsVurder(grunnlag: FullOmsorgForBarnUnder6Grunnlag): FullOmsorgForBarnUnder6Vurdering {
@@ -75,8 +114,37 @@ data class FullOmsorgForBarnUnder6Avslag(
     override val årsaker: List<AvslagÅrsak>,
 ) : VilkårsvurderingUtfall.Avslag()
 
-data class FullOmsorgForBarnUnder6Grunnlag(
-    val omsorgsAr: Int,
-    val omsorgsmottaker: PersonMedFødselsår,
-    val antallMånederFullOmsorg: Int,
-)
+sealed class FullOmsorgForBarnUnder6Grunnlag {
+    abstract val omsorgsAr: Int
+    abstract val omsorgsmottaker: PersonMedFødselsår
+}
+
+data class OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
+    override val omsorgsAr: Int,
+    override val omsorgsmottaker: PersonMedFødselsår,
+    val minstSeksMånederFullOmsorg: Boolean,
+) : FullOmsorgForBarnUnder6Grunnlag() {
+    init {
+        require(!omsorgsmottaker.erFødt(omsorgsAr))
+    }
+}
+
+data class OmsorgsmottakerFødtIOmsorgsårGrunnlag(
+    override val omsorgsAr: Int,
+    override val omsorgsmottaker: PersonMedFødselsår,
+    val minstEnMånedFullOmsorg: Boolean,
+) : FullOmsorgForBarnUnder6Grunnlag() {
+    init {
+        require(omsorgsmottaker.erFødt(omsorgsAr))
+    }
+}
+
+data class OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag(
+    override val omsorgsAr: Int,
+    override val omsorgsmottaker: PersonMedFødselsår,
+    val minstEnMånedOmsorgÅretEtterFødsel: Boolean,
+) : FullOmsorgForBarnUnder6Grunnlag() {
+    init {
+        require(omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER))
+    }
+}

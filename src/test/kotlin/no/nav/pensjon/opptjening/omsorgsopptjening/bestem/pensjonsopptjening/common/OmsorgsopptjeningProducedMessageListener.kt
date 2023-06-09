@@ -4,6 +4,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.kafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.junit.platform.commons.logging.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -15,6 +16,10 @@ import org.springframework.stereotype.Component
 class OmsorgsopptjeningProducedMessageListener {
 
     private val records: MutableList<ConsumerRecord<String, String>> = mutableListOf()
+
+    init {
+        LoggerFactory.getLogger(this::class.java).error { "THIS IS MY $this" }
+    }
 
     @KafkaListener(
         containerFactory = "omsorgsArbeidKafkaListenerContainerFactory",
@@ -34,6 +39,7 @@ class OmsorgsopptjeningProducedMessageListener {
             secondsPassed++
         }
         return records.firstOrNull { it.kafkaMessageType() == KafkaMessageType.OMSORGSOPPTJENING }
-            ?.also { records.remove(it) } ?: throw RuntimeException("No messages of type:${KafkaMessageType.OMSORGSOPPTJENING} to consume")
+            ?.also { records.remove(it) }
+            ?: throw RuntimeException("No messages of type:${KafkaMessageType.OMSORGSOPPTJENING} to consume")
     }
 }

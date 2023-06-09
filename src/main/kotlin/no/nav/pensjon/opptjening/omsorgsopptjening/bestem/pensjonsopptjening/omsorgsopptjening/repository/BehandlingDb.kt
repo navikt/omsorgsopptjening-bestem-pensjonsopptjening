@@ -8,7 +8,7 @@ internal class BehandlingDb(
     val omsorgsAr: Int,
     val omsorgsyter: String,
     val omsorgstype: OmsorgstypeDb,
-    val grunnlag: BeriketOmsorgsgrunnlagDb,
+    val grunnlag: BeriketGrunnlagDb,
     val vilkårsvurdering: VilkårsvurderingDb,
     val utfall: BehandlingsutfallDb
 )
@@ -25,7 +25,7 @@ internal fun Behandling.toDb(): BehandlingDb {
 }
 
 internal fun BehandlingDb.toDomain(): FullførtBehandling {
-    val omsorgsyter = this.grunnlag.omsorgsyter
+    val omsorgsyter = this.grunnlag.grunnlag.omsorgsyter
 
     return FullførtBehandling(
         omsorgsAr = omsorgsAr,

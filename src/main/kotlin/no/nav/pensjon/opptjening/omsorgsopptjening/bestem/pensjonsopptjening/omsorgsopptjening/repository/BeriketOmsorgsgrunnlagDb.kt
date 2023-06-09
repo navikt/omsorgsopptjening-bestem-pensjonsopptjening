@@ -1,8 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketOmsorgSak
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketOmsorgVedtakPeriode
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketOmsorgsgrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketSak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
@@ -10,7 +10,6 @@ import java.time.YearMonth
 
 internal data class BeriketOmsorgsgrunnlagDb(
     val omsorgsyter: PersonMedFødselsårDb,
-    val omsorgsAr: Int,
     val omsorgstype: OmsorgstypeDb,
     val kjoreHash: String,
     val kilde: KildeDb,
@@ -18,10 +17,9 @@ internal data class BeriketOmsorgsgrunnlagDb(
     val originaltGrunnlag: String
 )
 
-internal fun BeriketOmsorgsgrunnlag.toDb(): BeriketOmsorgsgrunnlagDb {
+internal fun BeriketDatagrunnlag.toDb(): BeriketOmsorgsgrunnlagDb {
     return BeriketOmsorgsgrunnlagDb(
         omsorgsyter = omsorgsyter.toDb(),
-        omsorgsAr = omsorgsAr,
         omsorgstype = omsorgstype.toDb(),
         kjoreHash = kjoreHash,
         kilde = kilde.toDb(),
@@ -30,10 +28,9 @@ internal fun BeriketOmsorgsgrunnlag.toDb(): BeriketOmsorgsgrunnlagDb {
     )
 }
 
-internal fun BeriketOmsorgsgrunnlagDb.toDomain(): BeriketOmsorgsgrunnlag {
-    return BeriketOmsorgsgrunnlag(
+internal fun BeriketOmsorgsgrunnlagDb.toDomain(): BeriketDatagrunnlag {
+    return BeriketDatagrunnlag(
         omsorgsyter = omsorgsyter.toDomain(),
-        omsorgsAr = omsorgsAr,
         omsorgstype = omsorgstype.toDomain(),
         kjoreHash = kjoreHash,
         kilde = kilde.toDomain(),
@@ -47,15 +44,15 @@ internal data class BeriketOmsorgSakDb(
     val omsorgVedtakPeriode: List<BeriketOmsorgVedtakPeriodeDb>
 )
 
-internal fun BeriketOmsorgSak.toDb(): BeriketOmsorgSakDb {
+internal fun BeriketSak.toDb(): BeriketOmsorgSakDb {
     return BeriketOmsorgSakDb(
         omsorgsyter = omsorgsyter.toDb(),
         omsorgVedtakPeriode = omsorgVedtakPeriode.map { it.toDb() }
     )
 }
 
-internal fun BeriketOmsorgSakDb.toDomain(): BeriketOmsorgSak {
-    return BeriketOmsorgSak(
+internal fun BeriketOmsorgSakDb.toDomain(): BeriketSak {
+    return BeriketSak(
         omsorgsyter = omsorgsyter.toDomain(),
         omsorgVedtakPeriode = omsorgVedtakPeriode.map { it.toDomain() }
     )
@@ -68,7 +65,7 @@ internal data class BeriketOmsorgVedtakPeriodeDb(
     val omsorgsmottaker: PersonMedFødselsårDb
 )
 
-internal fun BeriketOmsorgVedtakPeriode.toDb(): BeriketOmsorgVedtakPeriodeDb {
+internal fun BeriketVedtaksperiode.toDb(): BeriketOmsorgVedtakPeriodeDb {
     return BeriketOmsorgVedtakPeriodeDb(
         fom = fom.toString(),
         tom = tom.toString(),
@@ -80,8 +77,8 @@ internal fun BeriketOmsorgVedtakPeriode.toDb(): BeriketOmsorgVedtakPeriodeDb {
     )
 }
 
-internal fun BeriketOmsorgVedtakPeriodeDb.toDomain(): BeriketOmsorgVedtakPeriode {
-    return BeriketOmsorgVedtakPeriode(
+internal fun BeriketOmsorgVedtakPeriodeDb.toDomain(): BeriketVedtaksperiode {
+    return BeriketVedtaksperiode(
         fom = YearMonth.parse(fom),
         tom = YearMonth.parse(tom),
         prosent = prosent,

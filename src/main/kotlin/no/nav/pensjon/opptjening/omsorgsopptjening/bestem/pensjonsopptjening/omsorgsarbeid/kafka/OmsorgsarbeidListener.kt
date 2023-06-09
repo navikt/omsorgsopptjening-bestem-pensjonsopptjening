@@ -1,10 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka
 
-import io.micrometer.core.instrument.MeterRegistry
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.VurderGodskrivOmsorgsopptjeningService
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToClass
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.kafka.OmsorgsopptjeningProducer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -15,13 +12,9 @@ import org.springframework.stereotype.Component
 @Profile("!no-kafka")
 @Component
 class OmsorgsarbeidListener(
-    registry: MeterRegistry,
-    private val automatiskGodskrivOmsorgsopptjeningService: VurderGodskrivOmsorgsopptjeningService,
-    private val omsorgsGrunnlagService: OmsorgsgrunnlagService,
+    private val omsorgsarbeidMessageHandler: OmsorgsarbeidMessageHandler,
+    private val omsorgsopptjeningProducer: OmsorgsopptjeningProducer,
 ) {
-
-    private val antallLesteMeldinger = registry.counter("omsorgsArbeidListener", "antall", "lest")
-
     @KafkaListener(
         containerFactory = "omsorgsArbeidKafkaListenerContainerFactory",
         idIsGroup = false,
@@ -29,21 +22,18 @@ class OmsorgsarbeidListener(
         groupId = "\${OMSORGSOPPTJENING_BESTEM_GROUP_ID}"
     )
     fun poll(
-        hendelse: String,
         consumerRecord: ConsumerRecord<String, String>,
         acknowledgment: Acknowledgment
     ) {
-        antallLesteMeldinger.increment()
-        SECURE_LOG.info("Konsumerer omsorgsmelding: ${consumerRecord.key()}, ${consumerRecord.value()}")
-
-        if (consumerRecord.kafkaMessageType() == KafkaMessageType.OMSORGSARBEID) {
-            SECURE_LOG.info("Behandler: ${consumerRecord.value()}")
-
-            automatiskGodskrivOmsorgsopptjeningService.vurder(
-                omsorgsGrunnlag = omsorgsGrunnlagService.berik(
-                    consumerRecord.value().mapToClass(OmsorgsGrunnlag::class.java)
-                )
-            )
+        omsorgsarbeidMessageHandler.handle(consumerRecord).forEach {
+            when(it.utfall){
+                is AutomatiskGodskrivingUtfall.Avslag -> {
+                    //TODO
+                }
+                is AutomatiskGodskrivingUtfall.Innvilget -> {
+                    omsorgsopptjeningProducer.send(it)
+                }
+            }
         }
         acknowledgment.acknowledge()
     }

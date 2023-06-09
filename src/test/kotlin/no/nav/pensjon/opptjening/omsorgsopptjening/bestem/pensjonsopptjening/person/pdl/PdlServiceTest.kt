@@ -10,7 +10,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 
-internal class PdlServiceTest: SpringContextTest() {
+internal class PdlServiceTest: SpringContextTest.NoKafka() {
 
     @Autowired
     lateinit var pdlService: PdlService

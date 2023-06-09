@@ -1,13 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketOmsorgsgrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Eller.Companion.minstEn
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
 
 data class Behandling(
-    private val grunnlag: BeriketOmsorgsgrunnlag,
+    private val grunnlag: BarnetrygdGrunnlag,
 ) {
     fun omsorgsår() = grunnlag.omsorgsAr
+    fun omsorgsmottaker() = grunnlag.omsorgsmottaker
     fun omsorgsyter() = grunnlag.omsorgsyter
     fun omsorgstype() = grunnlag.omsorgstype
     fun grunnlag() = grunnlag
@@ -15,51 +14,30 @@ data class Behandling(
     fun utfall(): AutomatiskGodskrivingUtfall {
         return when (vilkårsvurdering().utfall is VilkårsvurderingUtfall.Innvilget) {
             true -> {
-                AutomatiskGodskrivingUtfall.Innvilget(omsorgsmottaker = finnInnvilgetFullOmsorg().omsorgsmottaker)
+                AutomatiskGodskrivingUtfall.Innvilget(
+                    omsorgsmottaker = omsorgsmottaker()
+                )
             }
 
             false -> {
-                AutomatiskGodskrivingUtfall.Avslag(årsaker = finnÅrsakerForAvslag())
+                AutomatiskGodskrivingUtfall.Avslag(
+                    omsorgsmottaker = omsorgsmottaker(),
+                    årsaker = finnÅrsakerForAvslag()
+                )
             }
         }
     }
 
     fun vilkårsvurdering(): VilkarsVurdering<*> {
         return og(
-            OmsorgsYterOver16Ar().vilkarsVurder(
-                OmsorgsyterOgOmsorgsårGrunnlag(
-                    omsorgsAr = omsorgsår(),
-                    omsorgsyter = omsorgsyter()
-                )
-            ),
-            OmsorgsyterUnder70Ar().vilkarsVurder(
-                OmsorgsyterOgOmsorgsårGrunnlag(
-                    omsorgsAr = omsorgsår(),
-                    omsorgsyter = omsorgsyter()
-                )
-            ),
-            grunnlag.omsorgsmottakere().minstEn { omsorgsmottaker ->
-                FullOmsorgForBarnUnder6().vilkarsVurder(
-                    FullOmsorgForBarnUnder6Grunnlag(
-                        omsorgsAr = omsorgsår(),
-                        omsorgsmottaker = omsorgsmottaker,
-                        antallMånederFullOmsorg = grunnlag.antallMånederFullOmsorgForMottaker(omsorgsmottaker)
-                    )
-                )
-            }
+            OmsorgsYterOver16Ar().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr()),
+            OmsorgsyterUnder70Ar().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr()),
+            FullOmsorgForBarnUnder6().vilkarsVurder(grunnlag.fullOmsorg())
         )
     }
 
     private fun finnAlleVilkårsvurderinger(): List<VilkarsVurdering<*>> {
         return UnwrapOgEllerVisitor.unwrap(vilkårsvurdering())
-    }
-
-    private fun finnInnvilgetFullOmsorg(): FullOmsorgForBarnUnder6Innvilget {
-        return finnAlleVilkårsvurderinger()
-            .filterIsInstance<FullOmsorgForBarnUnder6Vurdering>()
-            .map { it.utfall }
-            .filterIsInstance<FullOmsorgForBarnUnder6Innvilget>()
-            .minBy { it.omsorgsmottaker.fodselsAr } //TODO finn en eller annen sortering her
     }
 
     private fun finnÅrsakerForAvslag(): List<AvslagÅrsak> {

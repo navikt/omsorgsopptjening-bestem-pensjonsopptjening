@@ -3,7 +3,7 @@
     "hentPerson": {
       "folkeregisteridentifikator": [
         {
-          "identifikasjonsnummer": "07081812345",
+          "identifikasjonsnummer": "01052012345",
           "status": "I_BRUK",
           "type": "FNR",
           "metadata": {
@@ -14,7 +14,7 @@
       ],
       "foedsel": [
         {
-          "foedselsaar": 2018,
+          "foedselsaar": 2020,
           "metadata": {
             "historisk": false,
             "master": "FREG"

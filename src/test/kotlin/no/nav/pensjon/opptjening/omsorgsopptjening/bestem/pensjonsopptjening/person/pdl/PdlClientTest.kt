@@ -15,7 +15,7 @@ import org.springframework.web.client.RestClientException
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-internal class PdlClientTest : SpringContextTest() {
+internal class PdlClientTest : SpringContextTest.NoKafka() {
 
     @Autowired
     lateinit var pdlService: PdlService

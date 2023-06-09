@@ -126,7 +126,8 @@ internal sealed class VilkårsvurderingUtfallDb {
 )
 internal sealed class BehandlingsutfallDb {
     data class AutomatiskGodskrivingAvslag(
-        val årsaker: List<AvslagÅrsakDb>
+        val årsaker: List<AvslagÅrsakDb>,
+        val omsorgsmottaker: PersonMedFødselsårDb,
     ) : BehandlingsutfallDb()
 
     data class AutomatiskGodskrivingInnvilget(
@@ -137,16 +138,17 @@ internal sealed class BehandlingsutfallDb {
 
 internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
     return when (this) {
-       is AutomatiskGodskrivingUtfall.Avslag -> {
+        is AutomatiskGodskrivingUtfall.Avslag -> {
             BehandlingsutfallDb.AutomatiskGodskrivingAvslag(
-                årsaker = årsaker.toDb()
+                årsaker = årsaker.toDb(),
+                omsorgsmottaker = omsorgsmottaker.toDb()
             )
         }
 
         is AutomatiskGodskrivingUtfall.Innvilget -> {
             BehandlingsutfallDb.AutomatiskGodskrivingInnvilget(
                 årsak = "",
-                omsorgsmottaker = this.omsorgsmottaker.toDb()
+                omsorgsmottaker = omsorgsmottaker.toDb()
             )
         }
     }
@@ -248,12 +250,17 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
 internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
     return when (this) {
         is BehandlingsutfallDb.AutomatiskGodskrivingAvslag -> {
-            AutomatiskGodskrivingUtfall.Avslag(årsaker = årsaker.toDomain())
+            AutomatiskGodskrivingUtfall.Avslag(
+                omsorgsmottaker = omsorgsmottaker.toDomain(),
+                årsaker = årsaker.toDomain()
+            )
 
         }
 
         is BehandlingsutfallDb.AutomatiskGodskrivingInnvilget -> {
-            AutomatiskGodskrivingUtfall.Innvilget(omsorgsmottaker = this.omsorgsmottaker.toDomain())
+            AutomatiskGodskrivingUtfall.Innvilget(
+                omsorgsmottaker = this.omsorgsmottaker.toDomain()
+            )
         }
     }
 }

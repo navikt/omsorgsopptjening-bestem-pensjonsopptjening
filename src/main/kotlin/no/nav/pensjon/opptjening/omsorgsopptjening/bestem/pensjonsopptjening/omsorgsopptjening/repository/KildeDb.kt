@@ -4,13 +4,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 
 
 internal enum class KildeDb {
-    BARNETRYGD;
+    BARNETRYGD,
 }
 
 internal fun DomainKilde.toDb(): KildeDb {
     return when (this) {
         DomainKilde.BARNETRYGD -> KildeDb.BARNETRYGD
-        else -> throw RuntimeException("Unknown type: $this")
+        DomainKilde.INFOTRYGD -> TODO()
     }
 }
 

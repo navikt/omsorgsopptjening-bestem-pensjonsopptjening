@@ -9,6 +9,9 @@ internal enum class AvslagÅrsakDb {
     OMSORGSYTER_OVER_69,
     MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT, //ELLER
     ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT, //OG
+    ALDER_IKKE_0,
+    INGEN_MÅNEDER_FULL_OMSORG,
+    INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL,
 
 }
 
@@ -24,6 +27,9 @@ internal fun AvslagÅrsak.toDb(): AvslagÅrsakDb {
         AvslagÅrsak.OMSORGSYTER_OVER_69 -> AvslagÅrsakDb.OMSORGSYTER_OVER_69
         AvslagÅrsak.MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT -> AvslagÅrsakDb.MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT
         AvslagÅrsak.ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT -> AvslagÅrsakDb.ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT
+        AvslagÅrsak.ALDER_IKKE_0 -> AvslagÅrsakDb.ALDER_IKKE_0
+        AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG -> AvslagÅrsakDb.INGEN_MÅNEDER_FULL_OMSORG
+        AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL -> AvslagÅrsakDb.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL
     }
 }
 
@@ -39,5 +45,8 @@ internal fun AvslagÅrsakDb.toDomain(): AvslagÅrsak {
         AvslagÅrsakDb.OMSORGSYTER_OVER_69 -> AvslagÅrsak.OMSORGSYTER_OVER_69
         AvslagÅrsakDb.MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT -> AvslagÅrsak.MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT
         AvslagÅrsakDb.ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT -> AvslagÅrsak.ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT
+        AvslagÅrsakDb.ALDER_IKKE_0 -> AvslagÅrsak.ALDER_IKKE_0
+        AvslagÅrsakDb.INGEN_MÅNEDER_FULL_OMSORG -> AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG
+        AvslagÅrsakDb.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL -> AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL
     }
 }

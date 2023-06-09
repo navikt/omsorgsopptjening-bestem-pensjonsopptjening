@@ -46,7 +46,7 @@ import java.util.Queue
 sealed class VilkårsvurderingDb {
     internal data class FullOmsorgForBarnUnder6(
         val vilkar: String,
-        val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgForBarnUnder6,
+        val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
@@ -85,11 +85,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         is FullOmsorgForBarnUnder6Vurdering -> {
             VilkårsvurderingDb.FullOmsorgForBarnUnder6(
                 vilkar = vilkar.vilkarsInformasjon.beskrivelse,
-                grunnlag = GrunnlagVilkårsvurderingDb.OmsorgForBarnUnder6(
-                    omsorgsAr = grunnlag.omsorgsAr,
-                    omsorgsmottaker = grunnlag.omsorgsmottaker.toDb(),
-                    antallMånederFullOmsorg = grunnlag.antallMånederFullOmsorg
-                ),
+                grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
         }
