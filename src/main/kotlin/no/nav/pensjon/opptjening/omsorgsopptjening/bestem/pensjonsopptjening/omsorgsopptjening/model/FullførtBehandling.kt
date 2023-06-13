@@ -5,6 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
 
 data class FullførtBehandling(
+    val id: Long,
     val omsorgsAr: Int,
     val omsorgsyter: PersonMedFødselsår,
     val omsorgstype: DomainOmsorgstype,

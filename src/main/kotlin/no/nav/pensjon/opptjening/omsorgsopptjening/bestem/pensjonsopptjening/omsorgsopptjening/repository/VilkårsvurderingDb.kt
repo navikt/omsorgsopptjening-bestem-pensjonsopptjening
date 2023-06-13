@@ -2,17 +2,11 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Eller
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6Vurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsYterOver16Ar
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOver16ArVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterUnder70Ar
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterUnder70Vurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkarsVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.Eller
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.FullOmsorgForBarnUnder6
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.Og
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.OmsorgsyterUnder70Ar
 import java.util.LinkedList
 import java.util.Queue
 
@@ -76,14 +70,14 @@ sealed class VilkårsvurderingDb {
 internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
     return when (this) {
         is EllerVurdering -> {
-            VilkårsvurderingDb.Eller(
+            Eller(
                 eller = mapRecursive(LinkedList(grunnlag), emptyList()),
                 utfall = utfall.toDb()
             )
         }
 
         is FullOmsorgForBarnUnder6Vurdering -> {
-            VilkårsvurderingDb.FullOmsorgForBarnUnder6(
+            FullOmsorgForBarnUnder6(
                 vilkar = vilkar.vilkarsInformasjon.beskrivelse,
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
@@ -91,7 +85,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         }
 
         is OgVurdering -> {
-            VilkårsvurderingDb.Og(
+            Og(
                 og = mapRecursive(LinkedList(grunnlag), emptyList()),
                 utfall = utfall.toDb()
             )
@@ -109,7 +103,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         }
 
         is OmsorgsyterUnder70Vurdering -> {
-            VilkårsvurderingDb.OmsorgsyterUnder70Ar(
+            OmsorgsyterUnder70Ar(
                 vilkar = vilkar.vilkarsInformasjon.beskrivelse,
                 grunnlag = GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsÅr(
                     omsorgsyter = grunnlag.omsorgsyter.toDb(),
@@ -118,6 +112,8 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
                 utfall = utfall.toDb()
             )
         }
+
+        is KanKunGodskrivesEnOmsorgsyterVurdering -> TODO()
     }
 }
 

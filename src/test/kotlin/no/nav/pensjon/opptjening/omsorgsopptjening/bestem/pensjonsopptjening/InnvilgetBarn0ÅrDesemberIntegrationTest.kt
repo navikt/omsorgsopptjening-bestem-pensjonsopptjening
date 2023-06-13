@@ -116,6 +116,6 @@ class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
                 }
             }
 
-        assertEquals(2, behandlingRepo.findAll("12345678910").count())
+        assertEquals(2, behandlingRepo.finnForOmsorgsyter("12345678910").count())
     }
 }

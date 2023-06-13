@@ -6,7 +6,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingsutfallDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BeriketGrunnlagDb
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BeriketOmsorgsgrunnlagDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.OmsorgstypeDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.toDb
@@ -56,22 +55,34 @@ class BehandlingRepo {
             mapOf<String, Any>(
                 "id" to id
             ),
-            VilkårsresultatRowMapper()
+            BehandlingRowMapper()
         ).single().toDomain()
     }
 
-    fun findAll(fnr: String): List<FullførtBehandling> {
+    fun finnForOmsorgsyter(fnr: String): List<FullførtBehandling> {
         return jdbcTemplate.query(
             """select * from behandling where omsorgsyter = :omsorgsyter""",
             mapOf<String, Any>(
                 "omsorgsyter" to fnr
             ),
-            VilkårsresultatRowMapper()
+            BehandlingRowMapper()
+        ).toDomain()
+    }
+
+    fun finnForOmsorgsmottakerOgAr(omsorgsmottaker: String, ar: Int): List<FullførtBehandling> {
+        return jdbcTemplate.query(
+            """select * from behandling where omsorgsmottaker = :omsorgsmottaker and omsorgs_ar = :ar""",
+            mapOf<String, Any>(
+                "omsorgsmottaker" to omsorgsmottaker,
+                "ar" to ar
+
+            ),
+            BehandlingRowMapper()
         ).toDomain()
     }
 }
 
-internal class VilkårsresultatRowMapper : RowMapper<BehandlingDb> {
+internal class BehandlingRowMapper : RowMapper<BehandlingDb> {
     override fun mapRow(rs: ResultSet, rowNum: Int): BehandlingDb {
         return BehandlingDb(
             id = rs.getLong("id"),

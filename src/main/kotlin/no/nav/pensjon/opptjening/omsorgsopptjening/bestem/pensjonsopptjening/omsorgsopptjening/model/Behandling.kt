@@ -4,6 +4,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 
 data class Behandling(
     private val grunnlag: BarnetrygdGrunnlag,
+    private val vilkarFactory: VilkarFactory
 ) {
     fun omsorgsår() = grunnlag.omsorgsAr
     fun omsorgsmottaker() = grunnlag.omsorgsmottaker
@@ -15,13 +16,13 @@ data class Behandling(
         return when (vilkårsvurdering().utfall is VilkårsvurderingUtfall.Innvilget) {
             true -> {
                 AutomatiskGodskrivingUtfall.Innvilget(
-                    omsorgsmottaker = omsorgsmottaker()
+                    omsorgsmottaker = grunnlag.omsorgsmottaker
                 )
             }
 
             false -> {
                 AutomatiskGodskrivingUtfall.Avslag(
-                    omsorgsmottaker = omsorgsmottaker(),
+                    omsorgsmottaker = grunnlag.omsorgsmottaker,
                     årsaker = finnÅrsakerForAvslag()
                 )
             }
@@ -30,9 +31,10 @@ data class Behandling(
 
     fun vilkårsvurdering(): VilkarsVurdering<*> {
         return og(
-            OmsorgsYterOver16Ar().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr()),
-            OmsorgsyterUnder70Ar().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr()),
-            FullOmsorgForBarnUnder6().vilkarsVurder(grunnlag.fullOmsorg())
+            vilkarFactory.omsorgsyterOver16Ar(),
+            vilkarFactory.omsorgsyterUnder70Ar(),
+            vilkarFactory.fullOmsorgForBarnUnder6(),
+            vilkarFactory.kanKunGodskrivesEnOmsorgsyter()
         )
     }
 

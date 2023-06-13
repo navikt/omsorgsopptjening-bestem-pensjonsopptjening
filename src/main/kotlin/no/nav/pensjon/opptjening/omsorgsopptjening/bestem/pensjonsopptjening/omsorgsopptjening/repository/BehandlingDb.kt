@@ -30,6 +30,7 @@ internal fun BehandlingDb.toDomain(): FullførtBehandling {
     val omsorgsyter = this.grunnlag.grunnlag.omsorgsyter
 
     return FullførtBehandling(
+        id = id!!,
         omsorgsAr = omsorgsAr,
         omsorgsyter = omsorgsyter.toDomain(),
         omsorgstype = omsorgstype.toDomain(),
