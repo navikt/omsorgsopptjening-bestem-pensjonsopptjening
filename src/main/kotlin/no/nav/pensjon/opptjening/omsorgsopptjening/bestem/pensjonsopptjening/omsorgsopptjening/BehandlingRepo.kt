@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
@@ -33,11 +32,12 @@ class BehandlingRepo {
         return behandling.toDb().let { obj ->
             val keyHolder = GeneratedKeyHolder()
             jdbcTemplate.update(
-                """insert into behandling (omsorgs_ar, omsorgsyter, omsorgstype, grunnlag, vilkarsvurdering, utfall) values (:omsorgsar, :omsorgsyter, :omsorgstype, to_json(:grunnlag::json), to_json(:vilkarsvurdering::json), to_json(:utfall::json))""",
+                """insert into behandling (omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag, vilkarsvurdering, utfall) values (:omsorgsar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, to_json(:grunnlag::json), to_json(:vilkarsvurdering::json), to_json(:utfall::json))""",
                 MapSqlParameterSource(
                     mapOf<String, Any>(
                         "omsorgsar" to obj.omsorgsAr,
                         "omsorgsyter" to obj.omsorgsyter,
+                        "omsorgsmottaker" to obj.omsorgsmottaker,
                         "omsorgstype" to obj.omsorgstype.toString(),
                         "grunnlag" to obj.grunnlag.mapToJson(),
                         "vilkarsvurdering" to obj.vilkårsvurdering.mapToJson(),
@@ -77,6 +77,7 @@ internal class VilkårsresultatRowMapper : RowMapper<BehandlingDb> {
             id = rs.getLong("id"),
             omsorgsAr = rs.getInt("omsorgs_ar"),
             omsorgsyter = rs.getString("omsorgsyter"),
+            omsorgsmottaker = rs.getString("omsorgsmottaker"),
             omsorgstype = OmsorgstypeDb.valueOf(rs.getString("omsorgstype")),
             grunnlag = rs.getString("grunnlag").mapToClass(BeriketGrunnlagDb::class.java),
             vilkårsvurdering = rs.getString("vilkarsvurdering").mapToClass(VilkårsvurderingDb::class.java),

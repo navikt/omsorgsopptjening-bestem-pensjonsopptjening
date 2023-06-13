@@ -7,6 +7,7 @@ internal class BehandlingDb(
     val id: Long? = null,
     val omsorgsAr: Int,
     val omsorgsyter: String,
+    val omsorgsmottaker: String,
     val omsorgstype: OmsorgstypeDb,
     val grunnlag: BeriketGrunnlagDb,
     val vilkårsvurdering: VilkårsvurderingDb,
@@ -17,6 +18,7 @@ internal fun Behandling.toDb(): BehandlingDb {
     return BehandlingDb(
         omsorgsAr = omsorgsår(),
         omsorgsyter = omsorgsyter().fnr,
+        omsorgsmottaker = omsorgsmottaker().fnr,
         omsorgstype = omsorgstype().toDb(),
         grunnlag = grunnlag().toDb(),
         vilkårsvurdering = vilkårsvurdering().toDb(),
