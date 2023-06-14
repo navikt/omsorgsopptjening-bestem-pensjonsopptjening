@@ -69,6 +69,17 @@ class BehandlingRepo {
         ).toDomain()
     }
 
+    fun finnForOmsorgsyterOgAr(fnr: String, ar: Int): List<FullførtBehandling> {
+        return jdbcTemplate.query(
+            """select * from behandling where omsorgsyter = :omsorgsyter and omsorgs_ar = :ar""",
+            mapOf<String, Any>(
+                "omsorgsyter" to fnr,
+                "ar" to ar
+            ),
+            BehandlingRowMapper()
+        ).toDomain()
+    }
+
     fun finnForOmsorgsmottakerOgAr(omsorgsmottaker: String, ar: Int): List<FullførtBehandling> {
         return jdbcTemplate.query(
             """select * from behandling where omsorgsmottaker = :omsorgsmottaker and omsorgs_ar = :ar""",

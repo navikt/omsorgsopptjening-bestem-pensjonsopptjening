@@ -51,6 +51,22 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
         value = VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArInnvilget::class,
         name = "OmsorgsyterUnder70ArInnvilget",
     ),
+    JsonSubTypes.Type(
+        value = VilkårsvurderingUtfallDb.KanKunGodskrivesEnOmsorgsyterAvslag::class,
+        name = "KanKunGodskrivesEnOmsorgsyterAvslag",
+    ),
+    JsonSubTypes.Type(
+        value = VilkårsvurderingUtfallDb.KanKunGodskrivesEnOmsorgsyterInnvilget::class,
+        name = "KanKunGodskrivesEnOmsorgsyterInnvilget",
+    ),
+    JsonSubTypes.Type(
+        value = VilkårsvurderingUtfallDb.KanKunGodskrivesEtBarnPerÅrAvslag::class,
+        name = "KanKunGodskrivesEtBarnPerÅrAvslag",
+    ),
+    JsonSubTypes.Type(
+        value = VilkårsvurderingUtfallDb.KanKunGodskrivesEtBarnPerÅrInnvilget::class,
+        name = "KanKunGodskrivesEtBarnPerÅrInnvilget",
+    ),
 )
 internal sealed class VilkårsvurderingUtfallDb {
     data class EllerAvslått(
@@ -91,6 +107,22 @@ internal sealed class VilkårsvurderingUtfallDb {
     ) : VilkårsvurderingUtfallDb()
 
     data class OmsorgsyterUnder70ArInnvilget(
+        val årsak: String
+    ) : VilkårsvurderingUtfallDb()
+
+    data class KanKunGodskrivesEnOmsorgsyterAvslag(
+        val årsaker: List<AvslagÅrsakDb>
+    ) : VilkårsvurderingUtfallDb()
+
+    data class KanKunGodskrivesEnOmsorgsyterInnvilget(
+        val årsak: String
+    ) : VilkårsvurderingUtfallDb()
+
+    data class KanKunGodskrivesEtBarnPerÅrAvslag(
+        val årsaker: List<AvslagÅrsakDb>
+    ) : VilkårsvurderingUtfallDb()
+
+    data class KanKunGodskrivesEtBarnPerÅrInnvilget(
         val årsak: String
     ) : VilkårsvurderingUtfallDb()
 }
@@ -144,11 +176,11 @@ internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
 internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
     return when (this) {
         is EllerAvslått -> {
-            VilkårsvurderingUtfallDb.EllerAvslått(årsaker = this.årsaker.toDb())
+            VilkårsvurderingUtfallDb.EllerAvslått(årsaker = årsaker.toDb())
         }
 
         is EllerInnvilget -> {
-            VilkårsvurderingUtfallDb.EllerInnvilget(årsak = this.årsak)
+            VilkårsvurderingUtfallDb.EllerInnvilget(årsak = årsak)
         }
 
         is FullOmsorgForBarnUnder6Avslag -> {
@@ -157,38 +189,50 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
 
         is FullOmsorgForBarnUnder6Innvilget -> {
             VilkårsvurderingUtfallDb.FullOmsorgForBarnUnder6Innvilget(
-                årsak = this.årsak,
-                omsorgsmottaker = this.omsorgsmottaker.toDb()
+                årsak = årsak,
+                omsorgsmottaker = omsorgsmottaker.toDb()
             )
         }
 
         is OgAvslått -> {
-            VilkårsvurderingUtfallDb.OgAvslått(årsaker = this.årsaker.toDb())
+            VilkårsvurderingUtfallDb.OgAvslått(årsaker = årsaker.toDb())
         }
 
         is OgInnvilget -> {
-            VilkårsvurderingUtfallDb.OgInnvilget(årsak = this.årsak)
+            VilkårsvurderingUtfallDb.OgInnvilget(årsak = årsak)
         }
 
         is OmsorgsyterOver16ArAvslag -> {
-            VilkårsvurderingUtfallDb.OmsorgsyterOver16ArAvslag(årsaker = this.årsaker.toDb())
+            VilkårsvurderingUtfallDb.OmsorgsyterOver16ArAvslag(årsaker = årsaker.toDb())
         }
 
         is OmsorgsyterOver16ArInnvilget -> {
-            VilkårsvurderingUtfallDb.OmsorgsyterOver16ArInnvilget(årsak = this.årsak)
+            VilkårsvurderingUtfallDb.OmsorgsyterOver16ArInnvilget(årsak = årsak)
         }
 
         is OmsorgsyterUnder70ArAvslag -> {
-            VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArAvslag(årsaker = this.årsaker.toDb())
+            VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArAvslag(årsaker = årsaker.toDb())
         }
 
         is OmsorgsyterUnder70ArInnvilget -> {
-            VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArInnvilget(årsak = this.årsak)
+            VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArInnvilget(årsak = årsak)
         }
 
-        is KanKunGodskrivesEnOmsorgsyterAvslag -> TODO()
+        is KanKunGodskrivesEnOmsorgsyterAvslag -> {
+            VilkårsvurderingUtfallDb.KanKunGodskrivesEnOmsorgsyterAvslag(årsaker = årsaker.toDb())
+        }
 
-        is KanKunGodskrivesEnOmsorgsyterInnvilget -> TODO()
+        is KanKunGodskrivesEnOmsorgsyterInnvilget -> {
+            VilkårsvurderingUtfallDb.KanKunGodskrivesEnOmsorgsyterInnvilget(årsak = årsak)
+        }
+
+        is KanKunGodskrivesEtBarnPerÅrAvslag -> {
+            VilkårsvurderingUtfallDb.KanKunGodskrivesEtBarnPerÅrAvslag(årsaker = årsaker.toDb())
+        }
+
+        is KanKunGodskrivesEtBarnPerÅrInnvilget -> {
+            VilkårsvurderingUtfallDb.KanKunGodskrivesEtBarnPerÅrInnvilget(årsak = årsak)
+        }
     }
 }
 
@@ -199,7 +243,7 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.EllerInnvilget -> {
-            EllerInnvilget(årsak = this.årsak)
+            EllerInnvilget(årsak = årsak)
         }
 
         is VilkårsvurderingUtfallDb.FullOmsorgForBarnUnder6Avslag -> {
@@ -207,7 +251,7 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.FullOmsorgForBarnUnder6Innvilget -> {
-            FullOmsorgForBarnUnder6Innvilget(årsak = this.årsak, omsorgsmottaker = this.omsorgsmottaker.toDomain())
+            FullOmsorgForBarnUnder6Innvilget(årsak = årsak, omsorgsmottaker = omsorgsmottaker.toDomain())
         }
 
         is VilkårsvurderingUtfallDb.OgAvslått -> {
@@ -215,7 +259,7 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.OgInnvilget -> {
-            OgInnvilget(årsak = this.årsak)
+            OgInnvilget(årsak = årsak)
         }
 
         is VilkårsvurderingUtfallDb.OmsorgsyterOver16ArAvslag -> {
@@ -223,7 +267,7 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.OmsorgsyterOver16ArInnvilget -> {
-            OmsorgsyterOver16ArInnvilget(årsak = this.årsak)
+            OmsorgsyterOver16ArInnvilget(årsak = årsak)
         }
 
         is VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArAvslag -> {
@@ -231,7 +275,23 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArInnvilget -> {
-            OmsorgsyterUnder70ArInnvilget(årsak = this.årsak)
+            OmsorgsyterUnder70ArInnvilget(årsak = årsak)
+        }
+
+        is VilkårsvurderingUtfallDb.KanKunGodskrivesEnOmsorgsyterAvslag -> {
+            KanKunGodskrivesEnOmsorgsyterAvslag(årsaker = årsaker.toDomain())
+        }
+
+        is VilkårsvurderingUtfallDb.KanKunGodskrivesEnOmsorgsyterInnvilget -> {
+            KanKunGodskrivesEnOmsorgsyterInnvilget(årsak = årsak)
+        }
+
+        is VilkårsvurderingUtfallDb.KanKunGodskrivesEtBarnPerÅrAvslag -> {
+            KanKunGodskrivesEtBarnPerÅrAvslag(årsaker = årsaker.toDomain())
+        }
+
+        is VilkårsvurderingUtfallDb.KanKunGodskrivesEtBarnPerÅrInnvilget -> {
+            KanKunGodskrivesEtBarnPerÅrInnvilget(årsak = årsak)
         }
     }
 }
@@ -248,7 +308,7 @@ internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
 
         is BehandlingsutfallDb.AutomatiskGodskrivingInnvilget -> {
             AutomatiskGodskrivingUtfall.Innvilget(
-                omsorgsmottaker = this.omsorgsmottaker.toDomain()
+                omsorgsmottaker = omsorgsmottaker.toDomain()
             )
         }
     }

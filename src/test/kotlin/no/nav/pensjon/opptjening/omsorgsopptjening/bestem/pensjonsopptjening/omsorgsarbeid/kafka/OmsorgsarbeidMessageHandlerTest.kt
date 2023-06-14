@@ -75,10 +75,10 @@ class OmsorgsarbeidMessageHandlerTest : SpringContextTest.NoKafka() {
             ).toConsumerRecord()
         )
         assertEquals(8, result.count()) //1 per år per person + et ekstra for fødselsåret for 01122012345
-        assertEquals(7, result.count { it.utfall is AutomatiskGodskrivingUtfall.Innvilget })
-        assertEquals(1, result.count { it.utfall is AutomatiskGodskrivingUtfall.Avslag })
+        assertEquals(6, result.count { it.utfall is AutomatiskGodskrivingUtfall.Innvilget })
+        assertEquals(2, result.count { it.utfall is AutomatiskGodskrivingUtfall.Avslag })
         assertEquals(
-            listOf("01122012345", "07081812345"),
+            listOf("01122012345"),
             result.map { it.utfall }.filterIsInstance<AutomatiskGodskrivingUtfall.Innvilget>()
                 .map { it.omsorgsmottaker.fnr }.distinct()
         )

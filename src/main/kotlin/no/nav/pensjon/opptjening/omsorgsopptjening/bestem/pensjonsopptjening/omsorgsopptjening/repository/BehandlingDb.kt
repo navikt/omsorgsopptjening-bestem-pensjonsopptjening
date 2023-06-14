@@ -27,18 +27,18 @@ internal fun Behandling.toDb(): BehandlingDb {
 }
 
 internal fun BehandlingDb.toDomain(): FullførtBehandling {
-    val omsorgsyter = this.grunnlag.grunnlag.omsorgsyter
-
     return FullførtBehandling(
         id = id!!,
         omsorgsAr = omsorgsAr,
-        omsorgsyter = omsorgsyter.toDomain(),
+        omsorgsyter = omsorgsyter,
+        omsorgsmottaker = omsorgsmottaker,
         omsorgstype = omsorgstype.toDomain(),
         grunnlag = grunnlag.toDomain(),
         utfall = utfall.toDomain(),
         vilkårsvurdering = vilkårsvurdering.toDomain()
     )
 }
+
 internal fun List<BehandlingDb>.toDomain(): List<FullførtBehandling> {
     return map { it.toDomain() }
 }

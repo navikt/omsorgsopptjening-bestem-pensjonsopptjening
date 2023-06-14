@@ -16,13 +16,13 @@ data class Behandling(
         return when (vilkårsvurdering().utfall is VilkårsvurderingUtfall.Innvilget) {
             true -> {
                 AutomatiskGodskrivingUtfall.Innvilget(
-                    omsorgsmottaker = grunnlag.omsorgsmottaker
+                    omsorgsmottaker = omsorgsmottaker()
                 )
             }
 
             false -> {
                 AutomatiskGodskrivingUtfall.Avslag(
-                    omsorgsmottaker = grunnlag.omsorgsmottaker,
+                    omsorgsmottaker = omsorgsmottaker(),
                     årsaker = finnÅrsakerForAvslag()
                 )
             }
@@ -34,7 +34,8 @@ data class Behandling(
             vilkarFactory.omsorgsyterOver16Ar(),
             vilkarFactory.omsorgsyterUnder70Ar(),
             vilkarFactory.fullOmsorgForBarnUnder6(),
-            vilkarFactory.kanKunGodskrivesEnOmsorgsyter()
+            vilkarFactory.kanKunGodskrivesEnOmsorgsyter(),
+            vilkarFactory.kanKunGodskrivesEtBarnPerÅr()
         )
     }
 

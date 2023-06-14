@@ -7,24 +7,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 data class FullførtBehandling(
     val id: Long,
     val omsorgsAr: Int,
-    val omsorgsyter: PersonMedFødselsår,
+    val omsorgsyter: String,
+    val omsorgsmottaker: String,
     val omsorgstype: DomainOmsorgstype,
     val grunnlag: BarnetrygdGrunnlag,
     val utfall: BehandlingUtfall,
     val vilkårsvurdering: VilkarsVurdering<*>
 ) {
-    fun omsorgsmottaker(): PersonMedFødselsår? {
-        return when (utfall) {
-            is AutomatiskGodskrivingUtfall.Avslag -> {
-                null
-            }
-
-            is AutomatiskGodskrivingUtfall.Innvilget -> {
-                utfall.omsorgsmottaker
-            }
-        }
-    }
-
     fun kilde(): DomainKilde {
         return grunnlag.kilde
     }

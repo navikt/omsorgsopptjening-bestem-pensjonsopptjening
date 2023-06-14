@@ -6,16 +6,15 @@ class KanKunGodskrivesEnOmsorgsyter : Vilkar<KanKunGodskrivesEnOmsorgsyterGrunnl
         begrunnesleForAvslag = "Omsorgsmottaker har vært grunnlag for godskriving av annen omsorgsyter.",
         begrunnelseForInnvilgelse = "Omsorgsmottaker har ikke vært grunnlag for godskriving av annen omsorgsyter.",
     ),
-    utfallsFunksjon = `Person er over 16 ar`,
+    utfallsFunksjon = vurderUtfall,
 ) {
     companion object {
-        private val `Person er over 16 ar` =
-            fun Vilkar<KanKunGodskrivesEnOmsorgsyterGrunnlag>.(input: KanKunGodskrivesEnOmsorgsyterGrunnlag): VilkårsvurderingUtfall  {
-                if(input.behandlingsIdUtfallListe.filter { it.erUtfallInvilget }.any()) {
-                    return KanKunGodskrivesEnOmsorgsyterInnvilget(vilkarsInformasjon.begrunnesleForAvslag)
-                }
-                else {
+        private val vurderUtfall =
+            fun Vilkar<KanKunGodskrivesEnOmsorgsyterGrunnlag>.(input: KanKunGodskrivesEnOmsorgsyterGrunnlag): VilkårsvurderingUtfall {
+                if (input.behandlingsIdUtfallListe.none { it.erInnvilget }) {
                     return KanKunGodskrivesEnOmsorgsyterInnvilget(vilkarsInformasjon.begrunnelseForInnvilgelse)
+                } else {
+                    return KanKunGodskrivesEnOmsorgsyterAvslag(listOf(AvslagÅrsak.ALLEREDE_INNVILGET_FOR_ANNEN_MOTTAKER))
                 }
             }
     }
@@ -36,6 +35,14 @@ data class KanKunGodskrivesEnOmsorgsyterVurdering(
 ) : VilkarsVurdering<KanKunGodskrivesEnOmsorgsyterGrunnlag>()
 
 data class KanKunGodskrivesEnOmsorgsyterInnvilget(val årsak: String) : VilkårsvurderingUtfall.Innvilget()
-data class KanKunGodskrivesEnOmsorgsyterAvslag(override val årsaker: List<AvslagÅrsak>) : VilkårsvurderingUtfall.Avslag()
-data class KanKunGodskrivesEnOmsorgsyterGrunnlag(val behandlingsIdUtfallListe: List<BehandlingsIdUtfall>)
-data class BehandlingsIdUtfall(val behandlingsId: Long, val erUtfallInvilget: Boolean)
+data class KanKunGodskrivesEnOmsorgsyterAvslag(override val årsaker: List<AvslagÅrsak>) :
+    VilkårsvurderingUtfall.Avslag()
+
+data class KanKunGodskrivesEnOmsorgsyterGrunnlag(
+    val behandlingsIdUtfallListe: List<BehandlingsIdUtfall>
+)
+
+data class BehandlingsIdUtfall(
+    val behandlingsId: Long,
+    val erInnvilget: Boolean
+)

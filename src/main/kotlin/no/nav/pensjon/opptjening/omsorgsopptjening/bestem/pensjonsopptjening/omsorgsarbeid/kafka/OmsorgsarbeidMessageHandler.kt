@@ -28,7 +28,17 @@ class OmsorgsarbeidMessageHandler(
                  * vilkår yter ikke godskrevet annet barn samme år
                  * filtrer vekk all år som ikke er "gydlig opptjeningsår"?
                  */
-                .map { behandlingRepo.persist(Behandling(it, VilkarFactoryImpl(it, behandlingRepo))) }
+                .map {
+                    behandlingRepo.persist(
+                        Behandling(
+                            grunnlag = it,
+                            vilkarFactory = VilkarFactoryImpl(
+                                grunnlag = it,
+                                behandlingRepo = behandlingRepo
+                            )
+                        )
+                    )
+                }
         } else {
             emptyList()
         }

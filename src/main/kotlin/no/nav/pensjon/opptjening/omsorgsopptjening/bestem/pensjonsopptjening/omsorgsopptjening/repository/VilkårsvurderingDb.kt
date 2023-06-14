@@ -6,7 +6,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.Eller
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.FullOmsorgForBarnUnder6
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.Og
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.OmsorgsyterUnder70Ar
 import java.util.LinkedList
 import java.util.Queue
 
@@ -65,6 +64,18 @@ sealed class VilkårsvurderingDb {
         val og: List<VilkårsvurderingDb>,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
+    internal data class KanKunGodskrivesEnOmsorgsyter(
+        val vilkar: String,
+        val grunnlag: GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter,
+        val utfall: VilkårsvurderingUtfallDb,
+    ) : VilkårsvurderingDb()
+
+    internal data class KanKunGodskrivesEtBarnPerÅr(
+        val vilkar: String,
+        val grunnlag: GrunnlagVilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr,
+        val utfall: VilkårsvurderingUtfallDb,
+    ) : VilkårsvurderingDb()
 }
 
 internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
@@ -103,7 +114,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         }
 
         is OmsorgsyterUnder70Vurdering -> {
-            OmsorgsyterUnder70Ar(
+            VilkårsvurderingDb.OmsorgsyterUnder70Ar(
                 vilkar = vilkar.vilkarsInformasjon.beskrivelse,
                 grunnlag = GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsÅr(
                     omsorgsyter = grunnlag.omsorgsyter.toDb(),
@@ -113,7 +124,21 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is KanKunGodskrivesEnOmsorgsyterVurdering -> TODO()
+        is KanKunGodskrivesEnOmsorgsyterVurdering -> {
+            VilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter(
+                vilkar = vilkar.vilkarsInformasjon.beskrivelse,
+                grunnlag = grunnlag.toDb(),
+                utfall = utfall.toDb()
+            )
+        }
+
+        is KanKunGodskrivesEtBarnPerÅrVurdering -> {
+            VilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr(
+                vilkar = vilkar.vilkarsInformasjon.beskrivelse,
+                grunnlag = grunnlag.toDb(),
+                utfall = utfall.toDb()
+            )
+        }
     }
 }
 
@@ -134,7 +159,7 @@ internal fun List<VilkårsvurderingDb>.toDomain(): List<VilkarsVurdering<*>> {
 
 internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
     return when (this) {
-        is VilkårsvurderingDb.Eller -> {
+        is Eller -> {
             EllerVurdering(
                 vilkar = Eller(),
                 grunnlag = eller.toDomain(),
@@ -142,7 +167,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
             )
         }
 
-        is VilkårsvurderingDb.FullOmsorgForBarnUnder6 -> {
+        is FullOmsorgForBarnUnder6 -> {
             FullOmsorgForBarnUnder6Vurdering(
                 vilkar = FullOmsorgForBarnUnder6(),
                 grunnlag = grunnlag.toDomain(),
@@ -150,7 +175,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
             )
         }
 
-        is VilkårsvurderingDb.Og -> {
+        is Og -> {
             OgVurdering(
                 vilkar = Og(),
                 grunnlag = og.toDomain(),
@@ -171,6 +196,22 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
                 vilkar = OmsorgsyterUnder70Ar(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
+            )
+        }
+
+        is VilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter -> {
+            KanKunGodskrivesEnOmsorgsyterVurdering(
+                vilkar = KanKunGodskrivesEnOmsorgsyter(),
+                grunnlag = grunnlag.toDomain(),
+                utfall = utfall.toDomain()
+            )
+        }
+        is VilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr -> {
+            KanKunGodskrivesEtBarnPerÅrVurdering(
+                vilkar = KanKunGodskrivesEtBarnPerÅr(),
+                grunnlag = grunnlag.toDomain(),
+                utfall = utfall.toDomain()
+
             )
         }
     }

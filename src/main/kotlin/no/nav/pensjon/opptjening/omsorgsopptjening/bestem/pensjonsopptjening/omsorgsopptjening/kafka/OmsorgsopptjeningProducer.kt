@@ -29,13 +29,13 @@ class OmsorgsopptjeningProducer(
 
         val key = OmsorgsopptjeningInnvilgetKey(
             omsorgsAr = behandling.omsorgsAr,
-            omsorgsyter = behandling.omsorgsyter.fnr
+            omsorgsyter = behandling.omsorgsyter
 
         )
         val value = OmsorgsopptjeningInnvilget(
             omsorgsAr = behandling.omsorgsAr,
-            omsorgsyter = behandling.omsorgsyter.fnr,
-            omsorgsmottaker = behandling.omsorgsmottaker()!!.fnr,
+            omsorgsyter = behandling.omsorgsyter,
+            omsorgsmottaker = behandling.omsorgsmottaker,
             kilde = behandling.kilde().toKafka(),
             omsorgstype = behandling.omsorgstype.toKafka()
         )

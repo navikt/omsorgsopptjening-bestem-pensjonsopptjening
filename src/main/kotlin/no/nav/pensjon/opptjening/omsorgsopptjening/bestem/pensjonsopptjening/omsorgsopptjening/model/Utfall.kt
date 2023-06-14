@@ -9,7 +9,14 @@ sealed class VilkårsvurderingUtfall {
 
 }
 
-sealed class BehandlingUtfall
+sealed class BehandlingUtfall {
+    fun erInnvilget(): Boolean {
+        return when(this){
+            is AutomatiskGodskrivingUtfall.Avslag -> false
+            is AutomatiskGodskrivingUtfall.Innvilget -> true
+        }
+    }
+}
 sealed class AutomatiskGodskrivingUtfall : BehandlingUtfall() {
     data class Innvilget(val omsorgsmottaker: PersonMedFødselsår) : AutomatiskGodskrivingUtfall()
     data class Avslag(val omsorgsmottaker: PersonMedFødselsår, val årsaker: List<AvslagÅrsak>) : AutomatiskGodskrivingUtfall()
