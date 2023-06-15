@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AndreBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingsIdUtfall
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOgOmsorgsårGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonOgOmsorgsårGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6Grunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEnOmsorgsyterGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEtBarnPerÅrGrunnlag
@@ -32,7 +32,7 @@ import java.util.UUID
         name = "OmsorgBarnFødtUtenforOmsorgsår",
     ),
     JsonSubTypes.Type(
-        value = GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsÅr::class,
+        value = GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr::class,
         name = "OmsorgsyterOgOmsorgsÅr",
     ),
 )
@@ -60,8 +60,8 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         ) : OmsorgBarnUnder6()
     }
 
-    data class OmsorgsyterOgOmsorgsÅr(
-        val omsorgsyter: PersonMedFødselsårDb,
+    data class PersonOgOmsorgsÅr(
+        val person: PersonMedFødselsårDb,
         val omsorgsAr: Int
     ) : GrunnlagVilkårsvurderingDb()
 
@@ -218,11 +218,17 @@ internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.toDomain(): FullOmsorg
     }
 }
 
-internal fun GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsÅr.toDomain(): OmsorgsyterOgOmsorgsårGrunnlag {
-    return OmsorgsyterOgOmsorgsårGrunnlag(
-        omsorgsyter = omsorgsyter.toDomain(),
+internal fun GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr.toDomain(): PersonOgOmsorgsårGrunnlag {
+    return PersonOgOmsorgsårGrunnlag(
+        person = person.toDomain(),
         omsorgsAr = omsorgsAr
     )
 }
 
+internal fun PersonOgOmsorgsårGrunnlag.toDb(): GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr {
+    return GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr(
+        person = person.toDb(),
+        omsorgsAr = omsorgsAr
+    )
+}
 

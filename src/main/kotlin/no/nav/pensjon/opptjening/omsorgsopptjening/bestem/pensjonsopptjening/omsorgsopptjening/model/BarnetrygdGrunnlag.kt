@@ -49,9 +49,16 @@ sealed class BarnetrygdGrunnlag {
         return omsorgsSaker.single { it.omsorgsyter == this.omsorgsyter }
     }
 
-    fun forOmsorgsyterOgÅr(): OmsorgsyterOgOmsorgsårGrunnlag {
-        return OmsorgsyterOgOmsorgsårGrunnlag(
-            omsorgsyter = omsorgsyter,
+    fun forOmsorgsyterOgÅr(): PersonOgOmsorgsårGrunnlag {
+        return PersonOgOmsorgsårGrunnlag(
+            person = omsorgsyter,
+            omsorgsAr = omsorgsAr
+        )
+    }
+
+    fun forOmsorgsmottakerOgÅr(): PersonOgOmsorgsårGrunnlag {
+        return PersonOgOmsorgsårGrunnlag(
+            person = omsorgsmottaker,
             omsorgsAr = omsorgsAr
         )
     }

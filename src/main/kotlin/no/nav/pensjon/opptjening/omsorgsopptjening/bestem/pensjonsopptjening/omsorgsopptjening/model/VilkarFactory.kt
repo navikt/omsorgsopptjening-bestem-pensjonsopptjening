@@ -16,6 +16,11 @@ internal class VilkarFactoryImpl(
         return OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
 
     }
+    override fun omsorgsmottakerIkkeFylt6Ar(): OmsorgsmottakerIkkeFylt6ArVurdering {
+        return OmsorgsmottakerIkkeFylt6Ar().vilkarsVurder(grunnlag.forOmsorgsmottakerOgÅr())
+    }
+
+
 
     override fun kanKunGodskrivesEtBarnPerÅr(): KanKunGodskrivesEtBarnPerÅrVurdering {
         return KanKunGodskrivesEtBarnPerÅr().vilkarsVurder(
@@ -62,6 +67,7 @@ interface VilkarFactory {
     fun kanKunGodskrivesEnOmsorgsyter(): KanKunGodskrivesEnOmsorgsyterVurdering
     fun fullOmsorgForBarnUnder6(): FullOmsorgForBarnUnder6Vurdering
     fun omsorgsyterUnder70Ar(): OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering
+    fun omsorgsmottakerIkkeFylt6Ar(): OmsorgsmottakerIkkeFylt6ArVurdering
 
     fun kanKunGodskrivesEtBarnPerÅr(): KanKunGodskrivesEtBarnPerÅrVurdering
 

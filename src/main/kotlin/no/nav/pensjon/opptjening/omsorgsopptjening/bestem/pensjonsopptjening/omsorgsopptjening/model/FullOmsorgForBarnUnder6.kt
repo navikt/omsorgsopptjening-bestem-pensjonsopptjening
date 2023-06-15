@@ -27,8 +27,7 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
                 return this.let { vilkar ->
                     when (grunnlag) {
                         is OmsorgsmottakerFødtIOmsorgsårGrunnlag -> {
-                            val alderMottaker0 = grunnlag.alderMottaker(mellom = 0..0)
-                            if (grunnlag.minstEnMånedFullOmsorg && alderMottaker0) {
+                            if (grunnlag.minstEnMånedFullOmsorg) {
                                 FullOmsorgForBarnUnder6Innvilget(
                                     årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
                                     omsorgsmottaker = grunnlag.omsorgsmottaker
@@ -37,7 +36,6 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
                                 FullOmsorgForBarnUnder6Avslag(
                                     årsaker = mutableListOf<AvslagÅrsak>().let {
                                         if (!grunnlag.minstEnMånedFullOmsorg) it.add(AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG)
-                                        if (!alderMottaker0) it.add(AvslagÅrsak.ALDER_IKKE_0)
                                         it.toList()
                                     }
                                 )
@@ -45,9 +43,7 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
                         }
 
                         is OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag -> {
-                            val alderMottakerMellom1og5 = grunnlag.alderMottaker(mellom = 1..5)
-
-                            if (grunnlag.minstSeksMånederFullOmsorg && alderMottakerMellom1og5) {
+                            if (grunnlag.minstSeksMånederFullOmsorg) {
                                 FullOmsorgForBarnUnder6Innvilget(
                                     årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
                                     omsorgsmottaker = grunnlag.omsorgsmottaker
@@ -56,7 +52,6 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
                                 FullOmsorgForBarnUnder6Avslag(
                                     årsaker = mutableListOf<AvslagÅrsak>().let {
                                         if (!grunnlag.minstSeksMånederFullOmsorg) it.add(AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG)
-                                        if (!alderMottakerMellom1og5) it.add(AvslagÅrsak.BARN_IKKE_MELLOM_1_OG_5)
                                         it.toList()
                                     }
                                 )
@@ -64,8 +59,7 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
                         }
 
                         is OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag -> {
-                            val alderMottaker0 = grunnlag.alderMottaker(mellom = 0..0)
-                            if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel && alderMottaker0) {
+                            if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel) {
                                 FullOmsorgForBarnUnder6Innvilget(
                                     årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
                                     omsorgsmottaker = grunnlag.omsorgsmottaker
@@ -74,7 +68,6 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
                                 FullOmsorgForBarnUnder6Avslag(
                                     årsaker = mutableListOf<AvslagÅrsak>().let {
                                         if (!grunnlag.minstEnMånedOmsorgÅretEtterFødsel) it.add(AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL)
-                                        if (!alderMottaker0) it.add(AvslagÅrsak.ALDER_IKKE_0)
                                         it.toList()
                                     }
                                 )
@@ -83,10 +76,6 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
                     }
                 }
             }
-
-        private fun FullOmsorgForBarnUnder6Grunnlag.alderMottaker(mellom: IntRange): Boolean {
-            return omsorgsmottaker.alderVedUtløpAv(omsorgsAr) in mellom
-        }
     }
 
     override fun vilkarsVurder(grunnlag: FullOmsorgForBarnUnder6Grunnlag): FullOmsorgForBarnUnder6Vurdering {

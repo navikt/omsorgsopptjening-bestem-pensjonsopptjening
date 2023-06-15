@@ -10,8 +10,8 @@ class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
     fun `should be innvilget when subject younger than 70 years`() {
         val årstall = 2000
         val vilkarsVurdering = OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår().vilkarsVurder(
-            OmsorgsyterOgOmsorgsårGrunnlag(
-                omsorgsyter = PersonMedFødselsår(
+            PersonOgOmsorgsårGrunnlag(
+                person = PersonMedFødselsår(
                     fnr = "12345678910",
                     fodselsAr = årstall
                 ),
@@ -25,8 +25,8 @@ class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
     fun `should be avslag when subject older than 70 years`() {
         val årstall = 2000
         val vilkarsVurdering = OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår().vilkarsVurder(
-            OmsorgsyterOgOmsorgsårGrunnlag(
-                omsorgsyter = PersonMedFødselsår(
+            PersonOgOmsorgsårGrunnlag(
+                person = PersonMedFødselsår(
                     fnr = "12345678910",
                     fodselsAr = årstall
                 ),
@@ -42,8 +42,8 @@ class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
     fun `should be avslag when subject is 70 years`() {
         val årstall = 2000
         val vilkarsVurdering = OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår().vilkarsVurder(
-            OmsorgsyterOgOmsorgsårGrunnlag(
-                omsorgsyter = PersonMedFødselsår(
+            PersonOgOmsorgsårGrunnlag(
+                person = PersonMedFødselsår(
                     fnr = "12345678910",
                     fodselsAr = årstall
                 ),

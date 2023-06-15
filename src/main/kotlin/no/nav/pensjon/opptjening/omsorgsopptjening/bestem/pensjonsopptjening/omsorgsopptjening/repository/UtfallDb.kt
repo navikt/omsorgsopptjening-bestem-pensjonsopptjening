@@ -125,6 +125,14 @@ internal sealed class VilkårsvurderingUtfallDb {
     data class KanKunGodskrivesEtBarnPerÅrInnvilget(
         val årsak: String
     ) : VilkårsvurderingUtfallDb()
+
+    data class OmsorgsmottakerIkkeFylt6ArAvslag(
+        val årsaker: List<AvslagÅrsakDb>
+    ) : VilkårsvurderingUtfallDb()
+
+    data class OmsorgsmottakerIkkeFylt6ArInnvilget(
+        val årsak: String
+    ) : VilkårsvurderingUtfallDb()
 }
 
 
@@ -233,6 +241,13 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
         is KanKunGodskrivesEtBarnPerÅrInnvilget -> {
             VilkårsvurderingUtfallDb.KanKunGodskrivesEtBarnPerÅrInnvilget(årsak = årsak)
         }
+
+        is OmsorgsmottakerIkkeFylt6ArAvslag ->
+            VilkårsvurderingUtfallDb.OmsorgsmottakerIkkeFylt6ArAvslag(årsaker = årsaker.toDb())
+
+        is OmsorgsmottakerIkkeFylt6ArInnvilget -> {
+            VilkårsvurderingUtfallDb.OmsorgsmottakerIkkeFylt6ArInnvilget(årsak = årsak)
+        }
     }
 }
 
@@ -292,6 +307,13 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
 
         is VilkårsvurderingUtfallDb.KanKunGodskrivesEtBarnPerÅrInnvilget -> {
             KanKunGodskrivesEtBarnPerÅrInnvilget(årsak = årsak)
+        }
+
+        is VilkårsvurderingUtfallDb.OmsorgsmottakerIkkeFylt6ArAvslag -> {
+            OmsorgsmottakerIkkeFylt6ArAvslag(årsaker = årsaker.toDomain())
+        }
+        is VilkårsvurderingUtfallDb.OmsorgsmottakerIkkeFylt6ArInnvilget -> {
+            OmsorgsmottakerIkkeFylt6ArInnvilget(årsak = årsak)
         }
     }
 }

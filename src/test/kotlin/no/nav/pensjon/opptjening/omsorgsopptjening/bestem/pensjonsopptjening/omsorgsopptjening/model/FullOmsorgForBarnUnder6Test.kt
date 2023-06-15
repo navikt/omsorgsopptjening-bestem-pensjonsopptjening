@@ -8,40 +8,81 @@ import kotlin.test.assertEquals
 class KFullOmsorgForBarnUnder6Test {
 
     @Test
-    fun `required number of months for child between 0 and 6`() {
-        val omsorgsår = 2000
-        listOf(6).forEach { childAge ->
-            FullOmsorgForBarnUnder6().vilkarsVurder(
-                grunnlag = OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
-                    omsorgsAr = omsorgsår,
-                    omsorgsmottaker = PersonMedFødselsår(
-                        fnr = "12345678910",
-                        fodselsAr = omsorgsår - childAge
-                    ),
-                    minstSeksMånederFullOmsorg = true
-                )
-            ).also { vurdering ->
-                assertInstanceOf(FullOmsorgForBarnUnder6Avslag::class.java, vurdering.utfall).also {
-                    assertEquals(listOf(AvslagÅrsak.BARN_IKKE_MELLOM_1_OG_5), it.årsaker)
-                }
-            }
+    fun `Gitt en mottaker født utenfor omsorgsår når det er minst seks måneder full omsorg så invilget`() {
+        FullOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
+                omsorgsAr = 2000,
+                omsorgsmottaker = PersonMedFødselsår(
+                    fnr = "12125678910",
+                    fodselsAr = 1999
+                ),
+                minstSeksMånederFullOmsorg = true
+            )
+        ).also { vurdering ->
+            assertInstanceOf(FullOmsorgForBarnUnder6Innvilget::class.java, vurdering.utfall)}
+        }
 
-        }
-        listOf(1, 2, 3, 4, 5).forEach { childAge ->
-            FullOmsorgForBarnUnder6().vilkarsVurder(
-                grunnlag = OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
-                    omsorgsAr = omsorgsår,
-                    omsorgsmottaker = PersonMedFødselsår(
-                        fnr = "12345678910",
-                        fodselsAr = omsorgsår - childAge
-                    ),
-                    minstSeksMånederFullOmsorg = true
-                )
-            ).also {
-                assertInstanceOf(FullOmsorgForBarnUnder6Innvilget::class.java, it.utfall)
-            }
-        }
+    @Test
+    fun `Gitt en mottaker født I omsorgsår når det er minst en måned full omsorg så invilget`() {
+        FullOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = OmsorgsmottakerFødtIOmsorgsårGrunnlag(
+                omsorgsAr = 2000,
+                omsorgsmottaker = PersonMedFødselsår(
+                    fnr = "12345678910",
+                    fodselsAr = 2000
+                ),
+                minstEnMånedFullOmsorg = true
+            )
+        ).also { vurdering ->
+            assertInstanceOf(FullOmsorgForBarnUnder6Innvilget::class.java, vurdering.utfall)}
     }
+
+    @Test
+    fun `Gitt en mottaker født I omsorgsår når det ikke er minst en måned full omsorg så avslag`() {
+        FullOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = OmsorgsmottakerFødtIOmsorgsårGrunnlag(
+                omsorgsAr = 2000,
+                omsorgsmottaker = PersonMedFødselsår(
+                    fnr = "12345678910",
+                    fodselsAr = 2000
+                ),
+                minstEnMånedFullOmsorg = false
+            )
+        ).also { vurdering ->
+            assertInstanceOf(FullOmsorgForBarnUnder6Avslag::class.java, vurdering.utfall)}
+    }
+
+    @Test
+    fun `Gitt en mottaker født I desember i omsorgsår når det er minst en måned full omsorg så invilget`() {
+        FullOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag(
+                omsorgsAr = 2000,
+                omsorgsmottaker = PersonMedFødselsår(
+                    fnr = "12125678910",
+                    fodselsAr = 2000
+                ),
+                minstEnMånedOmsorgÅretEtterFødsel = true
+            )
+        ).also { vurdering ->
+            assertInstanceOf(FullOmsorgForBarnUnder6Innvilget::class.java, vurdering.utfall)}
+    }
+
+    @Test
+    fun `Gitt en mottaker født I desember i omsorgsår når det ikke er minst en måned full omsorg så avslag`() {
+        FullOmsorgForBarnUnder6().vilkarsVurder(
+            grunnlag = OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag(
+                omsorgsAr = 2000,
+                omsorgsmottaker = PersonMedFødselsår(
+                    fnr = "12125678910",
+                    fodselsAr = 2000
+                ),
+                minstEnMånedOmsorgÅretEtterFødsel = false
+            )
+        ).also { vurdering ->
+            assertInstanceOf(FullOmsorgForBarnUnder6Avslag::class.java, vurdering.utfall)}
+    }
+
+
 
     @Test
     fun `number of months with full omsorg`() {
@@ -94,7 +135,7 @@ class KFullOmsorgForBarnUnder6Test {
         ).also { vurdering ->
             assertInstanceOf(FullOmsorgForBarnUnder6Avslag::class.java, vurdering.utfall).also {
                 assertEquals(
-                    listOf(AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG, AvslagÅrsak.BARN_IKKE_MELLOM_1_OG_5),
+                    listOf(AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG),
                     it.årsaker
                 )
             }
