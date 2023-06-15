@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class KanKunGodskrivesEnOmsorgsyterTest {
 
@@ -22,11 +23,11 @@ class KanKunGodskrivesEnOmsorgsyterTest {
             KanKunGodskrivesEnOmsorgsyterGrunnlag(
                 listOf(
                     BehandlingsIdUtfall(
-                        behandlingsId = 1,
+                        behandlingsId = UUID.randomUUID(),
                         erInnvilget = false
                     ),
                     BehandlingsIdUtfall(
-                        behandlingsId = 2,
+                        behandlingsId = UUID.randomUUID(),
                         erInnvilget = false
                     )
                 )
@@ -42,11 +43,11 @@ class KanKunGodskrivesEnOmsorgsyterTest {
             KanKunGodskrivesEnOmsorgsyterGrunnlag(
                 listOf(
                     BehandlingsIdUtfall(
-                        behandlingsId = 1,
+                        behandlingsId = UUID.randomUUID(),
                         erInnvilget = false
                     ),
                     BehandlingsIdUtfall(
-                        behandlingsId = 2,
+                        behandlingsId = UUID.randomUUID(),
                         erInnvilget = true
                     )
                 )

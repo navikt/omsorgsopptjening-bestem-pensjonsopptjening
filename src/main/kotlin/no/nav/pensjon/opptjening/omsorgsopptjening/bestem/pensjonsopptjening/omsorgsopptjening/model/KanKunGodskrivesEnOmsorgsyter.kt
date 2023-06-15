@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import java.util.UUID
+
 class KanKunGodskrivesEnOmsorgsyter : Vilkar<KanKunGodskrivesEnOmsorgsyterGrunnlag>(
     vilkarsInformasjon = VilkarsInformasjon(
         beskrivelse = "Det kan gis pensjonsopptjening etter første ledd fra og med det året vedkommende fyller 17 år.",
@@ -43,6 +45,6 @@ data class KanKunGodskrivesEnOmsorgsyterGrunnlag(
 )
 
 data class BehandlingsIdUtfall(
-    val behandlingsId: Long,
+    val behandlingsId: UUID,
     val erInnvilget: Boolean
 )

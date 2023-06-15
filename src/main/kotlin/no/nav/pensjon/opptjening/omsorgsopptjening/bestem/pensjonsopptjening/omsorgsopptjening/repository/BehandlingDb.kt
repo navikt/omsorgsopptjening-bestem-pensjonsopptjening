@@ -2,16 +2,19 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
+import java.time.Instant
+import java.util.UUID
 
 internal class BehandlingDb(
-    val id: Long? = null,
+    val id: UUID? = null,
+    val opprettet: Instant? = null,
     val omsorgsAr: Int,
     val omsorgsyter: String,
     val omsorgsmottaker: String,
     val omsorgstype: OmsorgstypeDb,
     val grunnlag: BeriketGrunnlagDb,
     val vilkårsvurdering: VilkårsvurderingDb,
-    val utfall: BehandlingsutfallDb
+    val utfall: BehandlingsutfallDb,
 )
 
 internal fun Behandling.toDb(): BehandlingDb {
@@ -29,6 +32,7 @@ internal fun Behandling.toDb(): BehandlingDb {
 internal fun BehandlingDb.toDomain(): FullførtBehandling {
     return FullførtBehandling(
         id = id!!,
+        opprettet = opprettet!!,
         omsorgsAr = omsorgsAr,
         omsorgsyter = omsorgsyter,
         omsorgsmottaker = omsorgsmottaker,

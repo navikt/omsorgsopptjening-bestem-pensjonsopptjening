@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import java.util.UUID
+
 class KanKunGodskrivesEtBarnPerÅr : Vilkar<KanKunGodskrivesEtBarnPerÅrGrunnlag>(
     vilkarsInformasjon = VilkarsInformasjon(
         beskrivelse = "Kan kun godskrives et barn per år",
@@ -44,7 +46,7 @@ data class KanKunGodskrivesEtBarnPerÅrGrunnlag(
 )
 
 data class AndreBehandlinger(
-    val behandlingsId: Long,
+    val behandlingsId: UUID,
     val år: Int,
     val omsorgsmottaker: String,
     val erInnvilget: Boolean

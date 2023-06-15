@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class KanKunGodskrivesEtBarnPerÅrTest {
     @Test
@@ -23,7 +24,7 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 omsorgsmottaker = "a",
                 behandlinger = listOf(
                     AndreBehandlinger(
-                        behandlingsId = 1,
+                        behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "a",
                         erInnvilget = false
@@ -42,13 +43,13 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 omsorgsmottaker = "a",
                 behandlinger = listOf(
                     AndreBehandlinger(
-                        behandlingsId = 1,
+                        behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "a",
                         erInnvilget = true
                     ),
                     AndreBehandlinger(
-                        behandlingsId = 1,
+                        behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "b",
                         erInnvilget = false
@@ -74,13 +75,13 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 omsorgsmottaker = "a",
                 behandlinger = listOf(
                     AndreBehandlinger(
-                        behandlingsId = 1,
+                        behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "a",
                         erInnvilget = false
                     ),
                     AndreBehandlinger(
-                        behandlingsId = 1,
+                        behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "b",
                         erInnvilget = true

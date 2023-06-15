@@ -11,6 +11,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerFødtIOmsorgsårGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag
+import java.util.UUID
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -81,7 +82,7 @@ internal fun KanKunGodskrivesEnOmsorgsyterGrunnlag.toDb(): GrunnlagVilkårsvurde
 }
 
 data class BehandlingsIdUtfallDb(
-    val behandlingsId: Long,
+    val behandlingsId: UUID,
     val erInnvilget: Boolean
 )
 
@@ -128,7 +129,7 @@ internal fun BehandlingsIdUtfallDb.toDomain(): BehandlingsIdUtfall {
 }
 
 internal data class AndreBehandlingerDb(
-    val behandlingsId: Long,
+    val behandlingsId: UUID,
     val år: Int,
     val omsorgsmottaker: String,
     val erInnvilget: Boolean

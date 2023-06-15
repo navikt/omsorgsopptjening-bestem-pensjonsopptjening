@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Component
 import java.sql.ResultSet
+import java.util.UUID
 
 @Component
 class BehandlingRepo {
@@ -45,11 +46,11 @@ class BehandlingRepo {
                 ),
                 keyHolder
             )
-            find(keyHolder.keys!!["id"] as Long)
+            find(keyHolder.keys!!["id"] as UUID)
         }
     }
 
-    private fun find(id: Long): FullførtBehandling {
+    private fun find(id: UUID): FullførtBehandling {
         return jdbcTemplate.query(
             """select * from behandling where id = :id""",
             mapOf<String, Any>(
@@ -96,7 +97,8 @@ class BehandlingRepo {
 internal class BehandlingRowMapper : RowMapper<BehandlingDb> {
     override fun mapRow(rs: ResultSet, rowNum: Int): BehandlingDb {
         return BehandlingDb(
-            id = rs.getLong("id"),
+            id = UUID.fromString(rs.getString("id")),
+            opprettet = rs.getTimestamp("opprettet").toInstant(),
             omsorgsAr = rs.getInt("omsorgs_ar"),
             omsorgsyter = rs.getString("omsorgsyter"),
             omsorgsmottaker = rs.getString("omsorgsmottaker"),

@@ -2,10 +2,12 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
+import java.time.Instant
+import java.util.UUID
 
 data class FullførtBehandling(
-    val id: Long,
+    val id: UUID,
+    val opprettet: Instant,
     val omsorgsAr: Int,
     val omsorgsyter: String,
     val omsorgsmottaker: String,
