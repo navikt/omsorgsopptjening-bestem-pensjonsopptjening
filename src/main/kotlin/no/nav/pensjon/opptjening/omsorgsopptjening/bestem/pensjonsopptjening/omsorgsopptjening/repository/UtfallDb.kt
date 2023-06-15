@@ -73,9 +73,7 @@ internal sealed class VilkårsvurderingUtfallDb {
         val årsaker: List<AvslagÅrsakDb>
     ) : VilkårsvurderingUtfallDb()
 
-    data class EllerInnvilget(
-        val årsak: String
-    ) : VilkårsvurderingUtfallDb()
+    object EllerInnvilget : VilkårsvurderingUtfallDb()
 
     data class FullOmsorgForBarnUnder6Avslag(
         val årsaker: List<AvslagÅrsakDb>
@@ -90,9 +88,7 @@ internal sealed class VilkårsvurderingUtfallDb {
         val årsaker: List<AvslagÅrsakDb>
     ) : VilkårsvurderingUtfallDb()
 
-    data class OgInnvilget(
-        val årsak: String
-    ) : VilkårsvurderingUtfallDb()
+    object OgInnvilget: VilkårsvurderingUtfallDb()
 
     data class OmsorgsyterOver16ArAvslag(
         val årsaker: List<AvslagÅrsakDb>
@@ -188,7 +184,7 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
         }
 
         is EllerInnvilget -> {
-            VilkårsvurderingUtfallDb.EllerInnvilget(årsak = årsak)
+            VilkårsvurderingUtfallDb.EllerInnvilget
         }
 
         is FullOmsorgForBarnUnder6Avslag -> {
@@ -207,7 +203,7 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
         }
 
         is OgInnvilget -> {
-            VilkårsvurderingUtfallDb.OgInnvilget(årsak = årsak)
+            VilkårsvurderingUtfallDb.OgInnvilget
         }
 
         is OmsorgsyterFylt17ÅrAvslag -> {
@@ -258,7 +254,7 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.EllerInnvilget -> {
-            EllerInnvilget(årsak = årsak)
+            EllerInnvilget
         }
 
         is VilkårsvurderingUtfallDb.FullOmsorgForBarnUnder6Avslag -> {
@@ -274,7 +270,7 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.OgInnvilget -> {
-            OgInnvilget(årsak = årsak)
+            OgInnvilget
         }
 
         is VilkårsvurderingUtfallDb.OmsorgsyterOver16ArAvslag -> {

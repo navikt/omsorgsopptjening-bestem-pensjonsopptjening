@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 data class PersonOgOmsorgsårGrunnlag(
     val person: PersonMedFødselsår,
     val omsorgsAr: Int
-) {
+): ParagrafGrunnlag() {
     fun alderMottaker(mellom: IntRange): Boolean {
         return person.alderVedUtløpAv(omsorgsAr) in mellom
     }

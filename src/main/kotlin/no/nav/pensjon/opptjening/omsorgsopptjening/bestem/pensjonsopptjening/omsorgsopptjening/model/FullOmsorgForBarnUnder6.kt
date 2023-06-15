@@ -13,23 +13,19 @@ import java.time.Month
  * Det betyr at vi må sjekke om omsorgsyter har fått barnetrygd i året etter for å vite om omsorgsyter har rett til omsorgsopptjening
  *
  */
-class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
-    vilkarsInformasjon = VilkarsInformasjon(
-        beskrivelse = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn",
-        begrunnesleForAvslag = "Medlemmet har ikke et halve år med daglig omsorgen for et barn",
-        begrunnelseForInnvilgelse = "Medlemmet har et halve år med daglig omsorgen for et barn",
-    ),
-    utfallsFunksjon = vurderUtfall,
+class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>(
+    paragrafer = setOf(Paragraf.A),
+    utfallsFunksjon = vurderUtfall as Vilkar<FullOmsorgForBarnUnder6Grunnlag>.(FullOmsorgForBarnUnder6Grunnlag) -> VilkårsvurderingUtfall,
 ) {
     companion object {
         private val vurderUtfall =
-            fun Vilkar<FullOmsorgForBarnUnder6Grunnlag>.(grunnlag: FullOmsorgForBarnUnder6Grunnlag): VilkårsvurderingUtfall {
+            fun ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>.(grunnlag: FullOmsorgForBarnUnder6Grunnlag): VilkårsvurderingUtfall {
                 return this.let { vilkar ->
                     when (grunnlag) {
                         is OmsorgsmottakerFødtIOmsorgsårGrunnlag -> {
                             if (grunnlag.minstEnMånedFullOmsorg) {
                                 FullOmsorgForBarnUnder6Innvilget(
-                                    årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
+                                    årsak = "",
                                     omsorgsmottaker = grunnlag.omsorgsmottaker
                                 )
                             } else {
@@ -45,7 +41,7 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
                         is OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag -> {
                             if (grunnlag.minstSeksMånederFullOmsorg) {
                                 FullOmsorgForBarnUnder6Innvilget(
-                                    årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
+                                    årsak = "",
                                     omsorgsmottaker = grunnlag.omsorgsmottaker
                                 )
                             } else {
@@ -61,7 +57,7 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
                         is OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag -> {
                             if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel) {
                                 FullOmsorgForBarnUnder6Innvilget(
-                                    årsak = vilkar.vilkarsInformasjon.begrunnelseForInnvilgelse,
+                                    årsak = "",
                                     omsorgsmottaker = grunnlag.omsorgsmottaker
                                 )
                             } else {
@@ -80,7 +76,7 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
 
     override fun vilkarsVurder(grunnlag: FullOmsorgForBarnUnder6Grunnlag): FullOmsorgForBarnUnder6Vurdering {
         return FullOmsorgForBarnUnder6Vurdering(
-            vilkar = this,
+            paragrafer = paragrafer,
             grunnlag = grunnlag,
             utfall = utfallsFunksjon(grunnlag),
         )
@@ -88,10 +84,10 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
 }
 
 data class FullOmsorgForBarnUnder6Vurdering(
-    override val vilkar: Vilkar<FullOmsorgForBarnUnder6Grunnlag>,
+    override val paragrafer: Set<Paragraf>,
     override val grunnlag: FullOmsorgForBarnUnder6Grunnlag,
     override val utfall: VilkårsvurderingUtfall
-) : VilkarsVurdering<FullOmsorgForBarnUnder6Grunnlag>()
+) : ParagrafVurdering<FullOmsorgForBarnUnder6Grunnlag>()
 
 
 data class FullOmsorgForBarnUnder6Innvilget(
@@ -103,7 +99,7 @@ data class FullOmsorgForBarnUnder6Avslag(
     override val årsaker: List<AvslagÅrsak>,
 ) : VilkårsvurderingUtfall.Avslag()
 
-sealed class FullOmsorgForBarnUnder6Grunnlag {
+sealed class FullOmsorgForBarnUnder6Grunnlag : ParagrafGrunnlag() {
     abstract val omsorgsAr: Int
     abstract val omsorgsmottaker: PersonMedFødselsår
 }

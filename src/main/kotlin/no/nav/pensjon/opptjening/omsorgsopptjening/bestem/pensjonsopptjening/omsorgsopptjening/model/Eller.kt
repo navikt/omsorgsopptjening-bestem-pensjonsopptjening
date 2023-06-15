@@ -1,11 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 class Eller : Vilkar<List<VilkarsVurdering<*>>>(
-    vilkarsInformasjon = VilkarsInformasjon(
-        beskrivelse = "Et av vilkårene må være sanne.",
-        begrunnelseForInnvilgelse = "Et av vilkårene var sanne.",
-        begrunnesleForAvslag = "Ingen av vilkårene var sanne."
-    ),
     utfallsFunksjon = ellerFunksjon
 ) {
 
@@ -14,7 +9,7 @@ class Eller : Vilkar<List<VilkarsVurdering<*>>>(
             fun Vilkar<List<VilkarsVurdering<*>>>.(vilkarsVurdering: List<VilkarsVurdering<*>>): VilkårsvurderingUtfall {
                 return when {
                     vilkarsVurdering.map { it.utfall }.any { it is VilkårsvurderingUtfall.Innvilget } -> {
-                        EllerInnvilget(årsak = this.vilkarsInformasjon.begrunnelseForInnvilgelse)
+                        EllerInnvilget
                     }
 
                     else -> {
@@ -38,7 +33,6 @@ class Eller : Vilkar<List<VilkarsVurdering<*>>>(
 
     override fun vilkarsVurder(grunnlag: List<VilkarsVurdering<*>>): EllerVurdering {
         return EllerVurdering(
-            vilkar = this,
             grunnlag = grunnlag,
             utfall = utfallsFunksjon(grunnlag)
         )
@@ -46,14 +40,11 @@ class Eller : Vilkar<List<VilkarsVurdering<*>>>(
 }
 
 data class EllerVurdering(
-    override val vilkar: Vilkar<List<VilkarsVurdering<*>>>,
     override val grunnlag: List<VilkarsVurdering<*>>,
     override val utfall: VilkårsvurderingUtfall
 ) : VilkarsVurdering<List<VilkarsVurdering<*>>>()
 
-data class EllerInnvilget(
-    val årsak: String,
-) : VilkårsvurderingUtfall.Innvilget()
+object EllerInnvilget : VilkårsvurderingUtfall.Innvilget()
 
 data class EllerAvslått(
     override val årsaker: List<AvslagÅrsak>,
