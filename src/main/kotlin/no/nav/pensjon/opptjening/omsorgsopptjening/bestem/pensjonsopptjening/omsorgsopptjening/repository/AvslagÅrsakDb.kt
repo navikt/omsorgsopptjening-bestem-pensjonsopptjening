@@ -13,7 +13,7 @@ internal enum class AvslagÅrsakDb {
     INGEN_MÅNEDER_FULL_OMSORG,
     INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL,
     ALLEREDE_INNVILGET_FOR_ANNEN_MOTTAKER,
-    ALLEREDE_GODSKREVET_ANNET_BARN_FOR_ÅR,
+    ALLEREDE_GODSKREVET_BARN_FOR_ÅR,
 }
 
 internal fun List<AvslagÅrsak>.toDb(): List<AvslagÅrsakDb> {
@@ -32,7 +32,7 @@ internal fun AvslagÅrsak.toDb(): AvslagÅrsakDb {
         AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG -> AvslagÅrsakDb.INGEN_MÅNEDER_FULL_OMSORG
         AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL -> AvslagÅrsakDb.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL
         AvslagÅrsak.ALLEREDE_INNVILGET_FOR_ANNEN_MOTTAKER -> AvslagÅrsakDb.ALLEREDE_INNVILGET_FOR_ANNEN_MOTTAKER
-        AvslagÅrsak.ALLEREDE_GODSKREVET_ANNET_BARN_FOR_ÅR -> AvslagÅrsakDb.ALLEREDE_GODSKREVET_ANNET_BARN_FOR_ÅR
+        AvslagÅrsak.ALLEREDE_GODSKREVET_BARN_FOR_ÅR -> AvslagÅrsakDb.ALLEREDE_GODSKREVET_BARN_FOR_ÅR
     }
 }
 
@@ -52,6 +52,6 @@ internal fun AvslagÅrsakDb.toDomain(): AvslagÅrsak {
         AvslagÅrsakDb.INGEN_MÅNEDER_FULL_OMSORG -> AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG
         AvslagÅrsakDb.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL -> AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL
         AvslagÅrsakDb.ALLEREDE_INNVILGET_FOR_ANNEN_MOTTAKER -> AvslagÅrsak.ALLEREDE_INNVILGET_FOR_ANNEN_MOTTAKER
-        AvslagÅrsakDb.ALLEREDE_GODSKREVET_ANNET_BARN_FOR_ÅR -> AvslagÅrsak.ALLEREDE_GODSKREVET_ANNET_BARN_FOR_ÅR
+        AvslagÅrsakDb.ALLEREDE_GODSKREVET_BARN_FOR_ÅR -> AvslagÅrsak.ALLEREDE_GODSKREVET_BARN_FOR_ÅR
     }
 }

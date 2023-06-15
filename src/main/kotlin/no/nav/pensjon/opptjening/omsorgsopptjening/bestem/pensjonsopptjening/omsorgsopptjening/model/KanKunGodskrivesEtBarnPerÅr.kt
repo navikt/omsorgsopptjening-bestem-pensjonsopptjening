@@ -11,10 +11,10 @@ class KanKunGodskrivesEtBarnPerÅr : Vilkar<KanKunGodskrivesEtBarnPerÅrGrunnlag
     companion object {
         private val vurderUtfall =
             fun Vilkar<KanKunGodskrivesEtBarnPerÅrGrunnlag>.(input: KanKunGodskrivesEtBarnPerÅrGrunnlag): VilkårsvurderingUtfall {
-                if (input.behandlinger.none { it.erInnvilget && input.omsorgsmottaker != it.omsorgsmottaker }) {
+                if (input.behandlinger.none { it.erInnvilget }) {
                     return KanKunGodskrivesEtBarnPerÅrInnvilget(vilkarsInformasjon.begrunnelseForInnvilgelse)
                 } else {
-                    return KanKunGodskrivesEtBarnPerÅrAvslag(listOf(AvslagÅrsak.ALLEREDE_GODSKREVET_ANNET_BARN_FOR_ÅR))
+                    return KanKunGodskrivesEtBarnPerÅrAvslag(listOf(AvslagÅrsak.ALLEREDE_GODSKREVET_BARN_FOR_ÅR))
                 }
             }
     }

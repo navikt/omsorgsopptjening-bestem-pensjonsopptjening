@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class FullOmsorgForBarnUnder6Test {
+class KFullOmsorgForBarnUnder6Test {
 
     @Test
     fun `required number of months for child between 0 and 6`() {

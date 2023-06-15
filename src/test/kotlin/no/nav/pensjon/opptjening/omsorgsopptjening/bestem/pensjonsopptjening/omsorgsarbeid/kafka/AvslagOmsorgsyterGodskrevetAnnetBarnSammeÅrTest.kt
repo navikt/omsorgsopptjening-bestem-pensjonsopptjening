@@ -90,7 +90,7 @@ class AvslagOmsorgsyterGodskrevetAnnetBarnSammeÅrTest : SpringContextTest.NoKaf
                 assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall).also { utfall ->
                     assertEquals(
                         listOf(
-                            AvslagÅrsak.ALLEREDE_GODSKREVET_ANNET_BARN_FOR_ÅR
+                            AvslagÅrsak.ALLEREDE_GODSKREVET_BARN_FOR_ÅR
                         ),
                         utfall.årsaker
                     )
