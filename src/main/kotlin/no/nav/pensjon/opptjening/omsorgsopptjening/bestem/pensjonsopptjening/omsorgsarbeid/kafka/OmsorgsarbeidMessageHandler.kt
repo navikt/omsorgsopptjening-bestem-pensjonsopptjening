@@ -16,6 +16,7 @@ import java.time.Month
 class OmsorgsarbeidMessageHandler(
     private val omsorgsgrunnlagService: OmsorgsgrunnlagService,
     private val behandlingRepo: BehandlingRepo,
+    private val gyldigOpptjeningsår: GyldigOpptjeningår
 ) {
     fun handle(record: ConsumerRecord<String, String>): List<FullførtBehandling> {
         return if (record.kafkaMessageType() == KafkaMessageType.OMSORGSARBEID) {
@@ -28,6 +29,7 @@ class OmsorgsarbeidMessageHandler(
                  * vilkår yter ikke godskrevet annet barn samme år
                  * filtrer vekk all år som ikke er "gydlig opptjeningsår"?
                  */
+                .filter { gyldigOpptjeningsår.get().contains(it.omsorgsAr) }
                 .map {
                     behandlingRepo.persist(
                         Behandling(
