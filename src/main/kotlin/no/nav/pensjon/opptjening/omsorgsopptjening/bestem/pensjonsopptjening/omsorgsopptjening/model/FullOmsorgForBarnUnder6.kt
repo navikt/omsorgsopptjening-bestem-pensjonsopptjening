@@ -85,7 +85,7 @@ class FullOmsorgForBarnUnder6 : Vilkar<FullOmsorgForBarnUnder6Grunnlag>(
             }
 
         private fun FullOmsorgForBarnUnder6Grunnlag.alderMottaker(mellom: IntRange): Boolean {
-            return omsorgsmottaker.alder(omsorgsAr) in mellom
+            return omsorgsmottaker.alderVedUtløpAv(omsorgsAr) in mellom
         }
     }
 

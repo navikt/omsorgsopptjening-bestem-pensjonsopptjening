@@ -56,6 +56,10 @@ sealed class BarnetrygdGrunnlag {
         )
     }
 
+    protected fun alleMånederIGrunnlag(): Set<YearMonth> {
+        return omsorgsSaker.flatMap { it.omsorgVedtakPeriode }.flatMap { it.periode.alleMåneder() }.distinct().toSet()
+    }
+
     abstract fun fullOmsorg(): FullOmsorgForBarnUnder6Grunnlag
     sealed class FødtIOmsorgsår : BarnetrygdGrunnlag() {
         data class IkkeFødtDesember(
@@ -64,11 +68,7 @@ sealed class BarnetrygdGrunnlag {
         ) : FødtIOmsorgsår() {
             init {
                 require(
-                    Periode(
-                        YearMonth.of(omsorgsAr, Month.JANUARY),
-                        YearMonth.of(omsorgsAr, Month.DECEMBER)
-                    ).alleMåneder().containsAll(omsorgsSaker.flatMap { it.omsorgVedtakPeriode }
-                                                    .flatMap { it.periode.alleMåneder() }.distinct())
+                    Periode(omsorgsAr).alleMåneder().containsAll(alleMånederIGrunnlag())
                 ) { "Grunnlag contains months outside of the omsorgsår: $omsorgsAr" }
             }
 
@@ -88,11 +88,7 @@ sealed class BarnetrygdGrunnlag {
             init {
                 val årEtterOmsorgsår = omsorgsAr + 1
                 require(
-                    Periode(
-                        YearMonth.of(årEtterOmsorgsår, Month.JANUARY),
-                        YearMonth.of(årEtterOmsorgsår, Month.DECEMBER)
-                    ).alleMåneder().containsAll(omsorgsSaker.flatMap { it.omsorgVedtakPeriode }
-                                                    .flatMap { it.periode.alleMåneder() }.distinct())
+                    Periode(årEtterOmsorgsår).alleMåneder().containsAll(alleMånederIGrunnlag())
                 ) { "Grunnlag should only contain months from: $årEtterOmsorgsår" }
             }
 
@@ -112,11 +108,7 @@ sealed class BarnetrygdGrunnlag {
     ) : BarnetrygdGrunnlag() {
         init {
             require(
-                Periode(
-                    YearMonth.of(omsorgsAr, Month.JANUARY),
-                    YearMonth.of(omsorgsAr, Month.DECEMBER)
-                ).alleMåneder().containsAll(omsorgsSaker.flatMap { it.omsorgVedtakPeriode }
-                                                .flatMap { it.periode.alleMåneder() }.distinct())
+                Periode(omsorgsAr).alleMåneder().containsAll(alleMånederIGrunnlag())
             ) { "Grunnlag contains months outside of the omsorgsår: $omsorgsAr" }
         }
 

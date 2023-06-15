@@ -7,13 +7,13 @@ internal class VilkarFactoryImpl(
     private val grunnlag: BarnetrygdGrunnlag,
     private val behandlingRepo: BehandlingRepo
 ) : VilkarFactory {
-    override fun omsorgsyterOver16Ar(): OmsorgsyterOver16ArVurdering {
-        return OmsorgsYterOver16Ar().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
+    override fun omsorgsyterOver16Ar(): OmsorgsyterFylt17ÅrVurdering {
+        return OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
 
     }
 
-    override fun omsorgsyterUnder70Ar(): OmsorgsyterUnder70Vurdering {
-        return OmsorgsyterUnder70Ar().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
+    override fun omsorgsyterUnder70Ar(): OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering {
+        return OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
 
     }
 
@@ -58,10 +58,10 @@ internal class VilkarFactoryImpl(
 
 interface VilkarFactory {
 
-    fun omsorgsyterOver16Ar(): OmsorgsyterOver16ArVurdering
+    fun omsorgsyterOver16Ar(): OmsorgsyterFylt17ÅrVurdering
     fun kanKunGodskrivesEnOmsorgsyter(): KanKunGodskrivesEnOmsorgsyterVurdering
     fun fullOmsorgForBarnUnder6(): FullOmsorgForBarnUnder6Vurdering
-    fun omsorgsyterUnder70Ar(): OmsorgsyterUnder70Vurdering
+    fun omsorgsyterUnder70Ar(): OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering
 
     fun kanKunGodskrivesEtBarnPerÅr(): KanKunGodskrivesEtBarnPerÅrVurdering
 

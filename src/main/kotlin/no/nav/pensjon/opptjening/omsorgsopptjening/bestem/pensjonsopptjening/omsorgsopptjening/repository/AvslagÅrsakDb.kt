@@ -5,8 +5,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 internal enum class AvslagÅrsakDb {
     MINDRE_ENN_6_MND_FULL_OMSORG,
     BARN_IKKE_MELLOM_1_OG_5,
-    OMSORGSYTER_UNDER_16,
-    OMSORGSYTER_OVER_69,
+    OMSORGSYTER_IKKE_FYLLT_17_VED_UTGANG_AV_OMSORGSÅR,
+    OMSORGSYTER_FYLT_70_VED_UTGANG_AV_OMSORGSÅR,
     MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT, //ELLER
     ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT, //OG
     ALDER_IKKE_0,
@@ -24,8 +24,8 @@ internal fun AvslagÅrsak.toDb(): AvslagÅrsakDb {
     return when (this) {
         AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG -> AvslagÅrsakDb.MINDRE_ENN_6_MND_FULL_OMSORG
         AvslagÅrsak.BARN_IKKE_MELLOM_1_OG_5 -> AvslagÅrsakDb.BARN_IKKE_MELLOM_1_OG_5
-        AvslagÅrsak.OMSORGSYTER_IKKE_OVER_16 -> AvslagÅrsakDb.OMSORGSYTER_UNDER_16
-        AvslagÅrsak.OMSORGSYTER_OVER_69 -> AvslagÅrsakDb.OMSORGSYTER_OVER_69
+        AvslagÅrsak.OMSORGSYTER_IKKE_FYLLT_17_VED_UTGANG_AV_OMSORGSÅR -> AvslagÅrsakDb.OMSORGSYTER_IKKE_FYLLT_17_VED_UTGANG_AV_OMSORGSÅR
+        AvslagÅrsak.OMSORGSYTER_ELDRE_ENN_69_VED_UTGANG_AV_OMSORGSÅR -> AvslagÅrsakDb.OMSORGSYTER_FYLT_70_VED_UTGANG_AV_OMSORGSÅR
         AvslagÅrsak.MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT -> AvslagÅrsakDb.MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT
         AvslagÅrsak.ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT -> AvslagÅrsakDb.ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT
         AvslagÅrsak.ALDER_IKKE_0 -> AvslagÅrsakDb.ALDER_IKKE_0
@@ -44,8 +44,8 @@ internal fun AvslagÅrsakDb.toDomain(): AvslagÅrsak {
     return when (this) {
         AvslagÅrsakDb.MINDRE_ENN_6_MND_FULL_OMSORG -> AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG
         AvslagÅrsakDb.BARN_IKKE_MELLOM_1_OG_5 -> AvslagÅrsak.BARN_IKKE_MELLOM_1_OG_5
-        AvslagÅrsakDb.OMSORGSYTER_UNDER_16 -> AvslagÅrsak.OMSORGSYTER_IKKE_OVER_16
-        AvslagÅrsakDb.OMSORGSYTER_OVER_69 -> AvslagÅrsak.OMSORGSYTER_OVER_69
+        AvslagÅrsakDb.OMSORGSYTER_IKKE_FYLLT_17_VED_UTGANG_AV_OMSORGSÅR -> AvslagÅrsak.OMSORGSYTER_IKKE_FYLLT_17_VED_UTGANG_AV_OMSORGSÅR
+        AvslagÅrsakDb.OMSORGSYTER_FYLT_70_VED_UTGANG_AV_OMSORGSÅR -> AvslagÅrsak.OMSORGSYTER_ELDRE_ENN_69_VED_UTGANG_AV_OMSORGSÅR
         AvslagÅrsakDb.MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT -> AvslagÅrsak.MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT
         AvslagÅrsakDb.ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT -> AvslagÅrsak.ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT
         AvslagÅrsakDb.ALDER_IKKE_0 -> AvslagÅrsak.ALDER_IKKE_0

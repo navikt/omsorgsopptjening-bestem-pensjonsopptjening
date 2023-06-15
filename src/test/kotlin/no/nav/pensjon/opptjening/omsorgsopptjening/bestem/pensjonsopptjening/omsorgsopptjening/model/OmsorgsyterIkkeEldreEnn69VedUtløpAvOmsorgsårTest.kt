@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class OmsorgsyterUnder70ArTest {
+class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
     @Test
     fun `should be innvilget when subject younger than 70 years`() {
         val årstall = 2000
-        val vilkarsVurdering = OmsorgsyterUnder70Ar().vilkarsVurder(
+        val vilkarsVurdering = OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår().vilkarsVurder(
             OmsorgsyterOgOmsorgsårGrunnlag(
                 omsorgsyter = PersonMedFødselsår(
                     fnr = "12345678910",
@@ -18,13 +18,13 @@ class OmsorgsyterUnder70ArTest {
                 omsorgsAr = årstall + 69
             )
         )
-        Assertions.assertInstanceOf(OmsorgsyterUnder70ArInnvilget::class.java, vilkarsVurdering.utfall)
+        Assertions.assertInstanceOf(OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårInnvilget::class.java, vilkarsVurdering.utfall)
     }
 
     @Test
     fun `should be avslag when subject older than 70 years`() {
         val årstall = 2000
-        val vilkarsVurdering = OmsorgsyterUnder70Ar().vilkarsVurder(
+        val vilkarsVurdering = OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår().vilkarsVurder(
             OmsorgsyterOgOmsorgsårGrunnlag(
                 omsorgsyter = PersonMedFødselsår(
                     fnr = "12345678910",
@@ -33,15 +33,15 @@ class OmsorgsyterUnder70ArTest {
                 omsorgsAr = årstall + 71
             )
         )
-        Assertions.assertInstanceOf(OmsorgsyterUnder70ArAvslag::class.java, vilkarsVurdering.utfall).also {
-            assertEquals(listOf(AvslagÅrsak.OMSORGSYTER_OVER_69), it.årsaker)
+        Assertions.assertInstanceOf(OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårAvslag::class.java, vilkarsVurdering.utfall).also {
+            assertEquals(listOf(AvslagÅrsak.OMSORGSYTER_ELDRE_ENN_69_VED_UTGANG_AV_OMSORGSÅR), it.årsaker)
         }
     }
 
     @Test
     fun `should be avslag when subject is 70 years`() {
         val årstall = 2000
-        val vilkarsVurdering = OmsorgsyterUnder70Ar().vilkarsVurder(
+        val vilkarsVurdering = OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår().vilkarsVurder(
             OmsorgsyterOgOmsorgsårGrunnlag(
                 omsorgsyter = PersonMedFødselsår(
                     fnr = "12345678910",
@@ -50,8 +50,8 @@ class OmsorgsyterUnder70ArTest {
                 omsorgsAr = årstall + 70
             )
         )
-        Assertions.assertInstanceOf(OmsorgsyterUnder70ArAvslag::class.java, vilkarsVurdering.utfall).also {
-            assertEquals(listOf(AvslagÅrsak.OMSORGSYTER_OVER_69), it.årsaker)
+        Assertions.assertInstanceOf(OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårAvslag::class.java, vilkarsVurdering.utfall).also {
+            assertEquals(listOf(AvslagÅrsak.OMSORGSYTER_ELDRE_ENN_69_VED_UTGANG_AV_OMSORGSÅR), it.årsaker)
         }
     }
 }

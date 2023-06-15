@@ -202,19 +202,19 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
             VilkårsvurderingUtfallDb.OgInnvilget(årsak = årsak)
         }
 
-        is OmsorgsyterOver16ArAvslag -> {
+        is OmsorgsyterFylt17ÅrAvslag -> {
             VilkårsvurderingUtfallDb.OmsorgsyterOver16ArAvslag(årsaker = årsaker.toDb())
         }
 
-        is OmsorgsyterOver16ArInnvilget -> {
+        is OmsorgsyterFylt17ÅrInnvilget -> {
             VilkårsvurderingUtfallDb.OmsorgsyterOver16ArInnvilget(årsak = årsak)
         }
 
-        is OmsorgsyterUnder70ArAvslag -> {
+        is OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårAvslag -> {
             VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArAvslag(årsaker = årsaker.toDb())
         }
 
-        is OmsorgsyterUnder70ArInnvilget -> {
+        is OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårInnvilget -> {
             VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArInnvilget(årsak = årsak)
         }
 
@@ -263,19 +263,19 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.OmsorgsyterOver16ArAvslag -> {
-            OmsorgsyterOver16ArAvslag(årsaker = årsaker.toDomain())
+            OmsorgsyterFylt17ÅrAvslag(årsaker = årsaker.toDomain())
         }
 
         is VilkårsvurderingUtfallDb.OmsorgsyterOver16ArInnvilget -> {
-            OmsorgsyterOver16ArInnvilget(årsak = årsak)
+            OmsorgsyterFylt17ÅrInnvilget(årsak = årsak)
         }
 
         is VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArAvslag -> {
-            OmsorgsyterUnder70ArAvslag(årsaker = årsaker.toDomain())
+            OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårAvslag(årsaker = årsaker.toDomain())
         }
 
         is VilkårsvurderingUtfallDb.OmsorgsyterUnder70ArInnvilget -> {
-            OmsorgsyterUnder70ArInnvilget(årsak = årsak)
+            OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårInnvilget(årsak = årsak)
         }
 
         is VilkårsvurderingUtfallDb.KanKunGodskrivesEnOmsorgsyterAvslag -> {

@@ -20,12 +20,12 @@ import java.util.Queue
         name = "FullOmsorgForBarnUnder6",
     ),
     JsonSubTypes.Type(
-        value = VilkårsvurderingDb.OmsorgsyterOver16Ar::class,
-        name = "OmsorgsyterOver16Ar",
+        value = VilkårsvurderingDb.OmsorgsyterFylt17År::class,
+        name = "OmsorgsyterFylt17År",
     ),
     JsonSubTypes.Type(
-        value = VilkårsvurderingDb.OmsorgsyterUnder70Ar::class,
-        name = "OmsorgsyterUnder70Ar",
+        value = VilkårsvurderingDb.OmsorgsyterIkkeEldreEnn69År::class,
+        name = "OmsorgsyterIkkeEldreEnn69År",
     ),
     JsonSubTypes.Type(
         value = VilkårsvurderingDb.Eller::class,
@@ -43,13 +43,13 @@ sealed class VilkårsvurderingDb {
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
-    internal data class OmsorgsyterOver16Ar(
+    internal data class OmsorgsyterFylt17År(
         val vilkar: String,
         val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
-    internal data class OmsorgsyterUnder70Ar(
+    internal data class OmsorgsyterIkkeEldreEnn69År(
         val vilkar: String,
         val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
@@ -102,8 +102,8 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is OmsorgsyterOver16ArVurdering -> {
-            VilkårsvurderingDb.OmsorgsyterOver16Ar(
+        is OmsorgsyterFylt17ÅrVurdering -> {
+            VilkårsvurderingDb.OmsorgsyterFylt17År(
                 vilkar = vilkar.vilkarsInformasjon.beskrivelse,
                 grunnlag = GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsÅr(
                     omsorgsyter = grunnlag.omsorgsyter.toDb(),
@@ -113,8 +113,8 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is OmsorgsyterUnder70Vurdering -> {
-            VilkårsvurderingDb.OmsorgsyterUnder70Ar(
+        is OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering -> {
+            VilkårsvurderingDb.OmsorgsyterIkkeEldreEnn69År(
                 vilkar = vilkar.vilkarsInformasjon.beskrivelse,
                 grunnlag = GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsÅr(
                     omsorgsyter = grunnlag.omsorgsyter.toDb(),
@@ -183,17 +183,17 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
             )
         }
 
-        is VilkårsvurderingDb.OmsorgsyterOver16Ar -> {
-            OmsorgsyterUnder70Vurdering(
-                vilkar = OmsorgsYterOver16Ar(),
+        is VilkårsvurderingDb.OmsorgsyterFylt17År -> {
+            OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering(
+                vilkar = OmsorgsyterFylt17VedUtløpAvOmsorgsår(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )
         }
 
-        is VilkårsvurderingDb.OmsorgsyterUnder70Ar -> {
-            OmsorgsyterUnder70Vurdering(
-                vilkar = OmsorgsyterUnder70Ar(),
+        is VilkårsvurderingDb.OmsorgsyterIkkeEldreEnn69År -> {
+            OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering(
+                vilkar = OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )

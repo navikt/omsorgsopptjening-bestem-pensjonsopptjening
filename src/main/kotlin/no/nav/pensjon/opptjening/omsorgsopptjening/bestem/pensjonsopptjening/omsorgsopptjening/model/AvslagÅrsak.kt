@@ -3,8 +3,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 enum class AvslagÅrsak {
     MINDRE_ENN_6_MND_FULL_OMSORG,
     BARN_IKKE_MELLOM_1_OG_5,
-    OMSORGSYTER_IKKE_OVER_16,
-    OMSORGSYTER_OVER_69,
+    OMSORGSYTER_IKKE_FYLLT_17_VED_UTGANG_AV_OMSORGSÅR,
+    OMSORGSYTER_ELDRE_ENN_69_VED_UTGANG_AV_OMSORGSÅR,
     MINST_ET_VILKÅR_MÅ_VÆRE_OPPFYLT, //ELLER
     ALLE_VILKÅR_MÅ_VÆRE_OPPFYLT, //OG
     ALDER_IKKE_0,

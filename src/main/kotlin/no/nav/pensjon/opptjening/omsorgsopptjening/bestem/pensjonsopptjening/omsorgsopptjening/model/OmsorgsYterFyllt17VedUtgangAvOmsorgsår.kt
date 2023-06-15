@@ -1,25 +1,25 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
- class OmsorgsYterOver16Ar : Vilkar<OmsorgsyterOgOmsorgsårGrunnlag>(
+class OmsorgsyterFylt17VedUtløpAvOmsorgsår : Vilkar<OmsorgsyterOgOmsorgsårGrunnlag>(
     vilkarsInformasjon = VilkarsInformasjon(
         beskrivelse = "Det kan gis pensjonsopptjening etter første ledd fra og med det året vedkommende fyller 17 år.",
         begrunnesleForAvslag = "Medlemmet er under 17 år.",
         begrunnelseForInnvilgelse = "Medlemmet er over 16 år.",
     ),
-    utfallsFunksjon = `Person er over 16 ar`,
+    utfallsFunksjon = vurderUtfall,
 ) {
     companion object {
-        private val `Person er over 16 ar` =
+        private val vurderUtfall =
             fun Vilkar<OmsorgsyterOgOmsorgsårGrunnlag>.(input: OmsorgsyterOgOmsorgsårGrunnlag): VilkårsvurderingUtfall =
-                if (input.omsorgsyter.alder(input.omsorgsAr) > 16) {
-                    OmsorgsyterOver16ArInnvilget(this.vilkarsInformasjon.begrunnelseForInnvilgelse)
+                if (input.omsorgsyter.alderVedUtløpAv(input.omsorgsAr) >= 17) {
+                    OmsorgsyterFylt17ÅrInnvilget(this.vilkarsInformasjon.begrunnelseForInnvilgelse)
                 } else {
-                    OmsorgsyterOver16ArAvslag(årsaker = listOf(AvslagÅrsak.OMSORGSYTER_IKKE_OVER_16))
+                    OmsorgsyterFylt17ÅrAvslag(årsaker = listOf(AvslagÅrsak.OMSORGSYTER_IKKE_FYLLT_17_VED_UTGANG_AV_OMSORGSÅR))
                 }
     }
 
-    override fun vilkarsVurder(grunnlag: OmsorgsyterOgOmsorgsårGrunnlag): OmsorgsyterOver16ArVurdering {
-        return OmsorgsyterOver16ArVurdering(
+    override fun vilkarsVurder(grunnlag: OmsorgsyterOgOmsorgsårGrunnlag): OmsorgsyterFylt17ÅrVurdering {
+        return OmsorgsyterFylt17ÅrVurdering(
             vilkar = this,
             grunnlag = grunnlag,
             utfall = utfallsFunksjon(grunnlag),
@@ -27,11 +27,11 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
     }
 }
 
-data class OmsorgsyterOver16ArVurdering(
+data class OmsorgsyterFylt17ÅrVurdering(
     override val vilkar: Vilkar<OmsorgsyterOgOmsorgsårGrunnlag>,
     override val grunnlag: OmsorgsyterOgOmsorgsårGrunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : VilkarsVurdering<OmsorgsyterOgOmsorgsårGrunnlag>()
 
-data class OmsorgsyterOver16ArInnvilget(val årsak: String) : VilkårsvurderingUtfall.Innvilget()
-data class OmsorgsyterOver16ArAvslag(override val årsaker: List<AvslagÅrsak>) : VilkårsvurderingUtfall.Avslag()
+data class OmsorgsyterFylt17ÅrInnvilget(val årsak: String) : VilkårsvurderingUtfall.Innvilget()
+data class OmsorgsyterFylt17ÅrAvslag(override val årsaker: List<AvslagÅrsak>) : VilkårsvurderingUtfall.Avslag()

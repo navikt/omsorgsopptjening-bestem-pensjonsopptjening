@@ -14,13 +14,13 @@ class EllerTest {
     @Test
     fun `all avslag is avslag`() {
         eller(
-            OmsorgsYterOver16Ar().vilkarsVurder(
+            OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                 grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                     omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselAvslag),
                     omsorgsAr = omsorgsår
                 )
             ),
-            OmsorgsYterOver16Ar().vilkarsVurder(
+            OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                 grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                     omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselAvslag),
                     omsorgsAr = omsorgsår
@@ -34,13 +34,13 @@ class EllerTest {
     @Test
     fun `one innvilget is innvilget`() {
         eller(
-            OmsorgsYterOver16Ar().vilkarsVurder(
+            OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                 grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                     omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselAvslag),
                     omsorgsAr = omsorgsår
                 )
             ),
-            OmsorgsYterOver16Ar().vilkarsVurder(
+            OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                 grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                     omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselInnvilget),
                     omsorgsAr = omsorgsår
@@ -54,13 +54,13 @@ class EllerTest {
     @Test
     fun `all innvilget is innvilget`() {
         eller(
-            OmsorgsYterOver16Ar().vilkarsVurder(
+            OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                 grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                     omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselInnvilget),
                     omsorgsAr = omsorgsår
                 )
             ),
-            OmsorgsYterOver16Ar().vilkarsVurder(
+            OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                 grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                     omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselInnvilget),
                     omsorgsAr = omsorgsår
@@ -74,14 +74,14 @@ class EllerTest {
     @Test
     fun `nested eller with all avslag is avslag`() {
         eller(
-            OmsorgsYterOver16Ar().vilkarsVurder(
+            OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                 grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                     omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselAvslag),
                     omsorgsAr = omsorgsår
                 )
             ),
             eller(
-                OmsorgsYterOver16Ar().vilkarsVurder(
+                OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                     grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                         omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselAvslag),
                         omsorgsAr = omsorgsår
@@ -96,14 +96,14 @@ class EllerTest {
     @Test
     fun `nested eller with all innvilget is innvilget`() {
         eller(
-            OmsorgsYterOver16Ar().vilkarsVurder(
+            OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                 grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                     omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselAvslag),
                     omsorgsAr = omsorgsår
                 )
             ),
             eller(
-                OmsorgsYterOver16Ar().vilkarsVurder(
+                OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
                     grunnlag = OmsorgsyterOgOmsorgsårGrunnlag(
                         omsorgsyter = PersonMedFødselsår(fnr = "1", fodselsAr = fodselInnvilget),
                         omsorgsAr = omsorgsår
