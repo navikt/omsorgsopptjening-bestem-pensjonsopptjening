@@ -7,6 +7,6 @@ data class PersonOgOmsorgsårGrunnlag(
     val omsorgsAr: Int
 ) {
     fun alderMottaker(mellom: IntRange): Boolean {
-        return person.alder(omsorgsAr) in mellom
+        return person.alderVedUtløpAv(omsorgsAr) in mellom
     }
 }
