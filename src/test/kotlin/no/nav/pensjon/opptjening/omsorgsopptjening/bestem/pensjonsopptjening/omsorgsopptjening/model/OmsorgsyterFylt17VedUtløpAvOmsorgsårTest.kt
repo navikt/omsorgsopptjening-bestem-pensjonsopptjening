@@ -51,7 +51,9 @@ class OmsorgsyterFylt17VedUtløpAvOmsorgsårTest {
         )
         assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vilkarsVurdering.utfall).also {
             assertEquals(
-                Paragraf.A,
+                setOf(
+                    Lovhenvisning.FYLLER_17_AR
+                ),
                 it.lovhenvisning
             )
         }

@@ -59,7 +59,9 @@ class KanKunGodskrivesEtBarnPerÅrTest {
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
                 kotlin.test.assertEquals(
-                    Paragraf.A,
+                    setOf(
+                        Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN
+                    ),
                     it.lovhenvisning
                 )
             }
@@ -89,7 +91,9 @@ class KanKunGodskrivesEtBarnPerÅrTest {
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
                 kotlin.test.assertEquals(
-                    Paragraf.A,
+                    setOf(
+                        Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN
+                    ),
                     it.lovhenvisning
                 )
             }

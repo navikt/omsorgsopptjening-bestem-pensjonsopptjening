@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class KFullOmsorgForBarnUnder6Test {
+class FullOmsorgForBarnUnder6Test {
 
     @Test
     fun `Gitt en mottaker født utenfor omsorgsår når det er minst seks måneder full omsorg så invilget`() {
@@ -100,7 +100,10 @@ class KFullOmsorgForBarnUnder6Test {
             ).also { vurdering ->
                 assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
                     assertEquals(
-                        Paragraf.A,
+                        setOf(
+                            Lovhenvisning.MINST_HALVT_AR_OMSORGg,
+                            Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER
+                        ),
                         it.lovhenvisning
                     )
                 }
@@ -138,7 +141,10 @@ class KFullOmsorgForBarnUnder6Test {
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
                 assertEquals(
-                    Paragraf.A,
+                    setOf(
+                        Lovhenvisning.MINST_HALVT_AR_OMSORG,
+                        Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER
+                    ),
                     it.lovhenvisning
                 )
             }

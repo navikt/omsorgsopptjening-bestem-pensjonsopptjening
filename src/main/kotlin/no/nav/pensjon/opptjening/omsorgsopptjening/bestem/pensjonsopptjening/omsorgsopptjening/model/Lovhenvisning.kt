@@ -18,6 +18,15 @@ enum class Lovhenvisning(
         punktum = 1,
         tekst = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn som ikke har fylt seks år innen årets utgang"
     ),
+    KAN_KUN_GODSKRIVES_ET_BARN(
+        kortTittel = "",
+        kapittel = 20,
+        paragraf = 8,
+        bokstav = "a",
+        ledd = 1,
+        punktum = 1,
+        tekst = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn som ikke har fylt seks år innen årets utgang"
+    ),
     OMSORGSMOTTAKER_IKKE_FYLT_6_AR(
         kortTittel = "",
         kapittel = 20,
@@ -76,8 +85,7 @@ enum class Lovhenvisning(
     );
 
     override fun toString(): String {
-        return "$kortTittel § $kapittel-$paragraf ledd: $ledd $tekst"
-
+        return name
     }
 }
 

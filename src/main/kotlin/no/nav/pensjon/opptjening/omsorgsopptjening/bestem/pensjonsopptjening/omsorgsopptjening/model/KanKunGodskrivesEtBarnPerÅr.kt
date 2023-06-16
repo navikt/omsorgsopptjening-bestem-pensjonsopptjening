@@ -12,7 +12,7 @@ class KanKunGodskrivesEtBarnPerÅr : ParagrafVilkår<KanKunGodskrivesEtBarnPerÅ
     }
 
     override fun <T : Vilkar<KanKunGodskrivesEtBarnPerÅrGrunnlag>> T.bestemUtfall(grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag): VilkårsvurderingUtfall {
-        val lovhenvisning = setOf(Lovhenvisning.MINST_HALVT_AR_OMSORG)
+        val lovhenvisning = setOf(Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN)
         return if (grunnlag.behandlinger.none { it.erInnvilget }) {
             VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
         } else {

@@ -7,8 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AvslagÅrsak
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Paragraf
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Lovhenvisning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.ParagrafOppsummering
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode
@@ -89,17 +88,18 @@ class AvslagOmsorgsyterGodskrevetAnnetBarnSammeÅrTest : SpringContextTest.NoKaf
                 assertEquals("01052012345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall).also { utfall ->
+                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall).also {
                     assertEquals(
                         listOf(
-                            ParagrafOppsummering(Paragraf.A to true),
-                            ParagrafOppsummering(Paragraf.A to true),
-                            ParagrafOppsummering(Paragraf.A to true),
-                            ParagrafOppsummering(Paragraf.A to true),
-                            ParagrafOppsummering(Paragraf.A to true),
-                            ParagrafOppsummering(Paragraf.A to false),
+                            ParagrafOppsummering(Lovhenvisning.FYLLER_17_AR to true),
+                            ParagrafOppsummering(Lovhenvisning.FYLLER_69_AR to true),
+                            ParagrafOppsummering(Lovhenvisning.OMSORGSMOTTAKER_IKKE_FYLT_6_AR to true),
+                            ParagrafOppsummering(Lovhenvisning.IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR to true),
+                            ParagrafOppsummering(Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER to true),
+                            ParagrafOppsummering(Lovhenvisning.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER to true),
+                            ParagrafOppsummering(Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN to false),
                         ),
-                        utfall.oppsummering.paragrafOppsummering
+                        it.oppsummering.paragrafOppsummering
                     )
                 }
             }

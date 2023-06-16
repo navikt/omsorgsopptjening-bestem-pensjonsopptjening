@@ -172,7 +172,8 @@ enum class LovhenvisningDb {
     FULL_OMSORG_KAN_GODSKRIVES_AUTOMATISK,
     FYLLER_17_AR,
     FYLLER_69_AR,
-    OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER
+    OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER,
+    KAN_KUN_GODSKRIVES_ET_BARN
 }
 
 internal fun Set<Lovhenvisning>.toDb(): Set<LovhenvisningDb> {
@@ -188,6 +189,7 @@ internal fun Lovhenvisning.toDb(): LovhenvisningDb {
         Lovhenvisning.FYLLER_17_AR -> LovhenvisningDb.FYLLER_17_AR
         Lovhenvisning.FYLLER_69_AR -> LovhenvisningDb.FYLLER_69_AR
         Lovhenvisning.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER -> LovhenvisningDb.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER
+        Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN -> LovhenvisningDb.KAN_KUN_GODSKRIVES_ET_BARN
     }
 }
 
@@ -201,6 +203,7 @@ internal fun LovhenvisningDb.toDomain(): Lovhenvisning {
         LovhenvisningDb.FYLLER_17_AR -> Lovhenvisning.FYLLER_17_AR
         LovhenvisningDb.FYLLER_69_AR -> Lovhenvisning.FYLLER_69_AR
         LovhenvisningDb.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER -> Lovhenvisning.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER
+        LovhenvisningDb.KAN_KUN_GODSKRIVES_ET_BARN -> Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN
     }
 }
 

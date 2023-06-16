@@ -7,8 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AvslagÅrsak
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Paragraf
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Lovhenvisning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.ParagrafOppsummering
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode
@@ -76,12 +75,13 @@ class AvslagBarnFødtUtenforOpptjeningsårUnderHalvtÅrMedOmsorgTest : SpringCon
                 assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, behandling.utfall).also {
                     assertEquals(
                         listOf(
-                            ParagrafOppsummering(Paragraf.A to true),
-                            ParagrafOppsummering(Paragraf.A to true),
-                            ParagrafOppsummering(Paragraf.A to true),
-                            ParagrafOppsummering(Paragraf.A to false),
-                            ParagrafOppsummering(Paragraf.A to true),
-                            ParagrafOppsummering(Paragraf.A to true),
+                            ParagrafOppsummering(Lovhenvisning.FYLLER_17_AR to true),
+                            ParagrafOppsummering(Lovhenvisning.FYLLER_69_AR to true),
+                            ParagrafOppsummering(Lovhenvisning.OMSORGSMOTTAKER_IKKE_FYLT_6_AR to true),
+                            ParagrafOppsummering(Lovhenvisning.MINST_HALVT_AR_OMSORG to false),
+                            ParagrafOppsummering(Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER to false),
+                            ParagrafOppsummering(Lovhenvisning.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER to true),
+                            ParagrafOppsummering(Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN to true),
                         ),
                         it.oppsummering.paragrafOppsummering
                     )
