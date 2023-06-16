@@ -13,18 +13,15 @@ data class Behandling(
     fun grunnlag() = grunnlag
 
     fun utfall(): AutomatiskGodskrivingUtfall {
-        return when (vilkårsvurdering().utfall is VilkårsvurderingUtfall.Innvilget) {
-            true -> {
-                AutomatiskGodskrivingUtfall.Innvilget(
-                    omsorgsmottaker = omsorgsmottaker()
-                )
-            }
+        vilkårsvurdering().let {
+            return when (it.utfall.erInnvilget()) {
+                true -> {
+                    AutomatiskGodskrivingUtfall.Innvilget(oppsummering())
+                }
 
-            false -> {
-                AutomatiskGodskrivingUtfall.Avslag(
-                    omsorgsmottaker = omsorgsmottaker(),
-                    årsaker = finnÅrsakerForAvslag()
-                )
+                false -> {
+                    AutomatiskGodskrivingUtfall.Avslag(oppsummering())
+                }
             }
         }
     }
@@ -40,16 +37,29 @@ data class Behandling(
         )
     }
 
+    private fun oppsummering(): Behandlingsoppsummering {
+        return finnAlleVilkårsvurderinger()
+            .flatMap { vv ->
+                vv.utfall.paragrafer().map {
+                    it to vv.utfall.erInnvilget()
+                }
+            }.map {
+                ParagrafOppsummering(it)
+            }.let {
+                Behandlingsoppsummering(it)
+            }
+    }
+
     private fun finnAlleVilkårsvurderinger(): List<VilkarsVurdering<*>> {
         return UnwrapOgEllerVisitor.unwrap(vilkårsvurdering())
     }
 
-    private fun finnÅrsakerForAvslag(): List<AvslagÅrsak> {
+    private fun finnAvslagsparagrafer(): Set<Paragraf> {
         return finnAlleVilkårsvurderinger()
             .map { it.utfall }
             .filterIsInstance<VilkårsvurderingUtfall.Avslag>()
-            .flatMap { it.årsaker }
-
+            .flatMap { it.paragrafer() }
+            .toSet()
     }
 }
 

@@ -14,72 +14,42 @@ import java.time.Month
  *
  */
 class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>(
-    paragrafer = setOf(Paragraf.A),
-    utfallsFunksjon = vurderUtfall as Vilkar<FullOmsorgForBarnUnder6Grunnlag>.(FullOmsorgForBarnUnder6Grunnlag) -> VilkårsvurderingUtfall,
+    paragrafer = setOf(Paragraf.A)
 ) {
-    companion object {
-        private val vurderUtfall =
-            fun ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>.(grunnlag: FullOmsorgForBarnUnder6Grunnlag): VilkårsvurderingUtfall {
-                return this.let { vilkar ->
-                    when (grunnlag) {
-                        is OmsorgsmottakerFødtIOmsorgsårGrunnlag -> {
-                            if (grunnlag.minstEnMånedFullOmsorg) {
-                                FullOmsorgForBarnUnder6Innvilget(
-                                    årsak = "",
-                                    omsorgsmottaker = grunnlag.omsorgsmottaker
-                                )
-                            } else {
-                                FullOmsorgForBarnUnder6Avslag(
-                                    årsaker = mutableListOf<AvslagÅrsak>().let {
-                                        if (!grunnlag.minstEnMånedFullOmsorg) it.add(AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG)
-                                        it.toList()
-                                    }
-                                )
-                            }
-                        }
-
-                        is OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag -> {
-                            if (grunnlag.minstSeksMånederFullOmsorg) {
-                                FullOmsorgForBarnUnder6Innvilget(
-                                    årsak = "",
-                                    omsorgsmottaker = grunnlag.omsorgsmottaker
-                                )
-                            } else {
-                                FullOmsorgForBarnUnder6Avslag(
-                                    årsaker = mutableListOf<AvslagÅrsak>().let {
-                                        if (!grunnlag.minstSeksMånederFullOmsorg) it.add(AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG)
-                                        it.toList()
-                                    }
-                                )
-                            }
-                        }
-
-                        is OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag -> {
-                            if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel) {
-                                FullOmsorgForBarnUnder6Innvilget(
-                                    årsak = "",
-                                    omsorgsmottaker = grunnlag.omsorgsmottaker
-                                )
-                            } else {
-                                FullOmsorgForBarnUnder6Avslag(
-                                    årsaker = mutableListOf<AvslagÅrsak>().let {
-                                        if (!grunnlag.minstEnMånedOmsorgÅretEtterFødsel) it.add(AvslagÅrsak.INGEN_MÅNEDER_FULL_OMSORG_ÅR_ETTER_FØDSEL)
-                                        it.toList()
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-    }
-
     override fun vilkarsVurder(grunnlag: FullOmsorgForBarnUnder6Grunnlag): FullOmsorgForBarnUnder6Vurdering {
         return FullOmsorgForBarnUnder6Vurdering(
             paragrafer = paragrafer,
             grunnlag = grunnlag,
-            utfall = utfallsFunksjon(grunnlag),
+            utfall = bestemUtfall(grunnlag),
         )
+    }
+
+    override fun <T : Vilkar<FullOmsorgForBarnUnder6Grunnlag>> T.bestemUtfall(grunnlag: FullOmsorgForBarnUnder6Grunnlag): VilkårsvurderingUtfall {
+        return when (grunnlag) {
+            is OmsorgsmottakerFødtIOmsorgsårGrunnlag -> {
+                if (grunnlag.minstEnMånedFullOmsorg) {
+                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+                } else {
+                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+                }
+            }
+
+            is OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag -> {
+                if (grunnlag.minstSeksMånederFullOmsorg) {
+                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+                } else {
+                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+                }
+            }
+
+            is OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag -> {
+                if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel) {
+                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+                } else {
+                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+                }
+            }
+        }
     }
 }
 
@@ -88,16 +58,6 @@ data class FullOmsorgForBarnUnder6Vurdering(
     override val grunnlag: FullOmsorgForBarnUnder6Grunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<FullOmsorgForBarnUnder6Grunnlag>()
-
-
-data class FullOmsorgForBarnUnder6Innvilget(
-    val årsak: String,
-    val omsorgsmottaker: PersonMedFødselsår
-) : VilkårsvurderingUtfall.Innvilget()
-
-data class FullOmsorgForBarnUnder6Avslag(
-    override val årsaker: List<AvslagÅrsak>,
-) : VilkårsvurderingUtfall.Avslag()
 
 sealed class FullOmsorgForBarnUnder6Grunnlag : ParagrafGrunnlag() {
     abstract val omsorgsAr: Int

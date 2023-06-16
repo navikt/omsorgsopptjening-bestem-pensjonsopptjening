@@ -14,5 +14,5 @@ sealed class ParagrafVurdering<T : ParagrafGrunnlag> : VilkarsVurdering<T>() {
 }
 
 enum class Paragraf {
-    A, B, C;
+    A
 }

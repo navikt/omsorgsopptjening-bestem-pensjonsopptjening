@@ -4,25 +4,21 @@ import java.util.UUID
 
 class KanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<KanKunGodskrivesEnOmsorgsyterGrunnlag>(
     paragrafer = setOf(Paragraf.A),
-    utfallsFunksjon = vurderUtfall as Vilkar<KanKunGodskrivesEnOmsorgsyterGrunnlag>.(KanKunGodskrivesEnOmsorgsyterGrunnlag) -> VilkårsvurderingUtfall,
 ) {
-    companion object {
-        private val vurderUtfall =
-            fun ParagrafVilkår<KanKunGodskrivesEnOmsorgsyterGrunnlag>.(input: KanKunGodskrivesEnOmsorgsyterGrunnlag): VilkårsvurderingUtfall {
-                if (input.behandlingsIdUtfallListe.none { it.erInnvilget }) {
-                    return KanKunGodskrivesEnOmsorgsyterInnvilget("")
-                } else {
-                    return KanKunGodskrivesEnOmsorgsyterAvslag(listOf(AvslagÅrsak.ALLEREDE_INNVILGET_FOR_ANNEN_MOTTAKER))
-                }
-            }
-    }
-
     override fun vilkarsVurder(grunnlag: KanKunGodskrivesEnOmsorgsyterGrunnlag): KanKunGodskrivesEnOmsorgsyterVurdering {
         return KanKunGodskrivesEnOmsorgsyterVurdering(
             paragrafer = paragrafer,
             grunnlag = grunnlag,
-            utfall = utfallsFunksjon(grunnlag),
+            utfall = bestemUtfall(grunnlag),
         )
+    }
+
+    override fun <T : Vilkar<KanKunGodskrivesEnOmsorgsyterGrunnlag>> T.bestemUtfall(grunnlag: KanKunGodskrivesEnOmsorgsyterGrunnlag): VilkårsvurderingUtfall {
+        return if (grunnlag.behandlingsIdUtfallListe.none { it.erInnvilget }) {
+            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+        } else {
+            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+        }
     }
 }
 
@@ -32,13 +28,9 @@ data class KanKunGodskrivesEnOmsorgsyterVurdering(
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<KanKunGodskrivesEnOmsorgsyterGrunnlag>()
 
-data class KanKunGodskrivesEnOmsorgsyterInnvilget(val årsak: String) : VilkårsvurderingUtfall.Innvilget()
-data class KanKunGodskrivesEnOmsorgsyterAvslag(override val årsaker: List<AvslagÅrsak>) :
-    VilkårsvurderingUtfall.Avslag()
-
 data class KanKunGodskrivesEnOmsorgsyterGrunnlag(
     val behandlingsIdUtfallListe: List<BehandlingsIdUtfall>
-): ParagrafGrunnlag()
+) : ParagrafGrunnlag()
 
 data class BehandlingsIdUtfall(
     val behandlingsId: UUID,

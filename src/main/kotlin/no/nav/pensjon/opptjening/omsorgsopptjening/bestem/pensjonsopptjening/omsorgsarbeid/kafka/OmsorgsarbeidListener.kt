@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.kafka.OmsorgsopptjeningProducer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -26,16 +27,20 @@ class OmsorgsarbeidListener(
         acknowledgment: Acknowledgment
     ) {
         omsorgsarbeidMessageHandler.handle(consumerRecord).forEach {
-            when(it.utfall){
-                is AutomatiskGodskrivingUtfall.Avslag -> {
-                    //TODO
-                }
-                is AutomatiskGodskrivingUtfall.Innvilget -> {
-                    omsorgsopptjeningProducer.send(it)
-                }
+            when (it.erInnvilget()) {
+                true -> håndterInnvilgelse(it)
+                false -> håndterAvslag(it)
             }
         }
         acknowledgment.acknowledge()
+    }
+
+    private fun håndterInnvilgelse(behandling: FullførtBehandling) {
+        omsorgsopptjeningProducer.send(behandling)
+    }
+
+    private fun håndterAvslag(behandling: FullførtBehandling) {
+        behandling
     }
 
     companion object {

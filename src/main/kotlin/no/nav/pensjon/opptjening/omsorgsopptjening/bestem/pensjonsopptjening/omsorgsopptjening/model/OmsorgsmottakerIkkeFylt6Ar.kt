@@ -2,26 +2,21 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 class OmsorgsmottakerIkkeFylt6Ar : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>(
     paragrafer = setOf(Paragraf.A),
-    utfallsFunksjon = vurderUtfall as Vilkar<PersonOgOmsorgsårGrunnlag>.(PersonOgOmsorgsårGrunnlag) -> VilkårsvurderingUtfall,
 ) {
-
-    companion object {
-        private val vurderUtfall =
-            fun ParagrafVilkår<PersonOgOmsorgsårGrunnlag>.(input: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
-                if(input.alderMottaker(mellom = 0..5)) {
-                    return OmsorgsmottakerIkkeFylt6ArInnvilget("")
-                } else {
-                    return OmsorgsmottakerIkkeFylt6ArAvslag(listOf(AvslagÅrsak.BARN_IKKE_MELLOM_1_OG_5))
-                }
-            }
-    }
-
     override fun vilkarsVurder(grunnlag: PersonOgOmsorgsårGrunnlag): OmsorgsmottakerIkkeFylt6ArVurdering {
         return OmsorgsmottakerIkkeFylt6ArVurdering(
             paragrafer = paragrafer,
             grunnlag = grunnlag,
-            utfall = utfallsFunksjon(grunnlag),
+            utfall = bestemUtfall(grunnlag),
         )
+    }
+
+    override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
+        return if (grunnlag.alderMottaker(mellom = 0..5)) {
+            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+        } else {
+            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+        }
     }
 }
 
@@ -30,7 +25,3 @@ data class OmsorgsmottakerIkkeFylt6ArVurdering(
     override val grunnlag: PersonOgOmsorgsårGrunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<PersonOgOmsorgsårGrunnlag>()
-
-data class OmsorgsmottakerIkkeFylt6ArInnvilget(val årsak: String) : VilkårsvurderingUtfall.Innvilget()
-data class OmsorgsmottakerIkkeFylt6ArAvslag(override val årsaker: List<AvslagÅrsak>) :
-    VilkårsvurderingUtfall.Avslag()

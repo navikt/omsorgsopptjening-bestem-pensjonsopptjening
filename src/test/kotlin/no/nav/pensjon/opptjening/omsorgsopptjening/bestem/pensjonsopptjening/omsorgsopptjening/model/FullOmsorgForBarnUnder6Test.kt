@@ -19,7 +19,7 @@ class KFullOmsorgForBarnUnder6Test {
                 minstSeksMånederFullOmsorg = true
             )
         ).also { vurdering ->
-            assertInstanceOf(FullOmsorgForBarnUnder6Innvilget::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, vurdering.utfall)}
         }
 
     @Test
@@ -34,7 +34,7 @@ class KFullOmsorgForBarnUnder6Test {
                 minstEnMånedFullOmsorg = true
             )
         ).also { vurdering ->
-            assertInstanceOf(FullOmsorgForBarnUnder6Innvilget::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, vurdering.utfall)}
     }
 
     @Test
@@ -49,7 +49,7 @@ class KFullOmsorgForBarnUnder6Test {
                 minstEnMånedFullOmsorg = false
             )
         ).also { vurdering ->
-            assertInstanceOf(FullOmsorgForBarnUnder6Avslag::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall)}
     }
 
     @Test
@@ -64,7 +64,7 @@ class KFullOmsorgForBarnUnder6Test {
                 minstEnMånedOmsorgÅretEtterFødsel = true
             )
         ).also { vurdering ->
-            assertInstanceOf(FullOmsorgForBarnUnder6Innvilget::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, vurdering.utfall)}
     }
 
     @Test
@@ -79,7 +79,7 @@ class KFullOmsorgForBarnUnder6Test {
                 minstEnMånedOmsorgÅretEtterFødsel = false
             )
         ).also { vurdering ->
-            assertInstanceOf(FullOmsorgForBarnUnder6Avslag::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall)}
     }
 
 
@@ -98,8 +98,11 @@ class KFullOmsorgForBarnUnder6Test {
                     minstSeksMånederFullOmsorg = monthsFullOmsorg > 6
                 )
             ).also { vurdering ->
-                assertInstanceOf(FullOmsorgForBarnUnder6Avslag::class.java, vurdering.utfall).also {
-                    assertEquals(listOf(AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG), it.årsaker)
+                assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
+                    assertEquals(
+                        Paragraf.A,
+                        it.paragraf
+                    )
                 }
             }
 
@@ -115,7 +118,7 @@ class KFullOmsorgForBarnUnder6Test {
                     minstSeksMånederFullOmsorg = monthsFullOmsorg > 6
                 )
             ).also {
-                assertInstanceOf(FullOmsorgForBarnUnder6Innvilget::class.java, it.utfall)
+                assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, it.utfall)
             }
         }
     }
@@ -133,10 +136,10 @@ class KFullOmsorgForBarnUnder6Test {
                 minstSeksMånederFullOmsorg = false
             )
         ).also { vurdering ->
-            assertInstanceOf(FullOmsorgForBarnUnder6Avslag::class.java, vurdering.utfall).also {
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
                 assertEquals(
-                    listOf(AvslagÅrsak.MINDRE_ENN_6_MND_FULL_OMSORG),
-                    it.årsaker
+                    Paragraf.A,
+                    it.paragraf
                 )
             }
         }

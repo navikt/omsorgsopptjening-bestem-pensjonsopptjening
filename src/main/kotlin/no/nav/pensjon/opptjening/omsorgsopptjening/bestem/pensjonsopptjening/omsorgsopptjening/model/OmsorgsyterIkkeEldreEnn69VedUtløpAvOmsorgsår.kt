@@ -2,27 +2,21 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>(
     paragrafer = setOf(Paragraf.A),
-    utfallsFunksjon = vurderUtfall as Vilkar<PersonOgOmsorgsårGrunnlag>.(PersonOgOmsorgsårGrunnlag) -> VilkårsvurderingUtfall,
 ) {
-    companion object {
-        private val vurderUtfall =
-            fun ParagrafVilkår<PersonOgOmsorgsårGrunnlag>.(input: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
-                return if (input.person.alderVedUtløpAv(input.omsorgsAr) <= 69) {
-                    OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårInnvilget(
-                        årsak = ""
-                    )
-                } else {
-                    OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårAvslag(årsaker = listOf(AvslagÅrsak.OMSORGSYTER_ELDRE_ENN_69_VED_UTGANG_AV_OMSORGSÅR))
-                }
-            }
-    }
-
     override fun vilkarsVurder(grunnlag: PersonOgOmsorgsårGrunnlag): OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering {
         return OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering(
             paragrafer = paragrafer,
             grunnlag = grunnlag,
-            utfall = utfallsFunksjon(grunnlag),
+            utfall = bestemUtfall(grunnlag),
         )
+    }
+
+    override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
+        return if (grunnlag.person.alderVedUtløpAv(grunnlag.omsorgsAr) <= 69) {
+            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragrafer.single())
+        } else {
+            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragrafer.single())
+        }
     }
 }
 
@@ -31,7 +25,3 @@ data class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering(
     override val grunnlag: PersonOgOmsorgsårGrunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<PersonOgOmsorgsårGrunnlag>()
-
-data class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårInnvilget(val årsak: String) : VilkårsvurderingUtfall.Innvilget()
-data class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårAvslag(override val årsaker: List<AvslagÅrsak>) :
-    VilkårsvurderingUtfall.Avslag()

@@ -4,25 +4,21 @@ import java.util.UUID
 
 class KanKunGodskrivesEtBarnPerÅr : ParagrafVilkår<KanKunGodskrivesEtBarnPerÅrGrunnlag>(
     paragrafer = setOf(Paragraf.A),
-    utfallsFunksjon = vurderUtfall as Vilkar<KanKunGodskrivesEtBarnPerÅrGrunnlag>.(KanKunGodskrivesEtBarnPerÅrGrunnlag) -> VilkårsvurderingUtfall,
 ) {
-    companion object {
-        private val vurderUtfall =
-            fun ParagrafVilkår<KanKunGodskrivesEtBarnPerÅrGrunnlag>.(input: KanKunGodskrivesEtBarnPerÅrGrunnlag): VilkårsvurderingUtfall {
-                if (input.behandlinger.none { it.erInnvilget }) {
-                    return KanKunGodskrivesEtBarnPerÅrInnvilget("")
-                } else {
-                    return KanKunGodskrivesEtBarnPerÅrAvslag(listOf(AvslagÅrsak.ALLEREDE_GODSKREVET_BARN_FOR_ÅR))
-                }
-            }
-    }
-
     override fun vilkarsVurder(grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag): KanKunGodskrivesEtBarnPerÅrVurdering {
         return KanKunGodskrivesEtBarnPerÅrVurdering(
             paragrafer = paragrafer,
             grunnlag = grunnlag,
-            utfall = utfallsFunksjon(grunnlag),
+            utfall = bestemUtfall(grunnlag),
         )
+    }
+
+    override fun <T : Vilkar<KanKunGodskrivesEtBarnPerÅrGrunnlag>> T.bestemUtfall(grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag): VilkårsvurderingUtfall {
+        return if (grunnlag.behandlinger.none { it.erInnvilget }) {
+            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+        } else {
+            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+        }
     }
 }
 
@@ -31,10 +27,6 @@ data class KanKunGodskrivesEtBarnPerÅrVurdering(
     override val grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<KanKunGodskrivesEtBarnPerÅrGrunnlag>()
-
-data class KanKunGodskrivesEtBarnPerÅrInnvilget(val årsak: String) : VilkårsvurderingUtfall.Innvilget()
-data class KanKunGodskrivesEtBarnPerÅrAvslag(override val årsaker: List<AvslagÅrsak>) :
-    VilkårsvurderingUtfall.Avslag()
 
 data class KanKunGodskrivesEtBarnPerÅrGrunnlag(
     val omsorgsmottaker: String,

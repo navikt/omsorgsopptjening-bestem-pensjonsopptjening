@@ -1,21 +1,13 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 
-abstract class Vilkar<Grunnlag: Any>(
-    val utfallsFunksjon: Vilkar<Grunnlag>.(Grunnlag) -> VilkårsvurderingUtfall,
-) {
+abstract class Vilkar<Grunnlag : Any> {
     abstract fun vilkarsVurder(grunnlag: Grunnlag): VilkarsVurdering<Grunnlag>
+    protected abstract fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall
 }
 
-abstract class ParagrafVilkår<T: ParagrafGrunnlag>(
-    val paragrafer: Set<Paragraf>,
-    utfallsFunksjon: Vilkar<T>.(T) -> VilkårsvurderingUtfall
-) : Vilkar<T>(utfallsFunksjon)
+abstract class ParagrafVilkår<T : ParagrafGrunnlag>(
+    val paragrafer: Set<Paragraf>
+) : Vilkar<T>()
 
-abstract class ParagrafGrunnlag
-
-data class VilkarsInformasjon(
-    val beskrivelse: String,
-    val begrunnesleForAvslag: String,
-    val begrunnelseForInnvilgelse: String,
-)
+sealed class ParagrafGrunnlag

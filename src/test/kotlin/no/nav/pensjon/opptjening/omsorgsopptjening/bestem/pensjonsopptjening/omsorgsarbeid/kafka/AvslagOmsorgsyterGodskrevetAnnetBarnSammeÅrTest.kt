@@ -8,6 +8,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AvslagÅrsak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Paragraf
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.ParagrafOppsummering
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
@@ -90,9 +92,14 @@ class AvslagOmsorgsyterGodskrevetAnnetBarnSammeÅrTest : SpringContextTest.NoKaf
                 assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall).also { utfall ->
                     assertEquals(
                         listOf(
-                            AvslagÅrsak.ALLEREDE_GODSKREVET_BARN_FOR_ÅR
+                            ParagrafOppsummering(Paragraf.A to true),
+                            ParagrafOppsummering(Paragraf.A to true),
+                            ParagrafOppsummering(Paragraf.A to true),
+                            ParagrafOppsummering(Paragraf.A to true),
+                            ParagrafOppsummering(Paragraf.A to true),
+                            ParagrafOppsummering(Paragraf.A to false),
                         ),
-                        utfall.årsaker
+                        utfall.oppsummering.paragrafOppsummering
                     )
                 }
             }

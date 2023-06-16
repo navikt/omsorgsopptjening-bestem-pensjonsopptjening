@@ -13,7 +13,7 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 behandlinger = emptyList()
             )
         ).also {
-            assertInstanceOf(KanKunGodskrivesEtBarnPerÅrInnvilget::class.java, it.utfall)
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, it.utfall)
         }
     }
 
@@ -32,7 +32,7 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 )
             )
         ).also {
-            assertInstanceOf(KanKunGodskrivesEtBarnPerÅrInnvilget::class.java, it.utfall)
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, it.utfall)
         }
     }
 
@@ -57,12 +57,10 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 )
             )
         ).also { vurdering ->
-            assertInstanceOf(KanKunGodskrivesEtBarnPerÅrAvslag::class.java, vurdering.utfall).also {
-                assertEquals(
-                    listOf(
-                        AvslagÅrsak.ALLEREDE_GODSKREVET_BARN_FOR_ÅR
-                    ),
-                    it.årsaker
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
+                kotlin.test.assertEquals(
+                    Paragraf.A,
+                    it.paragraf
                 )
             }
         }
@@ -89,12 +87,10 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 )
             )
         ).also { vurdering ->
-            assertInstanceOf(KanKunGodskrivesEtBarnPerÅrAvslag::class.java, vurdering.utfall).also {
-                assertEquals(
-                    listOf(
-                        AvslagÅrsak.ALLEREDE_GODSKREVET_BARN_FOR_ÅR
-                    ),
-                    it.årsaker
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
+                kotlin.test.assertEquals(
+                    Paragraf.A,
+                    it.paragraf
                 )
             }
         }

@@ -21,7 +21,7 @@ class OmsorgsyterFylt17VedUtløpAvOmsorgsårTest {
                 omsorgsAr = fødselsår + 18
             )
         )
-        assertInstanceOf(OmsorgsyterFylt17ÅrInnvilget::class.java, vilkarsVurdering.utfall)
+        assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, vilkarsVurdering.utfall)
     }
 
     @Test
@@ -35,7 +35,7 @@ class OmsorgsyterFylt17VedUtløpAvOmsorgsårTest {
                 omsorgsAr = fødselsår + 17
             )
         )
-        assertInstanceOf(OmsorgsyterFylt17ÅrInnvilget::class.java, vilkarsVurdering.utfall)
+        assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, vilkarsVurdering.utfall)
     }
 
     @Test
@@ -49,8 +49,11 @@ class OmsorgsyterFylt17VedUtløpAvOmsorgsårTest {
                 omsorgsAr = fødselsår + 16
             )
         )
-        assertInstanceOf(OmsorgsyterFylt17ÅrAvslag::class.java, vilkarsVurdering.utfall).also {
-            assertEquals(listOf(AvslagÅrsak.OMSORGSYTER_IKKE_FYLLT_17_VED_UTGANG_AV_OMSORGSÅR), it.årsaker)
+        assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vilkarsVurdering.utfall).also {
+            assertEquals(
+                Paragraf.A,
+                it.paragraf
+            )
         }
     }
 }

@@ -19,4 +19,8 @@ data class FullførtBehandling(
     fun kilde(): DomainKilde {
         return grunnlag.kilde
     }
+
+    fun erInnvilget(): Boolean {
+        return utfall.erInnvilget()
+    }
 }

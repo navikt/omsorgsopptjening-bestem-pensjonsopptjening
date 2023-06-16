@@ -166,7 +166,7 @@ internal fun List<VilkårsvurderingDb>.toDomain(): List<VilkarsVurdering<*>> {
 }
 
 enum class ParagrafDb {
-    A,B,C;
+    A
 }
 
 internal fun Set<Paragraf>.toDb(): Set<ParagrafDb> {
@@ -175,16 +175,12 @@ internal fun Set<Paragraf>.toDb(): Set<ParagrafDb> {
 internal fun Paragraf.toDb(): ParagrafDb {
     return when(this){
         Paragraf.A -> ParagrafDb.A
-        Paragraf.B -> ParagrafDb.B
-        Paragraf.C -> ParagrafDb.C
     }
 }
 
 internal fun ParagrafDb.toDomain(): Paragraf {
     return when(this){
         ParagrafDb.A -> Paragraf.A
-        ParagrafDb.B -> Paragraf.B
-        ParagrafDb.C -> Paragraf.C
     }
 }
 
