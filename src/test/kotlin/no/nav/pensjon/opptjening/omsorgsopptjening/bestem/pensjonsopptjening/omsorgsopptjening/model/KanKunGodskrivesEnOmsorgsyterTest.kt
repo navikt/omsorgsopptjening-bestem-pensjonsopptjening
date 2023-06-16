@@ -56,7 +56,7 @@ class KanKunGodskrivesEnOmsorgsyterTest {
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
                 kotlin.test.assertEquals(
                     Paragraf.A,
-                    it.paragraf
+                    it.lovhenvisning
                 )
             }
         }

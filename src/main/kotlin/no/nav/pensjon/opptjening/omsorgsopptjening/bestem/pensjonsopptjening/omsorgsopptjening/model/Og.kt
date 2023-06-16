@@ -35,13 +35,13 @@ data class OgVurdering(
 ) : VilkarsVurdering<List<VilkarsVurdering<*>>>()
 
 object OgInnvilget : VilkårsvurderingUtfall.Innvilget() {
-    override fun paragrafer(): Set<Paragraf> {
+    override fun lovhenvisning(): Set<Lovhenvisning> {
         return emptySet()
     }
 }
 
 object OgAvslått: VilkårsvurderingUtfall.Avslag() {
-    override fun paragrafer(): Set<Paragraf> {
+    override fun lovhenvisning(): Set<Lovhenvisning> {
         return emptySet()
     }
 }

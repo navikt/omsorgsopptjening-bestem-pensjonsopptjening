@@ -40,7 +40,7 @@ data class Behandling(
     private fun oppsummering(): Behandlingsoppsummering {
         return finnAlleVilkårsvurderinger()
             .flatMap { vv ->
-                vv.utfall.paragrafer().map {
+                vv.utfall.lovhenvisning().map {
                     it to vv.utfall.erInnvilget()
                 }
             }.map {
@@ -54,11 +54,11 @@ data class Behandling(
         return UnwrapOgEllerVisitor.unwrap(vilkårsvurdering())
     }
 
-    private fun finnAvslagsparagrafer(): Set<Paragraf> {
+    private fun finnAvslagsparagrafer(): Set<Lovhenvisning> {
         return finnAlleVilkårsvurderinger()
             .map { it.utfall }
             .filterIsInstance<VilkårsvurderingUtfall.Avslag>()
-            .flatMap { it.paragrafer() }
+            .flatMap { it.lovhenvisning() }
             .toSet()
     }
 }

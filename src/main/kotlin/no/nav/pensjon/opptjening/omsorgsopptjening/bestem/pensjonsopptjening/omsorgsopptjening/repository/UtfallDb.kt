@@ -45,13 +45,13 @@ internal sealed class VilkårsvurderingUtfallDb {
 
     object OgInnvilget : VilkårsvurderingUtfallDb()
 
-    data class EnkeltParagrafInnvilget(val paragraf: ParagrafDb) : VilkårsvurderingUtfallDb()
+    data class EnkeltParagrafInnvilget(val paragraf: Set<LovhenvisningDb>) : VilkårsvurderingUtfallDb()
 
-    data class EnkeltParagrafAvslag(val paragraf: ParagrafDb) : VilkårsvurderingUtfallDb()
+    data class EnkeltParagrafAvslag(val paragraf: Set<LovhenvisningDb>) : VilkårsvurderingUtfallDb()
 }
 
 data class BehandlingsoppsummeringDb(
-    val paragrafOppsummering: List<Pair<ParagrafDb, Boolean>>
+    val paragrafOppsummering: List<Pair<LovhenvisningDb, Boolean>>
 )
 
 internal fun Behandlingsoppsummering.toDb(): BehandlingsoppsummeringDb {
@@ -120,11 +120,11 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
         }
 
         is VilkårsvurderingUtfall.Innvilget.EnkeltParagraf -> {
-            VilkårsvurderingUtfallDb.EnkeltParagrafInnvilget(paragraf = paragraf.toDb())
+            VilkårsvurderingUtfallDb.EnkeltParagrafInnvilget(paragraf = lovhenvisning.toDb())
         }
 
         is VilkårsvurderingUtfall.Avslag.EnkeltParagraf -> {
-            VilkårsvurderingUtfallDb.EnkeltParagrafAvslag(paragraf = paragraf.toDb())
+            VilkårsvurderingUtfallDb.EnkeltParagrafAvslag(paragraf = lovhenvisning.toDb())
         }
     }
 }
@@ -148,11 +148,11 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.EnkeltParagrafAvslag -> {
-            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragraf.toDomain())
+            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = paragraf.toDomain())
         }
 
         is VilkårsvurderingUtfallDb.EnkeltParagrafInnvilget -> {
-            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragraf.toDomain())
+            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = paragraf.toDomain())
         }
     }
 }

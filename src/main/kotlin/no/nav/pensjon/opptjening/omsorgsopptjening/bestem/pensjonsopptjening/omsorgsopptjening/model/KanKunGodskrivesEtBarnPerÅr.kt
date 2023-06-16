@@ -2,28 +2,27 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import java.util.UUID
 
-class KanKunGodskrivesEtBarnPerÅr : ParagrafVilkår<KanKunGodskrivesEtBarnPerÅrGrunnlag>(
-    paragrafer = setOf(Paragraf.A),
-) {
+class KanKunGodskrivesEtBarnPerÅr : ParagrafVilkår<KanKunGodskrivesEtBarnPerÅrGrunnlag>() {
     override fun vilkarsVurder(grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag): KanKunGodskrivesEtBarnPerÅrVurdering {
-        return KanKunGodskrivesEtBarnPerÅrVurdering(
-            paragrafer = paragrafer,
+        return bestemUtfall(grunnlag).let { KanKunGodskrivesEtBarnPerÅrVurdering(
+            lovhenvisninger = it.lovhenvisning(),
             grunnlag = grunnlag,
-            utfall = bestemUtfall(grunnlag),
-        )
+            utfall = it,
+        ) }
     }
 
     override fun <T : Vilkar<KanKunGodskrivesEtBarnPerÅrGrunnlag>> T.bestemUtfall(grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag): VilkårsvurderingUtfall {
+        val lovhenvisning = setOf(Lovhenvisning.MINST_HALVT_AR_OMSORG)
         return if (grunnlag.behandlinger.none { it.erInnvilget }) {
-            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
         } else {
-            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = lovhenvisning)
         }
     }
 }
 
 data class KanKunGodskrivesEtBarnPerÅrVurdering(
-    override val paragrafer: Set<Paragraf>,
+    override val lovhenvisninger: Set<Lovhenvisning>,
     override val grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<KanKunGodskrivesEtBarnPerÅrGrunnlag>()

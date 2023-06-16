@@ -10,9 +10,5 @@ sealed class VilkarsVurdering<Grunnlag : Any> {
 }
 
 sealed class ParagrafVurdering<T : ParagrafGrunnlag> : VilkarsVurdering<T>() {
-    abstract val paragrafer: Set<Paragraf>
-}
-
-enum class Paragraf {
-    A
+    abstract val lovhenvisninger: Set<Lovhenvisning>
 }

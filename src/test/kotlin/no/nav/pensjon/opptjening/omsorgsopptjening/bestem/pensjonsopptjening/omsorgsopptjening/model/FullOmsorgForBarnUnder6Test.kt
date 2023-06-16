@@ -101,7 +101,7 @@ class KFullOmsorgForBarnUnder6Test {
                 assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
                     assertEquals(
                         Paragraf.A,
-                        it.paragraf
+                        it.lovhenvisning
                     )
                 }
             }
@@ -139,7 +139,7 @@ class KFullOmsorgForBarnUnder6Test {
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
                 assertEquals(
                     Paragraf.A,
-                    it.paragraf
+                    it.lovhenvisning
                 )
             }
         }

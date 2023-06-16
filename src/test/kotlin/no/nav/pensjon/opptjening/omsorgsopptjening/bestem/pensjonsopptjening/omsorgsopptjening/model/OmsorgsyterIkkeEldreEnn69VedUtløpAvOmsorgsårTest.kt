@@ -36,7 +36,7 @@ class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
         Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vilkarsVurdering.utfall).also {
             assertEquals(
                 Paragraf.A,
-                it.paragraf
+                it.lovhenvisning
             )
         }
     }
@@ -56,7 +56,7 @@ class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
         Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vilkarsVurdering.utfall).also {
             assertEquals(
                 Paragraf.A,
-                it.paragraf
+                it.lovhenvisning
             )
         }
     }

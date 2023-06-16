@@ -43,13 +43,13 @@ data class EllerVurdering(
 ) : VilkarsVurdering<List<VilkarsVurdering<*>>>()
 
 object EllerInnvilget : VilkårsvurderingUtfall.Innvilget() {
-    override fun paragrafer(): Set<Paragraf> {
+    override fun lovhenvisning(): Set<Lovhenvisning> {
         return emptySet()
     }
 }
 
 object EllerAvslått : VilkårsvurderingUtfall.Avslag() {
-    override fun paragrafer(): Set<Paragraf> {
+    override fun lovhenvisning(): Set<Lovhenvisning> {
         return emptySet()
     }
 }

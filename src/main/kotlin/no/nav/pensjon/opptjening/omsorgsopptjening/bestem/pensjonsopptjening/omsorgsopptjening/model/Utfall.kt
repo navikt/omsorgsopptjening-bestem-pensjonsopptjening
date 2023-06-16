@@ -2,19 +2,19 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 sealed class VilkårsvurderingUtfall {
 
-    abstract fun paragrafer(): Set<Paragraf>
+    abstract fun lovhenvisning(): Set<Lovhenvisning>
     sealed class Innvilget : VilkårsvurderingUtfall() {
-        data class EnkeltParagraf(val paragraf: Paragraf) : Innvilget() {
-            override fun paragrafer(): Set<Paragraf> {
-                return setOf(paragraf)
+        data class EnkeltParagraf(val lovhenvisning: Set<Lovhenvisning>) : Innvilget() {
+            override fun lovhenvisning(): Set<Lovhenvisning> {
+                return lovhenvisning
             }
         }
     }
 
     sealed class Avslag : VilkårsvurderingUtfall() {
-        data class EnkeltParagraf(val paragraf: Paragraf) : Avslag() {
-            override fun paragrafer(): Set<Paragraf> {
-                return setOf(paragraf)
+        data class EnkeltParagraf(val lovhenvisning: Set<Lovhenvisning>) : Avslag() {
+            override fun lovhenvisning(): Set<Lovhenvisning> {
+                return lovhenvisning
             }
         }
     }
@@ -50,5 +50,5 @@ data class Behandlingsoppsummering(
 )
 
 data class ParagrafOppsummering(
-    val paragrafUtfall: Pair<Paragraf, Boolean>
+    val paragrafUtfall: Pair<Lovhenvisning, Boolean>
 )

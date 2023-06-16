@@ -6,8 +6,6 @@ abstract class Vilkar<Grunnlag : Any> {
     protected abstract fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall
 }
 
-abstract class ParagrafVilkår<T : ParagrafGrunnlag>(
-    val paragrafer: Set<Paragraf>
-) : Vilkar<T>()
+abstract class ParagrafVilkår<T : ParagrafGrunnlag>() : Vilkar<T>()
 
 sealed class ParagrafGrunnlag

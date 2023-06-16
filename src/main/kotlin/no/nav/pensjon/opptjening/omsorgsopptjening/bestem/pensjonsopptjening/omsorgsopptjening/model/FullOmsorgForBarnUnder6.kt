@@ -13,40 +13,43 @@ import java.time.Month
  * Det betyr at vi må sjekke om omsorgsyter har fått barnetrygd i året etter for å vite om omsorgsyter har rett til omsorgsopptjening
  *
  */
-class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>(
-    paragrafer = setOf(Paragraf.A)
-) {
+class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>() {
     override fun vilkarsVurder(grunnlag: FullOmsorgForBarnUnder6Grunnlag): FullOmsorgForBarnUnder6Vurdering {
-        return FullOmsorgForBarnUnder6Vurdering(
-            paragrafer = paragrafer,
-            grunnlag = grunnlag,
-            utfall = bestemUtfall(grunnlag),
-        )
+        return bestemUtfall(grunnlag).let {
+            FullOmsorgForBarnUnder6Vurdering(
+                lovhenvisninger = it.lovhenvisning(),
+                grunnlag = grunnlag,
+                utfall = it,
+            )
+        }
     }
 
     override fun <T : Vilkar<FullOmsorgForBarnUnder6Grunnlag>> T.bestemUtfall(grunnlag: FullOmsorgForBarnUnder6Grunnlag): VilkårsvurderingUtfall {
         return when (grunnlag) {
             is OmsorgsmottakerFødtIOmsorgsårGrunnlag -> {
+                val lovhenvisning = setOf(Lovhenvisning.IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR, Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER)
                 if (grunnlag.minstEnMånedFullOmsorg) {
-                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
                 } else {
-                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = lovhenvisning)
                 }
             }
 
             is OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag -> {
+                val lovhenvisning = setOf(Lovhenvisning.MINST_HALVT_AR_OMSORG, Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER)
                 if (grunnlag.minstSeksMånederFullOmsorg) {
-                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
                 } else {
-                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = lovhenvisning)
                 }
             }
 
             is OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag -> {
+                val lovhenvisning = setOf(Lovhenvisning.IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR, Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER)
                 if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel) {
-                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(paragraf = paragrafer.single())
+                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
                 } else {
-                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(paragraf = paragrafer.single())
+                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = lovhenvisning)
                 }
             }
         }
@@ -54,7 +57,7 @@ class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>
 }
 
 data class FullOmsorgForBarnUnder6Vurdering(
-    override val paragrafer: Set<Paragraf>,
+    override val lovhenvisninger: Set<Lovhenvisning>,
     override val grunnlag: FullOmsorgForBarnUnder6Grunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<FullOmsorgForBarnUnder6Grunnlag>()
