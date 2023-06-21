@@ -34,6 +34,10 @@ sealed class Referanse {
     data class OmsorgsopptjeningGisKunEnOmsorgsyter(
         override val henvisning: Henvisning = Forskrift.FOR_OMSORGSPOENG_K3_P4_L1_pkt1
     ) : Referanse()
+
+    data class OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder(
+        override val henvisning: Henvisning = Forskrift.FOR_OMSORGSPOENG_K2_P4_L3
+    ): Referanse()
 }
 
 sealed class Henvisning {
@@ -105,5 +109,15 @@ sealed class Forskrift(
         ledd = 2,
         tekst = "Det kan gis pensjonsopptjening etter første ledd fra og med det året vedkommende fyller 17 år, til og med det året vedkommende fyller 69 år."
     )
+    object FOR_OMSORGSPOENG_K2_P4_L3 : Forskrift(
+        kortTittel = "Forskrift om omsorgspoeng – barn",
+        kapittel = 3,
+        paragraf = 4,
+        ledd = 3,
+        bokstav = null,
+        tekst = "Når barnet eller barna bor skiftevis og tilnærmet like lenge hos mor og far, og begge omsorgsyterne hver måned får en del av barnetrygden eller får" +
+                " ytelsen utbetalt i tilnærmet lik lang periode av året, må omsorgsyterne sette fram krav om omsorgsopptjening med opplysning om hvem av omsorgsyterne " +
+                "som skal ha opptjeningen for kalenderåret"
+    );
 }
 

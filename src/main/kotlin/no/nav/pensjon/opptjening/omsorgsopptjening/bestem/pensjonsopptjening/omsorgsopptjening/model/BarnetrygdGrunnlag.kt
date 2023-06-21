@@ -55,6 +55,10 @@ sealed class BarnetrygdGrunnlag {
         )
     }
 
+    fun liktAntallMånederOmsorgGrunnlag(): LiktAntallMånederOmsorgGrunnlag {
+        return LiktAntallMånederOmsorgGrunnlag(YterMottakerManeder(omsorgsyter, omsorgsmottaker, omsorgsSaker.))
+    }
+
     fun forOmsorgsmottakerOgÅr(): PersonOgOmsorgsårGrunnlag {
         return PersonOgOmsorgsårGrunnlag(
             person = omsorgsmottaker,
