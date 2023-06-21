@@ -13,7 +13,7 @@ class KanKunGodskrivesEnOmsorgsyterTest {
                 emptyList()
             )
         ).also {
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, it.utfall)
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
         }
     }
 
@@ -33,7 +33,7 @@ class KanKunGodskrivesEnOmsorgsyterTest {
                 )
             )
         ).also {
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, it.utfall)
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
         }
     }
 
@@ -53,12 +53,12 @@ class KanKunGodskrivesEnOmsorgsyterTest {
                 )
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                 kotlin.test.assertEquals(
                     setOf(
-                        Lovhenvisning.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER
+                        Forskrift.FOR_OMSORGSPOENG_K3_P4_L1_pkt1
                     ),
-                    it.lovhenvisning
+                    it.henvisninger
                 )
             }
         }

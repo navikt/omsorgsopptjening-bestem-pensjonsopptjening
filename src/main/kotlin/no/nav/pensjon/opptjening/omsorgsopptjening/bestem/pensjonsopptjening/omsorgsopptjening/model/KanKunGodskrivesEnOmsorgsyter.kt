@@ -4,25 +4,30 @@ import java.util.UUID
 
 class KanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<KanKunGodskrivesEnOmsorgsyterGrunnlag>() {
     override fun vilkarsVurder(grunnlag: KanKunGodskrivesEnOmsorgsyterGrunnlag): KanKunGodskrivesEnOmsorgsyterVurdering {
-        return bestemUtfall(grunnlag).let { KanKunGodskrivesEnOmsorgsyterVurdering(
-            lovhenvisninger = it.lovhenvisning(),
-            grunnlag = grunnlag,
-            utfall = it,
-        ) }
+        return bestemUtfall(grunnlag).let {
+            KanKunGodskrivesEnOmsorgsyterVurdering(
+                henvisninger = it.henvisninger(),
+                grunnlag = grunnlag,
+                utfall = it,
+            )
+        }
     }
 
     override fun <T : Vilkar<KanKunGodskrivesEnOmsorgsyterGrunnlag>> T.bestemUtfall(grunnlag: KanKunGodskrivesEnOmsorgsyterGrunnlag): VilkårsvurderingUtfall {
-        val lovhenvisning = setOf(Lovhenvisning.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER)
-        return if (grunnlag.behandlingsIdUtfallListe.none { it.erInnvilget }) {
-            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
-        } else {
-            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = lovhenvisning)
+        setOf(
+            Referanse.OmsorgsopptjeningGisKunEnOmsorgsyter()
+        ).let {
+            return if (grunnlag.behandlingsIdUtfallListe.none { it.erInnvilget }) {
+                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+            } else {
+                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+            }
         }
     }
 }
 
 data class KanKunGodskrivesEnOmsorgsyterVurdering(
-    override val lovhenvisninger: Set<Lovhenvisning>,
+    override val henvisninger: Set<Henvisning>,
     override val grunnlag: KanKunGodskrivesEnOmsorgsyterGrunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<KanKunGodskrivesEnOmsorgsyterGrunnlag>()

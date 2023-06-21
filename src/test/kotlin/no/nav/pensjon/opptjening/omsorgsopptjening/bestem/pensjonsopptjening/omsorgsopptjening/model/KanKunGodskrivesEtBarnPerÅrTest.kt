@@ -13,7 +13,7 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 behandlinger = emptyList()
             )
         ).also {
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, it.utfall)
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
         }
     }
 
@@ -32,7 +32,7 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 )
             )
         ).also {
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, it.utfall)
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
         }
     }
 
@@ -57,12 +57,12 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 )
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                 kotlin.test.assertEquals(
                     setOf(
-                        Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN
+                        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1
                     ),
-                    it.lovhenvisning
+                    it.henvisninger
                 )
             }
         }
@@ -89,12 +89,12 @@ class KanKunGodskrivesEtBarnPerÅrTest {
                 )
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                 kotlin.test.assertEquals(
                     setOf(
-                        Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN
+                        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1
                     ),
-                    it.lovhenvisning
+                    it.henvisninger
                 )
             }
         }

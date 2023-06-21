@@ -18,7 +18,7 @@ class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
                 omsorgsAr = årstall + 69
             )
         )
-        Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, vilkarsVurdering.utfall)
+        Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vilkarsVurdering.utfall)
     }
 
     @Test
@@ -33,12 +33,12 @@ class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
                 omsorgsAr = årstall + 71
             )
         )
-        Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vilkarsVurdering.utfall).also {
+        Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vilkarsVurdering.utfall).also {
             assertEquals(
                 setOf(
-                    Lovhenvisning.FYLLER_69_AR
+                    Lovparagraf.FTRL_K20_P8_L2
                 ),
-                it.lovhenvisning
+                it.henvisninger
             )
         }
     }
@@ -55,12 +55,12 @@ class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
                 omsorgsAr = årstall + 70
             )
         )
-        Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vilkarsVurdering.utfall).also {
+        Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vilkarsVurdering.utfall).also {
             assertEquals(
                 setOf(
-                    Lovhenvisning.FYLLER_69_AR
+                    Lovparagraf.FTRL_K20_P8_L2
                 ),
-                it.lovhenvisning
+                it.henvisninger
             )
         }
     }

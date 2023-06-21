@@ -38,19 +38,19 @@ import java.util.Queue
 )
 sealed class VilkårsvurderingDb {
     internal data class FullOmsorgForBarnUnder6(
-        val paragrafer: Set<LovhenvisningDb>,
+        val paragrafer: Set<HenvisningDb>,
         val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
     internal data class OmsorgsyterFylt17År(
-        val paragrafer: Set<LovhenvisningDb>,
+        val paragrafer: Set<HenvisningDb>,
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
     internal data class OmsorgsyterIkkeEldreEnn69År(
-        val paragrafer: Set<LovhenvisningDb>,
+        val paragrafer: Set<HenvisningDb>,
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
@@ -66,19 +66,19 @@ sealed class VilkårsvurderingDb {
     ) : VilkårsvurderingDb()
 
     internal data class KanKunGodskrivesEnOmsorgsyter(
-        val paragrafer: Set<LovhenvisningDb>,
+        val paragrafer: Set<HenvisningDb>,
         val grunnlag: GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
     internal data class KanKunGodskrivesEtBarnPerÅr(
-        val paragrafer: Set<LovhenvisningDb>,
+        val paragrafer: Set<HenvisningDb>,
         val grunnlag: GrunnlagVilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
     internal data class OmsorgsmottakerIkkeFylt6Ar(
-        val paragrafer: Set<LovhenvisningDb>,
+        val paragrafer: Set<HenvisningDb>,
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
@@ -95,7 +95,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
 
         is FullOmsorgForBarnUnder6Vurdering -> {
             FullOmsorgForBarnUnder6(
-                paragrafer = lovhenvisninger.toDb(),
+                paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -110,7 +110,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
 
         is OmsorgsyterFylt17ÅrVurdering -> {
             VilkårsvurderingDb.OmsorgsyterFylt17År(
-                paragrafer = lovhenvisninger.toDb(),
+                paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -118,7 +118,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
 
         is OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering -> {
             VilkårsvurderingDb.OmsorgsyterIkkeEldreEnn69År(
-                paragrafer = lovhenvisninger.toDb(),
+                paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -126,7 +126,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
 
         is KanKunGodskrivesEnOmsorgsyterVurdering -> {
             VilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter(
-                paragrafer = lovhenvisninger.toDb(),
+                paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -134,7 +134,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
 
         is KanKunGodskrivesEtBarnPerÅrVurdering -> {
             VilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr(
-                paragrafer = lovhenvisninger.toDb(),
+                paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -142,7 +142,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
 
         is OmsorgsmottakerIkkeFylt6ArVurdering -> {
             VilkårsvurderingDb.OmsorgsmottakerIkkeFylt6Ar(
-                paragrafer = lovhenvisninger.toDb(),
+                paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -164,52 +164,55 @@ private fun mapRecursive(
 internal fun List<VilkårsvurderingDb>.toDomain(): List<VilkarsVurdering<*>> {
     return map { it.toDomain() }
 }
-enum class LovhenvisningDb {
-    MINST_HALVT_AR_OMSORG,
-    OMSORGSMOTTAKER_IKKE_FYLT_6_AR,
-    IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR,
-    OPPTJENING_GIS_BARNETRYGDMOTTAKER,
-    FULL_OMSORG_KAN_GODSKRIVES_AUTOMATISK,
-    FYLLER_17_AR,
-    FYLLER_69_AR,
-    OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER,
-    KAN_KUN_GODSKRIVES_ET_BARN
+
+enum class HenvisningDb {
+    FTRL_K20_P8_L1_Ba_pkt1,
+    FTRL_K20_P8_L1_Ba_pkt2,
+    FTRL_K20_P8_L1_Ba_pkt3,
+    FTRL_K20_P8_L2,
+    FOR_OMSORGSPOENG_K3_P4_L1_pkt1
 }
 
-internal fun Set<Lovhenvisning>.toDb(): Set<LovhenvisningDb> {
+internal fun Set<Henvisning>.toDb(): Set<HenvisningDb> {
     return map { it.toDb() }.toSet()
 }
-internal fun Lovhenvisning.toDb(): LovhenvisningDb {
-    return when(this){
-        Lovhenvisning.MINST_HALVT_AR_OMSORG -> LovhenvisningDb.MINST_HALVT_AR_OMSORG
-        Lovhenvisning.OMSORGSMOTTAKER_IKKE_FYLT_6_AR -> LovhenvisningDb.OMSORGSMOTTAKER_IKKE_FYLT_6_AR
-        Lovhenvisning.IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR -> LovhenvisningDb.IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR
-        Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER -> LovhenvisningDb.OPPTJENING_GIS_BARNETRYGDMOTTAKER
-        Lovhenvisning.FULL_OMSORG_KAN_GODSKRIVES_AUTOMATISK -> LovhenvisningDb.FULL_OMSORG_KAN_GODSKRIVES_AUTOMATISK
-        Lovhenvisning.FYLLER_17_AR -> LovhenvisningDb.FYLLER_17_AR
-        Lovhenvisning.FYLLER_69_AR -> LovhenvisningDb.FYLLER_69_AR
-        Lovhenvisning.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER -> LovhenvisningDb.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER
-        Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN -> LovhenvisningDb.KAN_KUN_GODSKRIVES_ET_BARN
+
+internal fun Henvisning.toDb(): HenvisningDb {
+    return when (this) {
+        is Forskrift -> toDb()
+        is Lovparagraf -> toDb()
     }
 }
 
-internal fun LovhenvisningDb.toDomain(): Lovhenvisning {
-    return when(this){
-        LovhenvisningDb.MINST_HALVT_AR_OMSORG -> Lovhenvisning.MINST_HALVT_AR_OMSORG
-        LovhenvisningDb.OMSORGSMOTTAKER_IKKE_FYLT_6_AR -> Lovhenvisning.OMSORGSMOTTAKER_IKKE_FYLT_6_AR
-        LovhenvisningDb.IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR -> Lovhenvisning.IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR
-        LovhenvisningDb.OPPTJENING_GIS_BARNETRYGDMOTTAKER -> Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER
-        LovhenvisningDb.FULL_OMSORG_KAN_GODSKRIVES_AUTOMATISK -> Lovhenvisning.FULL_OMSORG_KAN_GODSKRIVES_AUTOMATISK
-        LovhenvisningDb.FYLLER_17_AR -> Lovhenvisning.FYLLER_17_AR
-        LovhenvisningDb.FYLLER_69_AR -> Lovhenvisning.FYLLER_69_AR
-        LovhenvisningDb.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER -> Lovhenvisning.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER
-        LovhenvisningDb.KAN_KUN_GODSKRIVES_ET_BARN -> Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN
+internal fun Forskrift.toDb(): HenvisningDb {
+    return when (this) {
+        Forskrift.FOR_OMSORGSPOENG_K3_P4_L1_pkt1 -> HenvisningDb.FOR_OMSORGSPOENG_K3_P4_L1_pkt1
     }
 }
 
-internal fun Set<LovhenvisningDb>.toDomain(): Set<Lovhenvisning> {
+internal fun Lovparagraf.toDb(): HenvisningDb {
+    return when (this) {
+        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1 -> HenvisningDb.FTRL_K20_P8_L1_Ba_pkt1
+        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt2 -> HenvisningDb.FTRL_K20_P8_L1_Ba_pkt2
+        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt3 -> HenvisningDb.FTRL_K20_P8_L1_Ba_pkt3
+        Lovparagraf.FTRL_K20_P8_L2 -> HenvisningDb.FTRL_K20_P8_L2
+    }
+}
+
+internal fun HenvisningDb.toDomain(): Henvisning {
+    return when (this) {
+        HenvisningDb.FTRL_K20_P8_L1_Ba_pkt1 -> Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1
+        HenvisningDb.FTRL_K20_P8_L1_Ba_pkt2 -> Lovparagraf.FTRL_K20_P8_L1_Ba_pkt2
+        HenvisningDb.FTRL_K20_P8_L1_Ba_pkt3 -> Lovparagraf.FTRL_K20_P8_L1_Ba_pkt3
+        HenvisningDb.FTRL_K20_P8_L2 -> Lovparagraf.FTRL_K20_P8_L2
+        HenvisningDb.FOR_OMSORGSPOENG_K3_P4_L1_pkt1 -> Forskrift.FOR_OMSORGSPOENG_K3_P4_L1_pkt1
+    }
+}
+
+internal fun Set<HenvisningDb>.toDomain(): Set<Henvisning> {
     return map { it.toDomain() }.toSet()
 }
+
 internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
     return when (this) {
         is Eller -> {
@@ -221,7 +224,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
 
         is FullOmsorgForBarnUnder6 -> {
             FullOmsorgForBarnUnder6Vurdering(
-                lovhenvisninger = paragrafer.toDomain(),
+                henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )
@@ -236,7 +239,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
 
         is VilkårsvurderingDb.OmsorgsyterFylt17År -> {
             OmsorgsyterFylt17ÅrVurdering(
-                lovhenvisninger = paragrafer.toDomain(),
+                henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )
@@ -244,7 +247,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
 
         is VilkårsvurderingDb.OmsorgsyterIkkeEldreEnn69År -> {
             OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering(
-                lovhenvisninger = paragrafer.toDomain(),
+                henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )
@@ -252,14 +255,15 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
 
         is VilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter -> {
             KanKunGodskrivesEnOmsorgsyterVurdering(
-                lovhenvisninger = paragrafer.toDomain(),
+                henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )
         }
+
         is VilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr -> {
             KanKunGodskrivesEtBarnPerÅrVurdering(
-                lovhenvisninger = paragrafer.toDomain(),
+                henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
 
@@ -268,7 +272,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
 
         is VilkårsvurderingDb.OmsorgsmottakerIkkeFylt6Ar -> {
             OmsorgsmottakerIkkeFylt6ArVurdering(
-                lovhenvisninger = paragrafer.toDomain(),
+                henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )

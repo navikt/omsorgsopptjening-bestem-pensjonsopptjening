@@ -28,12 +28,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
         name = "OgInnvilget",
     ),
     JsonSubTypes.Type(
-        value = VilkårsvurderingUtfallDb.EnkeltParagrafAvslag::class,
-        name = "EnkeltParagrafAvslag",
+        value = VilkårsvurderingUtfallDb.VilkårAvslag::class,
+        name = "VilkårAvslag",
     ),
     JsonSubTypes.Type(
-        value = VilkårsvurderingUtfallDb.EnkeltParagrafInnvilget::class,
-        name = "EnkeltParagrafInnvilget",
+        value = VilkårsvurderingUtfallDb.VilkårInnvilget::class,
+        name = "VilkårInnvilget",
     ),
 )
 internal sealed class VilkårsvurderingUtfallDb {
@@ -44,25 +44,10 @@ internal sealed class VilkårsvurderingUtfallDb {
     object OgAvslått : VilkårsvurderingUtfallDb()
 
     object OgInnvilget : VilkårsvurderingUtfallDb()
+    data class VilkårAvslag(val henvisning: Set<HenvisningDb>) : VilkårsvurderingUtfallDb()
+    data class VilkårInnvilget(val henvisning: Set<HenvisningDb>) : VilkårsvurderingUtfallDb()
 
-    data class EnkeltParagrafInnvilget(val paragraf: Set<LovhenvisningDb>) : VilkårsvurderingUtfallDb()
-
-    data class EnkeltParagrafAvslag(val paragraf: Set<LovhenvisningDb>) : VilkårsvurderingUtfallDb()
 }
-
-data class BehandlingsoppsummeringDb(
-    val paragrafOppsummering: List<Pair<LovhenvisningDb, Boolean>>
-)
-
-internal fun Behandlingsoppsummering.toDb(): BehandlingsoppsummeringDb {
-    return BehandlingsoppsummeringDb(paragrafOppsummering.map { it.paragrafUtfall.first.toDb() to it.paragrafUtfall.second })
-}
-
-internal fun BehandlingsoppsummeringDb.toDomain(): Behandlingsoppsummering {
-    return Behandlingsoppsummering(paragrafOppsummering = paragrafOppsummering.map { it.first.toDomain() to it.second }
-        .map { ParagrafOppsummering(it) })
-}
-
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -80,23 +65,20 @@ internal fun BehandlingsoppsummeringDb.toDomain(): Behandlingsoppsummering {
     )
 )
 internal sealed class BehandlingsutfallDb {
-    data class AutomatiskGodskrivingAvslag(
-        val oppsummering: BehandlingsoppsummeringDb,
-    ) : BehandlingsutfallDb()
 
-    data class AutomatiskGodskrivingInnvilget(
-        val oppsummering: BehandlingsoppsummeringDb,
-    ) : BehandlingsutfallDb()
+    object AutomatiskGodskrivingAvslag : BehandlingsutfallDb()
+
+    object AutomatiskGodskrivingInnvilget : BehandlingsutfallDb()
 }
 
 internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
     return when (this) {
         is AutomatiskGodskrivingUtfall.Avslag -> {
-            BehandlingsutfallDb.AutomatiskGodskrivingAvslag(oppsummering = oppsummering.toDb())
+            BehandlingsutfallDb.AutomatiskGodskrivingAvslag
         }
 
         is AutomatiskGodskrivingUtfall.Innvilget -> {
-            BehandlingsutfallDb.AutomatiskGodskrivingInnvilget(oppsummering = oppsummering.toDb())
+            BehandlingsutfallDb.AutomatiskGodskrivingInnvilget
         }
     }
 }
@@ -119,12 +101,12 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
             VilkårsvurderingUtfallDb.OgInnvilget
         }
 
-        is VilkårsvurderingUtfall.Innvilget.EnkeltParagraf -> {
-            VilkårsvurderingUtfallDb.EnkeltParagrafInnvilget(paragraf = lovhenvisning.toDb())
+        is VilkårsvurderingUtfall.Innvilget.Vilkår -> {
+            VilkårsvurderingUtfallDb.VilkårInnvilget(henvisning = henvisninger.toDb())
         }
 
-        is VilkårsvurderingUtfall.Avslag.EnkeltParagraf -> {
-            VilkårsvurderingUtfallDb.EnkeltParagrafAvslag(paragraf = lovhenvisning.toDb())
+        is VilkårsvurderingUtfall.Avslag.Vilkår -> {
+            VilkårsvurderingUtfallDb.VilkårAvslag(henvisning = henvisninger.toDb())
         }
     }
 }
@@ -147,12 +129,12 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
             OgInnvilget
         }
 
-        is VilkårsvurderingUtfallDb.EnkeltParagrafAvslag -> {
-            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = paragraf.toDomain())
+        is VilkårsvurderingUtfallDb.VilkårAvslag -> {
+            VilkårsvurderingUtfall.Avslag.Vilkår(henvisninger = henvisning.toDomain())
         }
 
-        is VilkårsvurderingUtfallDb.EnkeltParagrafInnvilget -> {
-            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = paragraf.toDomain())
+        is VilkårsvurderingUtfallDb.VilkårInnvilget -> {
+            VilkårsvurderingUtfall.Innvilget.Vilkår(henvisninger = henvisning.toDomain())
         }
     }
 }
@@ -160,12 +142,12 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
 internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
     return when (this) {
         is BehandlingsutfallDb.AutomatiskGodskrivingAvslag -> {
-            AutomatiskGodskrivingUtfall.AvslagUtenOppgave(oppsummering.toDomain())
+            AutomatiskGodskrivingUtfall.AvslagUtenOppgave
 
         }
 
         is BehandlingsutfallDb.AutomatiskGodskrivingInnvilget -> {
-            AutomatiskGodskrivingUtfall.Innvilget(oppsummering.toDomain())
+            AutomatiskGodskrivingUtfall.Innvilget
         }
     }
 }

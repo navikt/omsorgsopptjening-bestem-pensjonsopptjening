@@ -5,24 +5,27 @@ import java.util.UUID
 class KanKunGodskrivesEtBarnPerÅr : ParagrafVilkår<KanKunGodskrivesEtBarnPerÅrGrunnlag>() {
     override fun vilkarsVurder(grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag): KanKunGodskrivesEtBarnPerÅrVurdering {
         return bestemUtfall(grunnlag).let { KanKunGodskrivesEtBarnPerÅrVurdering(
-            lovhenvisninger = it.lovhenvisning(),
+            henvisninger = it.henvisninger(),
             grunnlag = grunnlag,
             utfall = it,
         ) }
     }
 
     override fun <T : Vilkar<KanKunGodskrivesEtBarnPerÅrGrunnlag>> T.bestemUtfall(grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag): VilkårsvurderingUtfall {
-        val lovhenvisning = setOf(Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN)
-        return if (grunnlag.behandlinger.none { it.erInnvilget }) {
-            VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
-        } else {
-            VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = lovhenvisning)
+        return setOf(
+            Referanse.OpptjeningKanKunGodskrivesForEtBarnPerÅr()
+        ).let {
+            if (grunnlag.behandlinger.none { it.erInnvilget }) {
+                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+            } else {
+                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+            }
         }
     }
 }
 
 data class KanKunGodskrivesEtBarnPerÅrVurdering(
-    override val lovhenvisninger: Set<Lovhenvisning>,
+    override val henvisninger: Set<Henvisning>,
     override val grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<KanKunGodskrivesEtBarnPerÅrGrunnlag>()

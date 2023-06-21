@@ -17,7 +17,7 @@ class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>
     override fun vilkarsVurder(grunnlag: FullOmsorgForBarnUnder6Grunnlag): FullOmsorgForBarnUnder6Vurdering {
         return bestemUtfall(grunnlag).let {
             FullOmsorgForBarnUnder6Vurdering(
-                lovhenvisninger = it.lovhenvisning(),
+                henvisninger = it.henvisninger(),
                 grunnlag = grunnlag,
                 utfall = it,
             )
@@ -27,29 +27,41 @@ class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>
     override fun <T : Vilkar<FullOmsorgForBarnUnder6Grunnlag>> T.bestemUtfall(grunnlag: FullOmsorgForBarnUnder6Grunnlag): VilkårsvurderingUtfall {
         return when (grunnlag) {
             is OmsorgsmottakerFødtIOmsorgsårGrunnlag -> {
-                val lovhenvisning = setOf(Lovhenvisning.IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR, Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER)
-                if (grunnlag.minstEnMånedFullOmsorg) {
-                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
-                } else {
-                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = lovhenvisning)
+                setOf(
+                    Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår(),
+                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
+                ).let {
+                    if (grunnlag.minstEnMånedFullOmsorg) {
+                        VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                    } else {
+                        VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                    }
                 }
             }
 
             is OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag -> {
-                val lovhenvisning = setOf(Lovhenvisning.MINST_HALVT_AR_OMSORG, Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER)
-                if (grunnlag.minstSeksMånederFullOmsorg) {
-                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
-                } else {
-                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = lovhenvisning)
+                setOf(
+                    Referanse.MåHaMinstHalveÅretMedOmsorg(),
+                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
+                ).let {
+                    if (grunnlag.minstSeksMånederFullOmsorg) {
+                        VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                    } else {
+                        VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                    }
                 }
             }
 
             is OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag -> {
-                val lovhenvisning = setOf(Lovhenvisning.IKKE_KRAV_OM_MINST_HALVT_AR_I_FODSELSAR, Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER)
-                if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel) {
-                    VilkårsvurderingUtfall.Innvilget.EnkeltParagraf(lovhenvisning = lovhenvisning)
-                } else {
-                    VilkårsvurderingUtfall.Avslag.EnkeltParagraf(lovhenvisning = lovhenvisning)
+                setOf(
+                    Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår(),
+                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
+                ).let {
+                    if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel) {
+                        VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                    } else {
+                        VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                    }
                 }
             }
         }
@@ -57,7 +69,7 @@ class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>
 }
 
 data class FullOmsorgForBarnUnder6Vurdering(
-    override val lovhenvisninger: Set<Lovhenvisning>,
+    override val henvisninger: Set<Henvisning>,
     override val grunnlag: FullOmsorgForBarnUnder6Grunnlag,
     override val utfall: VilkårsvurderingUtfall
 ) : ParagrafVurdering<FullOmsorgForBarnUnder6Grunnlag>()

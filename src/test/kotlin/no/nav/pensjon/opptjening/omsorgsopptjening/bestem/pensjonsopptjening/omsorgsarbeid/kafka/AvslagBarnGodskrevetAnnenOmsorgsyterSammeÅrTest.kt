@@ -7,8 +7,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Lovhenvisning
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.ParagrafOppsummering
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
@@ -105,20 +103,7 @@ class AvslagBarnGodskrevetAnnenOmsorgsyterSammeÅrTest : SpringContextTest.NoKaf
                 assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall).also {
-                    assertEquals(
-                        listOf(
-                            ParagrafOppsummering(Lovhenvisning.FYLLER_17_AR to true),
-                            ParagrafOppsummering(Lovhenvisning.FYLLER_69_AR to true),
-                            ParagrafOppsummering(Lovhenvisning.OMSORGSMOTTAKER_IKKE_FYLT_6_AR to true),
-                            ParagrafOppsummering(Lovhenvisning.MINST_HALVT_AR_OMSORG to true),
-                            ParagrafOppsummering(Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER to true),
-                            ParagrafOppsummering(Lovhenvisning.OMSORGSOPPTJENING_GIS_KUN_EN_OMSORGSYTER to false),
-                            ParagrafOppsummering(Lovhenvisning.KAN_KUN_GODSKRIVES_ET_BARN to true),
-                        ),
-                        it.oppsummering.paragrafOppsummering
-                    )
-                }
+                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall)
             }
         }
     }

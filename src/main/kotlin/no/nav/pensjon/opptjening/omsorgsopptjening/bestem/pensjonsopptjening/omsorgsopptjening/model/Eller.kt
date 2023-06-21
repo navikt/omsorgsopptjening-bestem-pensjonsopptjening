@@ -43,13 +43,13 @@ data class EllerVurdering(
 ) : VilkarsVurdering<List<VilkarsVurdering<*>>>()
 
 object EllerInnvilget : VilkårsvurderingUtfall.Innvilget() {
-    override fun lovhenvisning(): Set<Lovhenvisning> {
-        return emptySet()
+    override fun henvisninger(): Set<Henvisning> {
+        TODO("Not yet implemented")
     }
 }
 
 object EllerAvslått : VilkårsvurderingUtfall.Avslag() {
-    override fun lovhenvisning(): Set<Lovhenvisning> {
-        return emptySet()
+    override fun henvisninger(): Set<Henvisning> {
+        TODO("Not yet implemented")
     }
 }

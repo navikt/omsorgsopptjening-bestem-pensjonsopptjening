@@ -2,19 +2,32 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 sealed class VilkårsvurderingUtfall {
 
-    abstract fun lovhenvisning(): Set<Lovhenvisning>
+    abstract fun henvisninger(): Set<Henvisning>
     sealed class Innvilget : VilkårsvurderingUtfall() {
-        data class EnkeltParagraf(val lovhenvisning: Set<Lovhenvisning>) : Innvilget() {
-            override fun lovhenvisning(): Set<Lovhenvisning> {
-                return lovhenvisning
+
+        data class Vilkår(val henvisninger: Set<Henvisning>) : Innvilget() {
+            override fun henvisninger(): Set<Henvisning> {
+                return henvisninger
+            }
+
+            companion object {
+                fun from(referanser: Set<Referanse>): Vilkår {
+                    return Vilkår(referanser.map { it.henvisning }.toSet())
+                }
             }
         }
     }
 
     sealed class Avslag : VilkårsvurderingUtfall() {
-        data class EnkeltParagraf(val lovhenvisning: Set<Lovhenvisning>) : Avslag() {
-            override fun lovhenvisning(): Set<Lovhenvisning> {
-                return lovhenvisning
+        data class Vilkår(val henvisninger: Set<Henvisning>) : Avslag() {
+            override fun henvisninger(): Set<Henvisning> {
+                return henvisninger
+            }
+
+            companion object {
+                fun from(referanser: Set<Referanse>): Vilkår {
+                    return Vilkår(referanser.map { it.henvisning }.toSet())
+                }
             }
         }
     }
@@ -38,21 +51,9 @@ sealed class BehandlingUtfall {
 }
 
 sealed class AutomatiskGodskrivingUtfall : BehandlingUtfall() {
+    object Innvilget : AutomatiskGodskrivingUtfall()
 
-    abstract val oppsummering: Behandlingsoppsummering
-
-    data class Innvilget(override val oppsummering: Behandlingsoppsummering) : AutomatiskGodskrivingUtfall()
     sealed class Avslag : AutomatiskGodskrivingUtfall()
-    data class AvslagMedOppgave(override val oppsummering: Behandlingsoppsummering) : Avslag()
-    data class AvslagUtenOppgave(override val oppsummering: Behandlingsoppsummering) : Avslag()
-
-
+    object AvslagMedOppgave : Avslag()
+    object AvslagUtenOppgave : Avslag()
 }
-
-data class Behandlingsoppsummering(
-    val paragrafOppsummering: List<ParagrafOppsummering>
-)
-
-data class ParagrafOppsummering(
-    val paragrafUtfall: Pair<Lovhenvisning, Boolean>
-)

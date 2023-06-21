@@ -19,7 +19,7 @@ class FullOmsorgForBarnUnder6Test {
                 minstSeksMånederFullOmsorg = true
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)}
         }
 
     @Test
@@ -34,7 +34,7 @@ class FullOmsorgForBarnUnder6Test {
                 minstEnMånedFullOmsorg = true
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)}
     }
 
     @Test
@@ -49,7 +49,7 @@ class FullOmsorgForBarnUnder6Test {
                 minstEnMånedFullOmsorg = false
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall)}
     }
 
     @Test
@@ -64,7 +64,7 @@ class FullOmsorgForBarnUnder6Test {
                 minstEnMånedOmsorgÅretEtterFødsel = true
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)}
     }
 
     @Test
@@ -79,7 +79,7 @@ class FullOmsorgForBarnUnder6Test {
                 minstEnMånedOmsorgÅretEtterFødsel = false
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall)}
     }
 
 
@@ -98,13 +98,13 @@ class FullOmsorgForBarnUnder6Test {
                     minstSeksMånederFullOmsorg = monthsFullOmsorg > 6
                 )
             ).also { vurdering ->
-                assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
+                assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                     assertEquals(
                         setOf(
-                            Lovhenvisning.MINST_HALVT_AR_OMSORG,
-                            Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER
+                            Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1,
+                            Lovparagraf.FTRL_K20_P8_L1_Ba_pkt3
                         ),
-                        it.lovhenvisning
+                        it.henvisninger
                     )
                 }
             }
@@ -121,7 +121,7 @@ class FullOmsorgForBarnUnder6Test {
                     minstSeksMånederFullOmsorg = monthsFullOmsorg > 6
                 )
             ).also {
-                assertInstanceOf(VilkårsvurderingUtfall.Innvilget.EnkeltParagraf::class.java, it.utfall)
+                assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
             }
         }
     }
@@ -139,13 +139,13 @@ class FullOmsorgForBarnUnder6Test {
                 minstSeksMånederFullOmsorg = false
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                 assertEquals(
                     setOf(
-                        Lovhenvisning.MINST_HALVT_AR_OMSORG,
-                        Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER
+                        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1,
+                        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt3
                     ),
-                    it.lovhenvisning
+                    it.henvisninger
                 )
             }
         }

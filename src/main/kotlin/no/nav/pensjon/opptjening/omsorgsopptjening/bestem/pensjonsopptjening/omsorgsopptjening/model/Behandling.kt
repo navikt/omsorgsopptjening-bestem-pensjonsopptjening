@@ -2,8 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
 
-data class Behandling
-    (
+data class Behandling(
     private val grunnlag: BarnetrygdGrunnlag,
     private val vilkarFactory: VilkarFactory
 ) {
@@ -17,11 +16,11 @@ data class Behandling
         vilkårsvurdering().let {
             return when (it.utfall.erInnvilget()) {
                 true -> {
-                    AutomatiskGodskrivingUtfall.Innvilget(oppsummering())
+                    AutomatiskGodskrivingUtfall.Innvilget
                 }
 
                 false -> {
-                    AutomatiskGodskrivingUtfall.AvslagUtenOppgave(oppsummering())
+                    AutomatiskGodskrivingUtfall.AvslagUtenOppgave
                 }
             }
         }
@@ -38,29 +37,8 @@ data class Behandling
         )
     }
 
-    private fun oppsummering(): Behandlingsoppsummering {
-        return finnAlleVilkårsvurderinger()
-            .flatMap { vv ->
-                vv.utfall.lovhenvisning().map {
-                    it to vv.utfall.erInnvilget()
-                }
-            }.map {
-                ParagrafOppsummering(it)
-            }.let {
-                Behandlingsoppsummering(it)
-            }
-    }
-
     private fun finnAlleVilkårsvurderinger(): List<VilkarsVurdering<*>> {
         return UnwrapOgEllerVisitor.unwrap(vilkårsvurdering())
-    }
-
-    private fun finnAvslagsparagrafer(): Set<Lovhenvisning> {
-        return finnAlleVilkårsvurderinger()
-            .map { it.utfall }
-            .filterIsInstance<VilkårsvurderingUtfall.Avslag>()
-            .flatMap { it.lovhenvisning() }
-            .toSet()
     }
 }
 
