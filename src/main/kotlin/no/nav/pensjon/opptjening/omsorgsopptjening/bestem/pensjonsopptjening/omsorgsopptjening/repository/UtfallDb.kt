@@ -160,7 +160,7 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
 internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
     return when (this) {
         is BehandlingsutfallDb.AutomatiskGodskrivingAvslag -> {
-            AutomatiskGodskrivingUtfall.Avslag(oppsummering.toDomain())
+            AutomatiskGodskrivingUtfall.AvslagUtenOppgave(oppsummering.toDomain())
 
         }
 

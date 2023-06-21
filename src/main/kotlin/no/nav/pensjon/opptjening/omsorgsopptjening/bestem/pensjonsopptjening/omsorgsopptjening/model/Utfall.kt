@@ -42,7 +42,11 @@ sealed class AutomatiskGodskrivingUtfall : BehandlingUtfall() {
     abstract val oppsummering: Behandlingsoppsummering
 
     data class Innvilget(override val oppsummering: Behandlingsoppsummering) : AutomatiskGodskrivingUtfall()
-    data class Avslag(override val oppsummering: Behandlingsoppsummering) : AutomatiskGodskrivingUtfall()
+    sealed class Avslag : AutomatiskGodskrivingUtfall()
+    data class AvslagMedOppgave(override val oppsummering: Behandlingsoppsummering) : Avslag()
+    data class AvslagUtenOppgave(override val oppsummering: Behandlingsoppsummering) : Avslag()
+
+
 }
 
 data class Behandlingsoppsummering(

@@ -2,7 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
 
-data class Behandling(
+data class Behandling
+    (
     private val grunnlag: BarnetrygdGrunnlag,
     private val vilkarFactory: VilkarFactory
 ) {
@@ -20,7 +21,7 @@ data class Behandling(
                 }
 
                 false -> {
-                    AutomatiskGodskrivingUtfall.Avslag(oppsummering())
+                    AutomatiskGodskrivingUtfall.AvslagUtenOppgave(oppsummering())
                 }
             }
         }

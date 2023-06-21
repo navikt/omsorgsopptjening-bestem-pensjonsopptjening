@@ -101,7 +101,7 @@ class FullOmsorgForBarnUnder6Test {
                 assertInstanceOf(VilkårsvurderingUtfall.Avslag.EnkeltParagraf::class.java, vurdering.utfall).also {
                     assertEquals(
                         setOf(
-                            Lovhenvisning.MINST_HALVT_AR_OMSORGg,
+                            Lovhenvisning.MINST_HALVT_AR_OMSORG,
                             Lovhenvisning.OPPTJENING_GIS_BARNETRYGDMOTTAKER
                         ),
                         it.lovhenvisning
