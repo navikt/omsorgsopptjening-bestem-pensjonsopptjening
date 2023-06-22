@@ -1,11 +1,11 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonOgOmsorgsårGrunnlag
 import java.util.UUID
 
@@ -18,23 +18,24 @@ internal sealed class GrunnlagVilkårsvurderingDb {
     internal sealed class OmsorgBarnUnder6 : GrunnlagVilkårsvurderingDb() {
         abstract val omsorgsAr: Int
         abstract val omsorgsmottaker: PersonMedFødselsårDb
+        abstract val antallMåneder: Int
 
         data class OmsorgBarnFødtOmsorgsår(
             override val omsorgsAr: Int,
             override val omsorgsmottaker: PersonMedFødselsårDb,
-            val minstEnMindFullOmsorg: Boolean,
+            override val antallMåneder: Int,
         ) : OmsorgBarnUnder6()
 
         data class OmsorgBarnFødtDesemberOmsorgsår(
             override val omsorgsAr: Int,
             override val omsorgsmottaker: PersonMedFødselsårDb,
-            val minstEnMånedFullOmsorgÅretEtterFødsel: Boolean,
+            override val antallMåneder: Int,
         ) : OmsorgBarnUnder6()
 
         data class OmsorgBarnFødtUtenforOmsorgsår(
             override val omsorgsAr: Int,
             override val omsorgsmottaker: PersonMedFødselsårDb,
-            val minstSeksMånederFullOmsorg: Boolean,
+            override val antallMåneder: Int,
         ) : OmsorgBarnUnder6()
     }
 
@@ -199,7 +200,7 @@ internal fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.toDb(): GrunnlagV
             GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker.toDb(),
-                minstEnMindFullOmsorg = minstEnMånedFullOmsorg
+                antallMåneder = antallMåneder
             )
         }
 
@@ -207,7 +208,7 @@ internal fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.toDb(): GrunnlagV
             GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker.toDb(),
-                minstSeksMånederFullOmsorg = minstSeksMånederFullOmsorg
+                antallMåneder = antallMåneder
             )
         }
 
@@ -215,7 +216,7 @@ internal fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.toDb(): GrunnlagV
             GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtDesemberOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker.toDb(),
-                minstEnMånedFullOmsorgÅretEtterFødsel = minstEnMånedOmsorgÅretEtterFødsel
+                antallMåneder = antallMåneder
             )
         }
     }
@@ -227,7 +228,7 @@ internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.toDomain(): Omsorgsyte
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker.toDomain(),
-                minstEnMånedFullOmsorg = minstEnMindFullOmsorg
+                antallMåneder = antallMåneder
             )
         }
 
@@ -235,7 +236,7 @@ internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.toDomain(): Omsorgsyte
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker.toDomain(),
-                minstSeksMånederFullOmsorg = minstSeksMånederFullOmsorg
+                antallMåneder = antallMåneder
 
             )
         }
@@ -244,7 +245,7 @@ internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.toDomain(): Omsorgsyte
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker.toDomain(),
-                minstEnMånedOmsorgÅretEtterFødsel = minstEnMånedFullOmsorgÅretEtterFødsel
+                antallMåneder = antallMåneder
             )
         }
     }

@@ -103,7 +103,7 @@ sealed class BarnetrygdGrunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
-                    minstEnMånedFullOmsorg = antallMånederFullOmsorgForMottaker() > 0
+                    antallMåneder = antallMånederFullOmsorgForMottaker()
                 )
             }
         }
@@ -123,7 +123,7 @@ sealed class BarnetrygdGrunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
-                    minstEnMånedOmsorgÅretEtterFødsel = antallMånederFullOmsorgForMottaker() > 0
+                    antallMåneder = antallMånederFullOmsorgForMottaker()
                 )
             }
         }
@@ -143,7 +143,7 @@ sealed class BarnetrygdGrunnlag {
             return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker,
-                minstSeksMånederFullOmsorg = antallMånederFullOmsorgForMottaker() > 6
+                antallMåneder = antallMånederFullOmsorgForMottaker()
             )
         }
     }

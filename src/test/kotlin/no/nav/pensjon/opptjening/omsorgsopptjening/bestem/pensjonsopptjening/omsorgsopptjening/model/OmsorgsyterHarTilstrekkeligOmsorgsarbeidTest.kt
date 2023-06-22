@@ -16,11 +16,12 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12125678910",
                     fodselsAr = 1999
                 ),
-                minstSeksMånederFullOmsorg = true
+                antallMåneder = 6
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)
         }
+    }
 
     @Test
     fun `Gitt en mottaker født I omsorgsår når det er minst en måned full omsorg så invilget`() {
@@ -31,10 +32,11 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12345678910",
                     fodselsAr = 2000
                 ),
-                minstEnMånedFullOmsorg = true
+                antallMåneder = 1
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)
+        }
     }
 
     @Test
@@ -46,10 +48,11 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12345678910",
                     fodselsAr = 2000
                 ),
-                minstEnMånedFullOmsorg = false
+                antallMåneder = 0
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall)
+        }
     }
 
     @Test
@@ -61,10 +64,11 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12125678910",
                     fodselsAr = 2000
                 ),
-                minstEnMånedOmsorgÅretEtterFødsel = true
+                antallMåneder = 1
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)
+        }
     }
 
     @Test
@@ -76,18 +80,18 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12125678910",
                     fodselsAr = 2000
                 ),
-                minstEnMånedOmsorgÅretEtterFødsel = false
+                antallMåneder = 0
             )
         ).also { vurdering ->
-            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall)}
+            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall)
+        }
     }
-
 
 
     @Test
     fun `number of months with full omsorg`() {
         val omsorgsår = 2000
-        listOf(0, 1, 2, 3, 4, 5, 6).forEach { monthsFullOmsorg ->
+        listOf(0, 1, 2, 3, 4, 5).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
                 grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                     omsorgsAr = omsorgsår,
@@ -95,7 +99,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                         fnr = "12345678910",
                         fodselsAr = omsorgsår - 2
                     ),
-                    minstSeksMånederFullOmsorg = monthsFullOmsorg > 6
+                    antallMåneder = monthsFullOmsorg
                 )
             ).also { vurdering ->
                 assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
@@ -110,7 +114,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
             }
 
         }
-        listOf(7, 8, 9, 10, 11, 12).forEach { monthsFullOmsorg ->
+        listOf(6, 7, 8, 9, 10, 11, 12).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
                 grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                     omsorgsAr = omsorgsår,
@@ -118,7 +122,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                         fnr = "12345678910",
                         fodselsAr = omsorgsår - 2
                     ),
-                    minstSeksMånederFullOmsorg = monthsFullOmsorg > 6
+                    antallMåneder = monthsFullOmsorg
                 )
             ).also {
                 assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -136,7 +140,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12345678910",
                     fodselsAr = omsorgsår - 6
                 ),
-                minstSeksMånederFullOmsorg = false
+                antallMåneder = 3
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {

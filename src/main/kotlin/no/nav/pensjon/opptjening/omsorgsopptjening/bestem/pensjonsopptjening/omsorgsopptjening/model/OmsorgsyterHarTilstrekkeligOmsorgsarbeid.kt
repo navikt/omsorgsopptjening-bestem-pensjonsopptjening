@@ -30,7 +30,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår(),
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
                 ).let {
-                    if (grunnlag.minstEnMånedFullOmsorg) {
+                   if (grunnlag.antallMåneder >= 1) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -43,7 +43,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     Referanse.MåHaMinstHalveÅretMedOmsorg(),
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
                 ).let {
-                    if (grunnlag.minstSeksMånederFullOmsorg) {
+                    if (grunnlag.antallMåneder >= 6) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -56,7 +56,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår(),
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
                 ).let {
-                    if (grunnlag.minstEnMånedOmsorgÅretEtterFødsel) {
+                    if (grunnlag.antallMåneder >= 1) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -75,11 +75,12 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
     sealed class Grunnlag : ParagrafGrunnlag() {
         abstract val omsorgsAr: Int
         abstract val omsorgsmottaker: PersonMedFødselsår
+        abstract val antallMåneder: Int
 
         data class OmsorgsmottakerFødtUtenforOmsorgsår(
             override val omsorgsAr: Int,
             override val omsorgsmottaker: PersonMedFødselsår,
-            val minstSeksMånederFullOmsorg: Boolean,
+            override val antallMåneder: Int,
         ) : Grunnlag() {
             init {
                 require(!omsorgsmottaker.erFødt(omsorgsAr))
@@ -89,7 +90,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         data class OmsorgsmottakerFødtIOmsorgsår(
             override val omsorgsAr: Int,
             override val omsorgsmottaker: PersonMedFødselsår,
-            val minstEnMånedFullOmsorg: Boolean,
+            override val antallMåneder: Int,
         ) : Grunnlag() {
             init {
                 require(omsorgsmottaker.erFødt(omsorgsAr))
@@ -99,7 +100,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         data class OmsorgsmottakerFødtIDesemberOmsorgsår(
             override val omsorgsAr: Int,
             override val omsorgsmottaker: PersonMedFødselsår,
-            val minstEnMånedOmsorgÅretEtterFødsel: Boolean,
+            override val antallMåneder: Int,
         ) : Grunnlag() {
             init {
                 require(omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER))
