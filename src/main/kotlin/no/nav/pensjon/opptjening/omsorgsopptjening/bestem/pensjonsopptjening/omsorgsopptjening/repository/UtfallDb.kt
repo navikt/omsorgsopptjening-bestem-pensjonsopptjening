@@ -56,7 +56,7 @@ internal sealed class VilkårsvurderingUtfallDb {
 )
 @JsonSubTypes(
     JsonSubTypes.Type(
-        value = BehandlingsutfallDb.AutomatiskGodskrivingAvslag::class,
+        value = BehandlingsutfallDb.AutomatiskGodskrivingAvslagUtenOppgave::class,
         name = "AutomatiskGodskrivingAvslag",
     ),
     JsonSubTypes.Type(
@@ -66,18 +66,23 @@ internal sealed class VilkårsvurderingUtfallDb {
 )
 internal sealed class BehandlingsutfallDb {
 
-    object AutomatiskGodskrivingAvslag : BehandlingsutfallDb()
+    object AutomatiskGodskrivingAvslagUtenOppgave : BehandlingsutfallDb()
+    object AutomatiskGodskrivingAvslagMedOppgave : BehandlingsutfallDb()
 
     object AutomatiskGodskrivingInnvilget : BehandlingsutfallDb()
 }
 
 internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
     return when (this) {
-        is AutomatiskGodskrivingUtfall.Avslag -> {
-            BehandlingsutfallDb.AutomatiskGodskrivingAvslag
+        AutomatiskGodskrivingUtfall.AvslagMedOppgave -> {
+            BehandlingsutfallDb.AutomatiskGodskrivingAvslagMedOppgave
         }
 
-        is AutomatiskGodskrivingUtfall.Innvilget -> {
+        AutomatiskGodskrivingUtfall.AvslagUtenOppgave -> {
+            BehandlingsutfallDb.AutomatiskGodskrivingAvslagUtenOppgave
+        }
+
+        AutomatiskGodskrivingUtfall.Innvilget -> {
             BehandlingsutfallDb.AutomatiskGodskrivingInnvilget
         }
     }
@@ -141,13 +146,16 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
 
 internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
     return when (this) {
-        is BehandlingsutfallDb.AutomatiskGodskrivingAvslag -> {
+        is BehandlingsutfallDb.AutomatiskGodskrivingAvslagUtenOppgave -> {
             AutomatiskGodskrivingUtfall.AvslagUtenOppgave
-
         }
 
         is BehandlingsutfallDb.AutomatiskGodskrivingInnvilget -> {
             AutomatiskGodskrivingUtfall.Innvilget
+        }
+
+        is BehandlingsutfallDb.AutomatiskGodskrivingAvslagMedOppgave -> {
+            AutomatiskGodskrivingUtfall.AvslagMedOppgave
         }
     }
 }

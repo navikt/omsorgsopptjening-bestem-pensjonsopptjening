@@ -13,14 +13,18 @@ data class Behandling(
     fun grunnlag() = grunnlag
 
     fun utfall(): AutomatiskGodskrivingUtfall {
-        vilkårsvurdering().let {
-            return when (it.utfall.erInnvilget()) {
+        return vilkårsvurdering().let {
+            when (it.utfall.erInnvilget()) {
                 true -> {
                     AutomatiskGodskrivingUtfall.Innvilget
                 }
 
                 false -> {
-                    AutomatiskGodskrivingUtfall.AvslagUtenOppgave
+                    if (it.erEnesteAvslag<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering>()) {
+                        AutomatiskGodskrivingUtfall.AvslagMedOppgave
+                    } else {
+                        AutomatiskGodskrivingUtfall.AvslagUtenOppgave
+                    }
                 }
             }
         }
@@ -32,16 +36,11 @@ data class Behandling(
             vilkarFactory.omsorgsyterUnder70Ar(),
             vilkarFactory.omsorgsmottakerIkkeFylt6Ar(),
             vilkarFactory.fullOmsorgForBarnUnder6(),
-            vilkarFactory.liktAntallMånederOmsorg(),
+            vilkarFactory.fullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder(),
             vilkarFactory.kanKunGodskrivesEnOmsorgsyter(),
             vilkarFactory.kanKunGodskrivesEtBarnPerÅr()
         )
     }
-
-    private fun finnAlleVilkårsvurderinger(): List<VilkarsVurdering<*>> {
-        return UnwrapOgEllerVisitor.unwrap(vilkårsvurdering())
-    }
 }
-
 
 

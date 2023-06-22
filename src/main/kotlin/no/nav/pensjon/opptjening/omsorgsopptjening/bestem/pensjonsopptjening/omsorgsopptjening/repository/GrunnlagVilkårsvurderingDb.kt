@@ -6,9 +6,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingsIdUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonOgOmsorgsårGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6Grunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6Vurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEnOmsorgsyterGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEtBarnPerÅrGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.LiktAntallMånederOmsorgGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.LiktAntallMånederOmsorgVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerFødtIOmsorgsårGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag
@@ -79,6 +82,18 @@ internal sealed class GrunnlagVilkårsvurderingDb {
     data class LiktAntallMåneder(
         val omsorgsyter: OmsorgsyterMottakerAntallMånederDb,
         val andreOmsorgsytere: List<OmsorgsyterMottakerAntallMånederDb>
+    ): GrunnlagVilkårsvurderingDb()
+
+    data class OmsorgBarnUnder6OgIngenHarLikeMangeMåneder(
+        val barnUnder6: VilkårsvurderingDb,
+        val likeMangeMåneder: VilkårsvurderingDb
+    ): GrunnlagVilkårsvurderingDb()
+}
+
+internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6OgIngenHarLikeMangeMåneder.toDomain(): FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag {
+    return FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag(
+        fullOmsorgForBarnUnder6Vurdering = barnUnder6.toDomain() as FullOmsorgForBarnUnder6Vurdering,
+        liktAntallMånederOmsorgVurdering = likeMangeMåneder.toDomain() as LiktAntallMånederOmsorgVurdering
     )
 }
 

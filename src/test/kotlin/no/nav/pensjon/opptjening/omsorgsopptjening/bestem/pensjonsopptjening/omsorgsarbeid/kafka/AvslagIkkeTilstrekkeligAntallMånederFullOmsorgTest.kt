@@ -7,6 +7,15 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6Vurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEnOmsorgsyterVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEtBarnPerÅrVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerIkkeFylt6ArVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterFylt17ÅrVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erInnvilget
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
@@ -20,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import java.time.Month
 import java.time.YearMonth
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
 class AvslagIkkeTilstrekkeligAntallMånederFullOmsorgTest : SpringContextTest.NoKafka() {
@@ -72,7 +83,15 @@ class AvslagIkkeTilstrekkeligAntallMånederFullOmsorgTest : SpringContextTest.No
                 assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall)
+                assertInstanceOf(AutomatiskGodskrivingUtfall.AvslagUtenOppgave::class.java, it.utfall)
+
+                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterFylt17ÅrVurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsmottakerIkkeFylt6ArVurdering>() }
+                assertTrue { it.vilkårsvurdering.erAvslått<FullOmsorgForBarnUnder6Vurdering>() }
+                assertTrue { it.vilkårsvurdering.erAvslått<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<KanKunGodskrivesEnOmsorgsyterVurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<KanKunGodskrivesEtBarnPerÅrVurdering>() }
             }
         }
 
@@ -103,7 +122,15 @@ class AvslagIkkeTilstrekkeligAntallMånederFullOmsorgTest : SpringContextTest.No
                 assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall)
+                assertInstanceOf(AutomatiskGodskrivingUtfall.AvslagUtenOppgave::class.java, it.utfall)
+
+                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterFylt17ÅrVurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsmottakerIkkeFylt6ArVurdering>() }
+                assertTrue { it.vilkårsvurdering.erAvslått<FullOmsorgForBarnUnder6Vurdering>() }
+                assertTrue { it.vilkårsvurdering.erAvslått<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<KanKunGodskrivesEnOmsorgsyterVurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<KanKunGodskrivesEtBarnPerÅrVurdering>() }
             }
         }
     }

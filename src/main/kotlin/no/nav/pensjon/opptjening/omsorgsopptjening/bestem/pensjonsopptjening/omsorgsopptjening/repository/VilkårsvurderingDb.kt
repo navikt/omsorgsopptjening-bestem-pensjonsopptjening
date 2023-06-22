@@ -88,6 +88,12 @@ sealed class VilkårsvurderingDb {
         val grunnlag: GrunnlagVilkårsvurderingDb.LiktAntallMåneder,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
+    internal data class OmsorgBarnUnder6OgIngenLikeMangeMåneder(
+        val paragrafer: Set<HenvisningDb>,
+        val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6OgIngenHarLikeMangeMåneder,
+        val utfall: VilkårsvurderingUtfallDb,
+    ) : VilkårsvurderingDb()
 }
 
 internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
@@ -158,6 +164,17 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             VilkårsvurderingDb.LiktAntallMåneder(
                 paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
+                utfall = utfall.toDb()
+            )
+        }
+
+        is FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering -> {
+            VilkårsvurderingDb.OmsorgBarnUnder6OgIngenLikeMangeMåneder(
+                paragrafer = henvisninger.toDb(),
+                grunnlag = GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6OgIngenHarLikeMangeMåneder(
+                    barnUnder6 = grunnlag.fullOmsorgForBarnUnder6Vurdering.toDb(),
+                    likeMangeMåneder = grunnlag.liktAntallMånederOmsorgVurdering.toDb()
+                ),
                 utfall = utfall.toDb()
             )
         }
@@ -297,6 +314,14 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
 
         is VilkårsvurderingDb.LiktAntallMåneder -> {
             LiktAntallMånederOmsorgVurdering(
+                henvisninger = paragrafer.toDomain(),
+                grunnlag = grunnlag.toDomain(),
+                utfall = utfall.toDomain()
+            )
+        }
+
+        is VilkårsvurderingDb.OmsorgBarnUnder6OgIngenLikeMangeMåneder -> {
+            FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()

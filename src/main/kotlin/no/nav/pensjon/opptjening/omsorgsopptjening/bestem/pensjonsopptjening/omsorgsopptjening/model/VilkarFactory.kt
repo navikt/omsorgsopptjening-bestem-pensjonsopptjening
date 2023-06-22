@@ -16,10 +16,10 @@ internal class VilkarFactoryImpl(
         return OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår().vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
 
     }
+
     override fun omsorgsmottakerIkkeFylt6Ar(): OmsorgsmottakerIkkeFylt6ArVurdering {
         return OmsorgsmottakerIkkeFylt6Ar().vilkarsVurder(grunnlag.forOmsorgsmottakerOgÅr())
     }
-
 
 
     override fun kanKunGodskrivesEtBarnPerÅr(): KanKunGodskrivesEtBarnPerÅrVurdering {
@@ -42,7 +42,16 @@ internal class VilkarFactoryImpl(
             })
     }
 
-    override fun liktAntallMånederOmsorg(): LiktAntallMånederOmsorgVurdering {
+    override fun fullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder(): FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering {
+        return FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder().vilkarsVurder(
+            FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag(
+                fullOmsorgForBarnUnder6Vurdering = fullOmsorgForBarnUnder6(),
+                liktAntallMånederOmsorgVurdering = liktAntallMånederOmsorg()
+            )
+        )
+    }
+
+    fun liktAntallMånederOmsorg(): LiktAntallMånederOmsorgVurdering {
         return LiktAntallMånederOmsorg().vilkarsVurder(grunnlag.liktAntallMånederOmsorgGrunnlag())
     }
 
@@ -75,6 +84,5 @@ interface VilkarFactory {
 
     fun kanKunGodskrivesEtBarnPerÅr(): KanKunGodskrivesEtBarnPerÅrVurdering
 
-    fun liktAntallMånederOmsorg(): LiktAntallMånederOmsorgVurdering
-
+    fun fullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder(): FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering
 }
