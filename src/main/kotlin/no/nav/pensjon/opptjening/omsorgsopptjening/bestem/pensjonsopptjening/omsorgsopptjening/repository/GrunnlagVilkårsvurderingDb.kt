@@ -8,9 +8,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6Grunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEnOmsorgsyterGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEtBarnPerÅrGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.LiktAntallMånederOmsorgGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerFødtIOmsorgsårGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.YterMottakerManeder
 import java.util.UUID
 
 @JsonTypeInfo(
@@ -73,6 +75,48 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         val omsorgsmottaker: String,
         val behandlinger: List<AndreBehandlingerDb>
     ) : GrunnlagVilkårsvurderingDb()
+
+    data class LiktAntallMåneder(
+        val omsorgsyter: OmsorgsyterMottakerAntallMånederDb,
+        val andreOmsorgsytere: List<OmsorgsyterMottakerAntallMånederDb>
+    )
+}
+
+
+internal data class OmsorgsyterMottakerAntallMånederDb(
+    val omsorgsyter: PersonMedFødselsårDb,
+    val omsorgsmottaker: PersonMedFødselsårDb,
+    val antallMåneder: Int
+)
+
+internal fun OmsorgsyterMottakerAntallMånederDb.toDomain(): YterMottakerManeder {
+    return YterMottakerManeder(
+        omsorgsyter = omsorgsyter.toDomain(),
+        omsorgsmottaker = omsorgsmottaker.toDomain(),
+        antallManeder = antallMåneder
+    )
+}
+
+internal fun LiktAntallMånederOmsorgGrunnlag.toDb(): GrunnlagVilkårsvurderingDb.LiktAntallMåneder {
+    return GrunnlagVilkårsvurderingDb.LiktAntallMåneder(
+        omsorgsyter = omsorgsyter.toDb(),
+        andreOmsorgsytere = andreOmsorgsytere.map { it.toDb() }
+    )
+}
+
+internal fun GrunnlagVilkårsvurderingDb.LiktAntallMåneder.toDomain(): LiktAntallMånederOmsorgGrunnlag {
+    return LiktAntallMånederOmsorgGrunnlag(
+        omsorgsyter = omsorgsyter.toDomain(),
+        andreOmsorgsytere = andreOmsorgsytere.map { it.toDomain() }
+    )
+}
+
+internal fun YterMottakerManeder.toDb(): OmsorgsyterMottakerAntallMånederDb {
+    return OmsorgsyterMottakerAntallMånederDb(
+        omsorgsyter = omsorgsyter.toDb(),
+        omsorgsmottaker = omsorgsmottaker.toDb(),
+        antallMåneder = antallManeder
+    )
 }
 
 internal fun KanKunGodskrivesEnOmsorgsyterGrunnlag.toDb(): GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter {

@@ -26,7 +26,11 @@ data class BeriketDatagrunnlag(
 data class BeriketSak(
     val omsorgsyter: PersonMedFødselsår,
     val omsorgVedtakPeriode: List<BeriketVedtaksperiode>
-)
+){
+    fun antallMånederOmsorgFor(omsorgsmottaker: PersonMedFødselsår): Pair<PersonMedFødselsår, Int> {
+        return omsorgsyter to omsorgVedtakPeriode.filter { it.omsorgsmottaker == omsorgsmottaker }.sumOf { it.periode.antallMoneder() }
+    }
+}
 
 data class BeriketVedtaksperiode(
     val fom: YearMonth,

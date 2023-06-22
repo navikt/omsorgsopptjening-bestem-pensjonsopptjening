@@ -32,6 +32,7 @@ data class Behandling(
             vilkarFactory.omsorgsyterUnder70Ar(),
             vilkarFactory.omsorgsmottakerIkkeFylt6Ar(),
             vilkarFactory.fullOmsorgForBarnUnder6(),
+            vilkarFactory.liktAntallMånederOmsorg(),
             vilkarFactory.kanKunGodskrivesEnOmsorgsyter(),
             vilkarFactory.kanKunGodskrivesEtBarnPerÅr()
         )

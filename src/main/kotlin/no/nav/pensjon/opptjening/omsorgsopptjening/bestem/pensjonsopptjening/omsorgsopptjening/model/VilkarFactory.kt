@@ -42,8 +42,8 @@ internal class VilkarFactoryImpl(
             })
     }
 
-    override fun liktAntallMånederOmsorg(): LiktAntallMånederOmsorg {
-        return LiktAntallMånederOmsorg().vilkarsVurder(grunnlag.)
+    override fun liktAntallMånederOmsorg(): LiktAntallMånederOmsorgVurdering {
+        return LiktAntallMånederOmsorg().vilkarsVurder(grunnlag.liktAntallMånederOmsorgGrunnlag())
     }
 
     override fun fullOmsorgForBarnUnder6(): FullOmsorgForBarnUnder6Vurdering {
@@ -75,6 +75,6 @@ interface VilkarFactory {
 
     fun kanKunGodskrivesEtBarnPerÅr(): KanKunGodskrivesEtBarnPerÅrVurdering
 
-    fun liktAntallMånederOmsorg(): LiktAntallMånederOmsorg
+    fun liktAntallMånederOmsorg(): LiktAntallMånederOmsorgVurdering
 
 }

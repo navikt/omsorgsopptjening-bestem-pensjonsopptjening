@@ -82,6 +82,12 @@ sealed class VilkårsvurderingDb {
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
+    internal data class LiktAntallMåneder(
+        val paragrafer: Set<HenvisningDb>,
+        val grunnlag: GrunnlagVilkårsvurderingDb.LiktAntallMåneder,
+        val utfall: VilkårsvurderingUtfallDb,
+    ) : VilkårsvurderingDb()
 }
 
 internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
@@ -147,6 +153,14 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
                 utfall = utfall.toDb()
             )
         }
+
+        is LiktAntallMånederOmsorgVurdering -> {
+            VilkårsvurderingDb.LiktAntallMåneder(
+                paragrafer = henvisninger.toDb(),
+                grunnlag = grunnlag.toDb(),
+                utfall = utfall.toDb()
+            )
+        }
     }
 }
 
@@ -170,7 +184,8 @@ enum class HenvisningDb {
     FTRL_K20_P8_L1_Ba_pkt2,
     FTRL_K20_P8_L1_Ba_pkt3,
     FTRL_K20_P8_L2,
-    FOR_OMSORGSPOENG_K3_P4_L1_pkt1
+    FOR_OMSORGSPOENG_K3_P4_L1_pkt1,
+    FOR_OMSORGSPOENG_K2_P4_L3,
 }
 
 internal fun Set<Henvisning>.toDb(): Set<HenvisningDb> {
@@ -187,6 +202,7 @@ internal fun Henvisning.toDb(): HenvisningDb {
 internal fun Forskrift.toDb(): HenvisningDb {
     return when (this) {
         Forskrift.FOR_OMSORGSPOENG_K3_P4_L1_pkt1 -> HenvisningDb.FOR_OMSORGSPOENG_K3_P4_L1_pkt1
+        Forskrift.FOR_OMSORGSPOENG_K2_P4_L3 -> HenvisningDb.FOR_OMSORGSPOENG_K2_P4_L3
     }
 }
 
@@ -206,6 +222,7 @@ internal fun HenvisningDb.toDomain(): Henvisning {
         HenvisningDb.FTRL_K20_P8_L1_Ba_pkt3 -> Lovparagraf.FTRL_K20_P8_L1_Ba_pkt3
         HenvisningDb.FTRL_K20_P8_L2 -> Lovparagraf.FTRL_K20_P8_L2
         HenvisningDb.FOR_OMSORGSPOENG_K3_P4_L1_pkt1 -> Forskrift.FOR_OMSORGSPOENG_K3_P4_L1_pkt1
+        HenvisningDb.FOR_OMSORGSPOENG_K2_P4_L3 -> Forskrift.FOR_OMSORGSPOENG_K2_P4_L3
     }
 }
 
@@ -272,6 +289,14 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
 
         is VilkårsvurderingDb.OmsorgsmottakerIkkeFylt6Ar -> {
             OmsorgsmottakerIkkeFylt6ArVurdering(
+                henvisninger = paragrafer.toDomain(),
+                grunnlag = grunnlag.toDomain(),
+                utfall = utfall.toDomain()
+            )
+        }
+
+        is VilkårsvurderingDb.LiktAntallMåneder -> {
+            LiktAntallMånederOmsorgVurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()

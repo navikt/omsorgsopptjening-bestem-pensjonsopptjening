@@ -3,7 +3,7 @@
     "hentPerson": {
       "folkeregisteridentifikator": [
         {
-          "identifikasjonsnummer": "12345678910",
+          "identifikasjonsnummer": "01018212345",
           "status": "I_BRUK",
           "type": "FNR",
           "metadata": {
@@ -12,7 +12,7 @@
           }
         },
         {
-          "identifikasjonsnummer": "12345678911",
+          "identifikasjonsnummer": "61018212345",
           "status": "OPPHOERT",
           "type": "FNR",
           "metadata": {
@@ -23,7 +23,7 @@
       ],
       "foedsel": [
         {
-          "foedselsaar": 2000,
+          "foedselsaar": 1982,
           "metadata": {
             "historisk": false,
             "master": "FREG"

@@ -41,7 +41,7 @@ data class LiktAntallMånederOmsorgGrunnlag(
 ) : ParagrafGrunnlag() {
     init {
         require(andreOmsorgsytere.none { it.omsorgsyter == omsorgsyter.omsorgsyter }) { "Omsorgsyter som behandles kan ikke være i listen av andre omsorgsytere" }
-        require(andreOmsorgsytere.map { it.omsorgsmottaker }.distinct().single() == omsorgsyter.omsorgsmottaker)
+        require(if(andreOmsorgsytere.isNotEmpty()) andreOmsorgsytere.map { it.omsorgsmottaker }.distinct().single() == omsorgsyter.omsorgsmottaker else true)
     }
 
     fun finnesAndreOmsorgsytereMedLikeMangeManeder(): Boolean {

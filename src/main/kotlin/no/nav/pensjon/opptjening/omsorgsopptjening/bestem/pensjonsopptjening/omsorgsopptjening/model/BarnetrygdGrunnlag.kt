@@ -56,8 +56,25 @@ sealed class BarnetrygdGrunnlag {
     }
 
     fun liktAntallMånederOmsorgGrunnlag(): LiktAntallMånederOmsorgGrunnlag {
-        return LiktAntallMånederOmsorgGrunnlag(YterMottakerManeder(omsorgsyter, omsorgsmottaker, omsorgsSaker.))
+        return omsorgsSaker.associate { it.antallMånederOmsorgFor(omsorgsmottaker) }.let { yterTilAntallMnd ->
+            LiktAntallMånederOmsorgGrunnlag(
+                YterMottakerManeder(
+                    omsorgsyter = omsorgsyter,
+                    omsorgsmottaker = omsorgsmottaker,
+                    antallManeder = yterTilAntallMnd[omsorgsyter]!!
+                ),
+                andreOmsorgsytere = yterTilAntallMnd.filterNot { it.key == omsorgsyter }
+                    .map { (annenOmsorgsyter, antMnd) ->
+                        YterMottakerManeder(
+                            omsorgsyter = annenOmsorgsyter,
+                            omsorgsmottaker = omsorgsmottaker,
+                            antallManeder = antMnd
+                        )
+                    }
+            )
+        }
     }
+
 
     fun forOmsorgsmottakerOgÅr(): PersonOgOmsorgsårGrunnlag {
         return PersonOgOmsorgsårGrunnlag(
