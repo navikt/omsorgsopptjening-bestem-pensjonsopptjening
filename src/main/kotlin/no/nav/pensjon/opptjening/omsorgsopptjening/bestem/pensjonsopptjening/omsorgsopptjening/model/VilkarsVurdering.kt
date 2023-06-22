@@ -9,9 +9,7 @@ sealed class VilkarsVurdering<Grunnlag : Any> {
     }
 }
 
-sealed class ParagrafVurdering<T : ParagrafGrunnlag> : VilkarsVurdering<T>() {
-    abstract val henvisninger: Set<Henvisning>
-}
+sealed class ParagrafVurdering<T : ParagrafGrunnlag> : VilkarsVurdering<T>()
 
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erAvslått(): Boolean {
     return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { !erInnvilget<T>() }.single()

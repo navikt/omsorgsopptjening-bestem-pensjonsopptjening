@@ -9,20 +9,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
     include = JsonTypeInfo.As.PROPERTY,
     property = "type",
 )
-@JsonSubTypes(
-    JsonSubTypes.Type(
-        value = BeriketGrunnlagDb.FødtDesember::class,
-        name = "FødtDesember",
-    ),
-    JsonSubTypes.Type(
-        value = BeriketGrunnlagDb.IkkeFødtDesember::class,
-        name = "IkkeFødtDesember",
-    ),
-    JsonSubTypes.Type(
-        value = BeriketGrunnlagDb.IkkeFødtIOmsorgsår::class,
-        name = "IkkeFødtIOmsorgsår",
-    ),
-)
 internal sealed class BeriketGrunnlagDb {
     abstract val omsorgsår: Int
     abstract val grunnlag: BeriketOmsorgsgrunnlagDb

@@ -1,10 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-object OmsorgsyterFylt17VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
+object OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
     override fun vilkarsVurder(grunnlag: PersonOgOmsorgsårGrunnlag): Vurdering {
         return bestemUtfall(grunnlag).let {
             Vurdering(
-                henvisninger = it.henvisninger(),
                 grunnlag = grunnlag,
                 utfall = it,
             )
@@ -13,9 +12,9 @@ object OmsorgsyterFylt17VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorgs�
 
     override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller17()
+            Referanse.OmsorgsmottakerErIkkeFylt6FørUtgangAvOpptjeningsår()
         ).let {
-            if (grunnlag.person.alderVedUtløpAv(grunnlag.omsorgsAr) >= 17) {
+            if (grunnlag.alderMottaker(mellom = 0..5)) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -24,7 +23,6 @@ object OmsorgsyterFylt17VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorgs�
     }
 
     data class Vurdering(
-        override val henvisninger: Set<Henvisning>,
         override val grunnlag: PersonOgOmsorgsårGrunnlag,
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<PersonOgOmsorgsårGrunnlag>()

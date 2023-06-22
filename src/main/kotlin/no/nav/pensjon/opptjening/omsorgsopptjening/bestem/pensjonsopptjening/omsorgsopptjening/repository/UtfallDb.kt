@@ -10,32 +10,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
     include = JsonTypeInfo.As.PROPERTY,
     property = "type",
 )
-@JsonSubTypes(
-    JsonSubTypes.Type(
-        value = VilkårsvurderingUtfallDb.EllerAvslått::class,
-        name = "EllerAvslått",
-    ),
-    JsonSubTypes.Type(
-        value = VilkårsvurderingUtfallDb.EllerInnvilget::class,
-        name = "EllerInnvilget",
-    ),
-    JsonSubTypes.Type(
-        value = VilkårsvurderingUtfallDb.OgAvslått::class,
-        name = "OgAvslått",
-    ),
-    JsonSubTypes.Type(
-        value = VilkårsvurderingUtfallDb.OgInnvilget::class,
-        name = "OgInnvilget",
-    ),
-    JsonSubTypes.Type(
-        value = VilkårsvurderingUtfallDb.VilkårAvslag::class,
-        name = "VilkårAvslag",
-    ),
-    JsonSubTypes.Type(
-        value = VilkårsvurderingUtfallDb.VilkårInnvilget::class,
-        name = "VilkårInnvilget",
-    ),
-)
 internal sealed class VilkårsvurderingUtfallDb {
     object EllerAvslått : VilkårsvurderingUtfallDb()
 
@@ -53,16 +27,6 @@ internal sealed class VilkårsvurderingUtfallDb {
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
     property = "type",
-)
-@JsonSubTypes(
-    JsonSubTypes.Type(
-        value = BehandlingsutfallDb.AutomatiskGodskrivingAvslagUtenOppgave::class,
-        name = "AutomatiskGodskrivingAvslag",
-    ),
-    JsonSubTypes.Type(
-        value = BehandlingsutfallDb.AutomatiskGodskrivingInnvilget::class,
-        name = "AutomatiskGodskrivingInnvilget",
-    )
 )
 internal sealed class BehandlingsutfallDb {
 

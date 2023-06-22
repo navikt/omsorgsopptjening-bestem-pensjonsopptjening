@@ -2,12 +2,11 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
 
-object FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder :
-    ParagrafVilkår<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder.Grunnlag>() {
+object OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid :
+    ParagrafVilkår<OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return bestemUtfall(grunnlag).let {
             Vurdering(
-                henvisninger = it.henvisninger(),
                 grunnlag = grunnlag,
                 utfall = it,
             )
@@ -32,13 +31,12 @@ object FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder :
     }
 
     data class Vurdering(
-        override val henvisninger: Set<Henvisning>,
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>()
 
     data class Grunnlag(
-        val fullOmsorgForBarnUnder6Vurdering: FullOmsorgForBarnUnder6.Vurdering,
-        val liktAntallMånederOmsorgVurdering: LiktAntallMånederOmsorg.Vurdering,
+        val fullOmsorgForBarnUnder6Vurdering: OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering,
+        val liktAntallMånederOmsorgVurdering: OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Vurdering,
     ) : ParagrafGrunnlag()
 }

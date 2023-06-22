@@ -8,8 +8,8 @@ class KanKunGodskrivesEnOmsorgsyterTest {
 
     @Test
     fun `innvilget dersom det ikke eksisterer behandlinger`() {
-        KanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
-            KanKunGodskrivesEnOmsorgsyter.Grunnlag(
+        OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
+            OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag(
                 emptyList()
             )
         ).also {
@@ -19,14 +19,14 @@ class KanKunGodskrivesEnOmsorgsyterTest {
 
     @Test
     fun `innvilget dersom det ikke eksisterer innvilget behandling`() {
-        KanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
-            KanKunGodskrivesEnOmsorgsyter.Grunnlag(
+        OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
+            OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag(
                 listOf(
-                    KanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
+                    OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
                         behandlingsId = UUID.randomUUID(),
                         erInnvilget = false
                     ),
-                    KanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
+                    OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
                         behandlingsId = UUID.randomUUID(),
                         erInnvilget = false
                     )
@@ -39,14 +39,14 @@ class KanKunGodskrivesEnOmsorgsyterTest {
 
     @Test
     fun `avslag dersom det eksisterer innvilget behandling`() {
-        KanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
-            KanKunGodskrivesEnOmsorgsyter.Grunnlag(
+        OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
+            OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag(
                 listOf(
-                    KanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
+                    OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
                         behandlingsId = UUID.randomUUID(),
                         erInnvilget = false
                     ),
-                    KanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
+                    OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
                         behandlingsId = UUID.randomUUID(),
                         erInnvilget = true
                     )

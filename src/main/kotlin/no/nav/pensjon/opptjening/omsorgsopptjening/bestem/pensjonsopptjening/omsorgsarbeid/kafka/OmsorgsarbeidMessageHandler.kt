@@ -34,7 +34,7 @@ class OmsorgsarbeidMessageHandler(
                     behandlingRepo.persist(
                         Behandling(
                             grunnlag = it,
-                            vilkarFactory = VilkarFactoryImpl(
+                            vurderVilkår = VilkårsvurderingFactory(
                                 grunnlag = it,
                                 behandlingRepo = behandlingRepo
                             )

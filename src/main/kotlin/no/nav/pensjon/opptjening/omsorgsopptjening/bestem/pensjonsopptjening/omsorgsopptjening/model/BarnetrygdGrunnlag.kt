@@ -55,17 +55,17 @@ sealed class BarnetrygdGrunnlag {
         )
     }
 
-    fun liktAntallMånederOmsorgGrunnlag(): LiktAntallMånederOmsorg.Grunnlag {
+    fun tilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere(): OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag {
         return omsorgsSaker.associate { it.antallMånederOmsorgFor(omsorgsmottaker) }.let { yterTilAntallMnd ->
-            LiktAntallMånederOmsorg.Grunnlag(
-                LiktAntallMånederOmsorg.Grunnlag.YterMottakerManeder(
+            OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag(
+                OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag.YterMottakerManeder(
                     omsorgsyter = omsorgsyter,
                     omsorgsmottaker = omsorgsmottaker,
                     antallManeder = yterTilAntallMnd[omsorgsyter]!!
                 ),
                 andreOmsorgsytere = yterTilAntallMnd.filterNot { it.key == omsorgsyter }
                     .map { (annenOmsorgsyter, antMnd) ->
-                        LiktAntallMånederOmsorg.Grunnlag.YterMottakerManeder(
+                        OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag.YterMottakerManeder(
                             omsorgsyter = annenOmsorgsyter,
                             omsorgsmottaker = omsorgsmottaker,
                             antallManeder = antMnd
@@ -87,7 +87,7 @@ sealed class BarnetrygdGrunnlag {
         return omsorgsSaker.flatMap { it.omsorgVedtakPeriode }.flatMap { it.periode.alleMåneder() }.distinct().toSet()
     }
 
-    abstract fun fullOmsorg(): FullOmsorgForBarnUnder6.Grunnlag
+    abstract fun tilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag
     sealed class FødtIOmsorgsår : BarnetrygdGrunnlag() {
         data class IkkeFødtDesember(
             override val omsorgsAr: Int,
@@ -99,8 +99,8 @@ sealed class BarnetrygdGrunnlag {
                 ) { "Grunnlag contains months outside of the omsorgsår: $omsorgsAr" }
             }
 
-            override fun fullOmsorg(): FullOmsorgForBarnUnder6.Grunnlag {
-                return FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
+            override fun tilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
+                return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
                     minstEnMånedFullOmsorg = antallMånederFullOmsorgForMottaker() > 0
@@ -119,8 +119,8 @@ sealed class BarnetrygdGrunnlag {
                 ) { "Grunnlag should only contain months from: $årEtterOmsorgsår" }
             }
 
-            override fun fullOmsorg(): FullOmsorgForBarnUnder6.Grunnlag {
-                return FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
+            override fun tilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
+                return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
                     minstEnMånedOmsorgÅretEtterFødsel = antallMånederFullOmsorgForMottaker() > 0
@@ -139,8 +139,8 @@ sealed class BarnetrygdGrunnlag {
             ) { "Grunnlag contains months outside of the omsorgsår: $omsorgsAr" }
         }
 
-        override fun fullOmsorg(): FullOmsorgForBarnUnder6.Grunnlag {
-            return FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
+        override fun tilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
+            return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker,
                 minstSeksMånederFullOmsorg = antallMånederFullOmsorgForMottaker() > 6

@@ -2,11 +2,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import java.util.UUID
 
-object KanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<KanKunGodskrivesEnOmsorgsyter.Grunnlag>() {
+object OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr : ParagrafVilkår<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return bestemUtfall(grunnlag).let {
             Vurdering(
-                henvisninger = it.henvisninger(),
                 grunnlag = grunnlag,
                 utfall = it,
             )
@@ -14,10 +13,10 @@ object KanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<KanKunGodskrivesEnOmsorgs
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
-        setOf(
-            Referanse.OmsorgsopptjeningGisKunEnOmsorgsyter()
+        return setOf(
+            Referanse.OpptjeningKanKunGodskrivesForEtBarnPerÅr()
         ).let {
-            return if (grunnlag.behandlingsIdUtfallListe.none { it.erInnvilget }) {
+            if (grunnlag.behandlinger.none { it.erInnvilget }) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -26,18 +25,20 @@ object KanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<KanKunGodskrivesEnOmsorgs
     }
 
     data class Vurdering(
-        override val henvisninger: Set<Henvisning>,
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>()
 
     data class Grunnlag(
-        val behandlingsIdUtfallListe: List<BehandlingsIdUtfall>
+        val omsorgsmottaker: String,
+        val behandlinger: List<AndreBehandlinger>
     ) : ParagrafGrunnlag() {
-        data class BehandlingsIdUtfall(
-            //TODO legg til år og mottaker
+        data class AndreBehandlinger(
             val behandlingsId: UUID,
+            val år: Int,
+            val omsorgsmottaker: String,
             val erInnvilget: Boolean
         )
     }
 }
+

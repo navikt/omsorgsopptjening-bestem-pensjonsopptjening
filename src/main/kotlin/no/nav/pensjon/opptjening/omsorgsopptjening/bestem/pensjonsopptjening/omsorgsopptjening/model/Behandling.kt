@@ -4,7 +4,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 
 data class Behandling(
     private val grunnlag: BarnetrygdGrunnlag,
-    private val vilkarFactory: VilkarFactory
+    private val vurderVilkår: VurderVilkår
 ) {
     fun omsorgsår() = grunnlag.omsorgsAr
     fun omsorgsmottaker() = grunnlag.omsorgsmottaker
@@ -20,7 +20,7 @@ data class Behandling(
                 }
 
                 false -> {
-                    if (it.erEnesteAvslag<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder.Vurdering>()) {
+                    if (it.erEnesteAvslag<OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid.Vurdering>()) {
                         AutomatiskGodskrivingUtfall.AvslagMedOppgave
                     } else {
                         AutomatiskGodskrivingUtfall.AvslagUtenOppgave
@@ -32,13 +32,13 @@ data class Behandling(
 
     fun vilkårsvurdering(): VilkarsVurdering<*> {
         return og(
-            vilkarFactory.omsorgsyterOver16Ar(),
-            vilkarFactory.omsorgsyterUnder70Ar(),
-            vilkarFactory.omsorgsmottakerIkkeFylt6Ar(),
-            vilkarFactory.fullOmsorgForBarnUnder6(),
-            vilkarFactory.fullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder(),
-            vilkarFactory.kanKunGodskrivesEnOmsorgsyter(),
-            vilkarFactory.kanKunGodskrivesEtBarnPerÅr()
+            vurderVilkår.OmsorgsyterErFylt17VedUtløpAvOmsorgsår(),
+            vurderVilkår.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(),
+            vurderVilkår.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(),
+            vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
+            vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid(),
+            vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter(),
+            vurderVilkår.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr()
         )
     }
 }

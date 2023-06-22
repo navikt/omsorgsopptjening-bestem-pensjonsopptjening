@@ -13,11 +13,10 @@ import java.time.Month
  * Det betyr at vi må sjekke om omsorgsyter har fått barnetrygd i året etter for å vite om omsorgsyter har rett til omsorgsopptjening
  *
  */
-object FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6.Grunnlag>() {
+object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return bestemUtfall(grunnlag).let {
             Vurdering(
-                henvisninger = it.henvisninger(),
                 grunnlag = grunnlag,
                 utfall = it,
             )
@@ -68,7 +67,6 @@ object FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6.Grunnla
     }
 
     data class Vurdering(
-        override val henvisninger: Set<Henvisning>,
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>()

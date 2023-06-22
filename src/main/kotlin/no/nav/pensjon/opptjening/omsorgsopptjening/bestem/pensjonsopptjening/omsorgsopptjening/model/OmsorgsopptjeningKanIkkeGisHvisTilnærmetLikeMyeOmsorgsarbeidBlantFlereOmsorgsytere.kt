@@ -7,11 +7,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
  * må omsorgsyterne sette fram krav om omsorgsopptjening med opplysning om hvem av
  * omsorgsyterne som skal ha opptjeningen for kalenderåret
  */
-object LiktAntallMånederOmsorg : ParagrafVilkår<LiktAntallMånederOmsorg.Grunnlag>() {
+object OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere :
+    ParagrafVilkår<OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return bestemUtfall(grunnlag).let {
             Vurdering(
-                henvisninger = it.henvisninger(),
                 grunnlag = grunnlag,
                 utfall = it,
             )
@@ -19,17 +19,18 @@ object LiktAntallMånederOmsorg : ParagrafVilkår<LiktAntallMånederOmsorg.Grunn
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
-        return setOf(Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder()).let {
+        return setOf(
+            Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder()
+        ).let {
             if (grunnlag.finnesAndreOmsorgsytereMedLikeMangeManeder()) {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(setOf(Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder()))
+                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
             } else {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(setOf(Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder()))
+                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             }
         }
     }
 
     data class Vurdering(
-        override val henvisninger: Set<Henvisning>,
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>()
@@ -49,6 +50,7 @@ object LiktAntallMånederOmsorg : ParagrafVilkår<LiktAntallMånederOmsorg.Grunn
         fun finnesAndreOmsorgsytereMedLikeMangeManeder(): Boolean {
             return andreOmsorgsytere.any { omsorgsyter.antallManeder == it.antallManeder }
         }
+
         data class YterMottakerManeder(
             val omsorgsyter: PersonMedFødselsår,
             val omsorgsmottaker: PersonMedFødselsår,
