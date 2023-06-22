@@ -55,17 +55,17 @@ sealed class BarnetrygdGrunnlag {
         )
     }
 
-    fun liktAntallMånederOmsorgGrunnlag(): LiktAntallMånederOmsorgGrunnlag {
+    fun liktAntallMånederOmsorgGrunnlag(): LiktAntallMånederOmsorg.Grunnlag {
         return omsorgsSaker.associate { it.antallMånederOmsorgFor(omsorgsmottaker) }.let { yterTilAntallMnd ->
-            LiktAntallMånederOmsorgGrunnlag(
-                YterMottakerManeder(
+            LiktAntallMånederOmsorg.Grunnlag(
+                LiktAntallMånederOmsorg.Grunnlag.YterMottakerManeder(
                     omsorgsyter = omsorgsyter,
                     omsorgsmottaker = omsorgsmottaker,
                     antallManeder = yterTilAntallMnd[omsorgsyter]!!
                 ),
                 andreOmsorgsytere = yterTilAntallMnd.filterNot { it.key == omsorgsyter }
                     .map { (annenOmsorgsyter, antMnd) ->
-                        YterMottakerManeder(
+                        LiktAntallMånederOmsorg.Grunnlag.YterMottakerManeder(
                             omsorgsyter = annenOmsorgsyter,
                             omsorgsmottaker = omsorgsmottaker,
                             antallManeder = antMnd
@@ -87,7 +87,7 @@ sealed class BarnetrygdGrunnlag {
         return omsorgsSaker.flatMap { it.omsorgVedtakPeriode }.flatMap { it.periode.alleMåneder() }.distinct().toSet()
     }
 
-    abstract fun fullOmsorg(): FullOmsorgForBarnUnder6Grunnlag
+    abstract fun fullOmsorg(): FullOmsorgForBarnUnder6.Grunnlag
     sealed class FødtIOmsorgsår : BarnetrygdGrunnlag() {
         data class IkkeFødtDesember(
             override val omsorgsAr: Int,
@@ -99,8 +99,8 @@ sealed class BarnetrygdGrunnlag {
                 ) { "Grunnlag contains months outside of the omsorgsår: $omsorgsAr" }
             }
 
-            override fun fullOmsorg(): FullOmsorgForBarnUnder6Grunnlag {
-                return OmsorgsmottakerFødtIOmsorgsårGrunnlag(
+            override fun fullOmsorg(): FullOmsorgForBarnUnder6.Grunnlag {
+                return FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
                     minstEnMånedFullOmsorg = antallMånederFullOmsorgForMottaker() > 0
@@ -119,8 +119,8 @@ sealed class BarnetrygdGrunnlag {
                 ) { "Grunnlag should only contain months from: $årEtterOmsorgsår" }
             }
 
-            override fun fullOmsorg(): FullOmsorgForBarnUnder6Grunnlag {
-                return OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag(
+            override fun fullOmsorg(): FullOmsorgForBarnUnder6.Grunnlag {
+                return FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
                     minstEnMånedOmsorgÅretEtterFødsel = antallMånederFullOmsorgForMottaker() > 0
@@ -139,8 +139,8 @@ sealed class BarnetrygdGrunnlag {
             ) { "Grunnlag contains months outside of the omsorgsår: $omsorgsAr" }
         }
 
-        override fun fullOmsorg(): FullOmsorgForBarnUnder6Grunnlag {
-            return OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
+        override fun fullOmsorg(): FullOmsorgForBarnUnder6.Grunnlag {
+            return FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker,
                 minstSeksMånederFullOmsorg = antallMånederFullOmsorgForMottaker() > 6

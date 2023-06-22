@@ -8,8 +8,8 @@ class KanKunGodskrivesEnOmsorgsyterTest {
 
     @Test
     fun `innvilget dersom det ikke eksisterer behandlinger`() {
-        KanKunGodskrivesEnOmsorgsyter().vilkarsVurder(
-            KanKunGodskrivesEnOmsorgsyterGrunnlag(
+        KanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
+            KanKunGodskrivesEnOmsorgsyter.Grunnlag(
                 emptyList()
             )
         ).also {
@@ -19,14 +19,14 @@ class KanKunGodskrivesEnOmsorgsyterTest {
 
     @Test
     fun `innvilget dersom det ikke eksisterer innvilget behandling`() {
-        KanKunGodskrivesEnOmsorgsyter().vilkarsVurder(
-            KanKunGodskrivesEnOmsorgsyterGrunnlag(
+        KanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
+            KanKunGodskrivesEnOmsorgsyter.Grunnlag(
                 listOf(
-                    BehandlingsIdUtfall(
+                    KanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
                         behandlingsId = UUID.randomUUID(),
                         erInnvilget = false
                     ),
-                    BehandlingsIdUtfall(
+                    KanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
                         behandlingsId = UUID.randomUUID(),
                         erInnvilget = false
                     )
@@ -39,14 +39,14 @@ class KanKunGodskrivesEnOmsorgsyterTest {
 
     @Test
     fun `avslag dersom det eksisterer innvilget behandling`() {
-        KanKunGodskrivesEnOmsorgsyter().vilkarsVurder(
-            KanKunGodskrivesEnOmsorgsyterGrunnlag(
+        KanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
+            KanKunGodskrivesEnOmsorgsyter.Grunnlag(
                 listOf(
-                    BehandlingsIdUtfall(
+                    KanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
                         behandlingsId = UUID.randomUUID(),
                         erInnvilget = false
                     ),
-                    BehandlingsIdUtfall(
+                    KanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
                         behandlingsId = UUID.randomUUID(),
                         erInnvilget = true
                     )

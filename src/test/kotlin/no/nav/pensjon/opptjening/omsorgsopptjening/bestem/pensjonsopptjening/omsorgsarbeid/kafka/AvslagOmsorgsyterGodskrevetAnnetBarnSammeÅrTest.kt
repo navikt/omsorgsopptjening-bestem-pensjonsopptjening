@@ -7,13 +7,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6Vurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEnOmsorgsyterVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEtBarnPerÅrVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerIkkeFylt6ArVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterFylt17ÅrVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEnOmsorgsyter
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEtBarnPerÅr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerIkkeFylt6Ar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterFylt17VedUtløpAvOmsorgsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erInnvilget
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
@@ -98,13 +98,13 @@ class AvslagOmsorgsyterGodskrevetAnnetBarnSammeÅrTest : SpringContextTest.NoKaf
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
                 assertInstanceOf(AutomatiskGodskrivingUtfall.AvslagUtenOppgave::class.java, it.utfall)
 
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterFylt17ÅrVurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsmottakerIkkeFylt6ArVurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<FullOmsorgForBarnUnder6Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<KanKunGodskrivesEnOmsorgsyterVurdering>() }
-                assertTrue { it.vilkårsvurdering.erAvslått<KanKunGodskrivesEtBarnPerÅrVurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterFylt17VedUtløpAvOmsorgsår.Vurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsmottakerIkkeFylt6Ar.Vurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<FullOmsorgForBarnUnder6.Vurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder.Vurdering>() }
+                assertTrue { it.vilkårsvurdering.erInnvilget<KanKunGodskrivesEnOmsorgsyter.Vurdering>() }
+                assertTrue { it.vilkårsvurdering.erAvslått<KanKunGodskrivesEtBarnPerÅr.Vurdering>() }
             }
         }
     }

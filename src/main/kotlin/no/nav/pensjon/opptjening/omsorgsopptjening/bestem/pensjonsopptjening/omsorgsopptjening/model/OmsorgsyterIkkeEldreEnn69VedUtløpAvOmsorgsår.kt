@@ -1,12 +1,14 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
-    override fun vilkarsVurder(grunnlag: PersonOgOmsorgsårGrunnlag): OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering {
-        return bestemUtfall(grunnlag).let { OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering(
-            henvisninger = it.henvisninger(),
-            grunnlag = grunnlag,
-            utfall = it,
-        ) }
+object OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
+    override fun vilkarsVurder(grunnlag: PersonOgOmsorgsårGrunnlag): Vurdering {
+        return bestemUtfall(grunnlag).let {
+            Vurdering(
+                henvisninger = it.henvisninger(),
+                grunnlag = grunnlag,
+                utfall = it,
+            )
+        }
     }
 
     override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
@@ -21,10 +23,10 @@ class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgO
         }
 
     }
-}
 
-data class OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering(
-    override val henvisninger: Set<Henvisning>,
-    override val grunnlag: PersonOgOmsorgsårGrunnlag,
-    override val utfall: VilkårsvurderingUtfall
-) : ParagrafVurdering<PersonOgOmsorgsårGrunnlag>()
+    data class Vurdering(
+        override val henvisninger: Set<Henvisning>,
+        override val grunnlag: PersonOgOmsorgsårGrunnlag,
+        override val utfall: VilkårsvurderingUtfall
+    ) : ParagrafVurdering<PersonOgOmsorgsårGrunnlag>()
+}

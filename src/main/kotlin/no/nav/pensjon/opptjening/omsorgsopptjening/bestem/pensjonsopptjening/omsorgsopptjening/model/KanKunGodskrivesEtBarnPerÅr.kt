@@ -2,16 +2,18 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import java.util.UUID
 
-class KanKunGodskrivesEtBarnPerÅr : ParagrafVilkår<KanKunGodskrivesEtBarnPerÅrGrunnlag>() {
-    override fun vilkarsVurder(grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag): KanKunGodskrivesEtBarnPerÅrVurdering {
-        return bestemUtfall(grunnlag).let { KanKunGodskrivesEtBarnPerÅrVurdering(
-            henvisninger = it.henvisninger(),
-            grunnlag = grunnlag,
-            utfall = it,
-        ) }
+object KanKunGodskrivesEtBarnPerÅr : ParagrafVilkår<KanKunGodskrivesEtBarnPerÅr.Grunnlag>() {
+    override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
+        return bestemUtfall(grunnlag).let {
+            Vurdering(
+                henvisninger = it.henvisninger(),
+                grunnlag = grunnlag,
+                utfall = it,
+            )
+        }
     }
 
-    override fun <T : Vilkar<KanKunGodskrivesEtBarnPerÅrGrunnlag>> T.bestemUtfall(grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag): VilkårsvurderingUtfall {
+    override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return setOf(
             Referanse.OpptjeningKanKunGodskrivesForEtBarnPerÅr()
         ).let {
@@ -22,22 +24,23 @@ class KanKunGodskrivesEtBarnPerÅr : ParagrafVilkår<KanKunGodskrivesEtBarnPerÅ
             }
         }
     }
+
+    data class Vurdering(
+        override val henvisninger: Set<Henvisning>,
+        override val grunnlag: Grunnlag,
+        override val utfall: VilkårsvurderingUtfall
+    ) : ParagrafVurdering<Grunnlag>()
+
+    data class Grunnlag(
+        val omsorgsmottaker: String,
+        val behandlinger: List<AndreBehandlinger>
+    ) : ParagrafGrunnlag() {
+        data class AndreBehandlinger(
+            val behandlingsId: UUID,
+            val år: Int,
+            val omsorgsmottaker: String,
+            val erInnvilget: Boolean
+        )
+    }
 }
 
-data class KanKunGodskrivesEtBarnPerÅrVurdering(
-    override val henvisninger: Set<Henvisning>,
-    override val grunnlag: KanKunGodskrivesEtBarnPerÅrGrunnlag,
-    override val utfall: VilkårsvurderingUtfall
-) : ParagrafVurdering<KanKunGodskrivesEtBarnPerÅrGrunnlag>()
-
-data class KanKunGodskrivesEtBarnPerÅrGrunnlag(
-    val omsorgsmottaker: String,
-    val behandlinger: List<AndreBehandlinger>
-): ParagrafGrunnlag()
-
-data class AndreBehandlinger(
-    val behandlingsId: UUID,
-    val år: Int,
-    val omsorgsmottaker: String,
-    val erInnvilget: Boolean
-)

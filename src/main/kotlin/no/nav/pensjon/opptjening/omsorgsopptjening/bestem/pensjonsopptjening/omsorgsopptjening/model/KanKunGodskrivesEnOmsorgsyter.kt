@@ -2,10 +2,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import java.util.UUID
 
-class KanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<KanKunGodskrivesEnOmsorgsyterGrunnlag>() {
-    override fun vilkarsVurder(grunnlag: KanKunGodskrivesEnOmsorgsyterGrunnlag): KanKunGodskrivesEnOmsorgsyterVurdering {
+object KanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<KanKunGodskrivesEnOmsorgsyter.Grunnlag>() {
+    override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return bestemUtfall(grunnlag).let {
-            KanKunGodskrivesEnOmsorgsyterVurdering(
+            Vurdering(
                 henvisninger = it.henvisninger(),
                 grunnlag = grunnlag,
                 utfall = it,
@@ -13,7 +13,7 @@ class KanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<KanKunGodskrivesEnOmsorgsy
         }
     }
 
-    override fun <T : Vilkar<KanKunGodskrivesEnOmsorgsyterGrunnlag>> T.bestemUtfall(grunnlag: KanKunGodskrivesEnOmsorgsyterGrunnlag): VilkårsvurderingUtfall {
+    override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         setOf(
             Referanse.OmsorgsopptjeningGisKunEnOmsorgsyter()
         ).let {
@@ -24,20 +24,20 @@ class KanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<KanKunGodskrivesEnOmsorgsy
             }
         }
     }
+
+    data class Vurdering(
+        override val henvisninger: Set<Henvisning>,
+        override val grunnlag: Grunnlag,
+        override val utfall: VilkårsvurderingUtfall
+    ) : ParagrafVurdering<Grunnlag>()
+
+    data class Grunnlag(
+        val behandlingsIdUtfallListe: List<BehandlingsIdUtfall>
+    ) : ParagrafGrunnlag() {
+        data class BehandlingsIdUtfall(
+            //TODO legg til år og mottaker
+            val behandlingsId: UUID,
+            val erInnvilget: Boolean
+        )
+    }
 }
-
-data class KanKunGodskrivesEnOmsorgsyterVurdering(
-    override val henvisninger: Set<Henvisning>,
-    override val grunnlag: KanKunGodskrivesEnOmsorgsyterGrunnlag,
-    override val utfall: VilkårsvurderingUtfall
-) : ParagrafVurdering<KanKunGodskrivesEnOmsorgsyterGrunnlag>()
-
-data class KanKunGodskrivesEnOmsorgsyterGrunnlag(
-    val behandlingsIdUtfallListe: List<BehandlingsIdUtfall>
-) : ParagrafGrunnlag()
-
-data class BehandlingsIdUtfall(
-    //TODO legg til år og mottaker
-    val behandlingsId: UUID,
-    val erInnvilget: Boolean
-)

@@ -2,10 +2,20 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.Eller
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.FullOmsorgForBarnUnder6
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb.Og
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Forskrift
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Henvisning
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEnOmsorgsyter
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.KanKunGodskrivesEtBarnPerÅr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.LiktAntallMånederOmsorg
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Lovparagraf
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerIkkeFylt6Ar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterFylt17VedUtløpAvOmsorgsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkarsVurdering
 import java.util.LinkedList
 import java.util.Queue
 
@@ -99,14 +109,14 @@ sealed class VilkårsvurderingDb {
 internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
     return when (this) {
         is EllerVurdering -> {
-            Eller(
+            VilkårsvurderingDb.Eller(
                 eller = mapRecursive(LinkedList(grunnlag), emptyList()),
                 utfall = utfall.toDb()
             )
         }
 
-        is FullOmsorgForBarnUnder6Vurdering -> {
-            FullOmsorgForBarnUnder6(
+        is FullOmsorgForBarnUnder6.Vurdering -> {
+            VilkårsvurderingDb.FullOmsorgForBarnUnder6(
                 paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
@@ -114,13 +124,13 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         }
 
         is OgVurdering -> {
-            Og(
+            VilkårsvurderingDb.Og(
                 og = mapRecursive(LinkedList(grunnlag), emptyList()),
                 utfall = utfall.toDb()
             )
         }
 
-        is OmsorgsyterFylt17ÅrVurdering -> {
+        is OmsorgsyterFylt17VedUtløpAvOmsorgsår.Vurdering -> {
             VilkårsvurderingDb.OmsorgsyterFylt17År(
                 paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
@@ -128,7 +138,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering -> {
+        is OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering -> {
             VilkårsvurderingDb.OmsorgsyterIkkeEldreEnn69År(
                 paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
@@ -136,7 +146,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is KanKunGodskrivesEnOmsorgsyterVurdering -> {
+        is KanKunGodskrivesEnOmsorgsyter.Vurdering -> {
             VilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter(
                 paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
@@ -144,7 +154,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is KanKunGodskrivesEtBarnPerÅrVurdering -> {
+        is KanKunGodskrivesEtBarnPerÅr.Vurdering -> {
             VilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr(
                 paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
@@ -152,7 +162,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is OmsorgsmottakerIkkeFylt6ArVurdering -> {
+        is OmsorgsmottakerIkkeFylt6Ar.Vurdering -> {
             VilkårsvurderingDb.OmsorgsmottakerIkkeFylt6Ar(
                 paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
@@ -160,7 +170,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is LiktAntallMånederOmsorgVurdering -> {
+        is LiktAntallMånederOmsorg.Vurdering -> {
             VilkårsvurderingDb.LiktAntallMåneder(
                 paragrafer = henvisninger.toDb(),
                 grunnlag = grunnlag.toDb(),
@@ -168,7 +178,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering -> {
+        is FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder.Vurdering -> {
             VilkårsvurderingDb.OmsorgBarnUnder6OgIngenLikeMangeMåneder(
                 paragrafer = henvisninger.toDb(),
                 grunnlag = GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6OgIngenHarLikeMangeMåneder(
@@ -249,22 +259,22 @@ internal fun Set<HenvisningDb>.toDomain(): Set<Henvisning> {
 
 internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
     return when (this) {
-        is Eller -> {
+        is VilkårsvurderingDb.Eller -> {
             EllerVurdering(
                 grunnlag = eller.toDomain(),
                 utfall = utfall.toDomain()
             )
         }
 
-        is FullOmsorgForBarnUnder6 -> {
-            FullOmsorgForBarnUnder6Vurdering(
+        is VilkårsvurderingDb.FullOmsorgForBarnUnder6 -> {
+            FullOmsorgForBarnUnder6.Vurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )
         }
 
-        is Og -> {
+        is VilkårsvurderingDb.Og -> {
             OgVurdering(
                 grunnlag = og.toDomain(),
                 utfall = utfall.toDomain()
@@ -272,7 +282,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         }
 
         is VilkårsvurderingDb.OmsorgsyterFylt17År -> {
-            OmsorgsyterFylt17ÅrVurdering(
+            OmsorgsyterFylt17VedUtløpAvOmsorgsår.Vurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
@@ -280,7 +290,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         }
 
         is VilkårsvurderingDb.OmsorgsyterIkkeEldreEnn69År -> {
-            OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsårVurdering(
+            OmsorgsyterIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
@@ -288,7 +298,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         }
 
         is VilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter -> {
-            KanKunGodskrivesEnOmsorgsyterVurdering(
+            KanKunGodskrivesEnOmsorgsyter.Vurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
@@ -296,7 +306,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         }
 
         is VilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr -> {
-            KanKunGodskrivesEtBarnPerÅrVurdering(
+            KanKunGodskrivesEtBarnPerÅr.Vurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
@@ -305,7 +315,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         }
 
         is VilkårsvurderingDb.OmsorgsmottakerIkkeFylt6Ar -> {
-            OmsorgsmottakerIkkeFylt6ArVurdering(
+            OmsorgsmottakerIkkeFylt6Ar.Vurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
@@ -313,7 +323,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         }
 
         is VilkårsvurderingDb.LiktAntallMåneder -> {
-            LiktAntallMånederOmsorgVurdering(
+            LiktAntallMånederOmsorg.Vurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
@@ -321,7 +331,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         }
 
         is VilkårsvurderingDb.OmsorgBarnUnder6OgIngenLikeMangeMåneder -> {
-            FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering(
+            FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder.Vurdering(
                 henvisninger = paragrafer.toDomain(),
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()

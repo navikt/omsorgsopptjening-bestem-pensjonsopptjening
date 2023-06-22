@@ -2,11 +2,11 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
 
-class FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder :
-    ParagrafVilkår<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag>() {
-    override fun vilkarsVurder(grunnlag: FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag): FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering {
+object FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder :
+    ParagrafVilkår<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder.Grunnlag>() {
+    override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return bestemUtfall(grunnlag).let {
-            FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering(
+            Vurdering(
                 henvisninger = it.henvisninger(),
                 grunnlag = grunnlag,
                 utfall = it,
@@ -14,7 +14,7 @@ class FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder :
         }
     }
 
-    override fun <T : Vilkar<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag>> T.bestemUtfall(grunnlag: FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag): VilkårsvurderingUtfall {
+    override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return setOf(
             Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder()
         ).let { referanse ->
@@ -30,15 +30,15 @@ class FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder :
             }
         }
     }
+
+    data class Vurdering(
+        override val henvisninger: Set<Henvisning>,
+        override val grunnlag: Grunnlag,
+        override val utfall: VilkårsvurderingUtfall
+    ) : ParagrafVurdering<Grunnlag>()
+
+    data class Grunnlag(
+        val fullOmsorgForBarnUnder6Vurdering: FullOmsorgForBarnUnder6.Vurdering,
+        val liktAntallMånederOmsorgVurdering: LiktAntallMånederOmsorg.Vurdering,
+    ) : ParagrafGrunnlag()
 }
-
-data class FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering(
-    override val henvisninger: Set<Henvisning>,
-    override val grunnlag: FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag,
-    override val utfall: VilkårsvurderingUtfall
-) : ParagrafVurdering<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag>()
-
-data class FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederGrunnlag(
-    val fullOmsorgForBarnUnder6Vurdering: FullOmsorgForBarnUnder6Vurdering,
-    val liktAntallMånederOmsorgVurdering: LiktAntallMånederOmsorgVurdering,
-) : ParagrafGrunnlag()

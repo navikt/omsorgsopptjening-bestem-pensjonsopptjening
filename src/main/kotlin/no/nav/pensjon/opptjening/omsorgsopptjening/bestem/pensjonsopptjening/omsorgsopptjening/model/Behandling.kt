@@ -20,7 +20,7 @@ data class Behandling(
                 }
 
                 false -> {
-                    if (it.erEnesteAvslag<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMånederVurdering>()) {
+                    if (it.erEnesteAvslag<FullOmsorgForBarnUnder6OgIngenHarLiktAntallMåneder.Vurdering>()) {
                         AutomatiskGodskrivingUtfall.AvslagMedOppgave
                     } else {
                         AutomatiskGodskrivingUtfall.AvslagUtenOppgave

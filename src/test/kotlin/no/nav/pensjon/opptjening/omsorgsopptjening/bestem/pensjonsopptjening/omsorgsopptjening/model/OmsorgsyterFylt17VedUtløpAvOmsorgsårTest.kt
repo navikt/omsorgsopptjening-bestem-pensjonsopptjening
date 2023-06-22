@@ -12,7 +12,7 @@ class OmsorgsyterFylt17VedUtløpAvOmsorgsårTest {
 
     @Test
     fun `should be innvilget when subject has turned 17 before omsorgsår`() {
-        val vilkarsVurdering = OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
+        val vilkarsVurdering = OmsorgsyterFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
                 person = PersonMedFødselsår(
                     fnr = fnr,
@@ -26,7 +26,7 @@ class OmsorgsyterFylt17VedUtløpAvOmsorgsårTest {
 
     @Test
     fun `should be innvilget when subject turns 17 in omsorgsår`() {
-        val vilkarsVurdering = OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
+        val vilkarsVurdering = OmsorgsyterFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
                 person = PersonMedFødselsår(
                     fnr = fnr,
@@ -40,7 +40,7 @@ class OmsorgsyterFylt17VedUtløpAvOmsorgsårTest {
 
     @Test
     fun `should be avslag when subject has not turned 17`() {
-        val vilkarsVurdering = OmsorgsyterFylt17VedUtløpAvOmsorgsår().vilkarsVurder(
+        val vilkarsVurdering = OmsorgsyterFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
                 person = PersonMedFødselsår(
                     fnr = fnr,

@@ -7,8 +7,8 @@ import java.util.UUID
 class KanKunGodskrivesEtBarnPerÅrTest {
     @Test
     fun `innvilget hvis ingen andre behandlinger`() {
-        KanKunGodskrivesEtBarnPerÅr().vilkarsVurder(
-            KanKunGodskrivesEtBarnPerÅrGrunnlag(
+        KanKunGodskrivesEtBarnPerÅr.vilkarsVurder(
+            KanKunGodskrivesEtBarnPerÅr.Grunnlag(
                 omsorgsmottaker = "a",
                 behandlinger = emptyList()
             )
@@ -19,11 +19,11 @@ class KanKunGodskrivesEtBarnPerÅrTest {
 
     @Test
     fun `innvilget hvis ingen andre behandlinger er innvilget`() {
-        KanKunGodskrivesEtBarnPerÅr().vilkarsVurder(
-            KanKunGodskrivesEtBarnPerÅrGrunnlag(
+        KanKunGodskrivesEtBarnPerÅr.vilkarsVurder(
+            KanKunGodskrivesEtBarnPerÅr.Grunnlag(
                 omsorgsmottaker = "a",
                 behandlinger = listOf(
-                    AndreBehandlinger(
+                    KanKunGodskrivesEtBarnPerÅr.Grunnlag.AndreBehandlinger(
                         behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "a",
@@ -38,17 +38,17 @@ class KanKunGodskrivesEtBarnPerÅrTest {
 
     @Test
     fun `avslag hvis andre behandlinger er innvilget for omsorgsmottaker`() {
-        KanKunGodskrivesEtBarnPerÅr().vilkarsVurder(
-            KanKunGodskrivesEtBarnPerÅrGrunnlag(
+        KanKunGodskrivesEtBarnPerÅr.vilkarsVurder(
+            KanKunGodskrivesEtBarnPerÅr.Grunnlag(
                 omsorgsmottaker = "a",
                 behandlinger = listOf(
-                    AndreBehandlinger(
+                    KanKunGodskrivesEtBarnPerÅr.Grunnlag.AndreBehandlinger(
                         behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "a",
                         erInnvilget = true
                     ),
-                    AndreBehandlinger(
+                    KanKunGodskrivesEtBarnPerÅr.Grunnlag.AndreBehandlinger(
                         behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "b",
@@ -70,17 +70,17 @@ class KanKunGodskrivesEtBarnPerÅrTest {
 
     @Test
     fun `avslag hvis andre behandlinger er innvilget for andre enn omsorgsmottaker`() {
-        KanKunGodskrivesEtBarnPerÅr().vilkarsVurder(
-            KanKunGodskrivesEtBarnPerÅrGrunnlag(
+        KanKunGodskrivesEtBarnPerÅr.vilkarsVurder(
+            KanKunGodskrivesEtBarnPerÅr.Grunnlag(
                 omsorgsmottaker = "a",
                 behandlinger = listOf(
-                    AndreBehandlinger(
+                    KanKunGodskrivesEtBarnPerÅr.Grunnlag.AndreBehandlinger(
                         behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "a",
                         erInnvilget = false
                     ),
-                    AndreBehandlinger(
+                    KanKunGodskrivesEtBarnPerÅr.Grunnlag.AndreBehandlinger(
                         behandlingsId = UUID.randomUUID(),
                         år = 2020,
                         omsorgsmottaker = "b",

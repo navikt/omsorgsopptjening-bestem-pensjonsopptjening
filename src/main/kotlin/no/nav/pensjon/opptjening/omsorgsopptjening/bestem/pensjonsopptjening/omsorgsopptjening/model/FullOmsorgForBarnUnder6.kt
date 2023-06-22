@@ -13,10 +13,10 @@ import java.time.Month
  * Det betyr at vi må sjekke om omsorgsyter har fått barnetrygd i året etter for å vite om omsorgsyter har rett til omsorgsopptjening
  *
  */
-class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>() {
-    override fun vilkarsVurder(grunnlag: FullOmsorgForBarnUnder6Grunnlag): FullOmsorgForBarnUnder6Vurdering {
+object FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6.Grunnlag>() {
+    override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return bestemUtfall(grunnlag).let {
-            FullOmsorgForBarnUnder6Vurdering(
+            Vurdering(
                 henvisninger = it.henvisninger(),
                 grunnlag = grunnlag,
                 utfall = it,
@@ -24,9 +24,9 @@ class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>
         }
     }
 
-    override fun <T : Vilkar<FullOmsorgForBarnUnder6Grunnlag>> T.bestemUtfall(grunnlag: FullOmsorgForBarnUnder6Grunnlag): VilkårsvurderingUtfall {
+    override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return when (grunnlag) {
-            is OmsorgsmottakerFødtIOmsorgsårGrunnlag -> {
+            is Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> {
                 setOf(
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår(),
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
@@ -39,7 +39,7 @@ class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>
                 }
             }
 
-            is OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag -> {
+            is Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> {
                 setOf(
                     Referanse.MåHaMinstHalveÅretMedOmsorg(),
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
@@ -52,7 +52,7 @@ class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>
                 }
             }
 
-            is OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag -> {
+            is Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> {
                 setOf(
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår(),
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
@@ -66,45 +66,47 @@ class FullOmsorgForBarnUnder6 : ParagrafVilkår<FullOmsorgForBarnUnder6Grunnlag>
             }
         }
     }
-}
 
-data class FullOmsorgForBarnUnder6Vurdering(
-    override val henvisninger: Set<Henvisning>,
-    override val grunnlag: FullOmsorgForBarnUnder6Grunnlag,
-    override val utfall: VilkårsvurderingUtfall
-) : ParagrafVurdering<FullOmsorgForBarnUnder6Grunnlag>()
+    data class Vurdering(
+        override val henvisninger: Set<Henvisning>,
+        override val grunnlag: Grunnlag,
+        override val utfall: VilkårsvurderingUtfall
+    ) : ParagrafVurdering<Grunnlag>()
 
-sealed class FullOmsorgForBarnUnder6Grunnlag : ParagrafGrunnlag() {
-    abstract val omsorgsAr: Int
-    abstract val omsorgsmottaker: PersonMedFødselsår
-}
 
-data class OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
-    override val omsorgsAr: Int,
-    override val omsorgsmottaker: PersonMedFødselsår,
-    val minstSeksMånederFullOmsorg: Boolean,
-) : FullOmsorgForBarnUnder6Grunnlag() {
-    init {
-        require(!omsorgsmottaker.erFødt(omsorgsAr))
+    sealed class Grunnlag : ParagrafGrunnlag() {
+        abstract val omsorgsAr: Int
+        abstract val omsorgsmottaker: PersonMedFødselsår
+
+        data class OmsorgsmottakerFødtUtenforOmsorgsår(
+            override val omsorgsAr: Int,
+            override val omsorgsmottaker: PersonMedFødselsår,
+            val minstSeksMånederFullOmsorg: Boolean,
+        ) : Grunnlag() {
+            init {
+                require(!omsorgsmottaker.erFødt(omsorgsAr))
+            }
+        }
+
+        data class OmsorgsmottakerFødtIOmsorgsår(
+            override val omsorgsAr: Int,
+            override val omsorgsmottaker: PersonMedFødselsår,
+            val minstEnMånedFullOmsorg: Boolean,
+        ) : Grunnlag() {
+            init {
+                require(omsorgsmottaker.erFødt(omsorgsAr))
+            }
+        }
+
+        data class OmsorgsmottakerFødtIDesemberOmsorgsår(
+            override val omsorgsAr: Int,
+            override val omsorgsmottaker: PersonMedFødselsår,
+            val minstEnMånedOmsorgÅretEtterFødsel: Boolean,
+        ) : Grunnlag() {
+            init {
+                require(omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER))
+            }
+        }
     }
 }
 
-data class OmsorgsmottakerFødtIOmsorgsårGrunnlag(
-    override val omsorgsAr: Int,
-    override val omsorgsmottaker: PersonMedFødselsår,
-    val minstEnMånedFullOmsorg: Boolean,
-) : FullOmsorgForBarnUnder6Grunnlag() {
-    init {
-        require(omsorgsmottaker.erFødt(omsorgsAr))
-    }
-}
-
-data class OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag(
-    override val omsorgsAr: Int,
-    override val omsorgsmottaker: PersonMedFødselsår,
-    val minstEnMånedOmsorgÅretEtterFødsel: Boolean,
-) : FullOmsorgForBarnUnder6Grunnlag() {
-    init {
-        require(omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER))
-    }
-}

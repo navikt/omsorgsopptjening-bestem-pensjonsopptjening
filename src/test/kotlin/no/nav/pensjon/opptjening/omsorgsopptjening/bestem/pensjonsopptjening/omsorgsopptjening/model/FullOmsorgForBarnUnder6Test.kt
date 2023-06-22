@@ -9,8 +9,8 @@ class FullOmsorgForBarnUnder6Test {
 
     @Test
     fun `Gitt en mottaker født utenfor omsorgsår når det er minst seks måneder full omsorg så invilget`() {
-        FullOmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
+        FullOmsorgForBarnUnder6.vilkarsVurder(
+            grunnlag = FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = 2000,
                 omsorgsmottaker = PersonMedFødselsår(
                     fnr = "12125678910",
@@ -24,8 +24,8 @@ class FullOmsorgForBarnUnder6Test {
 
     @Test
     fun `Gitt en mottaker født I omsorgsår når det er minst en måned full omsorg så invilget`() {
-        FullOmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = OmsorgsmottakerFødtIOmsorgsårGrunnlag(
+        FullOmsorgForBarnUnder6.vilkarsVurder(
+            grunnlag = FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                 omsorgsAr = 2000,
                 omsorgsmottaker = PersonMedFødselsår(
                     fnr = "12345678910",
@@ -39,8 +39,8 @@ class FullOmsorgForBarnUnder6Test {
 
     @Test
     fun `Gitt en mottaker født I omsorgsår når det ikke er minst en måned full omsorg så avslag`() {
-        FullOmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = OmsorgsmottakerFødtIOmsorgsårGrunnlag(
+        FullOmsorgForBarnUnder6.vilkarsVurder(
+            grunnlag = FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                 omsorgsAr = 2000,
                 omsorgsmottaker = PersonMedFødselsår(
                     fnr = "12345678910",
@@ -54,8 +54,8 @@ class FullOmsorgForBarnUnder6Test {
 
     @Test
     fun `Gitt en mottaker født I desember i omsorgsår når det er minst en måned full omsorg så invilget`() {
-        FullOmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag(
+        FullOmsorgForBarnUnder6.vilkarsVurder(
+            grunnlag = FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                 omsorgsAr = 2000,
                 omsorgsmottaker = PersonMedFødselsår(
                     fnr = "12125678910",
@@ -69,8 +69,8 @@ class FullOmsorgForBarnUnder6Test {
 
     @Test
     fun `Gitt en mottaker født I desember i omsorgsår når det ikke er minst en måned full omsorg så avslag`() {
-        FullOmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = OmsorgsmottakerFødtIDesemberOmsorgsårGrunnlag(
+        FullOmsorgForBarnUnder6.vilkarsVurder(
+            grunnlag = FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                 omsorgsAr = 2000,
                 omsorgsmottaker = PersonMedFødselsår(
                     fnr = "12125678910",
@@ -88,8 +88,8 @@ class FullOmsorgForBarnUnder6Test {
     fun `number of months with full omsorg`() {
         val omsorgsår = 2000
         listOf(0, 1, 2, 3, 4, 5, 6).forEach { monthsFullOmsorg ->
-            FullOmsorgForBarnUnder6().vilkarsVurder(
-                grunnlag = OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
+            FullOmsorgForBarnUnder6.vilkarsVurder(
+                grunnlag = FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                     omsorgsAr = omsorgsår,
                     omsorgsmottaker = PersonMedFødselsår(
                         fnr = "12345678910",
@@ -111,8 +111,8 @@ class FullOmsorgForBarnUnder6Test {
 
         }
         listOf(7, 8, 9, 10, 11, 12).forEach { monthsFullOmsorg ->
-            FullOmsorgForBarnUnder6().vilkarsVurder(
-                grunnlag = OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
+            FullOmsorgForBarnUnder6.vilkarsVurder(
+                grunnlag = FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                     omsorgsAr = omsorgsår,
                     omsorgsmottaker = PersonMedFødselsår(
                         fnr = "12345678910",
@@ -129,8 +129,8 @@ class FullOmsorgForBarnUnder6Test {
     @Test
     fun `no requirements met`() {
         val omsorgsår = 2000
-        FullOmsorgForBarnUnder6().vilkarsVurder(
-            grunnlag = OmsorgsmottakerFødtUtenforOmsorgsårGrunnlag(
+        FullOmsorgForBarnUnder6.vilkarsVurder(
+            grunnlag = FullOmsorgForBarnUnder6.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsår,
                 omsorgsmottaker = PersonMedFødselsår(
                     fnr = "12345678910",
