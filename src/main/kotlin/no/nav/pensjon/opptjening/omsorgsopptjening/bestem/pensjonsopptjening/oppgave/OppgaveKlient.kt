@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave
 
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.mapAnyToJson
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -15,9 +16,13 @@ import java.time.format.DateTimeFormatter
  * Swagger: https://oppgave.dev.intern.nav.no/
  */
 @Component
-class OppgaveKlient(@Value("\${OPPGAVE_URL}") private val oppgaveUrl: String,
-                    val restTemplate: RestTemplate)
+class OppgaveKlient(
+    @Value("\${OPPGAVE_URL}") private val oppgaveUrl: String,
+    val restTemplate: RestTemplate,
+    private val registry: MeterRegistry
+)
 {
+    private val antallOpprettedeOppgaver = registry.counter("oppgaver", "antall", "opprettet")
     private val logger = LoggerFactory.getLogger(OppgaveKlient::class.java)
 
     fun opprettOppgave(aktoerId: String, sakId: String, beskrivelse: String, tildeltEnhetsnr: String) {
@@ -38,13 +43,11 @@ class OppgaveKlient(@Value("\${OPPGAVE_URL}") private val oppgaveUrl: String,
         )
             try {
                 val requestBody = mapAnyToJson(oppgave, true)
-
-                logger.info("Oppretter oppgave: $requestBody")
-
                 val httpEntity = HttpEntity(requestBody)
                 restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, String::class.java)
 
                 logger.info("Opprettet kravoppgave for sakId: $sakId")
+                antallOpprettedeOppgaver.increment()
             } catch(ex: HttpStatusCodeException) {
                 logger.error("En feil oppstod under opprettelse av oppgave ex: $ex body: ${ex.responseBodyAsString}")
                 throw RuntimeException("En feil oppstod under opprettelse av oppgave ex: ${ex.message} body: ${ex.responseBodyAsString}", ex)

@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
@@ -10,8 +11,11 @@ import org.springframework.web.client.RestTemplate
 @Component
 class PdlClient(
     @Value("\${PDL_URL}") private val pdlUrl: String,
-    private val restTemplate: RestTemplate
+    private val restTemplate: RestTemplate,
+    private val registry: MeterRegistry
 ) {
+    private val antallPersonerHentet = registry.counter("personer", "antall", "hentet")
+    private val antallAktoridHentet = registry.counter("aktorid", "antall", "hentet")
 
     @Retryable(
         maxAttempts = 4,
@@ -28,7 +32,7 @@ class PdlClient(
         response?.error?.extensions?.code?.also {
             if (it == PdlErrorCode.SERVER_ERROR) throw PdlException(response.error)
         }
-
+        antallPersonerHentet.increment()
         return response
     }
 
@@ -42,6 +46,7 @@ class PdlClient(
         response?.error?.extensions?.code?.also {
             if (it == PdlErrorCode.SERVER_ERROR) throw PdlException(response.error)
         }
+        antallAktoridHentet.increment()
         return response
     }
 }

@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka
 
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.kafka.OmsorgsopptjeningProducer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
@@ -15,7 +15,12 @@ import org.springframework.stereotype.Component
 class OmsorgsarbeidListener(
     private val omsorgsarbeidMessageHandler: OmsorgsarbeidMessageHandler,
     private val omsorgsopptjeningProducer: OmsorgsopptjeningProducer,
+    private val registry: MeterRegistry
 ) {
+    private val antallLesteMeldinger = registry.counter("omsorgsArbeid", "antall", "lest")
+    private val antallInnvilgedeOpptjeninger = registry.counter("opptjeninger", "antall", "innvilget")
+    private val antallAvslaatteOpptjeninger = registry.counter("opptjeninger", "antall", "avslaatt")
+
     @KafkaListener(
         containerFactory = "omsorgsArbeidKafkaListenerContainerFactory",
         idIsGroup = false,
@@ -26,10 +31,17 @@ class OmsorgsarbeidListener(
         consumerRecord: ConsumerRecord<String, String>,
         acknowledgment: Acknowledgment
     ) {
+        antallLesteMeldinger.increment()
         omsorgsarbeidMessageHandler.handle(consumerRecord).forEach {
             when (it.erInnvilget()) {
-                true -> håndterInnvilgelse(it)
-                false -> håndterAvslag(it)
+                true -> {
+                    håndterInnvilgelse(it)
+                    antallInnvilgedeOpptjeninger.increment()
+                }
+                false -> {
+                    håndterAvslag(it)
+                    antallAvslaatteOpptjeninger.increment()
+                }
             }
         }
         acknowledgment.acknowledge()

@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.sa
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.toJson
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -19,9 +20,11 @@ import java.util.*
 @Component
 class BestemSakKlient(
     @Value("\${BESTEMSAK_URL}") private val bestemSakUrl: String,
-    private val restTemplate: RestTemplate)
+    private val restTemplate: RestTemplate,
+    private val registry: MeterRegistry
+)
 {
-
+    private val antallSakerHentet = registry.counter("saker", "antall", "hentet")
     private val logger: Logger by lazy { LoggerFactory.getLogger(BestemSakKlient::class.java) }
     private val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
 
@@ -41,7 +44,7 @@ class BestemSakKlient(
                 HttpMethod.POST,
                 HttpEntity(requestBody.toJson(), headers),
                 String::class.java)
-
+            antallSakerHentet.increment()
             mapper.readValue(response.body, BestemSakResponse::class.java)
         } catch (ex: HttpStatusCodeException) {
             throw RuntimeException("En feil oppstod under kall til bestemSak i PESYS ex: ", ex)
