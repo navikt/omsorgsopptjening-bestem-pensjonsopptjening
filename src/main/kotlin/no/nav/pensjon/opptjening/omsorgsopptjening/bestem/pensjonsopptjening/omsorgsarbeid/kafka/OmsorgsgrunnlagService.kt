@@ -8,6 +8,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.springframework.stereotype.Service
 
 @Service
@@ -48,7 +49,7 @@ class OmsorgsgrunnlagService(
 
                 )
             },
-            originaltGrunnlag = this
+            originaltGrunnlag = serialize(this)
         )
     }
 }

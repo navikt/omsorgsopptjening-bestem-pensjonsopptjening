@@ -1,9 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.Periode
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
-import java.time.Month
 import java.time.YearMonth
 
 data class BeriketDatagrunnlag(
@@ -12,7 +10,7 @@ data class BeriketDatagrunnlag(
     val kjoreHash: String,
     val kilde: DomainKilde,
     val omsorgsSaker: List<BeriketSak>,
-    val originaltGrunnlag: OmsorgsGrunnlag
+    val originaltGrunnlag: String
 ) {
     fun omsorgsmottakere(): Set<PersonMedFødselsår> {
         return omsorgsytersSaker().omsorgVedtakPeriode.map { it.omsorgsmottaker }.toSet()

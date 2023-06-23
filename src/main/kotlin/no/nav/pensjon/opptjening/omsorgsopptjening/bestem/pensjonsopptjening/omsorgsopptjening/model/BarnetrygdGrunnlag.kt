@@ -27,9 +27,6 @@ sealed class BarnetrygdGrunnlag {
         get() = grunnlag.kilde
     val omsorgsSaker: List<BeriketSak>
         get() = grunnlag.omsorgsSaker
-    val originaltGrunnlag: OmsorgsGrunnlag
-        get() = grunnlag.originaltGrunnlag
-
 
     private fun hentFullOmsorgForMottaker(): List<BeriketVedtaksperiode> {
         return omsorgsytersSaker().omsorgVedtakPeriode

@@ -24,7 +24,7 @@ internal fun BeriketDatagrunnlag.toDb(): BeriketOmsorgsgrunnlagDb {
         kjoreHash = kjoreHash,
         kilde = kilde.toDb(),
         omsorgsSaker = omsorgsSaker.map { it.toDb() },
-        originaltGrunnlag = originaltGrunnlag.mapToJson()
+        originaltGrunnlag = originaltGrunnlag
     )
 }
 
@@ -35,7 +35,7 @@ internal fun BeriketOmsorgsgrunnlagDb.toDomain(): BeriketDatagrunnlag {
         kjoreHash = kjoreHash,
         kilde = kilde.toDomain(),
         omsorgsSaker = omsorgsSaker.map { it.toDomain() },
-        originaltGrunnlag = originaltGrunnlag.mapToClass(OmsorgsGrunnlag::class.java)
+        originaltGrunnlag = originaltGrunnlag
     )
 }
 
