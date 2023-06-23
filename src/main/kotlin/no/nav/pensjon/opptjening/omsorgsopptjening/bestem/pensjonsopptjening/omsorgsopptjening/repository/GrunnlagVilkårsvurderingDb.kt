@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid
@@ -45,12 +45,14 @@ internal sealed class GrunnlagVilkårsvurderingDb {
     ) : GrunnlagVilkårsvurderingDb()
 
     data class KanKunGodskrivesEnOmsorgsyter(
-        val behandlingsIdUtfall: List<BehandlingsIdUtfallDb>
+        val omsorgsAr: Int,
+        val behandlinger: List<FullførteBehandlingerForOmsorgsmottakerDb>
     ) : GrunnlagVilkårsvurderingDb()
 
     data class KanKunGodskrivesEtBarnPerÅr(
         val omsorgsmottaker: String,
-        val behandlinger: List<AndreBehandlingerDb>
+        val omsorgsAr: Int,
+        val behandlinger: List<FullførteBehandlingForOmsorgsyterDb>
     ) : GrunnlagVilkårsvurderingDb()
 
     data class LiktAntallMåneder(
@@ -108,31 +110,39 @@ internal fun OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantF
     )
 }
 
-internal fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter {
+internal fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter {
     return GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter(
-        behandlingsIdUtfall = behandlingsIdUtfallListe.toDbs()
+        omsorgsAr = omsorgsår,
+        behandlinger = fullførteBehandlinger.toDbs()
     )
 }
 
-data class BehandlingsIdUtfallDb(
+data class FullførteBehandlingerForOmsorgsmottakerDb(
     val behandlingsId: UUID,
+    val omsorgsyter: String,
+    val omsorgsmottaker: String,
+    val omsorgsAr: Int,
     val erInnvilget: Boolean
 )
 
-internal fun List<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall>.toDbs(): List<BehandlingsIdUtfallDb> {
+internal fun List<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag.FullførtBehandlingForOmsorgsmottaker>.toDbs(): List<FullførteBehandlingerForOmsorgsmottakerDb> {
     return map { it.toDb() }
 }
 
-internal fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall.toDb(): BehandlingsIdUtfallDb {
-    return BehandlingsIdUtfallDb(
+internal fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag.FullførtBehandlingForOmsorgsmottaker.toDb(): FullførteBehandlingerForOmsorgsmottakerDb {
+    return FullførteBehandlingerForOmsorgsmottakerDb(
         behandlingsId = behandlingsId,
-        erInnvilget = erInnvilget
+        omsorgsyter = omsorgsyter,
+        omsorgsmottaker = omsorgsmottaker,
+        omsorgsAr = omsorgsår,
+        erInnvilget = erInnvilget,
     )
 }
 
 internal fun OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr {
     return GrunnlagVilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr(
         omsorgsmottaker = omsorgsmottaker,
+        omsorgsAr = omsorgsår,
         behandlinger = behandlinger.toDb()
     )
 }
@@ -140,56 +150,65 @@ internal fun OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.toDb(): G
 internal fun GrunnlagVilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr.toDomain(): OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag {
     return OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag(
         omsorgsmottaker = omsorgsmottaker,
+        omsorgsår = omsorgsAr,
         behandlinger = behandlinger.toDomain()
     )
 }
 
-internal fun GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter.toDomain(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag {
-    return OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag(
-        behandlingsIdUtfallListe = behandlingsIdUtfall.toDomains()
+internal fun GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter.toDomain(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag {
+    return OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag(
+        omsorgsår = omsorgsAr,
+        fullførteBehandlinger = behandlinger.toDomain()
     )
 }
 
-internal fun List<BehandlingsIdUtfallDb>.toDomains(): List<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall> {
+@JvmName("FullførteBehandlingerForOmsorgsmottakerOgÅrDb")
+internal fun List<FullførteBehandlingerForOmsorgsmottakerDb>.toDomain(): List<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag.FullførtBehandlingForOmsorgsmottaker> {
     return map { it.toDomain() }
 }
 
-internal fun BehandlingsIdUtfallDb.toDomain(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall {
-    return OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
+internal fun FullførteBehandlingerForOmsorgsmottakerDb.toDomain(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag.FullførtBehandlingForOmsorgsmottaker {
+    return OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag.FullførtBehandlingForOmsorgsmottaker(
         behandlingsId = behandlingsId,
+        omsorgsyter = omsorgsyter,
+        omsorgsmottaker = omsorgsmottaker,
+        omsorgsår = omsorgsAr,
         erInnvilget = erInnvilget
     )
 }
 
-internal data class AndreBehandlingerDb(
+internal data class FullførteBehandlingForOmsorgsyterDb(
     val behandlingsId: UUID,
-    val år: Int,
+    val omsorgsyter: String,
     val omsorgsmottaker: String,
-    val erInnvilget: Boolean
+    val år: Int,
+    val erInnvilget: Boolean,
 )
 
-internal fun List<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger>.toDb(): List<AndreBehandlingerDb> {
+internal fun List<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter>.toDb(): List<FullførteBehandlingForOmsorgsyterDb> {
     return map { it.toDb() }
 }
 
-internal fun List<AndreBehandlingerDb>.toDomain(): List<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger> {
+internal fun List<FullførteBehandlingForOmsorgsyterDb>.toDomain(): List<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter> {
     return map { it.toDomain() }
 }
 
-internal fun OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger.toDb(): AndreBehandlingerDb {
-    return AndreBehandlingerDb(
+internal fun OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter.toDb(): FullførteBehandlingForOmsorgsyterDb {
+    return FullførteBehandlingForOmsorgsyterDb(
         behandlingsId = behandlingsId,
-        år = år,
+        omsorgsyter = omsorgsyter,
         omsorgsmottaker = omsorgsmottaker,
-        erInnvilget = erInnvilget
+        år = omsorgsÅr,
+        erInnvilget = erInnvilget,
     )
 }
 
-internal fun AndreBehandlingerDb.toDomain(): OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger {
-    return OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger(
+internal fun FullførteBehandlingForOmsorgsyterDb.toDomain(): OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter {
+    return OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter(
         behandlingsId = behandlingsId,
-        år = år,
+        omsorgsyter = omsorgsyter,
         omsorgsmottaker = omsorgsmottaker,
+        omsorgsÅr = år,
         erInnvilget = erInnvilget
     )
 }

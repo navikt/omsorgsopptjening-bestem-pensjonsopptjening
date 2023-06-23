@@ -6,11 +6,12 @@ import java.util.UUID
 
 class OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅrTest {
     @Test
-    fun `innvilget hvis ingen andre behandlinger`() {
+    fun `innvilget hvis ingen andre behandlinger i omsorgsåret`() {
         OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.vilkarsVurder(
             OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag(
                 omsorgsmottaker = "a",
-                behandlinger = emptyList()
+                omsorgsår = 2020,
+                behandlinger = emptyList(),
             )
         ).also {
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -18,18 +19,20 @@ class OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅrTest {
     }
 
     @Test
-    fun `innvilget hvis ingen andre behandlinger er innvilget`() {
+    fun `innvilget hvis ingen andre behandlinger er innvilget for omsorgsår`() {
         OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.vilkarsVurder(
             OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag(
                 omsorgsmottaker = "a",
+                omsorgsår = 2020,
                 behandlinger = listOf(
-                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger(
+                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter(
                         behandlingsId = UUID.randomUUID(),
-                        år = 2020,
+                        omsorgsÅr = 2020,
                         omsorgsmottaker = "a",
+                        omsorgsyter = "b",
                         erInnvilget = false
                     ),
-                )
+                ),
             )
         ).also {
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -37,22 +40,39 @@ class OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅrTest {
     }
 
     @Test
-    fun `avslag hvis andre behandlinger er innvilget for omsorgsmottaker`() {
+    fun `avslag hvis andre behandlinger er innvilget for omsorgsmottaker i omsorgsår`() {
         OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.vilkarsVurder(
             OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag(
                 omsorgsmottaker = "a",
+                omsorgsår = 2020,
                 behandlinger = listOf(
-                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger(
+                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter(
                         behandlingsId = UUID.randomUUID(),
-                        år = 2020,
-                        omsorgsmottaker = "a",
+                        omsorgsÅr = 2020,
+                        omsorgsyter = "a",
+                        omsorgsmottaker = "b",
                         erInnvilget = true
                     ),
-                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger(
+                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter(
                         behandlingsId = UUID.randomUUID(),
-                        år = 2020,
-                        omsorgsmottaker = "b",
+                        omsorgsÅr = 2020,
+                        omsorgsyter = "a",
+                        omsorgsmottaker = "c",
                         erInnvilget = false
+                    ),
+                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter(
+                        behandlingsId = UUID.randomUUID(),
+                        omsorgsÅr = 2019,
+                        omsorgsyter = "a",
+                        omsorgsmottaker = "b",
+                        erInnvilget = true
+                    ),
+                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter(
+                        behandlingsId = UUID.randomUUID(),
+                        omsorgsÅr = 2021,
+                        omsorgsyter = "a",
+                        omsorgsmottaker = "b",
+                        erInnvilget = true
                     ),
                 )
             )
@@ -69,21 +89,24 @@ class OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅrTest {
     }
 
     @Test
-    fun `avslag hvis andre behandlinger er innvilget for andre enn omsorgsmottaker`() {
+    fun `avslag hvis andre behandlinger er innvilget for andre enn omsorgsmottaker i omsorgsår`() {
         OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.vilkarsVurder(
             OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag(
                 omsorgsmottaker = "a",
+                omsorgsår = 2020,
                 behandlinger = listOf(
-                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger(
+                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter(
                         behandlingsId = UUID.randomUUID(),
-                        år = 2020,
-                        omsorgsmottaker = "a",
+                        omsorgsÅr = 2020,
+                        omsorgsyter = "a",
+                        omsorgsmottaker = "b",
                         erInnvilget = false
                     ),
-                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger(
+                    OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter(
                         behandlingsId = UUID.randomUUID(),
-                        år = 2020,
-                        omsorgsmottaker = "b",
+                        omsorgsÅr = 2020,
+                        omsorgsyter = "a",
+                        omsorgsmottaker = "c",
                         erInnvilget = true
                     ),
                 )

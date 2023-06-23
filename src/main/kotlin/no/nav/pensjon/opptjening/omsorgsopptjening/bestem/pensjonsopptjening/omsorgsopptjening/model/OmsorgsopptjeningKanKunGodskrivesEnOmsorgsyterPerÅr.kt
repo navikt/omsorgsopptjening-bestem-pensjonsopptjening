@@ -2,25 +2,24 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import java.util.UUID
 
-object OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag>() {
+object OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr :
+    ParagrafVilkår<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
-        return bestemUtfall(grunnlag).let {
-            Vurdering(
-                grunnlag = grunnlag,
-                utfall = it,
-            )
-        }
+        return Vurdering(
+            grunnlag = grunnlag,
+            utfall = bestemUtfall(grunnlag),
+        )
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         setOf(
             Referanse.OmsorgsopptjeningGisKunEnOmsorgsyterPerKalenderÅr,
             Referanse.OmsorgsopptjeningKanTidligstGisPåfølgendeKalenderårHvisAlleredeInnvilgetAnnenOmsorgsyter
-        ).let {
-            return if (grunnlag.behandlingsIdUtfallListe.none { it.erInnvilget }) {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+        ).let { referanser ->
+            return if (grunnlag.fullførteBehandlinger.none { it.erInnvilget && grunnlag.omsorgsår == it.omsorgsår }) {
+                VilkårsvurderingUtfall.Innvilget.Vilkår.from(referanser)
             } else {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                VilkårsvurderingUtfall.Avslag.Vilkår.from(referanser)
             }
         }
     }
@@ -31,11 +30,14 @@ object OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<Omsorgso
     ) : ParagrafVurdering<Grunnlag>()
 
     data class Grunnlag(
-        val behandlingsIdUtfallListe: List<BehandlingsIdUtfall>
+        val omsorgsår: Int,
+        val fullførteBehandlinger: List<FullførtBehandlingForOmsorgsmottaker>
     ) : ParagrafGrunnlag() {
-        data class BehandlingsIdUtfall(
-            //TODO legg til år og mottaker
+        data class FullførtBehandlingForOmsorgsmottaker(
             val behandlingsId: UUID,
+            val omsorgsyter: String,
+            val omsorgsmottaker: String,
+            val omsorgsår: Int,
             val erInnvilget: Boolean
         )
     }

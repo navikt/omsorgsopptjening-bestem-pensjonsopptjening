@@ -37,7 +37,7 @@ data class Behandling(
             vurderVilkår.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(),
             vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
             vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid(),
-            vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter(),
+            vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr()
         )
     }

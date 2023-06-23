@@ -2,12 +2,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 object OmsorgsyterErFylt17VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
     override fun vilkarsVurder(grunnlag: PersonOgOmsorgsårGrunnlag): Vurdering {
-        return bestemUtfall(grunnlag).let {
-            Vurdering(
-                grunnlag = grunnlag,
-                utfall = it,
-            )
-        }
+        return Vurdering(
+            grunnlag = grunnlag,
+            utfall = bestemUtfall(grunnlag),
+        )
     }
 
     override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {

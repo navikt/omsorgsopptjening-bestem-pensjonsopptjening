@@ -2,7 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import java.util.UUID
 
-object OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr : ParagrafVilkår<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag>() {
+object OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr :
+    ParagrafVilkår<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return bestemUtfall(grunnlag).let {
             Vurdering(
@@ -15,11 +16,11 @@ object OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr : ParagrafVilkår<Omsorg
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return setOf(
             Referanse.OpptjeningKanKunGodskrivesForEtBarnPerÅr
-        ).let {
-            if (grunnlag.behandlinger.none { it.erInnvilget }) {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+        ).let { referanser ->
+            if (grunnlag.behandlinger.none { it.erInnvilget && grunnlag.omsorgsår == it.omsorgsÅr }) {
+                VilkårsvurderingUtfall.Innvilget.Vilkår.from(referanser)
             } else {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                VilkårsvurderingUtfall.Avslag.Vilkår.from(referanser)
             }
         }
     }
@@ -31,12 +32,14 @@ object OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr : ParagrafVilkår<Omsorg
 
     data class Grunnlag(
         val omsorgsmottaker: String,
-        val behandlinger: List<AndreBehandlinger>
+        val omsorgsår: Int,
+        val behandlinger: List<FullførtBehandlingForOmsorgsyter>
     ) : ParagrafGrunnlag() {
-        data class AndreBehandlinger(
+        data class FullførtBehandlingForOmsorgsyter(
             val behandlingsId: UUID,
-            val år: Int,
+            val omsorgsyter: String,
             val omsorgsmottaker: String,
+            val omsorgsÅr: Int,
             val erInnvilget: Boolean
         )
     }

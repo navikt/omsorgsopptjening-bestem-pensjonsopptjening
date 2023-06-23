@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 interface VurderVilkår {
 
     fun OmsorgsyterErFylt17VedUtløpAvOmsorgsår(): OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering
-    fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Vurdering
+    fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering
     fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering
     fun OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(): OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering
     fun OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(): OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering
@@ -40,15 +40,17 @@ internal class VilkårsvurderingFactory(
                 fnr = grunnlag.omsorgsyter.fnr,
                 ar = grunnlag.omsorgsAr
             ).map {
-                OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.AndreBehandlinger(
+                OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag.FullførtBehandlingForOmsorgsyter(
                     behandlingsId = it.id,
-                    år = it.omsorgsAr,
+                    omsorgsyter = it.omsorgsyter,
+                    omsorgsÅr = it.omsorgsAr,
                     omsorgsmottaker = it.omsorgsmottaker,
                     erInnvilget = it.utfall.erInnvilget()
                 )
             }.let {
                 OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag(
                     omsorgsmottaker = grunnlag.omsorgsmottaker.fnr,
+                    omsorgsår = grunnlag.omsorgsAr,
                     behandlinger = it
                 )
             })
@@ -74,16 +76,24 @@ internal class VilkårsvurderingFactory(
 
     }
 
-    override fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Vurdering {
-        return OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.vilkarsVurder(
+    override fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering {
+        return OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.vilkarsVurder(
             behandlingRepo.finnForOmsorgsmottakerOgAr(
                 omsorgsmottaker = grunnlag.omsorgsmottaker.fnr,
                 ar = grunnlag.omsorgsAr
             ).map {
-                OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag.BehandlingsIdUtfall(
+                OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag.FullførtBehandlingForOmsorgsmottaker(
                     behandlingsId = it.id,
-                    erInnvilget = it.utfall.erInnvilget()
+                    omsorgsyter = it.omsorgsyter,
+                    omsorgsmottaker = it.omsorgsmottaker,
+                    omsorgsår = it.omsorgsAr,
+                    erInnvilget = it.erInnvilget(),
                 )
-            }.let { OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter.Grunnlag(it) })
+            }.let {
+                OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Grunnlag(
+                    omsorgsår = grunnlag.omsorgsAr,
+                    fullførteBehandlinger = it
+                )
+            })
     }
 }
