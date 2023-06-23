@@ -15,7 +15,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMye
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder()
+            Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder
         ).let { referanse ->
             og(
                 grunnlag.fullOmsorgForBarnUnder6Vurdering,

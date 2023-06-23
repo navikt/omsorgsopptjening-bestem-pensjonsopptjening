@@ -2,9 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Forskrift
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Henvisning
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Lovparagraf
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.JuridiskHenvisning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere
@@ -167,54 +165,49 @@ internal fun List<VilkårsvurderingDb>.toDomain(): List<VilkarsVurdering<*>> {
     return map { it.toDomain() }
 }
 
-enum class HenvisningDb {
-    FTRL_K20_P8_L1_Ba_pkt1,
-    FTRL_K20_P8_L1_Ba_pkt2,
-    FTRL_K20_P8_L1_Ba_pkt3,
-    FTRL_K20_P8_L2,
-    FOR_OMSORGSPOENG_K3_P4_L1_pkt1,
-    FOR_OMSORGSPOENG_K2_P4_L3,
+data class JuridiskHenvisningDb(
+    val kortTittel: String? = null,
+    val dato: String? = null,
+    val kapittel: Int? = null,
+    val paragraf: Int? = null,
+    val ledd: Int? = null,
+    val bokstav: String? = null,
+    val punktum: Int? = null,
+    val tekst: String? = null
+)
+
+internal fun JuridiskHenvisning.toDb(): JuridiskHenvisningDb {
+    return JuridiskHenvisningDb(
+        kortTittel = kortTittel,
+        dato = dato,
+        kapittel = kapittel,
+        paragraf = paragraf,
+        ledd = ledd,
+        bokstav = bokstav,
+        punktum = punktum,
+        tekst = tekst
+    )
 }
 
-internal fun Set<Henvisning>.toDb(): Set<HenvisningDb> {
+
+internal fun Set<JuridiskHenvisning>.toDb(): Set<JuridiskHenvisningDb> {
     return map { it.toDb() }.toSet()
 }
 
-internal fun Henvisning.toDb(): HenvisningDb {
-    return when (this) {
-        is Forskrift -> toDb()
-        is Lovparagraf -> toDb()
-    }
+internal fun JuridiskHenvisningDb.toDomain(): JuridiskHenvisning {
+    return JuridiskHenvisning.Arkivert(
+        kortTittel = kortTittel,
+        dato = dato,
+        kapittel = kapittel,
+        paragraf = paragraf,
+        ledd = ledd,
+        bokstav = bokstav,
+        punktum = punktum,
+        tekst = tekst
+    )
 }
 
-internal fun Forskrift.toDb(): HenvisningDb {
-    return when (this) {
-        Forskrift.FOR_OMSORGSPOENG_K3_P4_L1_pkt1 -> HenvisningDb.FOR_OMSORGSPOENG_K3_P4_L1_pkt1
-        Forskrift.FOR_OMSORGSPOENG_K2_P4_L3 -> HenvisningDb.FOR_OMSORGSPOENG_K2_P4_L3
-    }
-}
-
-internal fun Lovparagraf.toDb(): HenvisningDb {
-    return when (this) {
-        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1 -> HenvisningDb.FTRL_K20_P8_L1_Ba_pkt1
-        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt2 -> HenvisningDb.FTRL_K20_P8_L1_Ba_pkt2
-        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt3 -> HenvisningDb.FTRL_K20_P8_L1_Ba_pkt3
-        Lovparagraf.FTRL_K20_P8_L2 -> HenvisningDb.FTRL_K20_P8_L2
-    }
-}
-
-internal fun HenvisningDb.toDomain(): Henvisning {
-    return when (this) {
-        HenvisningDb.FTRL_K20_P8_L1_Ba_pkt1 -> Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1
-        HenvisningDb.FTRL_K20_P8_L1_Ba_pkt2 -> Lovparagraf.FTRL_K20_P8_L1_Ba_pkt2
-        HenvisningDb.FTRL_K20_P8_L1_Ba_pkt3 -> Lovparagraf.FTRL_K20_P8_L1_Ba_pkt3
-        HenvisningDb.FTRL_K20_P8_L2 -> Lovparagraf.FTRL_K20_P8_L2
-        HenvisningDb.FOR_OMSORGSPOENG_K3_P4_L1_pkt1 -> Forskrift.FOR_OMSORGSPOENG_K3_P4_L1_pkt1
-        HenvisningDb.FOR_OMSORGSPOENG_K2_P4_L3 -> Forskrift.FOR_OMSORGSPOENG_K2_P4_L3
-    }
-}
-
-internal fun Set<HenvisningDb>.toDomain(): Set<Henvisning> {
+internal fun Set<JuridiskHenvisningDb>.toDomain(): Set<JuridiskHenvisning> {
     return map { it.toDomain() }.toSet()
 }
 

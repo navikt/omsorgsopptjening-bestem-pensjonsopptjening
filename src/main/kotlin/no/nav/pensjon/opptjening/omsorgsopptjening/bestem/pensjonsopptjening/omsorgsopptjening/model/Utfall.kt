@@ -2,11 +2,11 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 sealed class VilkårsvurderingUtfall {
 
-    abstract fun henvisninger(): Set<Henvisning>
+    abstract fun henvisninger(): Set<JuridiskHenvisning>
     sealed class Innvilget : VilkårsvurderingUtfall() {
 
-        data class Vilkår(val henvisninger: Set<Henvisning>) : Innvilget() {
-            override fun henvisninger(): Set<Henvisning> {
+        data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Innvilget() {
+            override fun henvisninger(): Set<JuridiskHenvisning> {
                 return henvisninger
             }
 
@@ -19,8 +19,8 @@ sealed class VilkårsvurderingUtfall {
     }
 
     sealed class Avslag : VilkårsvurderingUtfall() {
-        data class Vilkår(val henvisninger: Set<Henvisning>) : Avslag() {
-            override fun henvisninger(): Set<Henvisning> {
+        data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Avslag() {
+            override fun henvisninger(): Set<JuridiskHenvisning> {
                 return henvisninger
             }
 

@@ -18,8 +18,8 @@ internal sealed class VilkårsvurderingUtfallDb {
     object OgAvslått : VilkårsvurderingUtfallDb()
 
     object OgInnvilget : VilkårsvurderingUtfallDb()
-    data class VilkårAvslag(val henvisning: Set<HenvisningDb>) : VilkårsvurderingUtfallDb()
-    data class VilkårInnvilget(val henvisning: Set<HenvisningDb>) : VilkårsvurderingUtfallDb()
+    data class VilkårAvslag(val henvisning: Set<JuridiskHenvisningDb>) : VilkårsvurderingUtfallDb()
+    data class VilkårInnvilget(val henvisning: Set<JuridiskHenvisningDb>) : VilkårsvurderingUtfallDb()
 
 }
 

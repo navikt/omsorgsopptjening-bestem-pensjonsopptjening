@@ -27,8 +27,8 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         return when (grunnlag) {
             is Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> {
                 setOf(
-                    Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår(),
-                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
+                    Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
+                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
                    if (grunnlag.antallMåneder >= 1) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
@@ -40,8 +40,8 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
             is Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> {
                 setOf(
-                    Referanse.MåHaMinstHalveÅretMedOmsorg(),
-                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
+                    Referanse.MåHaMinstHalveÅretMedOmsorg,
+                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
                     if (grunnlag.antallMåneder >= 6) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
@@ -53,8 +53,8 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
             is Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> {
                 setOf(
-                    Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår(),
-                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd()
+                    Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
+                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
                     if (grunnlag.antallMåneder >= 1) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)

@@ -56,7 +56,8 @@ class KanKunGodskrivesEnOmsorgsyterTest {
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                 kotlin.test.assertEquals(
                     setOf(
-                        Forskrift.FOR_OMSORGSPOENG_K3_P4_L1_pkt1
+                        JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum,
+                        JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Andre_Punktum
                     ),
                     it.henvisninger
                 )

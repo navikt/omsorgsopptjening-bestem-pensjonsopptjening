@@ -12,7 +12,7 @@ object OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår : ParagrafVilkår<Pe
 
     override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsmottakerErIkkeFylt6FørUtgangAvOpptjeningsår()
+            Referanse.OmsorgsmottakerErIkkeFylt6FørUtgangAvOpptjeningsår
         ).let {
             if (grunnlag.alderMottaker(mellom = 0..5)) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)

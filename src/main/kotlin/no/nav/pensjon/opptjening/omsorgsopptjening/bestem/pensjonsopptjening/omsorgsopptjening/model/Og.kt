@@ -35,14 +35,14 @@ data class OgVurdering(
 ) : VilkarsVurdering<List<VilkarsVurdering<*>>>()
 
 object OgInnvilget : VilkårsvurderingUtfall.Innvilget() {
-    override fun henvisninger(): Set<Henvisning> {
+    override fun henvisninger(): Set<JuridiskHenvisning> {
         TODO("Not yet implemented")
     }
 
 }
 
 object OgAvslått: VilkårsvurderingUtfall.Avslag() {
-    override fun henvisninger(): Set<Henvisning> {
+    override fun henvisninger(): Set<JuridiskHenvisning> {
         TODO("Not yet implemented")
     }
 }

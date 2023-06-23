@@ -14,7 +14,8 @@ object OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter : ParagrafVilkår<Omsorgso
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         setOf(
-            Referanse.OmsorgsopptjeningGisKunEnOmsorgsyter()
+            Referanse.OmsorgsopptjeningGisKunEnOmsorgsyterPerKalenderÅr,
+            Referanse.OmsorgsopptjeningKanTidligstGisPåfølgendeKalenderårHvisAlleredeInnvilgetAnnenOmsorgsyter
         ).let {
             return if (grunnlag.behandlingsIdUtfallListe.none { it.erInnvilget }) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)

@@ -52,7 +52,7 @@ class OmsorgsyterErFylt17VedUtløpAvOmsorgsårTest {
         assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vilkarsVurdering.utfall).also {
             assertEquals(
                 setOf(
-                    Lovparagraf.FTRL_K20_P8_L2
+                    JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Andre_Ledd
                 ),
                 it.henvisninger
             )

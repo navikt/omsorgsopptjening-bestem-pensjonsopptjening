@@ -12,7 +12,7 @@ object OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår : ParagrafVilkår<Person
 
     override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller69()
+            Referanse.OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller69
         ).let {
             if (grunnlag.person.alderVedUtløpAv(grunnlag.omsorgsAr) <= 69) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)

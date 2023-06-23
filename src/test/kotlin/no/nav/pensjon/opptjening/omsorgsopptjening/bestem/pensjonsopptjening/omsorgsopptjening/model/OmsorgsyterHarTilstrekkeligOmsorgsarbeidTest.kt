@@ -105,8 +105,8 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                     assertEquals(
                         setOf(
-                            Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1,
-                            Lovparagraf.FTRL_K20_P8_L1_Ba_pkt3
+                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum,
+                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum
                         ),
                         it.henvisninger
                     )
@@ -146,8 +146,8 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                 assertEquals(
                     setOf(
-                        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt1,
-                        Lovparagraf.FTRL_K20_P8_L1_Ba_pkt3
+                        JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum,
+                        JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum
                     ),
                     it.henvisninger
                 )

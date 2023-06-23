@@ -20,7 +20,7 @@ object OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOm
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder()
+            Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder
         ).let {
             if (grunnlag.finnesAndreOmsorgsytereMedLikeMangeManeder()) {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
