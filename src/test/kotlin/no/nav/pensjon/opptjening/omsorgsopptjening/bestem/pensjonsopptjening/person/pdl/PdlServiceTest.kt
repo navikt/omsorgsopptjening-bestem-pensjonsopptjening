@@ -1,34 +1,27 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.listener.OmsorgsarbeidListenerTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
-import org.junit.jupiter.api.AfterAll
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.cloud.contract.wiremock.WireMockSpring
-import org.springframework.kafka.test.context.EmbeddedKafka
-import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest(classes = [App::class])
-@ActiveProfiles("no-kafka")
-internal class PdlServiceTest {
+internal class PdlServiceTest: SpringContextTest.NoKafka() {
 
     @Autowired
     lateinit var pdlService: PdlService
 
-    private val dbContainer = PostgresqlTestContainer.instance
+    companion object {
+        const val FNR = "11111111111"
 
-    @BeforeEach
-    fun resetWiremock() {
-        wiremock.resetAll()
-   //     dbContainer.removeDataFromDB()
+        @RegisterExtension
+        val wiremock = WireMockExtension.newInstance()
+            .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
+            .build()!!
     }
 
     @Test
@@ -150,18 +143,5 @@ internal class PdlServiceTest {
         )
         val person = pdlService.hentPerson(FNR)
         assertEquals(1995, person.fodselsAr)
-    }
-
-    companion object {
-        const val FNR = "11111111111"
-        private const val PDL_PATH = "/graphql"
-        private val wiremock = WireMockServer(WireMockSpring.options().port(9991)).also { it.start() }
-
-        @JvmStatic
-        @AfterAll
-        fun clean() {
-            wiremock.stop()
-            wiremock.shutdown()
-        }
     }
 }

@@ -1,5 +1,6 @@
+OMSORGSARBEID_TOPIC: omsorgsarbeid
 OMSORGSOPPTJENING_TOPIC: omsorgsopptjening
-OMSORGSOPPTJENING_BESTEM_GROUP_ID: testgruppe
+OMSORGSOPPTJENING_BESTEM_GROUP_ID: omsorgsopptjening-testgruppe
 kafka:
   brokers: ${spring.embedded.kafka.brokers}
 
@@ -12,3 +13,7 @@ spring.datasource:
   url: jdbc:tc:postgresql:14:///test
   username: test
   password: test
+
+spring:
+  main:
+    allow-bean-definition-overriding: true

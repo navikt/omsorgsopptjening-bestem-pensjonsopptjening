@@ -1,35 +1,32 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.containing
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.MockTokenConfig.Companion.MOCK_TOKEN
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.cloud.contract.wiremock.WireMockSpring
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.client.RestClientException
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@AutoConfigureMockMvc
-@SpringBootTest(classes = [App::class])
-@ActiveProfiles("no-kafka")
-internal class PdlClientTest {
+internal class PdlClientTest : SpringContextTest.NoKafka() {
 
     @Autowired
     lateinit var pdlService: PdlService
 
-    private val dbContainer = PostgresqlTestContainer.instance
+    companion object {
+        const val FNR = "11111111111"
 
-    @BeforeEach
-    fun resetWiremock() {
-        wiremock.resetAll()
-      //  dbContainer.removeDataFromDB()
+        @RegisterExtension
+        val wiremock = WireMockExtension.newInstance()
+            .options(wireMockConfig().port(WIREMOCK_PORT))
+            .build()!!
     }
 
     @Test
@@ -187,19 +184,4 @@ internal class PdlClientTest {
         assertEquals(PdlErrorCode.BAD_REQUEST, error.code)
         wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
     }
-
-
-    companion object {
-        const val FNR = "11111111111"
-        private const val PDL_PATH = "/graphql"
-        private val wiremock = WireMockServer(WireMockSpring.options().port(9991)).also { it.start() }
-
-        @JvmStatic
-        @AfterAll
-        fun clean() {
-            wiremock.stop()
-            wiremock.shutdown()
-        }
-    }
-
 }

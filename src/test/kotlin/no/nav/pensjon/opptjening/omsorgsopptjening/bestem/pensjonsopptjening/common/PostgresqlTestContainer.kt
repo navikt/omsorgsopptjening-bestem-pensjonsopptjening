@@ -21,24 +21,16 @@ class PostgresqlTestContainer private constructor(image: String) : PostgreSQLCon
         //Do nothing, JVM handles shut down
     }
 
-//    fun removeDataFromDB() {
-//        dataSource.connection.apply {
-//            createStatement().execute(
-//                """
-//                        DELETE FROM INVOLVERTE_PERSONER;
-//                        DELETE FROM OMSORGSOPPTJENINGSGRUNNLAG;
-//                        DELETE FROM OMSORGSYTER;
-//                        DELETE FROM OMSORGSARBEIDSMOTTAKER;
-//                        DELETE FROM OMSORGSVEDTAK_PERIODE;
-//                        DELETE FROM OMSORGS_SAK;
-//                        DELETE FROM OMSORGS_GRUNNLAG;
-//                        DELETE FROM FNR;
-//                        DELETE FROM PERSON;
-//                    """
-//            )
-//            close()
-//        }
-//    }
+    fun removeDataFromDB() {
+        dataSource.connection.apply {
+            createStatement().execute(
+                """
+                        DELETE FROM BEHANDLING;
+                    """
+            )
+            close()
+        }
+    }
 
     companion object {
         val instance: PostgresqlTestContainer = PostgresqlTestContainer("postgres:14.7-alpine")
