@@ -35,7 +35,7 @@ class OmsorgsarbeidKafkaConfig(@Value("\${kafka.brokers}") private val aivenBoot
         }
 
     private fun consumerConfig(): Map<String, Any> = mapOf(
-        ConsumerConfig.CLIENT_ID_CONFIG to "omsorgsopptjening-konsument-omsorgsarbeid",
+        ConsumerConfig.CLIENT_ID_CONFIG to "omsorgsopptjening-bestem-pensjonsopptjening",
         ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG to aivenBootstrapServers,
         ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
         ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
