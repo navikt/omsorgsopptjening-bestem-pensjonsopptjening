@@ -7,6 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC.MDCCloseable
@@ -22,6 +23,11 @@ class OmsorgsarbeidListener(
     private val omsorgsopptjeningProducer: OmsorgsopptjeningProducer,
     private val registry: MeterRegistry
 ) {
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(this::class.java)
+
+    }
+
     private val antallLesteMeldinger = registry.counter("omsorgsArbeid", "antall", "lest")
     private val antallInnvilgedeOpptjeninger = registry.counter("opptjeninger", "antall", "innvilget")
     private val antallAvslaatteOpptjeninger = registry.counter("opptjeninger", "antall", "avslaatt")
@@ -29,7 +35,7 @@ class OmsorgsarbeidListener(
     @KafkaListener(
         containerFactory = "omsorgsArbeidKafkaListenerContainerFactory",
         idIsGroup = false,
-        topics = ["\${OMSORGSARBEID_TOPIC}"],
+        topics = [Topics.Omsorgsopptjening.NAME],
         groupId = "\${OMSORGSOPPTJENING_BESTEM_GROUP_ID}"
     )
     fun poll(
@@ -38,7 +44,7 @@ class OmsorgsarbeidListener(
     ) {
         antallLesteMeldinger.increment()
 
-        when (consumerRecord.kafkaMessageType()) {
+        when (val type = consumerRecord.kafkaMessageType()) {
             KafkaMessageType.OMSORGSGRUNNLAG -> {
                 Mdc.scopedMdc(CorrelationId.name, consumerRecord.getOrCreateCorrelationId()){
                     omsorgsarbeidMessageHandler.handle(deserialize(consumerRecord.value())).forEach {
@@ -58,7 +64,7 @@ class OmsorgsarbeidListener(
             }
 
             else -> {
-                TODO()
+                LOGGER.info("Hopper over uinteressant melding med type: $type")
             }
         }
         acknowledgment.acknowledge()
@@ -70,10 +76,6 @@ class OmsorgsarbeidListener(
 
     private fun håndterAvslag(behandling: FullførtBehandling) {
         behandling
-    }
-
-    companion object {
-        private val SECURE_LOG = LoggerFactory.getLogger("secure")
     }
 
     private fun ConsumerRecord<*, *>.getOrCreateCorrelationId(): String {

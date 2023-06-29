@@ -7,11 +7,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.GyldigOpptjeningsår2020
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsopptjeningInnvilget
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToClass
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -67,20 +66,19 @@ internal class InnvilgetBarn2ÅrIntegrationTest : SpringContextTest.WithKafka() 
             )
         )
 
-        omsorgsopptjeningListener.removeFirstRecord(maxSeconds = 10)
+        omsorgsopptjeningListener.getFirstRecord( 10, KafkaMessageType.OPPTJENING)
             .let { record ->
-                record.key().mapToClass(OmsorgsopptjeningInnvilget.KafkaKey::class.java).let {
+                record.key().mapToClass(Topics.Omsorgsopptjening.Key::class.java).let {
                     assertEquals(
-                        OmsorgsopptjeningInnvilget.KafkaKey(
-                            omsorgsAr = 2020,
-                            omsorgsyter = "12345678910"
+                        Topics.Omsorgsopptjening.Key(
+                            ident = "12345678910"
                         ),
                         it
                     )
                 }
-                record.value().mapToClass(OmsorgsopptjeningInnvilget::class.java).let {
+                record.value().mapToClass(OmsorgsopptjeningInnvilgetMelding::class.java).let {
                     assertEquals(
-                        OmsorgsopptjeningInnvilget(
+                        OmsorgsopptjeningInnvilgetMelding(
                             omsorgsAr = 2020,
                             omsorgsyter = "12345678910",
                             omsorgsmottaker = "07081812345",

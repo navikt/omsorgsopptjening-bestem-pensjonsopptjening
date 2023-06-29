@@ -3,12 +3,14 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.toKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsopptjeningInnvilget
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsopptjeningInnvilgetMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.header.internals.RecordHeader
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component
@@ -17,7 +19,6 @@ import java.util.concurrent.TimeUnit
 @Profile("!no-kafka")
 @Component
 class OmsorgsopptjeningProducer(
-    @Value("\${OMSORGSOPPTJENING_TOPIC}") private val omsorgsOpptjeningTopic: String,
     private val kafkaTemplate: KafkaTemplate<String, String>
 
 ) {
@@ -25,12 +26,10 @@ class OmsorgsopptjeningProducer(
     fun send(behandling: FullførtBehandling) {
         require(behandling.utfall is AutomatiskGodskrivingUtfall.Innvilget) { "Should only send messages for utfall: ${AutomatiskGodskrivingUtfall.Innvilget::class.java}" }
 
-        val key = OmsorgsopptjeningInnvilget.KafkaKey(
-            omsorgsAr = behandling.omsorgsAr,
-            omsorgsyter = behandling.omsorgsyter
-
+        val key = Topics.Omsorgsopptjening.Key(
+            ident = behandling.omsorgsyter
         )
-        val value = OmsorgsopptjeningInnvilget(
+        val value = OmsorgsopptjeningInnvilgetMelding(
             omsorgsAr = behandling.omsorgsAr,
             omsorgsyter = behandling.omsorgsyter,
             omsorgsmottaker = behandling.omsorgsmottaker,
@@ -42,14 +41,18 @@ class OmsorgsopptjeningProducer(
     }
 
     private fun send(key: String, value: String) {
-        val record = ProducerRecord(omsorgsOpptjeningTopic, null, null, key, value, createHeaders())
+        val record = ProducerRecord(Topics.Omsorgsopptjening.NAME, null, null, key, value, createHeaders())
         kafkaTemplate.send(record).get(1, TimeUnit.SECONDS)
     }
 
     private fun createHeaders() = mutableListOf(
         RecordHeader(
             KafkaMessageType.name,
-            KafkaMessageType.OPPTJENING.name.encodeToByteArray()
+            KafkaMessageType.OPPTJENING.name.encodeToByteArray(),
+        ),
+        RecordHeader(
+            CorrelationId.name,
+            Mdc.getOrCreateCorrelationId().encodeToByteArray()
         )
     )
 }

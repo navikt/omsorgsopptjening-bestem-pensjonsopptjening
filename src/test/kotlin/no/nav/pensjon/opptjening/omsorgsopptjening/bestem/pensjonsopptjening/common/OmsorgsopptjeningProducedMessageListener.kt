@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.kafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.junit.platform.commons.logging.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -24,7 +25,7 @@ class OmsorgsopptjeningProducedMessageListener {
     @KafkaListener(
         containerFactory = "omsorgsArbeidKafkaListenerContainerFactory",
         idIsGroup = false,
-        topics = ["\${OMSORGSOPPTJENING_TOPIC}"],
+        topics = [Topics.Omsorgsopptjening.NAME],
         groupId = "omsorgsopptjening-produced-messages-group"
     )
     private fun poll(record: ConsumerRecord<String, String>, ack: Acknowledgment) {
@@ -32,14 +33,13 @@ class OmsorgsopptjeningProducedMessageListener {
         ack.acknowledge()
     }
 
-    fun removeFirstRecord(maxSeconds: Int): ConsumerRecord<String, String> {
+    fun getFirstRecord(waitForSeconds: Int, type: KafkaMessageType): ConsumerRecord<String, String> {
         var secondsPassed = 0
-        while (secondsPassed < maxSeconds && records.none { it.kafkaMessageType() == KafkaMessageType.OPPTJENING }) {
+        while (secondsPassed < waitForSeconds && records.none{it.kafkaMessageType() == type}) {
             Thread.sleep(1000)
             secondsPassed++
         }
-        return records.firstOrNull { it.kafkaMessageType() == KafkaMessageType.OPPTJENING }
-            ?.also { records.remove(it) }
-            ?: throw RuntimeException("No messages of type:${KafkaMessageType.OPPTJENING} to consume")
+
+        return records.filter {it.kafkaMessageType() == type}.first().also { records.remove(it) }
     }
 }
