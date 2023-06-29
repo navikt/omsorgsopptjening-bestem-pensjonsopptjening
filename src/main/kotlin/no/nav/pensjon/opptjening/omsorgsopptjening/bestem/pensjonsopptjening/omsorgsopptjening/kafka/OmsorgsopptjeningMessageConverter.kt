@@ -41,10 +41,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 //        kjoreHash = omsorgsGrunnlag.kjoreHashe,
 //        kilde = convertToOmsorgsarbeidsKilde(omsorgsGrunnlag.kilde),
 //        omsorgsSaker = omsorgsGrunnlag.omsorgsSaker.map { sak ->
-//            KafkaOmsorgsSak(
+//            KafkaOmsorgsgrunnlagMelding.Sak(
 //                omsorgsyter = convertPerson(omsorgsGrunnlag.omsorgsyter),
 //                omsorgVedtakPeriode = sak.omsorgVedtakPeriode.map { periode ->
-//                    KafkaOmsorgVedtakPeriode(
+//                    KafkaOmsorgsgrunnlagMelding.VedtakPeriode(
 //                        fom = periode.fom,
 //                        tom = periode.tom,
 //                        prosent = periode.prosent,

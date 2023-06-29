@@ -6,10 +6,8 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.WithKafka.Companion.OMSORGSARBEID_TOPIC
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.WithKafka.Companion.OMSORGSOPPTJENING_TOPIC
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsArbeidKey
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -52,9 +50,9 @@ sealed class SpringContextTest {
         lateinit var omsorgsgrunnlagProducer: KafkaTemplate<String, String>
 
         fun sendOmsorgsgrunnlagKafka(
-            omsorgsGrunnlag: OmsorgsGrunnlag
+            omsorgsGrunnlag: OmsorgsgrunnlagMelding
         ) {
-            val omsorgsArbeidKey = OmsorgsArbeidKey(
+            val omsorgsArbeidKey = OmsorgsgrunnlagMelding.KafkaKey(
                 omsorgsyter = omsorgsGrunnlag.omsorgsyter,
                 omsorgsType = omsorgsGrunnlag.omsorgstype
             )
@@ -67,8 +65,8 @@ sealed class SpringContextTest {
                 omsorgsGrunnlag.mapToJson(),
                 listOf(
                     RecordHeader(
-                        KafkaHeaderKey.MESSAGE_TYPE,
-                        KafkaMessageType.OMSORGSARBEID.name.toByteArray()
+                        KafkaMessageType.name,
+                        KafkaMessageType.OMSORGSGRUNNLAG.name.toByteArray()
                     )
                 )
             )
@@ -89,13 +87,13 @@ sealed class SpringContextTest {
         val setState: String? = null,
     )
 
-    fun OmsorgsGrunnlag.toConsumerRecord(): ConsumerRecord<String, String> {
+    fun OmsorgsgrunnlagMelding.toConsumerRecord(): ConsumerRecord<String, String> {
         return ConsumerRecord(
             OMSORGSARBEID_TOPIC,
             1,
             1,
             serialize(
-                OmsorgsArbeidKey(
+                OmsorgsgrunnlagMelding.KafkaKey(
                     omsorgsyter = omsorgsyter,
                     omsorgsType = omsorgstype
                 )
@@ -104,8 +102,8 @@ sealed class SpringContextTest {
         ).apply {
             this.headers().add(
                 RecordHeader(
-                    KafkaHeaderKey.MESSAGE_TYPE,
-                    KafkaMessageType.OMSORGSARBEID.name.toByteArray()
+                    KafkaMessageType.name,
+                    KafkaMessageType.OMSORGSGRUNNLAG.name.toByteArray()
                 )
             )
         }

@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Eller.Companion.eller
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.PersonMedFødselsår
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 
@@ -10,7 +10,6 @@ class EllerTest {
     private val omsorgsår = 2020
     private val fodselAvslag = omsorgsår - 10
     private val fodselInnvilget = omsorgsår - 20
-
     @Test
     fun `all avslag is avslag`() {
         eller(

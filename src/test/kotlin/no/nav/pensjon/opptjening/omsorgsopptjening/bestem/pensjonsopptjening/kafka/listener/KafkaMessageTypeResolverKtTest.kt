@@ -1,8 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.listener
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.KafkaMessageTypeException
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.KafkaMessageTypeResolverException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.kafkaMessageType
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord.NULL_SIZE
@@ -11,34 +10,35 @@ import org.apache.kafka.common.header.internals.RecordHeaders
 import org.apache.kafka.common.record.TimestampType
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-internal class MessageTypeKtTest {
+internal class KafkaMessageTypeResolverKtTest {
 
     @Test
     fun `Given MESSAGE_TYPE header with value in KafkaMessageType When retrieving kafkaMessageType Then return message type`() {
         val consumerRecord = createConsumerRecord(
             RecordHeaders(
                 mutableListOf(
-                    createHeader(KafkaHeaderKey.MESSAGE_TYPE, KafkaMessageType.OMSORGSOPPTJENING.name),
+                    createHeader(KafkaMessageType.name, KafkaMessageType.OPPTJENING.name),
                     createHeader("OtherHeader", "OtherValue")
                 )
             )
         )
 
         val messageType = consumerRecord.kafkaMessageType()
-        assertEquals(KafkaMessageType.OMSORGSOPPTJENING, messageType)
+        assertEquals(KafkaMessageType.OPPTJENING, messageType)
     }
 
     @Test
     fun `Given no header with key MESSAGE_TYPE When retrieving kafkaMessageType Then throw error`() {
         val consumerRecord = createConsumerRecord(RecordHeaders())
 
-        val error = assertThrows<KafkaMessageTypeException> { consumerRecord.kafkaMessageType() }
+        val error = assertThrows<KafkaMessageTypeResolverException> { consumerRecord.kafkaMessageType() }
 
-        assertTrue(error.message!!.contains("was not found"))
+        assertTrue(error.message!!.contains("Could not identify header with name:MESSAGE_TYPE uniquely"))
     }
 
     @Test
@@ -46,15 +46,15 @@ internal class MessageTypeKtTest {
         val consumerRecord = createConsumerRecord(
             RecordHeaders(
                 mutableListOf(
-                    createHeader(KafkaHeaderKey.MESSAGE_TYPE, KafkaMessageType.OMSORGSOPPTJENING.name),
-                    createHeader(KafkaHeaderKey.MESSAGE_TYPE, KafkaMessageType.OMSORGSARBEID.name),
+                    createHeader(KafkaMessageType.name, KafkaMessageType.OPPTJENING.name),
+                    createHeader(KafkaMessageType.name, KafkaMessageType.OMSORGSGRUNNLAG.name),
                 )
             )
         )
 
-        val error = assertThrows<KafkaMessageTypeException> { consumerRecord.kafkaMessageType() }
+        val error = assertThrows<KafkaMessageTypeResolverException> { consumerRecord.kafkaMessageType() }
 
-        assertTrue(error.message!!.contains("had multiple values"))
+        assertTrue(error.message!!.contains("Could not identify header with name:MESSAGE_TYPE uniquely"))
     }
 
     @Test
@@ -62,14 +62,12 @@ internal class MessageTypeKtTest {
         val consumerRecord = createConsumerRecord(
             RecordHeaders(
                 mutableListOf(
-                    createHeader(KafkaHeaderKey.MESSAGE_TYPE, "Bogus"),
+                    createHeader(KafkaMessageType.name, "Bogus"),
                 )
             )
         )
 
-        val error = assertThrows<KafkaMessageTypeException> { consumerRecord.kafkaMessageType() }
-
-        assertTrue(error.message!!.contains("contained the unrecognized value"))
+        assertThrows<IllegalArgumentException> { consumerRecord.kafkaMessageType() }
     }
 
     private fun createConsumerRecord(recordHeaders: RecordHeaders) =

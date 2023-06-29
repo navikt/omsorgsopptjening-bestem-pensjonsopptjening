@@ -7,21 +7,19 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErFylt17VedUtløpAvOmsorgsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erInnvilget
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsSak
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Omsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -64,16 +62,16 @@ class AvslagMangeOmsorgsmottakereHarLikeMangeMånederOmsorgTest : SpringContextT
         )
 
         handler.handle(
-            OmsorgsGrunnlag(
+            OmsorgsgrunnlagMelding(
                 omsorgsyter = "12345678910",
                 omsorgstype = Omsorgstype.BARNETRYGD,
                 kjoreHash = "xxx",
                 kilde = Kilde.BARNETRYGD,
-                omsorgsSaker = listOf(
-                    OmsorgsSak(
+                saker =  listOf(
+                    OmsorgsgrunnlagMelding.Sak(
                         omsorgsyter = "12345678910",
-                        omsorgVedtakPeriode = listOf(
-                            OmsorgVedtakPeriode(
+                        vedtaksperioder = listOf(
+                            OmsorgsgrunnlagMelding.VedtakPeriode(
                                 fom = YearMonth.of(2020, Month.JANUARY),
                                 tom = YearMonth.of(2020, Month.JULY),
                                 prosent = 100,
@@ -81,10 +79,10 @@ class AvslagMangeOmsorgsmottakereHarLikeMangeMånederOmsorgTest : SpringContextT
                             )
                         )
                     ),
-                    OmsorgsSak(
+                    OmsorgsgrunnlagMelding.Sak(
                         omsorgsyter = "04010012797",
-                        omsorgVedtakPeriode = listOf(
-                            OmsorgVedtakPeriode(
+                        vedtaksperioder = listOf(
+                            OmsorgsgrunnlagMelding.VedtakPeriode(
                                 fom = YearMonth.of(2020, Month.JUNE),
                                 tom = YearMonth.of(2020, Month.DECEMBER),
                                 prosent = 100,
@@ -92,10 +90,10 @@ class AvslagMangeOmsorgsmottakereHarLikeMangeMånederOmsorgTest : SpringContextT
                             )
                         )
                     ),
-                    OmsorgsSak(
+                    OmsorgsgrunnlagMelding.Sak(
                         omsorgsyter = "01018212345",
-                        omsorgVedtakPeriode = listOf(
-                            OmsorgVedtakPeriode(
+                        vedtaksperioder = listOf(
+                            OmsorgsgrunnlagMelding.VedtakPeriode(
                                 fom = YearMonth.of(2020, Month.JANUARY),
                                 tom = YearMonth.of(2020, Month.JULY),
                                 prosent = 50,
@@ -105,7 +103,7 @@ class AvslagMangeOmsorgsmottakereHarLikeMangeMånederOmsorgTest : SpringContextT
                     ),
                 ),
                 rådata = RådataFraKilde("")
-            ).toConsumerRecord()
+            )
         ).also { result ->
             result.single().also {
                 assertEquals(2020, it.omsorgsAr)

@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.PersonMedFødselsår
+
 
 internal data class PersonMedFødselsårDb(
     val fnr: String,

@@ -3,8 +3,13 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.kafka.OmsorgsopptjeningProducer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
+import org.slf4j.MDC.MDCCloseable
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -32,16 +37,28 @@ class OmsorgsarbeidListener(
         acknowledgment: Acknowledgment
     ) {
         antallLesteMeldinger.increment()
-        omsorgsarbeidMessageHandler.handle(consumerRecord).forEach {
-            when (it.erInnvilget()) {
-                true -> {
-                    håndterInnvilgelse(it)
-                    antallInnvilgedeOpptjeninger.increment()
+
+        when (consumerRecord.kafkaMessageType()) {
+            KafkaMessageType.OMSORGSGRUNNLAG -> {
+                Mdc.scopedMdc(CorrelationId.name, consumerRecord.getOrCreateCorrelationId()){
+                    omsorgsarbeidMessageHandler.handle(deserialize(consumerRecord.value())).forEach {
+                        when (it.erInnvilget()) {
+                            true -> {
+                                håndterInnvilgelse(it)
+                                antallInnvilgedeOpptjeninger.increment()
+                            }
+
+                            false -> {
+                                håndterAvslag(it)
+                                antallAvslaatteOpptjeninger.increment()
+                            }
+                        }
+                    }
                 }
-                false -> {
-                    håndterAvslag(it)
-                    antallAvslaatteOpptjeninger.increment()
-                }
+            }
+
+            else -> {
+                TODO()
             }
         }
         acknowledgment.acknowledge()
@@ -59,4 +76,7 @@ class OmsorgsarbeidListener(
         private val SECURE_LOG = LoggerFactory.getLogger("secure")
     }
 
+    private fun ConsumerRecord<*, *>.getOrCreateCorrelationId(): String {
+        return headers().lastHeader(CorrelationId.name)?.let { String(it.value()) } ?: CorrelationId.generate()
+    }
 }

@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.Periode
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import java.time.YearMonth
 
 data class BeriketDatagrunnlag(

@@ -6,8 +6,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.toDomain
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlService
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.springframework.stereotype.Service
 
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 class OmsorgsgrunnlagService(
     private val pdlService: PdlService,
 ) {
-    fun berikDatagrunnlag(omsorgsarbeidsSnapshot: OmsorgsGrunnlag): BeriketDatagrunnlag {
+    fun berikDatagrunnlag(omsorgsarbeidsSnapshot: OmsorgsgrunnlagMelding): BeriketDatagrunnlag {
         val personer = omsorgsarbeidsSnapshot.hentPersoner().map {
             pdlService.hentPerson(it)
         }.map {
@@ -25,7 +25,7 @@ class OmsorgsgrunnlagService(
         return omsorgsarbeidsSnapshot.berikDatagrunnlag(personer)
     }
 
-    private fun OmsorgsGrunnlag.berikDatagrunnlag(persondata: Set<PersonMedFødselsår>): BeriketDatagrunnlag {
+    private fun OmsorgsgrunnlagMelding.berikDatagrunnlag(persondata: Set<PersonMedFødselsår>): BeriketDatagrunnlag {
         fun Set<PersonMedFødselsår>.finnPerson(fnr: String): PersonMedFødselsår {
             return single { it.fnr == fnr }
         }
@@ -35,10 +35,10 @@ class OmsorgsgrunnlagService(
             omsorgstype = omsorgstype.toDomain(),
             kjoreHash = kjoreHash,
             kilde = kilde.toDomain(),
-            omsorgsSaker = omsorgsSaker.map { omsorgsSak ->
+            omsorgsSaker = saker.map { omsorgsSak ->
                 BeriketSak(
                     omsorgsyter = persondata.finnPerson(omsorgsSak.omsorgsyter),
-                    omsorgVedtakPeriode = omsorgsSak.omsorgVedtakPeriode.map { omsorgVedtakPeriode ->
+                    omsorgVedtakPeriode = omsorgsSak.vedtaksperioder.map { omsorgVedtakPeriode ->
                         BeriketVedtaksperiode(
                             fom = omsorgVedtakPeriode.fom,
                             tom = omsorgVedtakPeriode.tom,

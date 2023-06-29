@@ -34,12 +34,12 @@ class OmsorgsopptjeningProducedMessageListener {
 
     fun removeFirstRecord(maxSeconds: Int): ConsumerRecord<String, String> {
         var secondsPassed = 0
-        while (secondsPassed < maxSeconds && records.none { it.kafkaMessageType() == KafkaMessageType.OMSORGSOPPTJENING }) {
+        while (secondsPassed < maxSeconds && records.none { it.kafkaMessageType() == KafkaMessageType.OPPTJENING }) {
             Thread.sleep(1000)
             secondsPassed++
         }
-        return records.firstOrNull { it.kafkaMessageType() == KafkaMessageType.OMSORGSOPPTJENING }
+        return records.firstOrNull { it.kafkaMessageType() == KafkaMessageType.OPPTJENING }
             ?.also { records.remove(it) }
-            ?: throw RuntimeException("No messages of type:${KafkaMessageType.OMSORGSOPPTJENING} to consume")
+            ?: throw RuntimeException("No messages of type:${KafkaMessageType.OPPTJENING} to consume")
     }
 }

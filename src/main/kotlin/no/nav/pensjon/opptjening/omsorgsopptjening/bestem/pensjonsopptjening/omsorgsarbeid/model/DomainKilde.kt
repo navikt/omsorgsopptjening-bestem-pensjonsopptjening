@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
+
 
 enum class DomainKilde {
     BARNETRYGD,

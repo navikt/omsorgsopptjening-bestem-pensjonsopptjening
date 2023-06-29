@@ -5,17 +5,13 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningProducedMessageListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.GyldigOpptjeningsår2020
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.GyldigOpptjeningsår2020Og2021
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgVedtakPeriode
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsSak
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsopptjeningInnvilget
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsopptjeningInnvilgetKey
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.Omsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsopptjeningInnvilget
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToClass
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -24,6 +20,7 @@ import org.springframework.test.context.ContextConfiguration
 import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
+
 @ContextConfiguration(classes = [GyldigOpptjeningsår2020Og2021::class])
 class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
 
@@ -49,16 +46,16 @@ class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
         )
 
         sendOmsorgsgrunnlagKafka(
-            omsorgsGrunnlag = OmsorgsGrunnlag(
+            omsorgsGrunnlag = OmsorgsgrunnlagMelding(
                 omsorgsyter = "12345678910",
                 omsorgstype = Omsorgstype.BARNETRYGD,
                 kjoreHash = "xxx",
                 kilde = Kilde.BARNETRYGD,
-                omsorgsSaker = listOf(
-                    OmsorgsSak(
+                saker = listOf(
+                    OmsorgsgrunnlagMelding.Sak(
                         omsorgsyter = "12345678910",
-                        omsorgVedtakPeriode = listOf(
-                            OmsorgVedtakPeriode(
+                        vedtaksperioder = listOf(
+                            OmsorgsgrunnlagMelding.VedtakPeriode(
                                 fom = YearMonth.of(2021, Month.JANUARY),
                                 tom = YearMonth.of(2021, Month.DECEMBER),
                                 prosent = 100,
@@ -73,9 +70,9 @@ class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
 
         omsorgsopptjeningListener.removeFirstRecord(maxSeconds = 10)
             .let { record ->
-                record.key().mapToClass(OmsorgsopptjeningInnvilgetKey::class.java).let {
+                record.key().mapToClass(OmsorgsopptjeningInnvilget.KafkaKey::class.java).let {
                     assertEquals(
-                        OmsorgsopptjeningInnvilgetKey(
+                        OmsorgsopptjeningInnvilget.KafkaKey(
                             omsorgsAr = 2020,
                             omsorgsyter = "12345678910"
                         ),
@@ -98,9 +95,9 @@ class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
 
         omsorgsopptjeningListener.removeFirstRecord(maxSeconds = 10)
             .let { record ->
-                record.key().mapToClass(OmsorgsopptjeningInnvilgetKey::class.java).let {
+                record.key().mapToClass(OmsorgsopptjeningInnvilget.KafkaKey::class.java).let {
                     assertEquals(
-                        OmsorgsopptjeningInnvilgetKey(
+                        OmsorgsopptjeningInnvilget.KafkaKey(
                             omsorgsAr = 2021,
                             omsorgsyter = "12345678910"
                         ),

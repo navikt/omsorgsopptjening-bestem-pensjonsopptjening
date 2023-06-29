@@ -82,6 +82,10 @@ internal class PdlClientTest : SpringContextTest.NoKafka() {
                 .withHeader("Nav-Consumer-Id", WireMock.equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
                 .withHeader("Tema", WireMock.equalTo("PEN"))
                 .withHeader(
+                    "x-correlation-id",
+                    WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$")
+                )
+                .withHeader(
                     "Nav-Call-Id",
                     WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$")
                 )

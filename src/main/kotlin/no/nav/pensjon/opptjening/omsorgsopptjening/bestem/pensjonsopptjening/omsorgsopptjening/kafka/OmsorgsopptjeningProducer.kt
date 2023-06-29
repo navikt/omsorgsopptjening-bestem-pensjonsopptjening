@@ -3,10 +3,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.toKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaHeaderKey
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsopptjeningInnvilget
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsopptjeningInnvilgetKey
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsopptjeningInnvilget
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.header.internals.RecordHeader
@@ -25,9 +23,9 @@ class OmsorgsopptjeningProducer(
 ) {
 
     fun send(behandling: FullførtBehandling) {
-        require(behandling.utfall is AutomatiskGodskrivingUtfall.Innvilget){"Should only send messages for utfall: ${AutomatiskGodskrivingUtfall.Innvilget::class.java}"}
+        require(behandling.utfall is AutomatiskGodskrivingUtfall.Innvilget) { "Should only send messages for utfall: ${AutomatiskGodskrivingUtfall.Innvilget::class.java}" }
 
-        val key = OmsorgsopptjeningInnvilgetKey(
+        val key = OmsorgsopptjeningInnvilget.KafkaKey(
             omsorgsAr = behandling.omsorgsAr,
             omsorgsyter = behandling.omsorgsyter
 
@@ -50,8 +48,8 @@ class OmsorgsopptjeningProducer(
 
     private fun createHeaders() = mutableListOf(
         RecordHeader(
-            KafkaHeaderKey.MESSAGE_TYPE,
-            KafkaMessageType.OMSORGSOPPTJENING.name.encodeToByteArray()
+            KafkaMessageType.name,
+            KafkaMessageType.OPPTJENING.name.encodeToByteArray()
         )
     )
 }

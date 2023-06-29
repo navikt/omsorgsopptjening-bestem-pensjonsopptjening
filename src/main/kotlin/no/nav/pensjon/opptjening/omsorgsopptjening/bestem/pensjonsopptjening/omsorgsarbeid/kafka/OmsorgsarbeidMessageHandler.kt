@@ -3,12 +3,12 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.OmsorgsGrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.PersonMedFødselsår
-import org.apache.kafka.clients.consumer.ConsumerRecord
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BarnetrygdGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import org.springframework.stereotype.Service
 import java.time.Month
 
@@ -18,35 +18,31 @@ class OmsorgsarbeidMessageHandler(
     private val behandlingRepo: BehandlingRepo,
     private val gyldigOpptjeningsår: GyldigOpptjeningår
 ) {
-    fun handle(record: ConsumerRecord<String, String>): List<FullførtBehandling> {
-        return if (record.kafkaMessageType() == KafkaMessageType.OMSORGSARBEID) {
-            deserialize<OmsorgsGrunnlag>(record.value())
-                .berikDatagrunnlag()
-                .barnetrygdgrunnlagPerMottakerPerÅr()
-                /**
-                 * TODO
-                 * vilkår ingen godskrevet for samme barn
-                 * vilkår yter ikke godskrevet annet barn samme år
-                 * filtrer vekk all år som ikke er "gydlig opptjeningsår"?
-                 */
-                .filter { gyldigOpptjeningsår.get().contains(it.omsorgsAr) }
-                .map {
-                    behandlingRepo.persist(
-                        Behandling(
+    fun handle(grunnlag: OmsorgsgrunnlagMelding): List<FullførtBehandling> {
+        return grunnlag
+            .berik()
+            .barnetrygdgrunnlagPerMottakerPerÅr()
+            /**
+             * TODO
+             * vilkår ingen godskrevet for samme barn
+             * vilkår yter ikke godskrevet annet barn samme år
+             * filtrer vekk all år som ikke er "gydlig opptjeningsår"?
+             */
+            .filter { gyldigOpptjeningsår.get().contains(it.omsorgsAr) }
+            .map {
+                behandlingRepo.persist(
+                    Behandling(
+                        grunnlag = it,
+                        vurderVilkår = VilkårsvurderingFactory(
                             grunnlag = it,
-                            vurderVilkår = VilkårsvurderingFactory(
-                                grunnlag = it,
-                                behandlingRepo = behandlingRepo
-                            )
+                            behandlingRepo = behandlingRepo
                         )
                     )
-                }
-        } else {
-            emptyList()
-        }
+                )
+            }
     }
 
-    private fun OmsorgsGrunnlag.berikDatagrunnlag(): BeriketDatagrunnlag {
+    private fun OmsorgsgrunnlagMelding.berik(): BeriketDatagrunnlag {
         return omsorgsgrunnlagService.berikDatagrunnlag(this)
     }
 
