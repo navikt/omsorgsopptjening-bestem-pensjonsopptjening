@@ -21,7 +21,7 @@ import java.time.Month
 import java.time.YearMonth
 
 @ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
-class InnvilgetBarnFødtOpptjeningsårOverHalvtÅrOmsorgTest : SpringContextTest.NoKafka() {
+class InnvilgetBarnFødtOpptjeningsårUnder6MndOmsorgTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var handler: OmsorgsarbeidMessageHandler
@@ -53,7 +53,7 @@ class InnvilgetBarnFødtOpptjeningsårOverHalvtÅrOmsorgTest : SpringContextTest
                         omsorgsyter = "12345678910",
                         vedtaksperioder = listOf(
                             OmsorgsgrunnlagMelding.VedtakPeriode(
-                                fom = YearMonth.of(2020, Month.MAY),
+                                fom = YearMonth.of(2020, Month.OCTOBER),
                                 tom = YearMonth.of(2025, Month.DECEMBER),
                                 prosent = 100,
                                 omsorgsmottaker = "01052012345"

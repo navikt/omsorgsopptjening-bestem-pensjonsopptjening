@@ -16,6 +16,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erInnvilget
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -28,10 +29,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import java.time.Month
 import java.time.YearMonth
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
-class AvslagBarnGodskrevetAnnenOmsorgsyterSammeÅrTest : SpringContextTest.NoKafka() {
+class AvslagBarnFødtOpptjeningsårDesemberAnnenOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var handler: OmsorgsarbeidMessageHandler
@@ -48,9 +50,13 @@ class AvslagBarnGodskrevetAnnenOmsorgsyterSammeÅrTest : SpringContextTest.NoKaf
         wiremock.stubPdl(
             listOf(
                 PdlScenario(body = "fnr_1bruk.json", setState = "hent barn 1"),
-                PdlScenario(inState = "hent barn 1", body = "fnr_barn_2ar_2020.json", setState = "hent annen forelder"),
-                PdlScenario(inState = "hent annen forelder", body = "fnr_samme_fnr_gjeldende_og_historisk.json", setState = "hent barn 2"),
-                PdlScenario(inState = "hent barn 2", body = "fnr_barn_2ar_2020.json"),
+                PdlScenario(inState = "hent barn 1", body = "fnr_barn_0ar_des_2020.json", setState = "hent forelder 2"),
+                PdlScenario(
+                    inState = "hent forelder 2",
+                    body = "fnr_samme_fnr_gjeldende_og_historisk.json",
+                    setState = "hent barn 2"
+                ),
+                PdlScenario(inState = "hent barn 2", body = "fnr_barn_0ar_des_2020.json"),
             )
         )
 
@@ -60,47 +66,32 @@ class AvslagBarnGodskrevetAnnenOmsorgsyterSammeÅrTest : SpringContextTest.NoKaf
                 omsorgstype = Omsorgstype.BARNETRYGD,
                 kjoreHash = "xxx",
                 kilde = Kilde.BARNETRYGD,
-                saker =  listOf(
+                saker = listOf(
                     OmsorgsgrunnlagMelding.Sak(
                         omsorgsyter = "12345678910",
                         vedtaksperioder = listOf(
                             OmsorgsgrunnlagMelding.VedtakPeriode(
-                                fom = YearMonth.of(2020, Month.JANUARY),
-                                tom = YearMonth.of(2020, Month.DECEMBER),
-                                prosent = 100,
-                                omsorgsmottaker = "07081812345"
+                                fom = YearMonth.of(2021, Month.JANUARY),
+                                tom = YearMonth.of(2021, Month.FEBRUARY),
+                                prosent = 50,
+                                omsorgsmottaker = "01122012345"
                             )
                         )
                     ),
-                ),
-                rådata = RådataFraKilde("")
-            )
-        ).also { result ->
-            result.single().also {
-                assertEquals(2020, it.omsorgsAr)
-                assertEquals("12345678910", it.omsorgsyter)
-                assertEquals("07081812345", it.omsorgsmottaker)
-                assertEquals(DomainKilde.BARNETRYGD, it.kilde())
-                assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Innvilget::class.java, it.utfall)
-            }
-        }
-
-        handler.handle(
-            OmsorgsgrunnlagMelding(
-                omsorgsyter = "04010012797",
-                omsorgstype = Omsorgstype.BARNETRYGD,
-                kjoreHash = "xxx",
-                kilde = Kilde.BARNETRYGD,
-                saker =  listOf(
                     OmsorgsgrunnlagMelding.Sak(
                         omsorgsyter = "04010012797",
                         vedtaksperioder = listOf(
                             OmsorgsgrunnlagMelding.VedtakPeriode(
-                                fom = YearMonth.of(2020, Month.JANUARY),
-                                tom = YearMonth.of(2020, Month.DECEMBER),
+                                fom = YearMonth.of(2021, Month.JANUARY),
+                                tom = YearMonth.of(2021, Month.FEBRUARY),
+                                prosent = 50,
+                                omsorgsmottaker = "01122012345"
+                            ),
+                            OmsorgsgrunnlagMelding.VedtakPeriode(
+                                fom = YearMonth.of(2021, Month.MARCH),
+                                tom = YearMonth.of(2021, Month.MAY),
                                 prosent = 100,
-                                omsorgsmottaker = "07081812345"
+                                omsorgsmottaker = "01122012345"
                             )
                         )
                     ),
@@ -108,21 +99,32 @@ class AvslagBarnGodskrevetAnnenOmsorgsyterSammeÅrTest : SpringContextTest.NoKaf
                 rådata = RådataFraKilde("")
             )
         ).also { result ->
-            result.single().also {
-                assertEquals(2020, it.omsorgsAr)
-                assertEquals("04010012797", it.omsorgsyter)
-                assertEquals("07081812345", it.omsorgsmottaker)
-                assertEquals(DomainKilde.BARNETRYGD, it.kilde())
-                assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.AvslagUtenOppgave::class.java, it.utfall)
+            result.single().also { behandling ->
+                assertEquals(2020, behandling.omsorgsAr)
+                assertEquals("12345678910", behandling.omsorgsyter)
+                assertEquals("01122012345", behandling.omsorgsmottaker)
+                assertEquals(DomainKilde.BARNETRYGD, behandling.kilde())
+                assertEquals(DomainOmsorgstype.BARNETRYGD, behandling.omsorgstype)
+                assertInstanceOf(AutomatiskGodskrivingUtfall.AvslagUtenOppgave::class.java, behandling.utfall)
 
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erAvslått<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erAvslått<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>() }
+
+                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
+                    assertFalse(it.grunnlag.omsorgsyterHarFlest())
+                    assertFalse(it.grunnlag.flereHarLikeMange())
+                    assertEquals(
+                        mapOf(
+                            "12345678910" to 2,
+                            "04010012797" to 5,
+                        ), it.grunnlag.yterTilAntall
+                    )
+                }
             }
         }
     }

@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonOgOmsorgsårGrunnlag
 import java.util.UUID
@@ -70,11 +70,11 @@ internal sealed class GrunnlagVilkårsvurderingDb {
     ) : GrunnlagVilkårsvurderingDb()
 }
 
-internal fun GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere.toDomain(): OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
-    return OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
+internal fun GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere.toDomain(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
+    return OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
         omsorgsyter = omsorgsyter.toDomain(),
         summert = data.map {
-            OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.SummertOmsorgForMottakerOgÅr(
+            OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.SummertOmsorgForMottakerOgÅr(
                 omsorgsyter = it.omsorgsyter.toDomain(),
                 omsorgsmottaker = it.omsorgsmottaker.toDomain(),
                 antallMåneder = it.antallMåneder,
@@ -92,7 +92,7 @@ internal data class OmsorgsyterMottakerAntallMånederDb(
     val år: Int,
 )
 
-internal fun OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere {
+internal fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere {
     return GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere(
         omsorgsyter = omsorgsyter.toDb(),
         data = summert.map {

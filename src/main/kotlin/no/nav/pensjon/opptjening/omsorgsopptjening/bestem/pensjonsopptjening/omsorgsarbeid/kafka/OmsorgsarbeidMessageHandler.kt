@@ -103,12 +103,12 @@ class OmsorgsarbeidMessageHandler(
 
     private fun BeriketDatagrunnlag.perMottaker(): Map<PersonMedFødselsår, BeriketDatagrunnlag> {
         return omsorgsmottakere().associateWith { omsorgsmottaker ->
-            copy(omsorgsSaker = omsorgsSaker.map { sak -> sak.copy(omsorgVedtakPeriode = sak.omsorgVedtakPeriode.filter { it.omsorgsmottaker == omsorgsmottaker }) })
+            copy(omsorgsSaker = omsorgsSaker.map { sak -> sak.copy(omsorgVedtakPerioder = sak.omsorgVedtakPerioder.filter { it.omsorgsmottaker == omsorgsmottaker }) })
         }
     }
 
     private fun BeriketDatagrunnlag.perÅr(): Map<Int, BeriketDatagrunnlag> {
-        val alleÅrIGrunnlag = omsorgsSaker.flatMap { it.omsorgVedtakPeriode }
+        val alleÅrIGrunnlag = omsorgsSaker.flatMap { it.omsorgVedtakPerioder }
             .flatMap { it.periode.alleMåneder() }
             .map { it.year }
             .distinct()
@@ -116,7 +116,7 @@ class OmsorgsarbeidMessageHandler(
         return alleÅrIGrunnlag.associateWith { år ->
             copy(omsorgsSaker = omsorgsSaker
                 .map { sak ->
-                    sak.copy(omsorgVedtakPeriode = sak.omsorgVedtakPeriode
+                    sak.copy(omsorgVedtakPerioder = sak.omsorgVedtakPerioder
                         .filter { it.periode.overlapper(år) }
                         .map { barnetrygdPeriode ->
                             barnetrygdPeriode.periode.overlappendeMåneder(år).let {

@@ -7,7 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErFylt17VedUtløpAvOmsorgsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
@@ -125,7 +125,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Vurdering -> {
+        is OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering -> {
             VilkårsvurderingDb.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
@@ -255,7 +255,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         }
 
         is VilkårsvurderingDb.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere -> {
-            OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Vurdering(
+            OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering(
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )

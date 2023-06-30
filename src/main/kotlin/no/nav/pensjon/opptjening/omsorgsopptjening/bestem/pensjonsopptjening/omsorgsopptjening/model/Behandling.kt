@@ -13,20 +13,21 @@ data class Behandling(
     fun grunnlag() = grunnlag
 
     fun utfall(): AutomatiskGodskrivingUtfall {
-        return vilkårsvurdering().let {
-            when (it.utfall.erInnvilget()) {
+        return vilkårsvurdering().let { vilkårsvurdering ->
+            when (vilkårsvurdering.utfall.erInnvilget()) {
                 true -> {
                     AutomatiskGodskrivingUtfall.Innvilget
                 }
 
                 false -> {
-                    if (it.erEnesteAvslag<OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()) {
-                        it.finnVurdering<OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
+                    if (vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()) {
+                        vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
                             if (it.grunnlag.flereHarLikeMange()) {
                                 AutomatiskGodskrivingUtfall.AvslagMedOppgave
+                            } else {
+                                AutomatiskGodskrivingUtfall.AvslagUtenOppgave
                             }
                         }
-                        AutomatiskGodskrivingUtfall.AvslagMedOppgave
                     } else {
                         AutomatiskGodskrivingUtfall.AvslagUtenOppgave
                     }

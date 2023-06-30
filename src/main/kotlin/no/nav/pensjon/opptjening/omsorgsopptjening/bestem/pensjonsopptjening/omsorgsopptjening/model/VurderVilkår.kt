@@ -56,7 +56,7 @@ internal class VilkårsvurderingFactory(
     }
 
     override fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): VilkarsVurdering<*> {
-        return OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.vilkarsVurder(
+        return OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.vilkarsVurder(
             grunnlag.summertAntallMånederPerOmsorgsyter()
         )
     }

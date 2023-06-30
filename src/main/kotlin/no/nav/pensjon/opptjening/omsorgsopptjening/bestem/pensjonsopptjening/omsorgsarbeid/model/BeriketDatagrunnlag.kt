@@ -13,7 +13,7 @@ data class BeriketDatagrunnlag(
     val originaltGrunnlag: String
 ) {
     fun omsorgsmottakere(): Set<PersonMedFødselsår> {
-        return omsorgsytersSaker().omsorgVedtakPeriode.map { it.omsorgsmottaker }.toSet()
+        return omsorgsytersSaker().omsorgVedtakPerioder.map { it.omsorgsmottaker }.toSet()
     }
 
     fun omsorgsytersSaker(): BeriketSak {
@@ -23,10 +23,10 @@ data class BeriketDatagrunnlag(
 
 data class BeriketSak(
     val omsorgsyter: PersonMedFødselsår,
-    val omsorgVedtakPeriode: List<BeriketVedtaksperiode>
+    val omsorgVedtakPerioder: List<BeriketVedtaksperiode>
 ){
     fun antallMånederOmsorgFor(omsorgsmottaker: PersonMedFødselsår): Pair<PersonMedFødselsår, Int> {
-        return omsorgsyter to omsorgVedtakPeriode.filter { it.omsorgsmottaker == omsorgsmottaker }.sumOf { it.periode.antallMoneder() }
+        return omsorgsyter to omsorgVedtakPerioder.filter { it.omsorgsmottaker == omsorgsmottaker }.sumOf { it.periode.antallMoneder() }
     }
 }
 

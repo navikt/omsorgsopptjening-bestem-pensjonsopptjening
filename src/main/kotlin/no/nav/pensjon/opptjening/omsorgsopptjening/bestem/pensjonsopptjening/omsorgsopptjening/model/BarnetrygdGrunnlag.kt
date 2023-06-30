@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketSak
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.PersonMedFødselsår
@@ -27,25 +26,16 @@ sealed class BarnetrygdGrunnlag {
     val omsorgsSaker: List<BeriketSak>
         get() = grunnlag.omsorgsSaker
 
-    private fun hentFullOmsorgForMottaker(): List<BeriketVedtaksperiode> {
-        return omsorgsytersSak().omsorgVedtakPeriode
-            .filter { it.prosent == 100 } //TODO delt og full
+    protected fun antallMånederOmsorgForOmsorgsyter(): Int {
+        return omsorgsytersSak().antallMånederOmsorgFor(omsorgsmottaker).second
     }
 
-    protected fun antallMånederFullOmsorgForMottaker(): Int {
-        return hentFullOmsorgForMottaker()
-            .flatMap { it.periode.alleMåneder() }
-            .toSet()
-            .count()
-
-    }
-
-    fun summertAntallMånederPerOmsorgsyter(): OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
-        return OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
+    fun summertAntallMånederPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
+        return OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
             omsorgsyter = omsorgsyter,
             summert = omsorgsSaker.map {
                 it.antallMånederOmsorgFor(omsorgsmottaker).let { (omsorgsyter, antallMåneder) ->
-                    OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.SummertOmsorgForMottakerOgÅr(
+                    OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.SummertOmsorgForMottakerOgÅr(
                         omsorgsyter = omsorgsyter,
                         omsorgsmottaker = omsorgsmottaker,
                         antallMåneder = antallMåneder,
@@ -77,7 +67,7 @@ sealed class BarnetrygdGrunnlag {
     }
 
     protected fun alleMånederIGrunnlag(): Set<YearMonth> {
-        return omsorgsSaker.flatMap { it.omsorgVedtakPeriode }.flatMap { it.periode.alleMåneder() }.distinct().toSet()
+        return omsorgsSaker.flatMap { it.omsorgVedtakPerioder }.flatMap { it.periode.alleMåneder() }.distinct().toSet()
     }
 
     abstract fun tilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag
@@ -96,7 +86,7 @@ sealed class BarnetrygdGrunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
-                    antallMåneder = antallMånederFullOmsorgForMottaker()
+                    antallMåneder = antallMånederOmsorgForOmsorgsyter()
                 )
             }
         }
@@ -116,7 +106,7 @@ sealed class BarnetrygdGrunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
-                    antallMåneder = antallMånederFullOmsorgForMottaker()
+                    antallMåneder = antallMånederOmsorgForOmsorgsyter()
                 )
             }
         }
@@ -136,7 +126,7 @@ sealed class BarnetrygdGrunnlag {
             return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker,
-                antallMåneder = antallMånederFullOmsorgForMottaker()
+                antallMåneder = antallMånederOmsorgForOmsorgsyter()
             )
         }
     }

@@ -44,14 +44,14 @@ internal data class BeriketOmsorgSakDb(
 internal fun BeriketSak.toDb(): BeriketOmsorgSakDb {
     return BeriketOmsorgSakDb(
         omsorgsyter = omsorgsyter.toDb(),
-        omsorgVedtakPeriode = omsorgVedtakPeriode.map { it.toDb() }
+        omsorgVedtakPeriode = omsorgVedtakPerioder.map { it.toDb() }
     )
 }
 
 internal fun BeriketOmsorgSakDb.toDomain(): BeriketSak {
     return BeriketSak(
         omsorgsyter = omsorgsyter.toDomain(),
-        omsorgVedtakPeriode = omsorgVedtakPeriode.map { it.toDomain() }
+        omsorgVedtakPerioder = omsorgVedtakPeriode.map { it.toDomain() }
     )
 }
 

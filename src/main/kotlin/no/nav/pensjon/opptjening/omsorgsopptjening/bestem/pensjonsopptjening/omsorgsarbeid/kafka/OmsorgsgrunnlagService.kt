@@ -38,7 +38,7 @@ class OmsorgsgrunnlagService(
             omsorgsSaker = saker.map { omsorgsSak ->
                 BeriketSak(
                     omsorgsyter = persondata.finnPerson(omsorgsSak.omsorgsyter),
-                    omsorgVedtakPeriode = omsorgsSak.vedtaksperioder.map { omsorgVedtakPeriode ->
+                    omsorgVedtakPerioder = omsorgsSak.vedtaksperioder.map { omsorgVedtakPeriode ->
                         BeriketVedtaksperiode(
                             fom = omsorgVedtakPeriode.fom,
                             tom = omsorgVedtakPeriode.tom,

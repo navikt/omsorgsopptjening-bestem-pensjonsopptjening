@@ -2,8 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.PersonMedFødselsår
 
-object OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere :
-    ParagrafVilkår<OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag>() {
+object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
+    ParagrafVilkår<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return Vurdering(
             grunnlag = grunnlag,
