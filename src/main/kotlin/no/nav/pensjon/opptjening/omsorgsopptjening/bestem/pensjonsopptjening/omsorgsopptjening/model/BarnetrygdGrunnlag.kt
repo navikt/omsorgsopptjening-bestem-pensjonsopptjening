@@ -28,8 +28,8 @@ sealed class BarnetrygdGrunnlag {
         get() = grunnlag.omsorgsSaker
 
     private fun hentFullOmsorgForMottaker(): List<BeriketVedtaksperiode> {
-        return omsorgsytersSaker().omsorgVedtakPeriode
-            .filter { it.prosent == 100 }
+        return omsorgsytersSak().omsorgVedtakPeriode
+            .filter { it.prosent == 100 } //TODO delt og full
     }
 
     protected fun antallMånederFullOmsorgForMottaker(): Int {
@@ -40,7 +40,25 @@ sealed class BarnetrygdGrunnlag {
 
     }
 
-    private fun omsorgsytersSaker(): BeriketSak {
+    fun summertAntallMånederPerOmsorgsyter(): OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
+        return OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
+            omsorgsyter = omsorgsyter,
+            summert = omsorgsSaker.map {
+                it.antallMånederOmsorgFor(omsorgsmottaker).let { (omsorgsyter, antallMåneder) ->
+                    OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.SummertOmsorgForMottakerOgÅr(
+                        omsorgsyter = omsorgsyter,
+                        omsorgsmottaker = omsorgsmottaker,
+                        antallMåneder = antallMåneder,
+                        år = omsorgsAr
+
+                    )
+                }
+            }
+        )
+
+    }
+
+    private fun omsorgsytersSak(): BeriketSak {
         return omsorgsSaker.single { it.omsorgsyter == this.omsorgsyter }
     }
 
@@ -50,27 +68,6 @@ sealed class BarnetrygdGrunnlag {
             omsorgsAr = omsorgsAr
         )
     }
-
-    fun tilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere(): OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag {
-        return omsorgsSaker.associate { it.antallMånederOmsorgFor(omsorgsmottaker) }.let { yterTilAntallMnd ->
-            OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag(
-                OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag.YterMottakerManeder(
-                    omsorgsyter = omsorgsyter,
-                    omsorgsmottaker = omsorgsmottaker,
-                    antallManeder = yterTilAntallMnd[omsorgsyter]!!
-                ),
-                andreOmsorgsytere = yterTilAntallMnd.filterNot { it.key == omsorgsyter }
-                    .map { (annenOmsorgsyter, antMnd) ->
-                        OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag.YterMottakerManeder(
-                            omsorgsyter = annenOmsorgsyter,
-                            omsorgsmottaker = omsorgsmottaker,
-                            antallManeder = antMnd
-                        )
-                    }
-            )
-        }
-    }
-
 
     fun forOmsorgsmottakerOgÅr(): PersonOgOmsorgsårGrunnlag {
         return PersonOgOmsorgsårGrunnlag(

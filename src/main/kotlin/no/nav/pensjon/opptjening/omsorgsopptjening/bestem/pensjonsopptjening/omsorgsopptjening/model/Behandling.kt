@@ -20,7 +20,12 @@ data class Behandling(
                 }
 
                 false -> {
-                    if (it.erEnesteAvslag<OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid.Vurdering>()) {
+                    if (it.erEnesteAvslag<OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()) {
+                        it.finnVurdering<OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
+                            if (it.grunnlag.flereHarLikeMange()) {
+                                AutomatiskGodskrivingUtfall.AvslagMedOppgave
+                            }
+                        }
                         AutomatiskGodskrivingUtfall.AvslagMedOppgave
                     } else {
                         AutomatiskGodskrivingUtfall.AvslagUtenOppgave
@@ -36,7 +41,7 @@ data class Behandling(
             vurderVilkår.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(),
             vurderVilkår.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(),
             vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
-            vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid(),
+            vurderVilkår.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr()
         )

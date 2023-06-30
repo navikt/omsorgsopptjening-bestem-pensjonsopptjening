@@ -22,3 +22,7 @@ inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erInnvilget():
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erEnesteAvslag(): Boolean {
     return erAvslått<T>() && UnwrapOgEllerVisitor.unwrap(this).count { !it.utfall.erInnvilget() } == 1
 }
+
+inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.finnVurdering(): T {
+    return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().single()
+}

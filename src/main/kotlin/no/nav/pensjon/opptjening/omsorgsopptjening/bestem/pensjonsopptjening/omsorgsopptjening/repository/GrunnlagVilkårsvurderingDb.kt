@@ -1,11 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonOgOmsorgsårGrunnlag
 import java.util.UUID
 
@@ -64,12 +63,24 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         val barnUnder6: VilkårsvurderingDb,
         val likeMangeMåneder: VilkårsvurderingDb
     ) : GrunnlagVilkårsvurderingDb()
+
+    data class MestAvAlleOmsorgsytere(
+        val omsorgsyter: PersonMedFødselsårDb,
+        val data: List<OmsorgsyterMottakerAntallMånederDb>
+    ) : GrunnlagVilkårsvurderingDb()
 }
 
-internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6OgIngenHarLikeMangeMåneder.toDomain(): OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid.Grunnlag {
-    return OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid.Grunnlag(
-        fullOmsorgForBarnUnder6Vurdering = barnUnder6.toDomain() as OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering,
-        liktAntallMånederOmsorgVurdering = likeMangeMåneder.toDomain() as OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Vurdering
+internal fun GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere.toDomain(): OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
+    return OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
+        omsorgsyter = omsorgsyter.toDomain(),
+        summert = data.map {
+            OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.SummertOmsorgForMottakerOgÅr(
+                omsorgsyter = it.omsorgsyter.toDomain(),
+                omsorgsmottaker = it.omsorgsmottaker.toDomain(),
+                antallMåneder = it.antallMåneder,
+                år = it.år
+            )
+        }
     )
 }
 
@@ -77,36 +88,21 @@ internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6OgIngenHarLikeMangeMån
 internal data class OmsorgsyterMottakerAntallMånederDb(
     val omsorgsyter: PersonMedFødselsårDb,
     val omsorgsmottaker: PersonMedFødselsårDb,
-    val antallMåneder: Int
+    val antallMåneder: Int,
+    val år: Int,
 )
 
-internal fun OmsorgsyterMottakerAntallMånederDb.toDomain(): OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag.YterMottakerManeder {
-    return OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag.YterMottakerManeder(
-        omsorgsyter = omsorgsyter.toDomain(),
-        omsorgsmottaker = omsorgsmottaker.toDomain(),
-        antallManeder = antallMåneder
-    )
-}
-
-internal fun OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.LiktAntallMåneder {
-    return GrunnlagVilkårsvurderingDb.LiktAntallMåneder(
+internal fun OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere {
+    return GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere(
         omsorgsyter = omsorgsyter.toDb(),
-        andreOmsorgsytere = andreOmsorgsytere.map { it.toDb() }
-    )
-}
-
-internal fun GrunnlagVilkårsvurderingDb.LiktAntallMåneder.toDomain(): OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag {
-    return OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag(
-        omsorgsyter = omsorgsyter.toDomain(),
-        andreOmsorgsytere = andreOmsorgsytere.map { it.toDomain() }
-    )
-}
-
-internal fun OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Grunnlag.YterMottakerManeder.toDb(): OmsorgsyterMottakerAntallMånederDb {
-    return OmsorgsyterMottakerAntallMånederDb(
-        omsorgsyter = omsorgsyter.toDb(),
-        omsorgsmottaker = omsorgsmottaker.toDb(),
-        antallMåneder = antallManeder
+        data = summert.map {
+            OmsorgsyterMottakerAntallMånederDb(
+                omsorgsyter = it.omsorgsyter.toDb(),
+                omsorgsmottaker = it.omsorgsmottaker.toDb(),
+                antallMåneder = it.antallMåneder,
+                år = it.år
+            )
+        }
     )
 }
 

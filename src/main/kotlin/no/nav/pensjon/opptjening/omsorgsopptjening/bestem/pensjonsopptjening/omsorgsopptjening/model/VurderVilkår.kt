@@ -11,8 +11,7 @@ interface VurderVilkår {
     fun OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(): OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering
 
     fun OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr(): OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering
-
-    fun OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid.Vurdering
+    fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): VilkarsVurdering<*>
 }
 
 internal class VilkårsvurderingFactory(
@@ -56,21 +55,11 @@ internal class VilkårsvurderingFactory(
             })
     }
 
-    override fun OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid.Vurdering {
-        return OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid.vilkarsVurder(
-            OmsorgsyterHarTilstrekkeligOmsorgsarbeidOgIngenAndreOmsorgsyterHarLikeMyeOmsorgsarbeid.Grunnlag(
-                fullOmsorgForBarnUnder6Vurdering = OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
-                liktAntallMånederOmsorgVurdering = OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere()
-            )
+    override fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): VilkarsVurdering<*> {
+        return OmsorgstyerHarMestOmsorgAvAlleOmsorgsytere.vilkarsVurder(
+            grunnlag.summertAntallMånederPerOmsorgsyter()
         )
     }
-
-    private fun OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere(): OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.Vurdering {
-        return OmsorgsopptjeningKanIkkeGisHvisTilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere.vilkarsVurder(
-            grunnlag.tilnærmetLikeMyeOmsorgsarbeidBlantFlereOmsorgsytere()
-        )
-    }
-
     override fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering {
         return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(grunnlag.tilstrekkeligOmsorgsarbeid())
 
