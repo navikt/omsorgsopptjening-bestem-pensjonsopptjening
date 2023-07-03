@@ -15,6 +15,7 @@
       "foedsel": [
         {
           "foedselsaar": 1990,
+          "foedselsdato": "1990-01-01",
           "metadata": {
             "master": "PDL",
             "historisk": false,
@@ -31,6 +32,7 @@
         },
         {
           "foedselsaar": 1991,
+          "foedselsdato": "1991-01-01",
           "metadata": {
             "master": "PDL",
             "historisk": false,

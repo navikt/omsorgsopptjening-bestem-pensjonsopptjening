@@ -22,6 +22,7 @@
       "foedsel": [
         {
           "foedselsaar": 2018,
+          "foedselsdato": "2018-08-07",
           "metadata": {
             "historisk": false,
             "master": "FREG"

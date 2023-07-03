@@ -15,6 +15,7 @@
       "foedsel": [
         {
           "foedselsaar": 1996,
+          "foedselsdato": "1996-01-01",
           "metadata": {
             "master": "PDL",
             "historisk": false,
@@ -31,6 +32,7 @@
         },
         {
           "foedselsaar": 1997,
+          "foedselsdato": "1997-01-01",
           "metadata": {
             "master": "PDL",
             "historisk": false,
@@ -47,6 +49,7 @@
         },
         {
           "foedselsaar": 1998,
+          "foedselsdato": "1998-01-01",
           "metadata": {
             "master": "FREG",
             "historisk": false,

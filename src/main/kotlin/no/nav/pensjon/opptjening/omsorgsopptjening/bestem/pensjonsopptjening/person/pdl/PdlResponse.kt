@@ -26,6 +26,7 @@ data class Folkeregisteridentifikator(
 
 data class Foedsel(
     val foedselsaar: Int,
+    val foedselsdato: String,
     val metadata: Metadata,
     val folkeregistermetadata: Folkeregistermetadata? = null,
 )

@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.PersonMedFødselsår
+
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonMedFødselsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import java.time.YearMonth
 
@@ -24,9 +25,10 @@ data class BeriketDatagrunnlag(
 data class BeriketSak(
     val omsorgsyter: PersonMedFødselsår,
     val omsorgVedtakPerioder: List<BeriketVedtaksperiode>
-){
+) {
     fun antallMånederOmsorgFor(omsorgsmottaker: PersonMedFødselsår): Pair<PersonMedFødselsår, Int> {
-        return omsorgsyter to omsorgVedtakPerioder.filter { it.omsorgsmottaker == omsorgsmottaker }.sumOf { it.periode.antallMoneder() }
+        return omsorgsyter to omsorgVedtakPerioder.filter { it.omsorgsmottaker == omsorgsmottaker }
+            .sumOf { it.periode.antallMoneder() }
     }
 }
 

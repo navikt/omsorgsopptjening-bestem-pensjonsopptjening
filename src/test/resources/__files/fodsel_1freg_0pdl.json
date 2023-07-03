@@ -15,6 +15,7 @@
       "foedsel": [
         {
           "foedselsaar": 1992,
+          "foedselsdato": "1992-01-01",
           "metadata": {
             "master": "FREG",
             "historisk": false,
