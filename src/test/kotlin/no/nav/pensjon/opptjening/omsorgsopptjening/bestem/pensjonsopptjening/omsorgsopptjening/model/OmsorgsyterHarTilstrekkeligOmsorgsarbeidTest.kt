@@ -65,7 +65,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 omsorgsAr = 2000,
                 omsorgsmottaker = Person(
                     fnr = "12125678910",
-                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
+                    fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1)
                 ),
                 antallMåneder = 1
             )
@@ -81,7 +81,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 omsorgsAr = 2000,
                 omsorgsmottaker = Person(
                     fnr = "12125678910",
-                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
+                    fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1)
                 ),
                 antallMåneder = 0
             )
