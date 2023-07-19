@@ -6,6 +6,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Month
 
@@ -15,18 +17,20 @@ class OmsorgsarbeidMessageHandler(
     private val behandlingRepo: BehandlingRepo,
     private val gyldigOpptjeningsår: GyldigOpptjeningår
 ) {
+    companion object {
+        private val log: Logger = LoggerFactory.getLogger(this::class.java)
+    }
+
     fun handle(grunnlag: OmsorgsgrunnlagMelding): List<FullførtBehandling> {
         return grunnlag
             .berik()
             .barnetrygdgrunnlagPerMottakerPerÅr()
-            /**
-             * TODO
-             * vilkår ingen godskrevet for samme barn
-             * vilkår yter ikke godskrevet annet barn samme år
-             * filtrer vekk all år som ikke er "gydlig opptjeningsår"?
-             */
-            .filter { gyldigOpptjeningsår.get().contains(it.omsorgsAr) }
+            .filter {
+                log.info("Filtrerer vekk andre opptjeningsår enn: ${gyldigOpptjeningsår.get()}")
+                gyldigOpptjeningsår.get().contains(it.omsorgsAr)
+            }
             .map {
+                log.info("Utfører vilkårsvurdering")
                 behandlingRepo.persist(
                     Behandling(
                         grunnlag = it,
@@ -40,10 +44,12 @@ class OmsorgsarbeidMessageHandler(
     }
 
     private fun OmsorgsgrunnlagMelding.berik(): BeriketDatagrunnlag {
+        log.info("Beriker datagrunnlag")
         return omsorgsgrunnlagService.berikDatagrunnlag(this)
     }
 
     private fun BeriketDatagrunnlag.barnetrygdgrunnlagPerMottakerPerÅr(): List<BarnetrygdGrunnlag> {
+        log.info("Lager grunnlag per omsorgsmottaker per opptjeningsår")
         return perMottakerPerÅr().fold(emptyList()) { acc, (mottaker, år, grunnlag) ->
             acc + when (mottaker.erFødt(år)) {
                 true -> {

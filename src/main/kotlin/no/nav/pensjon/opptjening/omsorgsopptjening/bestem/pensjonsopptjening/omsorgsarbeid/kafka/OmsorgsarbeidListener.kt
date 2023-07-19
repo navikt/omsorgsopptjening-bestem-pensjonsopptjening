@@ -10,7 +10,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMess
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC.MDCCloseable
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
@@ -24,7 +23,7 @@ class OmsorgsarbeidListener(
     private val registry: MeterRegistry
 ) {
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(this::class.java)
+        private val log = LoggerFactory.getLogger(this::class.java)
 
     }
 
@@ -46,7 +45,8 @@ class OmsorgsarbeidListener(
 
         when (val type = consumerRecord.kafkaMessageType()) {
             KafkaMessageType.OMSORGSGRUNNLAG -> {
-                Mdc.scopedMdc(CorrelationId.name, consumerRecord.getOrCreateCorrelationId()){
+                Mdc.scopedMdc(CorrelationId.name, consumerRecord.getOrCreateCorrelationId()) {
+                    log.info("Prosesserer melding")
                     omsorgsarbeidMessageHandler.handle(deserialize(consumerRecord.value())).forEach {
                         when (it.erInnvilget()) {
                             true -> {
@@ -59,22 +59,25 @@ class OmsorgsarbeidListener(
                                 antallAvslaatteOpptjeninger.increment()
                             }
                         }
+                        log.info("Melding prosessert")
                     }
                 }
             }
 
             else -> {
-                LOGGER.info("Hopper over uinteressant melding med type: $type")
+                log.info("Hopper over uinteressant melding med type: $type")
             }
         }
         acknowledgment.acknowledge()
     }
 
     private fun håndterInnvilgelse(behandling: FullførtBehandling) {
+        log.info("Håndterer innvilgelse")
         omsorgsopptjeningProducer.send(behandling)
     }
 
     private fun håndterAvslag(behandling: FullførtBehandling) {
+        log.info("Håndterer avslag")
         behandling
     }
 
