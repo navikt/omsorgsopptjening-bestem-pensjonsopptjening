@@ -16,30 +16,30 @@ import java.util.UUID
 internal sealed class GrunnlagVilkårsvurderingDb {
     internal sealed class OmsorgBarnUnder6 : GrunnlagVilkårsvurderingDb() {
         abstract val omsorgsAr: Int
-        abstract val omsorgsmottaker: PersonMedFødselsårDb
+        abstract val omsorgsmottaker: PersonDb
         abstract val antallMåneder: Int
 
         data class OmsorgBarnFødtOmsorgsår(
             override val omsorgsAr: Int,
-            override val omsorgsmottaker: PersonMedFødselsårDb,
+            override val omsorgsmottaker: PersonDb,
             override val antallMåneder: Int,
         ) : OmsorgBarnUnder6()
 
         data class OmsorgBarnFødtDesemberOmsorgsår(
             override val omsorgsAr: Int,
-            override val omsorgsmottaker: PersonMedFødselsårDb,
+            override val omsorgsmottaker: PersonDb,
             override val antallMåneder: Int,
         ) : OmsorgBarnUnder6()
 
         data class OmsorgBarnFødtUtenforOmsorgsår(
             override val omsorgsAr: Int,
-            override val omsorgsmottaker: PersonMedFødselsårDb,
+            override val omsorgsmottaker: PersonDb,
             override val antallMåneder: Int,
         ) : OmsorgBarnUnder6()
     }
 
     data class PersonOgOmsorgsÅr(
-        val person: PersonMedFødselsårDb,
+        val person: PersonDb,
         val omsorgsAr: Int
     ) : GrunnlagVilkårsvurderingDb()
 
@@ -65,7 +65,7 @@ internal sealed class GrunnlagVilkårsvurderingDb {
     ) : GrunnlagVilkårsvurderingDb()
 
     data class MestAvAlleOmsorgsytere(
-        val omsorgsyter: PersonMedFødselsårDb,
+        val omsorgsyter: PersonDb,
         val data: List<OmsorgsyterMottakerAntallMånederDb>
     ) : GrunnlagVilkårsvurderingDb()
 }
@@ -86,8 +86,8 @@ internal fun GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere.toDomain(): Omso
 
 
 internal data class OmsorgsyterMottakerAntallMånederDb(
-    val omsorgsyter: PersonMedFødselsårDb,
-    val omsorgsmottaker: PersonMedFødselsårDb,
+    val omsorgsyter: PersonDb,
+    val omsorgsmottaker: PersonDb,
     val antallMåneder: Int,
     val år: Int,
 )

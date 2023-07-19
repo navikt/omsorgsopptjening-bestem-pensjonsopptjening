@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
+import java.time.Month
 
 internal class PdlServiceTest: SpringContextTest.NoKafka() {
 
@@ -103,7 +105,7 @@ internal class PdlServiceTest: SpringContextTest.NoKafka() {
             )
         )
         val person: PdlPerson = pdlService.hentPerson(FNR)
-        assertEquals(1992, person.fodselsAr)
+        assertEquals(LocalDate.of(1992, Month.JANUARY, 1), person.fodselsdato)
     }
 
     @Test
@@ -116,7 +118,7 @@ internal class PdlServiceTest: SpringContextTest.NoKafka() {
             )
         )
         val person = pdlService.hentPerson(FNR)
-        assertEquals(1990, person.fodselsAr)
+        assertEquals(LocalDate.of(1990, Month.JANUARY, 1), person.fodselsdato)
     }
 
     @Test
@@ -129,7 +131,7 @@ internal class PdlServiceTest: SpringContextTest.NoKafka() {
             )
         )
         val person = pdlService.hentPerson(FNR)
-        assertEquals(1998, person.fodselsAr)
+        assertEquals(LocalDate.of(1998, Month.JANUARY, 1), person.fodselsdato)
     }
 
     @Test
@@ -142,6 +144,6 @@ internal class PdlServiceTest: SpringContextTest.NoKafka() {
             )
         )
         val person = pdlService.hentPerson(FNR)
-        assertEquals(1995, person.fodselsAr)
+        assertEquals(LocalDate.of(1995, Month.JANUARY, 1), person.fodselsdato)
     }
 }

@@ -5,7 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketSak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.toDomain
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlService
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -20,14 +20,14 @@ class OmsorgsgrunnlagService(
         val personer = omsorgsarbeidsSnapshot.hentPersoner().map {
             pdlService.hentPerson(it)
         }.map {
-            PersonMedFødselsår(it.gjeldendeFnr, it.fodselsAr)
+            Person(it.gjeldendeFnr, it.fodselsdato)
         }.toSet()
 
         return omsorgsarbeidsSnapshot.berikDatagrunnlag(personer)
     }
 
-    private fun OmsorgsgrunnlagMelding.berikDatagrunnlag(persondata: Set<PersonMedFødselsår>): BeriketDatagrunnlag {
-        fun Set<PersonMedFødselsår>.finnPerson(fnr: String): PersonMedFødselsår {
+    private fun OmsorgsgrunnlagMelding.berikDatagrunnlag(persondata: Set<Person>): BeriketDatagrunnlag {
+        fun Set<Person>.finnPerson(fnr: String): Person {
             return single { it.fnr == fnr }
         }
 

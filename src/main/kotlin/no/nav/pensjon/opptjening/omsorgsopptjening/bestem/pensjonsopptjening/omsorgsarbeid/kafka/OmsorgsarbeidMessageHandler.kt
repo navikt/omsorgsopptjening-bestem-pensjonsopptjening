@@ -96,7 +96,7 @@ class OmsorgsarbeidMessageHandler(
         }
     }
 
-    private fun BeriketDatagrunnlag.perMottakerPerÅr(): List<Triple<PersonMedFødselsår, Int, BeriketDatagrunnlag>> {
+    private fun BeriketDatagrunnlag.perMottakerPerÅr(): List<Triple<Person, Int, BeriketDatagrunnlag>> {
         return perMottaker().flatMap { (omsorgsmottaker, grunnlagPerMottaker) ->
             grunnlagPerMottaker.perÅr().map { (år, grunnlagPerÅrPerMottaker) ->
                 Triple(omsorgsmottaker, år, grunnlagPerÅrPerMottaker)
@@ -104,7 +104,7 @@ class OmsorgsarbeidMessageHandler(
         }
     }
 
-    private fun BeriketDatagrunnlag.perMottaker(): Map<PersonMedFødselsår, BeriketDatagrunnlag> {
+    private fun BeriketDatagrunnlag.perMottaker(): Map<Person, BeriketDatagrunnlag> {
         return omsorgsmottakere().associateWith { omsorgsmottaker ->
             copy(omsorgsSaker = omsorgsSaker.map { sak -> sak.copy(omsorgVedtakPerioder = sak.omsorgVedtakPerioder.filter { it.omsorgsmottaker == omsorgsmottaker }) })
         }

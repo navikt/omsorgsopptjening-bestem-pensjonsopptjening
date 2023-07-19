@@ -72,12 +72,12 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
     sealed class Grunnlag : ParagrafGrunnlag() {
         abstract val omsorgsAr: Int
-        abstract val omsorgsmottaker: PersonMedFødselsår
+        abstract val omsorgsmottaker: Person
         abstract val antallMåneder: Int
 
         data class OmsorgsmottakerFødtUtenforOmsorgsår(
             override val omsorgsAr: Int,
-            override val omsorgsmottaker: PersonMedFødselsår,
+            override val omsorgsmottaker: Person,
             override val antallMåneder: Int,
         ) : Grunnlag() {
             init {
@@ -87,7 +87,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
         data class OmsorgsmottakerFødtIOmsorgsår(
             override val omsorgsAr: Int,
-            override val omsorgsmottaker: PersonMedFødselsår,
+            override val omsorgsmottaker: Person,
             override val antallMåneder: Int,
         ) : Grunnlag() {
             init {
@@ -97,7 +97,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
         data class OmsorgsmottakerFødtIDesemberOmsorgsår(
             override val omsorgsAr: Int,
-            override val omsorgsmottaker: PersonMedFødselsår,
+            override val omsorgsmottaker: Person,
             override val antallMåneder: Int,
         ) : Grunnlag() {
             init {

@@ -4,7 +4,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 
 data class PersonOgOmsorgsårGrunnlag(
-    val person: PersonMedFødselsår,
+    val person: Person,
     val omsorgsAr: Int
 ): ParagrafGrunnlag() {
     fun alderMottaker(mellom: IntRange): Boolean {

@@ -6,7 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import java.time.YearMonth
 
 internal data class BeriketOmsorgsgrunnlagDb(
-    val omsorgsyter: PersonMedFødselsårDb,
+    val omsorgsyter: PersonDb,
     val omsorgstype: OmsorgstypeDb,
     val kjoreHash: String,
     val kilde: KildeDb,
@@ -37,7 +37,7 @@ internal fun BeriketOmsorgsgrunnlagDb.toDomain(): BeriketDatagrunnlag {
 }
 
 internal data class BeriketOmsorgSakDb(
-    val omsorgsyter: PersonMedFødselsårDb,
+    val omsorgsyter: PersonDb,
     val omsorgVedtakPeriode: List<BeriketOmsorgVedtakPeriodeDb>
 )
 
@@ -59,7 +59,7 @@ internal data class BeriketOmsorgVedtakPeriodeDb(
     val fom: String,
     val tom: String,
     val prosent: Int,
-    val omsorgsmottaker: PersonMedFødselsårDb
+    val omsorgsmottaker: PersonDb
 )
 
 internal fun BeriketVedtaksperiode.toDb(): BeriketOmsorgVedtakPeriodeDb {
@@ -67,9 +67,9 @@ internal fun BeriketVedtaksperiode.toDb(): BeriketOmsorgVedtakPeriodeDb {
         fom = fom.toString(),
         tom = tom.toString(),
         prosent = prosent,
-        omsorgsmottaker = PersonMedFødselsårDb(
+        omsorgsmottaker = PersonDb(
             fnr = omsorgsmottaker.fnr,
-            fødselsår = omsorgsmottaker.fodselsAr
+            fødselsdato = omsorgsmottaker.fødselsdato.toString()
         )
     )
 }

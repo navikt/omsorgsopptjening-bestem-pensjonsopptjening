@@ -12,11 +12,11 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         val hentPersonQueryResponse = pdlResponse?.data?.hentPerson ?: throw PdlException(pdlResponse?.error)
 
         val gjeldende = hentPersonQueryResponse.gjeldendeIdent()
-        val historisk = hentPersonQueryResponse.historisk().filter { it.fnr !=  gjeldende.fnr}
+        val historisk = hentPersonQueryResponse.historisk().filter { it.fnr != gjeldende.fnr }
 
         return PdlPerson(
             alleFnr = historisk + gjeldende,
-            fodselsAr = hentPersonQueryResponse.foedselsAr(),
+            fodselsdato = hentPersonQueryResponse.foedselsdato(),
             doedsdato = bestemDoedsdato(pdlResponse.data.hentPerson.doedsfall)
         )
     }
@@ -33,31 +33,45 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
     private fun bestemDoedsdato(doedsfall: List<Doedsfall?>): LocalDate? {
         return doedsfall.firstOrNull()?.doedsdato
     }
+
     private fun HentPersonQueryResponse.historisk() = folkeregisteridentifikator
         .filter { it.status == Status.OPPHOERT }
         .distinctBy { it.identifikasjonsnummer }
-        .map { PdlFnr(it.identifikasjonsnummer, gjeldende = false)}
+        .map { PdlFnr(it.identifikasjonsnummer, gjeldende = false) }
 
     private fun HentPersonQueryResponse.gjeldendeIdent() =
         folkeregisteridentifikator
             .firstOrNull { it.status == Status.I_BRUK }
-            ?.let{PdlFnr(it.identifikasjonsnummer, gjeldende = true)}
+            ?.let { PdlFnr(it.identifikasjonsnummer, gjeldende = true) }
             ?: throw PdlMottatDataException("Fnr i bruk finnes ikke")
 
 
-    private fun HentPersonQueryResponse.foedselsAr(): Int =
-        when (foedsel.size) {
-            1 -> foedsel.first().foedselsaar
-            else -> foedsel.avklarFoedsel()?.foedselsaar
-                ?: throw PdlMottatDataException("Fødselsår finnes ikke i respons fra pdl")
+    private fun HentPersonQueryResponse.foedselsdato(): LocalDate {
+        return when (foedsel.size) {
+            0 -> {
+                throw PdlMottatDataException("Fødselsår finnes ikke i respons fra pdl")
+            }
+
+            1 -> {
+                LocalDate.parse(foedsel.first().foedselsdato)
+            }
+
+            else -> {
+                LocalDate.parse(foedsel.avklarFoedsel()?.foedselsdato)
+                    ?: throw PdlMottatDataException("Fødselsår finnes ikke i respons fra pdl")
+            }
         }
+    }
+
 }
 
-data class PdlPerson(val alleFnr: List<PdlFnr>, val fodselsAr: Int, val doedsdato: LocalDate? = null){
-
+data class PdlPerson(
+    val alleFnr: List<PdlFnr>,
+    val fodselsdato: LocalDate,
+    val doedsdato: LocalDate? = null
+) {
     val gjeldendeFnr: String get() = alleFnr.first { it.gjeldende }.fnr
     val historiskeFnr: List<String> get() = alleFnr.filter { !it.gjeldende }.map { it.fnr }
-
 }
 
 data class PdlFnr(val fnr: String, val gjeldende: Boolean)

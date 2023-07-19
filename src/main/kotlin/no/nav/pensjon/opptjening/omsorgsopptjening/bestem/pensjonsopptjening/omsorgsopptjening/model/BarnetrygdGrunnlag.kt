@@ -13,9 +13,9 @@ sealed class BarnetrygdGrunnlag {
     abstract val omsorgsAr: Int
     abstract val grunnlag: BeriketDatagrunnlag
 
-    val omsorgsyter: PersonMedFødselsår
+    val omsorgsyter: Person
         get() = grunnlag.omsorgsyter
-    val omsorgsmottaker: PersonMedFødselsår
+    val omsorgsmottaker: Person
         get() = grunnlag.omsorgsmottakere().single()
     val omsorgstype: DomainOmsorgstype
         get() = grunnlag.omsorgstype

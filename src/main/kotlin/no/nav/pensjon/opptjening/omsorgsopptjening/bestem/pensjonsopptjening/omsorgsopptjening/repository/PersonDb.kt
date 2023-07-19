@@ -1,23 +1,24 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonMedFødselsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
+import java.time.LocalDate
 
 
-internal data class PersonMedFødselsårDb(
+internal data class PersonDb(
     val fnr: String,
-    val fødselsår: Int
+    val fødselsdato: String
 )
 
-internal fun PersonMedFødselsår.toDb(): PersonMedFødselsårDb {
-    return PersonMedFødselsårDb(
+internal fun Person.toDb(): PersonDb {
+    return PersonDb(
         fnr = fnr,
-        fødselsår = fodselsAr
+        fødselsdato = fødselsdato.toString()
     )
 }
 
-internal fun PersonMedFødselsårDb.toDomain(): PersonMedFødselsår {
-    return PersonMedFødselsår(
+internal fun PersonDb.toDomain(): Person {
+    return Person(
         fnr = fnr,
-        fodselsAr = fødselsår
+        fødselsdato = LocalDate.parse(fødselsdato),
     )
 }

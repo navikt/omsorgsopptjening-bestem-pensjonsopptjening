@@ -3,15 +3,15 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import java.time.LocalDate
 import java.time.Month
 
-class PersonMedFødselsår(
+class Person(
     val fnr: String,
-    val fodselsAr: Int
+    val fødselsdato: LocalDate,
 ) {
-    override fun equals(other: Any?) = this === other || (other is PersonMedFødselsår && this.fnr == other.fnr)
+    override fun equals(other: Any?) = this === other || (other is Person && this.fnr == other.fnr)
     override fun hashCode() = fnr.hashCode()
 
     fun alderVedUtløpAv(aarstall: Int): Int {
-        return aarstall - fodselsAr
+        return aarstall - fødselsdato.year
     }
 
     fun erFødt(årstall: Int): Boolean {
@@ -23,14 +23,7 @@ class PersonMedFødselsår(
     }
 
     fun fødselsdato(): LocalDate {
-        return LocalDate.of(fodselsAr, fnrMonth(), fnrDay())
-    }
-
-    private fun fnrDay(): Int {
-        return Integer.parseInt(fnr.substring(0, 2))
-    }
-    private fun fnrMonth(): Month {
-        return Month.of(Integer.parseInt(fnr.substring(2, 4)))
+        return fødselsdato
     }
 }
 

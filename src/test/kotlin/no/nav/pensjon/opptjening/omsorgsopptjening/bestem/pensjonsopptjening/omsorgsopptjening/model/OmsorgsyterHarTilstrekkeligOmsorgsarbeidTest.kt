@@ -1,8 +1,11 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 
+import net.bytebuddy.asm.Advice.Local
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
+import java.time.Month
 import kotlin.test.assertEquals
 
 class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
@@ -12,9 +15,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = 2000,
-                omsorgsmottaker = PersonMedFødselsår(
+                omsorgsmottaker = Person(
                     fnr = "12125678910",
-                    fodselsAr = 1999
+                    fødselsdato = LocalDate.of(1999, Month.JANUARY, 1)
                 ),
                 antallMåneder = 6
             )
@@ -28,9 +31,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                 omsorgsAr = 2000,
-                omsorgsmottaker = PersonMedFødselsår(
+                omsorgsmottaker = Person(
                     fnr = "12345678910",
-                    fodselsAr = 2000
+                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
                 ),
                 antallMåneder = 1
             )
@@ -44,9 +47,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                 omsorgsAr = 2000,
-                omsorgsmottaker = PersonMedFødselsår(
+                omsorgsmottaker = Person(
                     fnr = "12345678910",
-                    fodselsAr = 2000
+                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
                 ),
                 antallMåneder = 0
             )
@@ -60,9 +63,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                 omsorgsAr = 2000,
-                omsorgsmottaker = PersonMedFødselsår(
+                omsorgsmottaker = Person(
                     fnr = "12125678910",
-                    fodselsAr = 2000
+                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
                 ),
                 antallMåneder = 1
             )
@@ -76,9 +79,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                 omsorgsAr = 2000,
-                omsorgsmottaker = PersonMedFødselsår(
+                omsorgsmottaker = Person(
                     fnr = "12125678910",
-                    fodselsAr = 2000
+                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
                 ),
                 antallMåneder = 0
             )
@@ -95,9 +98,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
                 grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                     omsorgsAr = omsorgsår,
-                    omsorgsmottaker = PersonMedFødselsår(
+                    omsorgsmottaker = Person(
                         fnr = "12345678910",
-                        fodselsAr = omsorgsår - 2
+                        fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1)
                     ),
                     antallMåneder = monthsFullOmsorg
                 )
@@ -118,9 +121,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
                 grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                     omsorgsAr = omsorgsår,
-                    omsorgsmottaker = PersonMedFødselsår(
+                    omsorgsmottaker = Person(
                         fnr = "12345678910",
-                        fodselsAr = omsorgsår - 2
+                        fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1)
                     ),
                     antallMåneder = monthsFullOmsorg
                 )
@@ -136,9 +139,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsår,
-                omsorgsmottaker = PersonMedFødselsår(
+                omsorgsmottaker = Person(
                     fnr = "12345678910",
-                    fodselsAr = omsorgsår - 6
+                    fødselsdato = LocalDate.of(omsorgsår - 6, Month.JANUARY, 1)
                 ),
                 antallMåneder = 3
             )

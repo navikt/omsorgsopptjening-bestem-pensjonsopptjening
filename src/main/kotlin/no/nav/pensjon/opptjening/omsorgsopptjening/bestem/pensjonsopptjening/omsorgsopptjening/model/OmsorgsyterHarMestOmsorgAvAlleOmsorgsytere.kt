@@ -27,7 +27,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     ) : ParagrafVurdering<Grunnlag>()
 
     data class Grunnlag(
-        val omsorgsyter: PersonMedFødselsår,
+        val omsorgsyter: Person,
         val summert: List<SummertOmsorgForMottakerOgÅr>
     ) : ParagrafGrunnlag() {
         val yterTilAntall = summert.associate { it.omsorgsyter.fnr to it.antallMåneder }
@@ -42,8 +42,8 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
 
     data class SummertOmsorgForMottakerOgÅr(
-        val omsorgsyter: PersonMedFødselsår,
-        val omsorgsmottaker: PersonMedFødselsår,
+        val omsorgsyter: Person,
+        val omsorgsmottaker: Person,
         val antallMåneder: Int,
         val år: Int
     )

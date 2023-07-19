@@ -3,19 +3,23 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
+import java.time.Month
 import kotlin.test.assertEquals
 
 class OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
+
+    private val årstall = LocalDate.of(2000, Month.JANUARY, 1)
     @Test
     fun `should be innvilget when subject younger than 70 years`() {
-        val årstall = 2000
+
         val vilkarsVurdering = OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = PersonMedFødselsår(
+                person = Person(
                     fnr = "12345678910",
-                    fodselsAr = årstall
+                    fødselsdato = årstall
                 ),
-                omsorgsAr = årstall + 69
+                omsorgsAr = årstall.plusYears(69).year
             )
         )
         Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vilkarsVurdering.utfall)
@@ -23,14 +27,13 @@ class OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
 
     @Test
     fun `should be avslag when subject older than 70 years`() {
-        val årstall = 2000
         val vilkarsVurdering = OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = PersonMedFødselsår(
+                person = Person(
                     fnr = "12345678910",
-                    fodselsAr = årstall
+                    fødselsdato = årstall
                 ),
-                omsorgsAr = årstall + 71
+                omsorgsAr = årstall.plusYears(71).year
             )
         )
         Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vilkarsVurdering.utfall).also {
@@ -45,14 +48,13 @@ class OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
 
     @Test
     fun `should be avslag when subject is 70 years`() {
-        val årstall = 2000
         val vilkarsVurdering = OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = PersonMedFødselsår(
+                person = Person(
                     fnr = "12345678910",
-                    fodselsAr = årstall
+                    fødselsdato = årstall
                 ),
-                omsorgsAr = årstall + 70
+                omsorgsAr = årstall.plusYears(70).year
             )
         )
         Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vilkarsVurdering.utfall).also {

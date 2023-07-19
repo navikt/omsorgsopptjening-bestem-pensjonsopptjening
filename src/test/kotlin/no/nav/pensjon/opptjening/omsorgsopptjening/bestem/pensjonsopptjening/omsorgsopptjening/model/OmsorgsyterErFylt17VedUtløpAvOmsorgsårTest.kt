@@ -4,21 +4,23 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
+import java.time.Month
 
 class OmsorgsyterErFylt17VedUtløpAvOmsorgsårTest {
 
     private val fnr = "01058512345"
-    private val fødselsår = 2000
+    private val fødselsår = LocalDate.of(2000, Month.JANUARY, 1)
 
     @Test
     fun `should be innvilget when subject has turned 17 before omsorgsår`() {
         val vilkarsVurdering = OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = PersonMedFødselsår(
+                person = Person(
                     fnr = fnr,
-                    fodselsAr = fødselsår
+                    fødselsdato = fødselsår
                 ),
-                omsorgsAr = fødselsår + 18
+                omsorgsAr = fødselsår.plusYears(18).year
             )
         )
         assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vilkarsVurdering.utfall)
@@ -28,11 +30,11 @@ class OmsorgsyterErFylt17VedUtløpAvOmsorgsårTest {
     fun `should be innvilget when subject turns 17 in omsorgsår`() {
         val vilkarsVurdering = OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = PersonMedFødselsår(
+                person = Person(
                     fnr = fnr,
-                    fodselsAr = fødselsår
+                    fødselsdato = fødselsår
                 ),
-                omsorgsAr = fødselsår + 17
+                omsorgsAr = fødselsår.plusYears(17).year
             )
         )
         assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vilkarsVurdering.utfall)
@@ -42,11 +44,11 @@ class OmsorgsyterErFylt17VedUtløpAvOmsorgsårTest {
     fun `should be avslag when subject has not turned 17`() {
         val vilkarsVurdering = OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = PersonMedFødselsår(
+                person = Person(
                     fnr = fnr,
-                    fodselsAr = fødselsår
+                    fødselsdato = fødselsår
                 ),
-                omsorgsAr = fødselsår + 16
+                omsorgsAr = fødselsår.plusYears(16).year
             )
         )
         assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vilkarsVurdering.utfall).also {
