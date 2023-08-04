@@ -25,13 +25,13 @@ class OppgaveKlient(
     private val antallOpprettedeOppgaver = registry.counter("oppgaver", "antall", "opprettet")
     private val logger = LoggerFactory.getLogger(OppgaveKlient::class.java)
 
-    fun opprettOppgave(aktoerId: String, sakId: String, beskrivelse: String, tildeltEnhetsnr: String) {
-        val oppgave = Oppgave(
-            oppgavetype = Oppgave.OppgaveType.KRAV.toString(),
-            tema = Oppgave.Tema.PENSJON.toString(),
-            behandlingstema = Oppgave.Behandlingstema.OMSORG.toString(),
-            temagruppe =  Oppgave.Temagruppe.PENSJON.toString(),
-            prioritet = Oppgave.Prioritet.NORM.toString(),
+    fun opprettOppgave(aktoerId: String, sakId: String, beskrivelse: String, tildeltEnhetsnr: String): String {
+        val oppgaveRequest = OppgaveRequest(
+            oppgavetype = OppgaveRequest.OppgaveType.KRAV.toString(),
+            tema = OppgaveRequest.Tema.PENSJON.toString(),
+            behandlingstema = OppgaveRequest.Behandlingstema.OMSORG.toString(),
+            temagruppe =  OppgaveRequest.Temagruppe.PENSJON.toString(),
+            prioritet = OppgaveRequest.Prioritet.NORM.toString(),
             aktoerId = aktoerId,
             aktivDato = LocalDate.now().format(DateTimeFormatter.ISO_DATE),
             opprettetAvEnhetsnr = "9999",
@@ -41,13 +41,13 @@ class OppgaveKlient(
 
             beskrivelse = beskrivelse
         )
-            try {
-                val requestBody = mapAnyToJson(oppgave, true)
-                val httpEntity = HttpEntity(requestBody)
-                restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, String::class.java)
-
+        val requestBody = mapAnyToJson(oppgaveRequest, true)
+        val httpEntity = HttpEntity(requestBody)
+            return try {
+                val response = restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OppgaveResponse::class.java)
                 logger.info("Opprettet kravoppgave for sakId: $sakId")
                 antallOpprettedeOppgaver.increment()
+                response.body!!.id
             } catch(ex: HttpStatusCodeException) {
                 logger.error("En feil oppstod under opprettelse av oppgave ex: $ex body: ${ex.responseBodyAsString}")
                 throw RuntimeException("En feil oppstod under opprettelse av oppgave ex: ${ex.message} body: ${ex.responseBodyAsString}", ex)
@@ -58,38 +58,38 @@ class OppgaveKlient(
         }
 }
 
-private class Oppgave(
-    val id: Long? = null,
-    val tildeltEnhetsnr: String? = null,
-    val endretAvEnhetsnr: String? = null,
-    val opprettetAvEnhetsnr: String? = null,
-    val journalpostId: String? = null,
-    val journalpostkilde: String? = null,
-    val behandlesAvApplikasjon: String? = null,
-    val saksreferanse: String? = null,
-    val bnr: String? = null,
-    val samhandlernr: String? = null,
-    val aktoerId: String? = null,
-    val orgnr: String? = null,
-    val tilordnetRessurs: String? = null,
-    val beskrivelse: String? = null,
-    val temagruppe: String? = null,
-    val tema: String? = null,
-    val behandlingstema: String? = null,
-    val oppgavetype: String? = null,
-    val behandlingstype: String? = null,
-    val prioritet: String? = null,
-    val versjon: String? = null,
-    val mappeId: String? = null,
-    val fristFerdigstillelse: String? = null,
-    val aktivDato: String? = null,
-    val opprettetTidspunkt: String? = null,
-    val opprettetAv: String? = null,
-    val endretAv: String? = null,
-    val ferdigstiltTidspunkt: String? = null,
-    val endretTidspunkt: String? = null,
-    val status: String? = null,
-    val metadata: Map<String, String>? = null
+private class OppgaveRequest(
+    private val id: Long? = null,
+    private val tildeltEnhetsnr: String? = null,
+    private val endretAvEnhetsnr: String? = null,
+    private val opprettetAvEnhetsnr: String? = null,
+    private val journalpostId: String? = null,
+    private val journalpostkilde: String? = null,
+    private val behandlesAvApplikasjon: String? = null,
+    private val saksreferanse: String? = null,
+    private val bnr: String? = null,
+    private val samhandlernr: String? = null,
+    private val aktoerId: String? = null,
+    private val orgnr: String? = null,
+    private val tilordnetRessurs: String? = null,
+    private val beskrivelse: String? = null,
+    private val temagruppe: String? = null,
+    private val tema: String? = null,
+    private val behandlingstema: String? = null,
+    private val oppgavetype: String? = null,
+    private val behandlingstype: String? = null,
+    private val prioritet: String? = null,
+    private val versjon: String? = null,
+    private val mappeId: String? = null,
+    private val fristFerdigstillelse: String? = null,
+    private val aktivDato: String? = null,
+    private val opprettetTidspunkt: String? = null,
+    private val opprettetAv: String? = null,
+    private val endretAv: String? = null,
+    private val ferdigstiltTidspunkt: String? = null,
+    private val endretTidspunkt: String? = null,
+    private val status: String? = null,
+    private val metadata: Map<String, String>? = null
 ) {
 
     enum class OppgaveType : Code {
@@ -142,3 +142,7 @@ private class Oppgave(
         }
     }
 }
+
+data class OppgaveResponse(
+     val id: String
+)
