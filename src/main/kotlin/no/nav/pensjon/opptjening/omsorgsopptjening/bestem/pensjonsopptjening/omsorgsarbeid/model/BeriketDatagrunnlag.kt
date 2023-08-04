@@ -10,8 +10,7 @@ data class BeriketDatagrunnlag(
     val omsorgstype: DomainOmsorgstype,
     val kjoreHash: String,
     val kilde: DomainKilde,
-    val omsorgsSaker: List<BeriketSak>,
-    val originaltGrunnlag: String
+    val omsorgsSaker: List<BeriketSak>
 ) {
     fun omsorgsmottakere(): Set<Person> {
         return omsorgsytersSaker().omsorgVedtakPerioder.map { it.omsorgsmottaker }.toSet()

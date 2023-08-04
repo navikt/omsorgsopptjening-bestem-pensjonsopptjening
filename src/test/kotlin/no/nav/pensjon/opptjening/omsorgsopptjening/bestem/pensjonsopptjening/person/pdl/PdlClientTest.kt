@@ -106,7 +106,7 @@ internal class PdlClientTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    @Disabled
+    @Disabled("Treig som følge av backoff ved retry")
     fun `Given other code than 200 When getting person Then retry 3 times before give up`() {
         wiremock.stubFor(WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(401)))
         assertThrows<RestClientException> { pdlService.hentPerson(FNR) }
@@ -114,7 +114,7 @@ internal class PdlClientTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    @Disabled
+    @Disabled("Treig som følge av backoff ved retry")
     fun `Given server error When getting person Then retry 3 times before give up`() {
         wiremock.stubFor(
             WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(

@@ -10,8 +10,7 @@ internal data class BeriketOmsorgsgrunnlagDb(
     val omsorgstype: OmsorgstypeDb,
     val kjoreHash: String,
     val kilde: KildeDb,
-    val omsorgsSaker: List<BeriketOmsorgSakDb>,
-    val originaltGrunnlag: String
+    val omsorgsSaker: List<BeriketOmsorgSakDb>
 )
 
 internal fun BeriketDatagrunnlag.toDb(): BeriketOmsorgsgrunnlagDb {
@@ -20,8 +19,7 @@ internal fun BeriketDatagrunnlag.toDb(): BeriketOmsorgsgrunnlagDb {
         omsorgstype = omsorgstype.toDb(),
         kjoreHash = kjoreHash,
         kilde = kilde.toDb(),
-        omsorgsSaker = omsorgsSaker.map { it.toDb() },
-        originaltGrunnlag = originaltGrunnlag
+        omsorgsSaker = omsorgsSaker.map { it.toDb() }
     )
 }
 
@@ -31,8 +29,7 @@ internal fun BeriketOmsorgsgrunnlagDb.toDomain(): BeriketDatagrunnlag {
         omsorgstype = omsorgstype.toDomain(),
         kjoreHash = kjoreHash,
         kilde = kilde.toDomain(),
-        omsorgsSaker = omsorgsSaker.map { it.toDomain() },
-        originaltGrunnlag = originaltGrunnlag
+        omsorgsSaker = omsorgsSaker.map { it.toDomain() }
     )
 }
 

@@ -34,7 +34,7 @@ class OmsorgsarbeidRepo(
     fun persist(melding: PersistertKafkaMelding): PersistertKafkaMelding {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into melding (melding, correlation_id) values (:melding, :correlation_id)""",
+            """insert into melding (melding, correlation_id) values (to_json(:melding::json), :correlation_id)""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "melding" to melding.melding,

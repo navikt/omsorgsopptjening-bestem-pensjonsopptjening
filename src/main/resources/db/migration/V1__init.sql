@@ -4,7 +4,7 @@ create table melding
 (
     id uuid primary key default uuid_generate_v4(),
     opprettet timestamptz default now() not null,
-    melding varchar not null,
+    melding json not null,
     correlation_id varchar not null
 );
 
