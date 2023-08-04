@@ -1,12 +1,12 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.OmsorgsopptjeningProducedMessageListener
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.GyldigOpptjeningsår2020Og2021
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
@@ -20,8 +20,8 @@ import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
 
-@ContextConfiguration(classes = [GyldigOpptjeningsår2020Og2021::class])
-class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
+@ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
+class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
 
     @Autowired
     private lateinit var behandlingRepo: BehandlingRepo
@@ -40,7 +40,7 @@ class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
         wiremock.stubPdl(
             listOf(
                 PdlScenario(body = "fnr_1bruk.json", setState = "hent barn"),
-                PdlScenario(inState = "hent barn", body = "fnr_barn_0ar_des_2020.json")
+                PdlScenario(inState = "hent barn", body = "fnr_barn_0ar_may_2020.json")
             )
         )
 
@@ -55,10 +55,10 @@ class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
                         omsorgsyter = "12345678910",
                         vedtaksperioder = listOf(
                             OmsorgsgrunnlagMelding.VedtakPeriode(
-                                fom = YearMonth.of(2021, Month.JANUARY),
-                                tom = YearMonth.of(2021, Month.DECEMBER),
+                                fom = YearMonth.of(2020, Month.OCTOBER),
+                                tom = YearMonth.of(2020, Month.DECEMBER),
                                 prosent = 100,
-                                omsorgsmottaker = "01122012345"
+                                omsorgsmottaker = "01052012345"
                             )
                         )
                     )
@@ -66,30 +66,6 @@ class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
                 rådata = RådataFraKilde("")
             )
         )
-
-        omsorgsopptjeningListener.getFirstRecord( 10, KafkaMessageType.OPPTJENING )
-            .let { record ->
-                record.key().mapToClass(Topics.Omsorgsopptjening.Key::class.java).let {
-                    assertEquals(
-                        Topics.Omsorgsopptjening.Key(
-                            ident = "12345678910"
-                        ),
-                        it
-                    )
-                }
-                record.value().mapToClass(OmsorgsopptjeningInnvilgetMelding::class.java).let {
-                    assertEquals(
-                        OmsorgsopptjeningInnvilgetMelding(
-                            omsorgsAr = 2020,
-                            omsorgsyter = "12345678910",
-                            omsorgsmottaker = "01122012345",
-                            kilde = Kilde.BARNETRYGD,
-                            omsorgstype = Omsorgstype.BARNETRYGD
-                        ),
-                        it
-                    )
-                }
-            }
 
         omsorgsopptjeningListener.getFirstRecord( 10, KafkaMessageType.OPPTJENING)
             .let { record ->
@@ -100,21 +76,23 @@ class InnvilgetBarn0ÅrDesemberIntegrationTest : SpringContextTest.WithKafka() {
                         ),
                         it
                     )
+
                 }
                 record.value().mapToClass(OmsorgsopptjeningInnvilgetMelding::class.java).let {
                     assertEquals(
                         OmsorgsopptjeningInnvilgetMelding(
-                            omsorgsAr = 2021,
+                            omsorgsAr = 2020,
                             omsorgsyter = "12345678910",
-                            omsorgsmottaker = "01122012345",
+                            omsorgsmottaker = "01052012345",
                             kilde = Kilde.BARNETRYGD,
                             omsorgstype = Omsorgstype.BARNETRYGD
                         ),
                         it
                     )
                 }
+                assertEquals("abc", String(record.headers().lastHeader(CorrelationId.name).value()))
             }
 
-        assertEquals(2, behandlingRepo.finnForOmsorgsyter("12345678910").count())
+        assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
     }
 }

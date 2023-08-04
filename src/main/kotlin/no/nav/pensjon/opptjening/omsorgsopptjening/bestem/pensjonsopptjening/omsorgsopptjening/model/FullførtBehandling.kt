@@ -14,7 +14,8 @@ data class FullførtBehandling(
     val omsorgstype: DomainOmsorgstype,
     val grunnlag: BarnetrygdGrunnlag,
     val utfall: BehandlingUtfall,
-    val vilkårsvurdering: VilkarsVurdering<*>
+    val vilkårsvurdering: VilkarsVurdering<*>,
+    val kafkaMeldingId: UUID,
 ) {
     fun kilde(): DomainKilde {
         return grunnlag.kilde

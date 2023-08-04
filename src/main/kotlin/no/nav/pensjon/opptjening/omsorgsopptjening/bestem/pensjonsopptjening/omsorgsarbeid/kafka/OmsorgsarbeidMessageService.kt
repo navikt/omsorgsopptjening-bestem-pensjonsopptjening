@@ -2,32 +2,102 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.kafka.OmsorgsopptjeningProducer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BarnetrygdGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import java.time.Month
 
 @Service
-class OmsorgsarbeidMessageHandler(
+class OmsorgsarbeidMessageService(
     private val omsorgsgrunnlagService: OmsorgsgrunnlagService,
     private val behandlingRepo: BehandlingRepo,
-    private val gyldigOpptjeningsår: GyldigOpptjeningår
+    private val gyldigOpptjeningsår: GyldigOpptjeningår,
+    private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
+    private val omsorgsopptjeningProducer: OmsorgsopptjeningProducer,
 ) {
+    @Autowired
+    private lateinit var statusoppdatering: Statusoppdatering
+
+    /**
+     * https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/annotations.html
+     *
+     * "In proxy mode (which is the default), only external method calls coming in through the proxy are intercepted.
+     * This means that self-invocation (in effect, a method within the target object calling another method of the target object)
+     * does not lead to an actual transaction at runtime even if the invoked method is marked with @Transactional.
+     * Also, the proxy must be fully initialized to provide the expected behavior, so you should not rely on this feature
+     * in your initialization code - for example, in a @PostConstruct method."
+     */
+    @Component
+    private class Statusoppdatering(
+        private val omsorgsarbeidRepo: OmsorgsarbeidRepo
+    ) {
+        @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRES_NEW)
+        fun markerForRetry(melding: PersistertKafkaMelding, exception: Throwable) {
+            melding.retry(exception.toString()).let {
+                if (it.status is PersistertKafkaMelding.Status.Feilet) log.error("Gir opp videre prosessering av melding")
+                omsorgsarbeidRepo.updateStatus(it)
+            }
+        }
+    }
+
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
-    fun handle(grunnlag: OmsorgsgrunnlagMelding): List<FullførtBehandling> {
-        return grunnlag
+    @Transactional(rollbackFor = [Throwable::class])
+    fun process(): List<FullførtBehandling> {
+        return omsorgsarbeidRepo.finnNesteUprosesserte()?.let { melding ->
+            Mdc.scopedMdc(CorrelationId.name, melding.correlationId) {
+                try {
+                    log.info("Prosesserer melding")
+                    handle(melding).also { resultat ->
+                        omsorgsarbeidRepo.updateStatus(melding.ferdig())
+                        resultat.forEach { //TODO forekle ved å droppe flere år?
+                            when (it.erInnvilget()) {
+                                true -> {
+                                    håndterInnvilgelse(it)
+                                }
+
+                                false -> {
+                                    håndterAvslag(it)
+                                }
+                            }
+                            log.info("Melding prosessert")
+                        }
+                    }
+                } catch (exception: Throwable) {
+                    log.error("Exception caught while processing message: ${melding.id}, exeption:$exception")
+                    statusoppdatering.markerForRetry(melding, exception)
+                    throw exception
+                }
+            }
+        } ?: emptyList()
+    }
+
+    private fun handle(melding: PersistertKafkaMelding): List<FullførtBehandling> {
+        return deserialize<OmsorgsgrunnlagMelding>(melding.melding)
             .berik()
             .barnetrygdgrunnlagPerMottakerPerÅr()
-            .filter {
-                log.info("Filtrerer vekk andre opptjeningsår enn: ${gyldigOpptjeningsår.get()}")
-                gyldigOpptjeningsår.get().contains(it.omsorgsAr)
+            .filter { barnetrygdGrunnlag ->
+                gyldigOpptjeningsår.get().contains(barnetrygdGrunnlag.omsorgsAr).also {
+                    if (!it) log.info("Filtrerer vekk grunnlag for ugyldig opptjeningsår: ${barnetrygdGrunnlag.omsorgsAr}")
+                }
             }
             .map {
                 log.info("Utfører vilkårsvurdering")
@@ -37,10 +107,22 @@ class OmsorgsarbeidMessageHandler(
                         vurderVilkår = VilkårsvurderingFactory(
                             grunnlag = it,
                             behandlingRepo = behandlingRepo
-                        )
+                        ),
+                        kafkaMeldingId = melding.id!!
                     )
                 )
             }
+    }
+
+
+    private fun håndterInnvilgelse(behandling: FullførtBehandling) {
+        log.info("Håndterer innvilgelse")
+        omsorgsopptjeningProducer.send(behandling)
+    }
+
+    private fun håndterAvslag(behandling: FullførtBehandling) {
+        log.info("Håndterer avslag")
+        behandling
     }
 
     private fun OmsorgsgrunnlagMelding.berik(): BeriketDatagrunnlag {

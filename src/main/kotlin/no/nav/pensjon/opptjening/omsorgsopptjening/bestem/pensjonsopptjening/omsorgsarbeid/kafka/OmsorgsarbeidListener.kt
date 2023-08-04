@@ -1,11 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.kafka.OmsorgsopptjeningProducer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -15,21 +13,14 @@ import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
 
-@Profile("!no-kafka")
 @Component
+@Profile("!no-kafka")
 class OmsorgsarbeidListener(
-    private val omsorgsarbeidMessageHandler: OmsorgsarbeidMessageHandler,
-    private val omsorgsopptjeningProducer: OmsorgsopptjeningProducer,
-    private val registry: MeterRegistry
+    private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
-
     }
-
-    private val antallLesteMeldinger = registry.counter("omsorgsArbeid", "antall", "lest")
-    private val antallInnvilgedeOpptjeninger = registry.counter("opptjeninger", "antall", "innvilget")
-    private val antallAvslaatteOpptjeninger = registry.counter("opptjeninger", "antall", "avslaatt")
 
     @KafkaListener(
         containerFactory = "omsorgsArbeidKafkaListenerContainerFactory",
@@ -41,44 +32,24 @@ class OmsorgsarbeidListener(
         consumerRecord: ConsumerRecord<String, String>,
         acknowledgment: Acknowledgment
     ) {
-        antallLesteMeldinger.increment()
-
-        when (val type = consumerRecord.kafkaMessageType()) {
+        when (consumerRecord.kafkaMessageType()) {
             KafkaMessageType.OMSORGSGRUNNLAG -> {
                 Mdc.scopedMdc(CorrelationId.name, consumerRecord.getOrCreateCorrelationId()) {
                     log.info("Prosesserer melding")
-                    omsorgsarbeidMessageHandler.handle(deserialize(consumerRecord.value())).forEach {
-                        when (it.erInnvilget()) {
-                            true -> {
-                                håndterInnvilgelse(it)
-                                antallInnvilgedeOpptjeninger.increment()
-                            }
-
-                            false -> {
-                                håndterAvslag(it)
-                                antallAvslaatteOpptjeninger.increment()
-                            }
-                        }
-                        log.info("Melding prosessert")
-                    }
+                    omsorgsarbeidRepo.persist(
+                        PersistertKafkaMelding(
+                            melding = consumerRecord.value(),
+                            correlationId = Mdc.getOrCreateCorrelationId(),
+                        )
+                    )
                 }
             }
 
             else -> {
-                log.info("Hopper over uinteressant melding med type: $type")
+                //NOOP
             }
         }
         acknowledgment.acknowledge()
-    }
-
-    private fun håndterInnvilgelse(behandling: FullførtBehandling) {
-        log.info("Håndterer innvilgelse")
-        omsorgsopptjeningProducer.send(behandling)
-    }
-
-    private fun håndterAvslag(behandling: FullførtBehandling) {
-        log.info("Håndterer avslag")
-        behandling
     }
 
     private fun ConsumerRecord<*, *>.getOrCreateCorrelationId(): String {

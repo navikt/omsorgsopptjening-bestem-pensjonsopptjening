@@ -2,9 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kafka.KafkaSecurityConfig
-import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -21,7 +19,6 @@ import java.time.Duration
 @Configuration
 @Profile("!no-kafka")
 class OmsorgsarbeidKafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers: String) {
-
     @Bean
     fun omsorgsArbeidKafkaListenerContainerFactory(kafkaSecurityConfig: KafkaSecurityConfig.Common): ConcurrentKafkaListenerContainerFactory<String, String>? =
         ConcurrentKafkaListenerContainerFactory<String, String>().apply {

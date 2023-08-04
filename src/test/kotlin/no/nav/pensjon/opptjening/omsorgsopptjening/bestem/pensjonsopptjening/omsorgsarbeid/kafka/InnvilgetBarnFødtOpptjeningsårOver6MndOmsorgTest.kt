@@ -6,11 +6,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -19,12 +21,16 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
 import java.time.Month
 import java.time.YearMonth
+import java.util.UUID
 
 @ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
 class InnvilgetBarnFødtOpptjeningsårOver6MndOmsorgTest : SpringContextTest.NoKafka() {
 
     @Autowired
-    private lateinit var handler: OmsorgsarbeidMessageHandler
+    private lateinit var repo: OmsorgsarbeidRepo
+
+    @Autowired
+    private lateinit var handler: OmsorgsarbeidMessageService
 
     companion object {
         @RegisterExtension
@@ -42,28 +48,36 @@ class InnvilgetBarnFødtOpptjeningsårOver6MndOmsorgTest : SpringContextTest.NoK
             )
         )
 
-        handler.handle(
-            OmsorgsgrunnlagMelding(
-                omsorgsyter = "12345678910",
-                omsorgstype = Omsorgstype.BARNETRYGD,
-                kjoreHash = "xxx",
-                kilde = Kilde.BARNETRYGD,
-                saker =  listOf(
-                    OmsorgsgrunnlagMelding.Sak(
+        repo.persist(
+            PersistertKafkaMelding(
+                melding = serialize(
+                    OmsorgsgrunnlagMelding(
                         omsorgsyter = "12345678910",
-                        vedtaksperioder = listOf(
-                            OmsorgsgrunnlagMelding.VedtakPeriode(
-                                fom = YearMonth.of(2020, Month.MAY),
-                                tom = YearMonth.of(2025, Month.DECEMBER),
-                                prosent = 100,
-                                omsorgsmottaker = "01052012345"
-                            )
-                        )
-                    ),
+                        omsorgstype = Omsorgstype.BARNETRYGD,
+                        kjoreHash = "xxx",
+                        kilde = Kilde.BARNETRYGD,
+                        saker = listOf(
+                            OmsorgsgrunnlagMelding.Sak(
+                                omsorgsyter = "12345678910",
+                                vedtaksperioder = listOf(
+                                    OmsorgsgrunnlagMelding.VedtakPeriode(
+                                        fom = YearMonth.of(2020, Month.MAY),
+                                        tom = YearMonth.of(2025, Month.DECEMBER),
+                                        prosent = 100,
+                                        omsorgsmottaker = "01052012345"
+                                    )
+                                )
+                            ),
+                        ),
+                        rådata = RådataFraKilde("")
+                    )
                 ),
-                rådata = RådataFraKilde("")
+                correlationId = UUID.randomUUID().toString(),
             )
-        ).also { result ->
+        )
+
+
+        handler.process().also { result ->
             result.single().also {
                 assertEquals(2020, it.omsorgsAr)
                 assertEquals("12345678910", it.omsorgsyter)

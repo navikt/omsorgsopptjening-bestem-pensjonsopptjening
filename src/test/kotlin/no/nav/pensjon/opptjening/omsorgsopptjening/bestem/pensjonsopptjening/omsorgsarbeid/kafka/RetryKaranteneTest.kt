@@ -4,10 +4,10 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -16,21 +16,32 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ContextConfiguration
+import java.time.Clock
 import java.time.Month
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
-class InnvilgetBarnFødtOpptjeningsårUnder6MndOmsorgTest : SpringContextTest.NoKafka() {
+class RetryKaranteneTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var repo: OmsorgsarbeidRepo
 
     @Autowired
+    private lateinit var behandlingRepo: BehandlingRepo
+
+    @Autowired
     private lateinit var handler: OmsorgsarbeidMessageService
+
+    @MockBean
+    private lateinit var clock: Clock
 
     companion object {
         @RegisterExtension
@@ -43,12 +54,19 @@ class InnvilgetBarnFødtOpptjeningsårUnder6MndOmsorgTest : SpringContextTest.No
     fun test() {
         wiremock.stubPdl(
             listOf(
-                PdlScenario(body = "fnr_1bruk.json", setState = "hent barn 1"),
-                PdlScenario(inState = "hent barn 1", body = "fnr_barn_0ar_may_2020.json"),
+                PdlScenario(body = "error_bad_request.json", setState = "success"),
+                PdlScenario(inState = "success", body = "fnr_1bruk.json", setState = "hent barn 1"),
+                PdlScenario(inState = "hent barn 1", body = "fnr_barn_2ar_2020.json"),
             )
         )
+        given(clock.instant()).willReturn(
+            Clock.systemUTC().instant(), //karantene
+            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
+            Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
+            Clock.systemUTC().instant().plus(6, ChronoUnit.HOURS), //karantenetid utløpt
+        )
 
-        repo.persist(
+        val melding = repo.persist(
             PersistertKafkaMelding(
                 melding = serialize(
                     OmsorgsgrunnlagMelding(
@@ -61,10 +79,10 @@ class InnvilgetBarnFødtOpptjeningsårUnder6MndOmsorgTest : SpringContextTest.No
                                 omsorgsyter = "12345678910",
                                 vedtaksperioder = listOf(
                                     OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.OCTOBER),
+                                        fom = YearMonth.of(2018, Month.SEPTEMBER),
                                         tom = YearMonth.of(2025, Month.DECEMBER),
                                         prosent = 100,
-                                        omsorgsmottaker = "01052012345"
+                                        omsorgsmottaker = "07081812345"
                                     )
                                 )
                             ),
@@ -76,16 +94,27 @@ class InnvilgetBarnFødtOpptjeningsårUnder6MndOmsorgTest : SpringContextTest.No
             )
         )
 
+        assertInstanceOf(PersistertKafkaMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
 
-        handler.process().also { result ->
-            result.single().also {
-                assertEquals(2020, it.omsorgsAr)
-                assertEquals("12345678910", it.omsorgsyter)
-                assertEquals("01052012345", it.omsorgsmottaker)
-                assertEquals(DomainKilde.BARNETRYGD, it.kilde())
-                assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Innvilget::class.java, it.utfall)
-            }
+        assertThrows<PdlException> {
+            handler.process()
         }
+        assertInstanceOf(PersistertKafkaMelding.Status.Retry::class.java, repo.find(melding.id!!).status).also {
+            assertEquals(1, it.antallForsøk)
+        }
+
+        assertEquals(emptyList<FullførtBehandling>(), handler.process())
+        assertInstanceOf(PersistertKafkaMelding.Status.Retry::class.java, repo.find(melding.id!!).status).also {
+            assertEquals(1, it.antallForsøk)
+        }
+
+        assertEquals(emptyList<FullførtBehandling>(), handler.process())
+        assertInstanceOf(PersistertKafkaMelding.Status.Retry::class.java, repo.find(melding.id!!).status).also {
+            assertEquals(1, it.antallForsøk)
+        }
+
+        assertEquals(1, handler.process().count())
+
+        assertInstanceOf(PersistertKafkaMelding.Status.Ferdig::class.java, repo.find(melding.id!!).status)
     }
 }

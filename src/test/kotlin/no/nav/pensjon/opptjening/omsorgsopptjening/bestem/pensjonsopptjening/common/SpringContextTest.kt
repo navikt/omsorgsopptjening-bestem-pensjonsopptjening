@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.stubbing.Scenario
+import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
@@ -12,16 +13,25 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.clients.producer.RecordMetadata
+import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.header.internals.RecordHeader
 import org.junit.jupiter.api.BeforeEach
+import org.mockito.BDDMockito.any
+import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.SendResult
 import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
+import java.util.concurrent.CompletableFuture
 
-
+@DirtiesContext
 sealed class SpringContextTest {
 
     companion object {
@@ -33,6 +43,27 @@ sealed class SpringContextTest {
     @SpringBootTest(classes = [App::class])
     class NoKafka : SpringContextTest() {
 
+        @MockBean
+        private lateinit var kafkaTemplate: KafkaTemplate<String, String>
+
+        @PostConstruct
+        fun postConstruct() {
+            willAnswer { invocation ->
+                invocation.getArgument(0, ProducerRecord::class.java).let {
+                    CompletableFuture.completedFuture(
+                        SendResult(
+                            it,
+                            RecordMetadata(
+                                TopicPartition(
+                                    it.topic(),
+                                    0
+                                ), 0L, 0, 0L, 0, 0
+                            )
+                        )
+                    )
+                }
+            }.given(kafkaTemplate).send(any<ProducerRecord<String, String>>())
+        }
     }
 
 

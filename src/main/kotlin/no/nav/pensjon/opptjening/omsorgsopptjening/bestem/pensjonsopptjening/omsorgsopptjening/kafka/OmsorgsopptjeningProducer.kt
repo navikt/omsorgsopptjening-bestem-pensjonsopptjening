@@ -16,11 +16,10 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
-@Profile("!no-kafka")
+//@Profile("!no-kafka")
 @Component
 class OmsorgsopptjeningProducer(
     private val kafkaTemplate: KafkaTemplate<String, String>
-
 ) {
 
     fun send(behandling: FullførtBehandling) {

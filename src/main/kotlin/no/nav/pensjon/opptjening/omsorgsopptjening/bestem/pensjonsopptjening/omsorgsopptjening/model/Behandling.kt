@@ -1,16 +1,20 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
+import java.util.UUID
 
 data class Behandling(
     private val grunnlag: BarnetrygdGrunnlag,
-    private val vurderVilkår: VurderVilkår
+    private val vurderVilkår: VurderVilkår,
+    private val kafkaMeldingId: UUID
 ) {
     fun omsorgsår() = grunnlag.omsorgsAr
     fun omsorgsmottaker() = grunnlag.omsorgsmottaker
     fun omsorgsyter() = grunnlag.omsorgsyter
     fun omsorgstype() = grunnlag.omsorgstype
     fun grunnlag() = grunnlag
+
+    fun kafkaMeldingId() = kafkaMeldingId
 
     fun utfall(): AutomatiskGodskrivingUtfall {
         return vilkårsvurdering().let { vilkårsvurdering ->

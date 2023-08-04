@@ -15,6 +15,7 @@ internal class BehandlingDb(
     val grunnlag: BeriketGrunnlagDb,
     val vilkårsvurdering: VilkårsvurderingDb,
     val utfall: BehandlingsutfallDb,
+    val kafkaMeldingId: UUID,
 )
 
 internal fun Behandling.toDb(): BehandlingDb {
@@ -25,7 +26,8 @@ internal fun Behandling.toDb(): BehandlingDb {
         omsorgstype = omsorgstype().toDb(),
         grunnlag = grunnlag().toDb(),
         vilkårsvurdering = vilkårsvurdering().toDb(),
-        utfall = utfall().toDb()
+        utfall = utfall().toDb(),
+        kafkaMeldingId = kafkaMeldingId()
     )
 }
 
@@ -39,7 +41,8 @@ internal fun BehandlingDb.toDomain(): FullførtBehandling {
         omsorgstype = omsorgstype.toDomain(),
         grunnlag = grunnlag.toDomain(),
         utfall = utfall.toDomain(),
-        vilkårsvurdering = vilkårsvurdering.toDomain()
+        vilkårsvurdering = vilkårsvurdering.toDomain(),
+        kafkaMeldingId = kafkaMeldingId
     )
 }
 

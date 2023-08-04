@@ -7,6 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.junit.platform.commons.logging.LoggerFactory
 import org.springframework.context.annotation.Profile
+import org.springframework.context.annotation.Scope
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
@@ -35,11 +36,11 @@ class OmsorgsopptjeningProducedMessageListener {
 
     fun getFirstRecord(waitForSeconds: Int, type: KafkaMessageType): ConsumerRecord<String, String> {
         var secondsPassed = 0
-        while (secondsPassed < waitForSeconds && records.none{it.kafkaMessageType() == type}) {
+        while (secondsPassed < waitForSeconds && records.none { it.kafkaMessageType() == type }) {
             Thread.sleep(1000)
             secondsPassed++
         }
 
-        return records.filter {it.kafkaMessageType() == type}.first().also { records.remove(it) }
+        return records.first { it.kafkaMessageType() == type }.also { records.remove(it) }
     }
 }

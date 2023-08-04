@@ -7,7 +7,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -16,21 +19,33 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ContextConfiguration
+import java.time.Clock
+import java.time.Instant
 import java.time.Month
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
-class InnvilgetBarnFødtOpptjeningsårUnder6MndOmsorgTest : SpringContextTest.NoKafka() {
+class RetryTilSuccessTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var repo: OmsorgsarbeidRepo
 
     @Autowired
+    private lateinit var behandlingRepo: BehandlingRepo
+
+    @Autowired
     private lateinit var handler: OmsorgsarbeidMessageService
+
+    @MockBean
+    private lateinit var clock: Clock
 
     companion object {
         @RegisterExtension
@@ -43,12 +58,18 @@ class InnvilgetBarnFødtOpptjeningsårUnder6MndOmsorgTest : SpringContextTest.No
     fun test() {
         wiremock.stubPdl(
             listOf(
-                PdlScenario(body = "fnr_1bruk.json", setState = "hent barn 1"),
-                PdlScenario(inState = "hent barn 1", body = "fnr_barn_0ar_may_2020.json"),
+                PdlScenario(body = "error_bad_request.json", setState = "feil2"),
+                PdlScenario(inState = "feil2", body = "error_not_found.json", setState = "success"),
+                PdlScenario(inState = "success", body = "fnr_1bruk.json", setState = "hent barn 1"),
+                PdlScenario(inState = "hent barn 1", body = "fnr_barn_2ar_2020.json"),
             )
         )
+        /**
+         * Stiller klokka litt fram i tid for å unngå at [PersistertKafkaMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
+         */
+        given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
 
-        repo.persist(
+        val melding = repo.persist(
             PersistertKafkaMelding(
                 melding = serialize(
                     OmsorgsgrunnlagMelding(
@@ -61,10 +82,10 @@ class InnvilgetBarnFødtOpptjeningsårUnder6MndOmsorgTest : SpringContextTest.No
                                 omsorgsyter = "12345678910",
                                 vedtaksperioder = listOf(
                                     OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.OCTOBER),
+                                        fom = YearMonth.of(2018, Month.SEPTEMBER),
                                         tom = YearMonth.of(2025, Month.DECEMBER),
                                         prosent = 100,
-                                        omsorgsmottaker = "01052012345"
+                                        omsorgsmottaker = "07081812345"
                                     )
                                 )
                             ),
@@ -76,16 +97,43 @@ class InnvilgetBarnFødtOpptjeningsårUnder6MndOmsorgTest : SpringContextTest.No
             )
         )
 
+        assertInstanceOf(PersistertKafkaMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
+
+        assertThrows<PdlException> {
+            handler.process()
+        }
+
+        repo.find(melding.id!!).let { m ->
+            assertInstanceOf(PersistertKafkaMelding.Status.Retry::class.java, m.status).let {
+                assertEquals(1, it.antallForsøk)
+                assertEquals(3, it.maxAntallForsøk)
+            }
+        }
+        assertEquals(emptyList<FullførtBehandling>(), behandlingRepo.finnForOmsorgsyter("12345678910"))
+
+        assertThrows<PdlException> {
+            handler.process()
+        }
+
+        repo.find(melding.id!!).let { m ->
+            assertInstanceOf(PersistertKafkaMelding.Status.Retry::class.java, m.status).let {
+                assertEquals(2, it.antallForsøk)
+                assertEquals(3, it.maxAntallForsøk)
+            }
+        }
+        assertEquals(emptyList<FullførtBehandling>(), behandlingRepo.finnForOmsorgsyter("12345678910"))
+
 
         handler.process().also { result ->
             result.single().also {
                 assertEquals(2020, it.omsorgsAr)
                 assertEquals("12345678910", it.omsorgsyter)
-                assertEquals("01052012345", it.omsorgsmottaker)
+                assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
                 assertInstanceOf(AutomatiskGodskrivingUtfall.Innvilget::class.java, it.utfall)
             }
         }
+        assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
     }
 }
