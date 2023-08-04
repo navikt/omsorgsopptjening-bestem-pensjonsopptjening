@@ -13,19 +13,23 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToClass
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.BDDMockito
+import org.mockito.BDDMockito.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ContextConfiguration
 import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
 
-@ContextConfiguration(classes = [GyldigOpptjeningsår2020Og2021::class])
 class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafka() {
 
     @Autowired
     private lateinit var behandlingRepo: BehandlingRepo
     @Autowired
-    lateinit var omsorgsopptjeningListener: OmsorgsopptjeningProducedMessageListener
+    private lateinit var omsorgsopptjeningListener: OmsorgsopptjeningProducedMessageListener
+    @MockBean
+    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
         @RegisterExtension
@@ -42,6 +46,9 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
                 PdlScenario(inState = "hent barn", body = "fnr_barn_0ar_des_2020.json")
             )
         )
+        willAnswer {
+            listOf(2020, 2021)
+        }.given(gyldigOpptjeningår).get()
 
         sendOmsorgsgrunnlagKafka(
             omsorgsGrunnlag = OmsorgsgrunnlagMelding(

@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ContextConfiguration
@@ -32,7 +33,7 @@ import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-@ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
+
 class RetryTilSuccessTest : SpringContextTest.NoKafka() {
 
     @Autowired
@@ -46,6 +47,9 @@ class RetryTilSuccessTest : SpringContextTest.NoKafka() {
 
     @MockBean
     private lateinit var clock: Clock
+
+    @MockBean
+    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
         @RegisterExtension
@@ -68,6 +72,9 @@ class RetryTilSuccessTest : SpringContextTest.NoKafka() {
          * Stiller klokka litt fram i tid for å unngå at [PersistertKafkaMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
+        willAnswer {
+            listOf(2020)
+        }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
             PersistertKafkaMelding(

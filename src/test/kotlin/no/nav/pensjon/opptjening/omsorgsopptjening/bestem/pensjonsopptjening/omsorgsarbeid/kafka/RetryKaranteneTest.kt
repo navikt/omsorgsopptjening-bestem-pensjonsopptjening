@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ContextConfiguration
@@ -28,20 +29,20 @@ import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-@ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
+
 class RetryKaranteneTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var repo: OmsorgsarbeidRepo
 
     @Autowired
-    private lateinit var behandlingRepo: BehandlingRepo
-
-    @Autowired
     private lateinit var handler: OmsorgsarbeidMessageService
 
     @MockBean
     private lateinit var clock: Clock
+
+    @MockBean
+    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
         @RegisterExtension
@@ -65,6 +66,9 @@ class RetryKaranteneTest : SpringContextTest.NoKafka() {
             Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(6, ChronoUnit.HOURS), //karantenetid utløpt
         )
+        willAnswer {
+            listOf(2020)
+        }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
             PersistertKafkaMelding(

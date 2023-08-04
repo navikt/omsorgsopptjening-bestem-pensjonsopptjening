@@ -26,7 +26,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.BDDMockito
+import org.mockito.BDDMockito.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ContextConfiguration
 import java.time.Month
 import java.time.YearMonth
@@ -34,7 +37,6 @@ import java.util.UUID
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-@ContextConfiguration(classes = [GyldigOpptjeningsår2020Og2021::class])
 class InnvilgetOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
 
     @Autowired
@@ -42,6 +44,9 @@ class InnvilgetOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var handler: OmsorgsarbeidMessageService
+
+    @MockBean
+    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
         @RegisterExtension
@@ -67,6 +72,9 @@ class InnvilgetOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
                 ),
             )
         )
+        willAnswer {
+            listOf(2020, 2021)
+        }.given(gyldigOpptjeningår).get()
 
         repo.persist(
             PersistertKafkaMelding(

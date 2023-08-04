@@ -17,13 +17,15 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.ContextConfiguration
 import java.time.Month
 import java.time.YearMonth
 import java.util.UUID
 
-@ContextConfiguration(classes = [GyldigOpptjeningsår2020::class])
+
 class InnvilgetBarnFødtUtenforOpptjeningsårTest : SpringContextTest.NoKafka() {
 
     @Autowired
@@ -31,6 +33,8 @@ class InnvilgetBarnFødtUtenforOpptjeningsårTest : SpringContextTest.NoKafka() 
 
     @Autowired
     private lateinit var handler: OmsorgsarbeidMessageService
+    @MockBean
+    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
         @RegisterExtension
@@ -47,6 +51,9 @@ class InnvilgetBarnFødtUtenforOpptjeningsårTest : SpringContextTest.NoKafka() 
                 PdlScenario(inState = "hent barn 1", body = "fnr_barn_2ar_2020.json"),
             )
         )
+        willAnswer {
+            listOf(2020)
+        }.given(gyldigOpptjeningår).get()
 
         repo.persist(
             PersistertKafkaMelding(
