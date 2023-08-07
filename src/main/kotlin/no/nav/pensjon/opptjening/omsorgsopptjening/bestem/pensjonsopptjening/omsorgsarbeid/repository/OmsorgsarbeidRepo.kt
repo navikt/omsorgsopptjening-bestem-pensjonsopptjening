@@ -1,10 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.PersistertKafkaMelding
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.deserializeList
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.serialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -14,16 +13,6 @@ import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
-
-inline fun <reified T> List<T>.serialize(): String {
-    val listType = mapper.typeFactory.constructCollectionLikeType(List::class.java, T::class.java)
-    return mapper.writerFor(listType).writeValueAsString(this)
-}
-
-inline fun <reified T> String.deserializeList(): List<T> {
-    val listType = mapper.typeFactory.constructCollectionLikeType(List::class.java, T::class.java)
-    return mapper.readerFor(listType).readValue(this)
-}
 
 @Component
 class OmsorgsarbeidRepo(
@@ -81,7 +70,7 @@ class OmsorgsarbeidRepo(
 
     fun finnNesteUprosesserte(): PersistertKafkaMelding? {
         return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where (ms.status->>'type' = 'Klar') or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for update of m skip locked""",
+            """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where (ms.status->>'type' = 'Klar') or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of m skip locked""",
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),

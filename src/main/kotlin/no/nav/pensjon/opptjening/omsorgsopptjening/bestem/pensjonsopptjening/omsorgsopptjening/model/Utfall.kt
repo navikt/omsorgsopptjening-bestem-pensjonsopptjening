@@ -53,7 +53,5 @@ sealed class BehandlingUtfall {
 sealed class AutomatiskGodskrivingUtfall : BehandlingUtfall() {
     object Innvilget : AutomatiskGodskrivingUtfall()
 
-    sealed class Avslag : AutomatiskGodskrivingUtfall()
-    object AvslagMedOppgave : Avslag()
-    object AvslagUtenOppgave : Avslag()
+    object Avslag : AutomatiskGodskrivingUtfall()
 }

@@ -11,7 +11,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.toDomain
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -21,10 +20,9 @@ import java.sql.ResultSet
 import java.util.UUID
 
 @Component
-class BehandlingRepo {
-
-    @Autowired
-    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
+class BehandlingRepo(
+    private val jdbcTemplate: NamedParameterJdbcTemplate
+) {
 
     fun persist(behandling: Behandling): FullførtBehandling {
         return behandling.toDb().let { obj ->

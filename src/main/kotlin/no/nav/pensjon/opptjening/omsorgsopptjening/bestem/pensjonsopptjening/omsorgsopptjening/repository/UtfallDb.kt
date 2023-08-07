@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
-import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
 
@@ -30,20 +29,15 @@ internal sealed class VilkårsvurderingUtfallDb {
 )
 internal sealed class BehandlingsutfallDb {
 
-    object AutomatiskGodskrivingAvslagUtenOppgave : BehandlingsutfallDb()
-    object AutomatiskGodskrivingAvslagMedOppgave : BehandlingsutfallDb()
+    object AutomatiskGodskrivingAvslag : BehandlingsutfallDb()
 
     object AutomatiskGodskrivingInnvilget : BehandlingsutfallDb()
 }
 
 internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
     return when (this) {
-        AutomatiskGodskrivingUtfall.AvslagMedOppgave -> {
-            BehandlingsutfallDb.AutomatiskGodskrivingAvslagMedOppgave
-        }
-
-        AutomatiskGodskrivingUtfall.AvslagUtenOppgave -> {
-            BehandlingsutfallDb.AutomatiskGodskrivingAvslagUtenOppgave
+        AutomatiskGodskrivingUtfall.Avslag -> {
+            BehandlingsutfallDb.AutomatiskGodskrivingAvslag
         }
 
         AutomatiskGodskrivingUtfall.Innvilget -> {
@@ -110,16 +104,12 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
 
 internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
     return when (this) {
-        is BehandlingsutfallDb.AutomatiskGodskrivingAvslagUtenOppgave -> {
-            AutomatiskGodskrivingUtfall.AvslagUtenOppgave
-        }
-
         is BehandlingsutfallDb.AutomatiskGodskrivingInnvilget -> {
             AutomatiskGodskrivingUtfall.Innvilget
         }
 
-        is BehandlingsutfallDb.AutomatiskGodskrivingAvslagMedOppgave -> {
-            AutomatiskGodskrivingUtfall.AvslagMedOppgave
+        is BehandlingsutfallDb.AutomatiskGodskrivingAvslag -> {
+            AutomatiskGodskrivingUtfall.Avslag
         }
     }
 }

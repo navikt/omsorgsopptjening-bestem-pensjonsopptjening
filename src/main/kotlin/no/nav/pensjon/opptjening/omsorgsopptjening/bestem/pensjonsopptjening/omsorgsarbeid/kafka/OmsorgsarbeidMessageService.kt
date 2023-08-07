@@ -10,6 +10,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
@@ -30,6 +31,7 @@ class OmsorgsarbeidMessageService(
     private val gyldigOpptjeningsår: GyldigOpptjeningår,
     private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
     private val omsorgsopptjeningProducer: OmsorgsopptjeningProducer,
+    private val oppgaveService: OppgaveService
 ) {
     @Autowired
     private lateinit var statusoppdatering: Statusoppdatering
@@ -45,12 +47,16 @@ class OmsorgsarbeidMessageService(
      */
     @Component
     private class Statusoppdatering(
-        private val omsorgsarbeidRepo: OmsorgsarbeidRepo
+        private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
+        private val oppgaveService: OppgaveService
     ) {
         @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRES_NEW)
         fun markerForRetry(melding: PersistertKafkaMelding, exception: Throwable) {
             melding.retry(exception.toString()).let {
-                if (it.status is PersistertKafkaMelding.Status.Feilet) log.error("Gir opp videre prosessering av melding")
+                if (it.status is PersistertKafkaMelding.Status.Feilet) {
+                    log.error("Gir opp videre prosessering av melding")
+                    oppgaveService.opprett(melding)
+                }
                 omsorgsarbeidRepo.updateStatus(it)
             }
         }
@@ -122,7 +128,15 @@ class OmsorgsarbeidMessageService(
 
     private fun håndterAvslag(behandling: FullførtBehandling) {
         log.info("Håndterer avslag")
-        behandling
+        //TODO forhindre doble oppgaver? Vil produsere oppgave for alle omsorgsytere p.t.
+        when (behandling.skalOppretteOppgave()) {
+            true -> {
+                oppgaveService.opprett(behandling)
+            }
+            false -> {
+                //NOOP
+            }
+        }
     }
 
     private fun OmsorgsgrunnlagMelding.berik(): BeriketDatagrunnlag {

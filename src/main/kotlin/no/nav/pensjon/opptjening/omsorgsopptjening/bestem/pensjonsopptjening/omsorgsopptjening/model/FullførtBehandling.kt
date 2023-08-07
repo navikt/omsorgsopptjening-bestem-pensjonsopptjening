@@ -24,4 +24,12 @@ data class FullførtBehandling(
     fun erInnvilget(): Boolean {
         return utfall.erInnvilget()
     }
+
+    fun skalOppretteOppgave(): Boolean {
+        return if (vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()) {
+            vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().grunnlag.flereHarLikeMange()
+        } else {
+            false
+        }
+    }
 }

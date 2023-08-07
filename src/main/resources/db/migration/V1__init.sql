@@ -28,3 +28,19 @@ create table behandling
     utfall json not null,
     kafkaMeldingId uuid not null references melding(id)
 );
+
+create table oppgave
+(
+    id uuid primary key default uuid_generate_v4(),
+    opprettet timestamptz default now() not null,
+    behandlingId uuid references behandling(id),
+    meldingId uuid not null references melding(id),
+    detaljer json not null
+);
+
+create table oppgave_status
+(
+    id uuid not null references oppgave(id),
+    status json not null,
+    statushistorikk json not null
+);

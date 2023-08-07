@@ -19,23 +19,8 @@ data class Behandling(
     fun utfall(): AutomatiskGodskrivingUtfall {
         return vilkårsvurdering().let { vilkårsvurdering ->
             when (vilkårsvurdering.utfall.erInnvilget()) {
-                true -> {
-                    AutomatiskGodskrivingUtfall.Innvilget
-                }
-
-                false -> {
-                    if (vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()) {
-                        vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                            if (it.grunnlag.flereHarLikeMange()) {
-                                AutomatiskGodskrivingUtfall.AvslagMedOppgave
-                            } else {
-                                AutomatiskGodskrivingUtfall.AvslagUtenOppgave
-                            }
-                        }
-                    } else {
-                        AutomatiskGodskrivingUtfall.AvslagUtenOppgave
-                    }
-                }
+                true -> AutomatiskGodskrivingUtfall.Innvilget
+                false -> AutomatiskGodskrivingUtfall.Avslag
             }
         }
     }

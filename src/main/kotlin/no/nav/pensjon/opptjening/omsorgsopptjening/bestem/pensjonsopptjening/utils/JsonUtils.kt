@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ut
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 
 fun Any.toJson() = mapAnyToJson(this)
 
@@ -19,4 +20,14 @@ fun mapAnyToJson(data: Any, nonempty: Boolean = false): String {
             .writerWithDefaultPrettyPrinter()
             .writeValueAsString(data)
     }
+}
+
+inline fun <reified T> List<T>.serialize(): String {
+    val listType = mapper.typeFactory.constructCollectionLikeType(List::class.java, T::class.java)
+    return mapper.writerFor(listType).writeValueAsString(this)
+}
+
+inline fun <reified T> String.deserializeList(): List<T> {
+    val listType = mapper.typeFactory.constructCollectionLikeType(List::class.java, T::class.java)
+    return mapper.readerFor(listType).readValue(this)
 }

@@ -7,6 +7,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveDetaljer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
@@ -22,7 +26,6 @@ import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.test.context.ContextConfiguration
 import java.time.Clock
 import java.time.Instant
 import java.time.Month
@@ -47,6 +50,12 @@ class RetryTilFailureTest : SpringContextTest.NoKafka() {
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
+
+    @Autowired
+    private lateinit var oppgaveRepo: OppgaveRepo
+
+    @Autowired
+    private lateinit var oppgaveService: OppgaveService
 
     companion object {
         @RegisterExtension
@@ -73,6 +82,7 @@ class RetryTilFailureTest : SpringContextTest.NoKafka() {
             listOf(2020)
         }.given(gyldigOpptjeningår).get()
 
+        val correlationId = UUID.randomUUID().toString()
         val melding = repo.persist(
             PersistertKafkaMelding(
                 melding = serialize(
@@ -97,7 +107,7 @@ class RetryTilFailureTest : SpringContextTest.NoKafka() {
                         rådata = RådataFraKilde("")
                     )
                 ),
-                correlationId = UUID.randomUUID().toString(),
+                correlationId = correlationId,
             )
         )
 
@@ -143,5 +153,21 @@ class RetryTilFailureTest : SpringContextTest.NoKafka() {
         }
 
         assertEquals(0, behandlingRepo.finnForOmsorgsyter("12345678910").count())
+
+        oppgaveRepo.findForMelding(melding.id!!)!!.also { oppgave ->
+            assertInstanceOf(OppgaveDetaljer.UspesifisertFeilsituasjon::class.java, oppgave.detaljer).also {
+                assertEquals("12345678910", it.omsorgsyter)
+            }
+            assertEquals(null, oppgave.behandlingId)
+            assertEquals(melding.id, oppgave.meldingId)
+            assertEquals(correlationId, oppgave.correlationId.toString())
+            assertInstanceOf(Oppgave.Status.Klar::class.java, oppgave.status)
+        }
+
+        oppgaveService.process()!!.also { oppgave ->
+            assertInstanceOf(Oppgave.Status.Ferdig::class.java, oppgave.status).also {
+                assertEquals("oppgaveId", it.oppgaveId)
+            }
+        }
     }
 }

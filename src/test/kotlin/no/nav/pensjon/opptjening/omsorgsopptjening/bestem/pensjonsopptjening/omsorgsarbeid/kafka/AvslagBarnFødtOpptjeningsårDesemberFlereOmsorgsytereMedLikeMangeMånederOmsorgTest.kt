@@ -18,7 +18,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erInnvilget
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -35,10 +38,10 @@ import java.time.Month
 import java.time.YearMonth
 import java.util.UUID
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class AvslagAnnenOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
+
+class AvslagBarnFødtOpptjeningsårDesemberFlereOmsorgsytereMedLikeMangeMånederOmsorgTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var repo: OmsorgsarbeidRepo
@@ -48,6 +51,9 @@ class AvslagAnnenOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
+
+    @Autowired
+    private lateinit var oppgaveService: OppgaveService
 
     @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
@@ -64,23 +70,22 @@ class AvslagAnnenOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
         wiremock.stubPdl(
             listOf(
                 PdlScenario(body = "fnr_1bruk.json", setState = "hent barn 1"),
-                PdlScenario(inState = "hent barn 1", body = "fnr_barn_2ar_2020.json", setState = "hent annen forelder"),
+                PdlScenario(inState = "hent barn 1", body = "fnr_barn_0ar_des_2020.json", setState = "hent forelder 2"),
                 PdlScenario(
-                    inState = "hent annen forelder",
+                    inState = "hent forelder 2",
                     body = "fnr_samme_fnr_gjeldende_og_historisk.json",
-                    setState = "hent annen forelder 2"
+                    setState = "hent barn 2"
                 ),
-                PdlScenario(
-                    inState = "hent annen forelder 2",
-                    body = "fnr_1bruk_pluss_historisk.json",
-                ),
+                PdlScenario(inState = "hent barn 2", body = "fnr_barn_0ar_des_2020.json"),
             )
         )
         willAnswer {
-            listOf(2020, 2021)
+            listOf(2020)
         }.given(gyldigOpptjeningår).get()
 
-        val melding = repo.persist(
+        val correlationId = UUID.randomUUID().toString()
+
+        repo.persist(
             PersistertKafkaMelding(
                 melding = serialize(
                     OmsorgsgrunnlagMelding(
@@ -93,16 +98,10 @@ class AvslagAnnenOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
                                 omsorgsyter = "12345678910",
                                 vedtaksperioder = listOf(
                                     OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.MAY),
-                                        prosent = 50,
-                                        omsorgsmottaker = "07081812345"
-                                    ),
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.SEPTEMBER),
-                                        tom = YearMonth.of(2020, Month.OCTOBER),
+                                        fom = YearMonth.of(2021, Month.JANUARY),
+                                        tom = YearMonth.of(2021, Month.JUNE),
                                         prosent = 100,
-                                        omsorgsmottaker = "07081812345"
+                                        omsorgsmottaker = "01122012345"
                                     )
                                 )
                             ),
@@ -110,67 +109,71 @@ class AvslagAnnenOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
                                 omsorgsyter = "04010012797",
                                 vedtaksperioder = listOf(
                                     OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.MAY),
-                                        prosent = 50,
-                                        omsorgsmottaker = "07081812345"
+                                        fom = YearMonth.of(2021, Month.JULY),
+                                        tom = YearMonth.of(2021, Month.DECEMBER),
+                                        prosent = 100,
+                                        omsorgsmottaker = "01122012345"
                                     ),
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.JUNE),
-                                        tom = YearMonth.of(2020, Month.AUGUST),
-                                        prosent = 100,
-                                        omsorgsmottaker = "07081812345"
-                                    )
-                                )
-                            ),
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "01018212345",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.NOVEMBER),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "07081812345"
-                                    )
                                 )
                             ),
                         ),
                         rådata = RådataFraKilde("")
-                    )                ),
-                correlationId = UUID.randomUUID().toString(),
+                    )
+                ),
+                correlationId = correlationId,
             )
         )
 
-        handler.process().also { result ->
-            result.single().also {
-                assertEquals(2020, it.omsorgsAr)
-                assertEquals("12345678910", it.omsorgsyter)
-                assertEquals("07081812345", it.omsorgsmottaker)
-                assertEquals(DomainKilde.BARNETRYGD, it.kilde())
-                assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall)
+        val behandling = handler.process().let { result ->
+            result.single().also { behandling ->
+                assertEquals(2020, behandling.omsorgsAr)
+                assertEquals("12345678910", behandling.omsorgsyter)
+                assertEquals("01122012345", behandling.omsorgsmottaker)
+                assertEquals(DomainKilde.BARNETRYGD, behandling.kilde())
+                assertEquals(DomainOmsorgstype.BARNETRYGD, behandling.omsorgstype)
+                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, behandling.utfall)
 
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erAvslått<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering>() }
-                assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erAvslått<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering>() }
+                assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>() }
 
-                it.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
+                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
                     assertFalse(it.grunnlag.omsorgsyterHarFlest())
-                    assertFalse(it.grunnlag.flereHarLikeMange())
+                    assertTrue(it.grunnlag.flereHarLikeMange())
                     assertEquals(
                         mapOf(
-                            "12345678910" to 7,
-                            "04010012797" to 8,
-                            "01018212345" to 2,
+                            "12345678910" to 6,
+                            "04010012797" to 6,
                         ), it.grunnlag.yterTilAntall
                     )
                 }
             }
         }
-        assertNull(oppgaveRepo.findForMelding(melding.id!!))
+
+        oppgaveRepo.findForMelding(behandling.kafkaMeldingId)!!.also { oppgave ->
+            assertInstanceOf(OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår::class.java, oppgave.detaljer).also {
+                assertEquals("12345678910", it.omsorgsyter)
+                assertEquals("01122012345", it.omsorgsmottaker)
+                assertEquals(
+                    """
+                    Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01122012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene.
+                """.trimIndent(), it.oppgaveTekst
+                )
+            }
+            assertEquals(behandling.id, oppgave.behandlingId)
+            assertEquals(behandling.kafkaMeldingId, oppgave.meldingId)
+            assertEquals(correlationId, oppgave.correlationId.toString())
+            assertInstanceOf(Oppgave.Status.Klar::class.java, oppgave.status)
+        }
+
+        oppgaveService.process()!!.also { oppgave ->
+            assertInstanceOf(Oppgave.Status.Ferdig::class.java, oppgave.status).also {
+                assertEquals("oppgaveId", it.oppgaveId)
+            }
+        }
     }
 }

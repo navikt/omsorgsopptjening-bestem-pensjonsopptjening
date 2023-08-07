@@ -31,12 +31,21 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         val summert: List<SummertOmsorgForMottakerOgÅr>
     ) : ParagrafGrunnlag() {
         val yterTilAntall = summert.associate { it.omsorgsyter.fnr to it.antallMåneder }
+
+        private fun andreOmsorgsytere(): Map<String, Int> {
+            return yterTilAntall.filterNot { it.key == omsorgsyter.fnr }
+        }
+
+        fun andreOmsorgsytereMedLikeMange(): Map<String, Int> {
+            return andreOmsorgsytere().filter { it.value == yterTilAntall[omsorgsyter.fnr]!! }
+        }
+
         fun omsorgsyterHarFlest(): Boolean {
-            return yterTilAntall.filterNot { it.key == omsorgsyter.fnr }.none { it.value >= yterTilAntall[omsorgsyter.fnr]!! }
-            }
+            return andreOmsorgsytere().none { it.value >= yterTilAntall[omsorgsyter.fnr]!! }
+        }
 
         fun flereHarLikeMange(): Boolean {
-            return yterTilAntall.count() > 1 && yterTilAntall.map { it.value }.distinct().count() == 1
+            return andreOmsorgsytereMedLikeMange().isNotEmpty()
         }
     }
 
