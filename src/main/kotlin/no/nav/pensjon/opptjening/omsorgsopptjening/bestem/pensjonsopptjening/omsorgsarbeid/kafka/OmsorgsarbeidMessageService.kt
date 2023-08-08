@@ -133,6 +133,7 @@ class OmsorgsarbeidMessageService(
             true -> {
                 oppgaveService.opprett(behandling)
             }
+
             false -> {
                 //NOOP
             }
@@ -201,9 +202,11 @@ class OmsorgsarbeidMessageService(
     }
 
     private fun BeriketDatagrunnlag.perMottaker(): Map<Person, BeriketDatagrunnlag> {
-        return omsorgsmottakere().associateWith { omsorgsmottaker ->
-            copy(omsorgsSaker = omsorgsSaker.map { sak -> sak.copy(omsorgVedtakPerioder = sak.omsorgVedtakPerioder.filter { it.omsorgsmottaker == omsorgsmottaker }) })
-        }
+        return omsorgsmottakere()
+            .sortedBy { it.fødselsdato } //eldste barn først
+            .associateWith { omsorgsmottaker ->
+                copy(omsorgsSaker = omsorgsSaker.map { sak -> sak.copy(omsorgVedtakPerioder = sak.omsorgVedtakPerioder.filter { it.omsorgsmottaker == omsorgsmottaker }) })
+            }
     }
 
     private fun BeriketDatagrunnlag.perÅr(): Map<Int, BeriketDatagrunnlag> {
