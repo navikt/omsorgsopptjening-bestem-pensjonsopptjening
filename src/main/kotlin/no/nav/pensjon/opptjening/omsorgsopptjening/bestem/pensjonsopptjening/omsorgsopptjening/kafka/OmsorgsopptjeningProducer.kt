@@ -11,12 +11,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.header.internals.RecordHeader
-import org.springframework.context.annotation.Profile
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
-//@Profile("!no-kafka")
 @Component
 class OmsorgsopptjeningProducer(
     private val kafkaTemplate: KafkaTemplate<String, String>

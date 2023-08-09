@@ -2,21 +2,24 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketSak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
-
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
-import java.time.YearMonth
+import java.time.Month
 
+/**
+ * Grunnlaget for vurdering av en [omsorgsyter]s rett til omsorgsopptjening basert på mottatt barnetrygd for
+ * en gitt [omsorgsmottaker] i et gitt [omsorgsAr].
+ */
 sealed class BarnetrygdGrunnlag {
 
     abstract val omsorgsAr: Int
+    abstract val omsorgsmottaker: Person
     abstract val grunnlag: BeriketDatagrunnlag
 
     val omsorgsyter: Person
         get() = grunnlag.omsorgsyter
-    val omsorgsmottaker: Person
-        get() = grunnlag.omsorgsmottakere().single()
     val omsorgstype: DomainOmsorgstype
         get() = grunnlag.omsorgstype
     val kjoreHash: String
@@ -26,30 +29,30 @@ sealed class BarnetrygdGrunnlag {
     val omsorgsSaker: List<BeriketSak>
         get() = grunnlag.omsorgsSaker
 
-    protected fun antallMånederOmsorgForOmsorgsyter(): Int {
-        return omsorgsytersSak().antallMånederOmsorgFor(omsorgsmottaker).second
+
+    protected fun omsorgsytersAntallMånederOmsorgForOmsorgsmottaker(): Int {
+        return antallMånederOmsorgForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!
     }
 
-    fun summertAntallMånederPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
-        return OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
-            omsorgsyter = omsorgsyter,
-            summert = omsorgsSaker.map {
-                it.antallMånederOmsorgFor(omsorgsmottaker).let { (omsorgsyter, antallMåneder) ->
-                    OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.SummertOmsorgForMottakerOgÅr(
-                        omsorgsyter = omsorgsyter,
-                        omsorgsmottaker = omsorgsmottaker,
-                        antallMåneder = antallMåneder,
-                        år = omsorgsAr
+    private fun antallMånederOmsorgForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Int> {
+        return grunnlag.omsorgsSaker
+            .associate { it.omsorgsyter to it.månederOmsorgFor(omsorgsmottaker) }
+    }
 
+    fun forSummertOmsorgPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
+        return antallMånederOmsorgForOmsorgsmottakerPerOmsorgsyter().let {
+            OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
+                omsorgsyter = omsorgsyter,
+                summert = it.map { (yter, antallMnd) ->
+                    OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.SummertOmsorgForMottakerOgÅr(
+                        omsorgsyter = yter,
+                        omsorgsmottaker = omsorgsmottaker,
+                        antallMåneder = antallMnd,
+                        år = omsorgsAr
                     )
                 }
-            }
-        )
-
-    }
-
-    private fun omsorgsytersSak(): BeriketSak {
-        return omsorgsSaker.single { it.omsorgsyter == this.omsorgsyter }
+            )
+        }
     }
 
     fun forOmsorgsyterOgÅr(): PersonOgOmsorgsårGrunnlag {
@@ -66,47 +69,69 @@ sealed class BarnetrygdGrunnlag {
         )
     }
 
-    protected fun alleMånederIGrunnlag(): Set<YearMonth> {
-        return omsorgsSaker.flatMap { it.omsorgVedtakPerioder }.flatMap { it.periode.alleMåneder() }.distinct().toSet()
-    }
+    abstract fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag
 
-    abstract fun tilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag
+    /**
+     * Hvor mye omsorgsarbeid som kreves for å kunne motta omsorgsopptjening avhenger av når barnet er født på året,
+     * samt hvilket [omsorgsAr] det vurderes omsorgsopptjening for.
+     *
+     * For spesialtilfellene hvor barn er [FødtIOmsorgsår.FødtDesember] vil det ikke eksistere utbetalinger av
+     * barnetrygd for det aktuelle [omsorgsAr] i kildesystemet [DomainKilde.BARNETRYGD]. Vurderingen av disse gjøres
+     * på bakgrunn av eventuell barnetrygd utbetalt i påfølgende år.
+     *
+     * @see Referanse.MåHaMinstHalveÅretMedOmsorg
+     * @see Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår
+     */
     sealed class FødtIOmsorgsår : BarnetrygdGrunnlag() {
         data class IkkeFødtDesember(
             override val omsorgsAr: Int,
+            override val omsorgsmottaker: Person,
             override val grunnlag: BeriketDatagrunnlag
         ) : FødtIOmsorgsår() {
             init {
                 require(
-                    Periode(omsorgsAr).alleMåneder().containsAll(alleMånederIGrunnlag())
+                    Periode(omsorgsAr).alleMåneder().containsAll(grunnlag.alleMåneder)
                 ) { "Grunnlag contains months outside of the omsorgsår: $omsorgsAr" }
+                require(
+                    omsorgsmottaker.erFødt(omsorgsAr)
+                ) { "$omsorgsmottaker er ikke født i $omsorgsAr" }
+                require(
+                    !omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER)
+                ) { "Forventer ikke grunnlag for fødselsåret dersom barn er født i desember" }
             }
 
-            override fun tilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
+            override fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
-                    antallMåneder = antallMånederOmsorgForOmsorgsyter()
+                    antallMåneder = omsorgsytersAntallMånederOmsorgForOmsorgsmottaker()
                 )
             }
         }
 
         data class FødtDesember(
             override val omsorgsAr: Int,
+            override val omsorgsmottaker: Person,
             override val grunnlag: BeriketDatagrunnlag
         ) : FødtIOmsorgsår() {
             init {
                 val årEtterOmsorgsår = omsorgsAr + 1
                 require(
-                    Periode(årEtterOmsorgsår).alleMåneder().containsAll(alleMånederIGrunnlag())
+                    Periode(årEtterOmsorgsår).alleMåneder().containsAll(grunnlag.alleMåneder)
                 ) { "Grunnlag should only contain months from: $årEtterOmsorgsår" }
+                require(
+                    omsorgsmottaker.erFødt(omsorgsAr)
+                ) { "$omsorgsmottaker er ikke født i $omsorgsAr" }
+                require(
+                    omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER)
+                ) { "$omsorgsmottaker er ikke født i ${Month.DECEMBER} i $omsorgsAr" }
             }
 
-            override fun tilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
+            override fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
-                    antallMåneder = antallMånederOmsorgForOmsorgsyter()
+                    antallMåneder = omsorgsytersAntallMånederOmsorgForOmsorgsmottaker()
                 )
             }
         }
@@ -114,20 +139,116 @@ sealed class BarnetrygdGrunnlag {
 
     data class IkkeFødtIOmsorgsår(
         override val omsorgsAr: Int,
+        override val omsorgsmottaker: Person,
         override val grunnlag: BeriketDatagrunnlag
     ) : BarnetrygdGrunnlag() {
         init {
             require(
-                Periode(omsorgsAr).alleMåneder().containsAll(alleMånederIGrunnlag())
+                Periode(omsorgsAr).alleMåneder().containsAll(grunnlag.alleMåneder)
             ) { "Grunnlag contains months outside of the omsorgsår: $omsorgsAr" }
+            require(
+                !omsorgsmottaker.erFødt(omsorgsAr)
+            ) { "$omsorgsmottaker er født i $omsorgsAr" }
         }
 
-        override fun tilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
+        override fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
             return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker,
-                antallMåneder = antallMånederOmsorgForOmsorgsyter()
+                antallMåneder = omsorgsytersAntallMånederOmsorgForOmsorgsmottaker()
             )
         }
     }
+}
+
+fun BeriketDatagrunnlag.transformerTilBarnetrygdGrunnlag(): List<BarnetrygdGrunnlag> {
+    return barnetrygdgrunnlagPerMottakerPerÅr()
+}
+
+private fun BeriketDatagrunnlag.barnetrygdgrunnlagPerMottakerPerÅr(): List<BarnetrygdGrunnlag> {
+    return `opprett grunnlag per omsorgsmottaker per år`()
+        .fold(emptyList()) { acc, (mottaker, år, grunnlag) ->
+            acc + when (mottaker.erFødt(år)) {
+                true -> {
+                    listOf(
+                        BarnetrygdGrunnlag.FødtIOmsorgsår.IkkeFødtDesember(
+                            omsorgsAr = år,
+                            omsorgsmottaker = mottaker,
+                            grunnlag = grunnlag
+                        )
+                    )
+                }
+
+                false -> {
+                    when (mottaker.erFødt(år - 1, Month.DECEMBER)) {
+                        true -> {
+                            listOf(
+                                BarnetrygdGrunnlag.FødtIOmsorgsår.FødtDesember(
+                                    omsorgsAr = år - 1,
+                                    omsorgsmottaker = mottaker,
+                                    grunnlag = grunnlag
+                                ),
+                                BarnetrygdGrunnlag.IkkeFødtIOmsorgsår(
+                                    omsorgsAr = år,
+                                    omsorgsmottaker = mottaker,
+                                    grunnlag = grunnlag
+                                ),
+                            )
+                        }
+
+                        false -> {
+                            listOf(
+                                BarnetrygdGrunnlag.IkkeFødtIOmsorgsår(
+                                    omsorgsAr = år,
+                                    omsorgsmottaker = mottaker,
+                                    grunnlag = grunnlag
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+}
+
+private fun BeriketDatagrunnlag.`opprett grunnlag per omsorgsmottaker per år`(): List<Triple<Person, Int, BeriketDatagrunnlag>> {
+    return `avgrens grunnlagsdata per omsorgsmottaker`()
+        .flatMap { (omsorgsmottaker, grunnlagPerMottaker) ->
+            grunnlagPerMottaker.`avgrens for omsorgsår`()
+                .map { (år, grunnlagPerÅrPerMottaker) ->
+                    Triple(omsorgsmottaker, år, grunnlagPerÅrPerMottaker)
+                }
+        }
+}
+
+private fun BeriketDatagrunnlag.`avgrens grunnlagsdata per omsorgsmottaker`(): Map<Person, BeriketDatagrunnlag> {
+    return omsorgsytersOmsorgsmottakere
+        .sortedBy { it.fødselsdato } //eldste barn først
+        .associateWith { omsorgsmottaker ->
+            copy(omsorgsSaker = omsorgsSaker
+                .map { sak -> sak.copy(omsorgVedtakPerioder = sak.omsorgVedtakPerioder.filter { it.omsorgsmottaker == omsorgsmottaker }) }
+            )
+        }
+}
+
+private fun BeriketDatagrunnlag.`avgrens for omsorgsår`(): Map<Int, BeriketDatagrunnlag> {
+    return omsorgsytersOmsorgsår
+        .associateWith { år ->
+            copy(omsorgsSaker = omsorgsSaker
+                .map { sak ->
+                    sak.copy(omsorgVedtakPerioder = sak.omsorgVedtakPerioder
+                        .filter { it.periode.overlapper(år) }
+                        .map { barnetrygdPeriode ->
+                            barnetrygdPeriode.periode.overlappendeMåneder(år)
+                                .let {
+                                    BeriketVedtaksperiode(
+                                        fom = it.min(),
+                                        tom = it.max(),
+                                        prosent = barnetrygdPeriode.prosent,
+                                        omsorgsmottaker = barnetrygdPeriode.omsorgsmottaker
+                                    )
+                                }
+                        })
+                })
+        }
 }

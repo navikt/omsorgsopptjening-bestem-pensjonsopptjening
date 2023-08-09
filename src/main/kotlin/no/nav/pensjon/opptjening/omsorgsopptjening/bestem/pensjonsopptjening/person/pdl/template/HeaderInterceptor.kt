@@ -10,9 +10,15 @@ import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.util.*
 
 @Component
-class HeaderInterceptor(private val tokenProvider: TokenProvider) : ClientHttpRequestInterceptor {
+class HeaderInterceptor(
+    private val tokenProvider: TokenProvider
+) : ClientHttpRequestInterceptor {
 
-    override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
+    override fun intercept(
+        request: HttpRequest,
+        body: ByteArray,
+        execution: ClientHttpRequestExecution
+    ): ClientHttpResponse {
         request.headers.apply {
             add("Nav-Call-Id", UUID.randomUUID().toString())
             add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")

@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.PersistertKafkaMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.deserializeList
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.serialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
@@ -20,7 +20,7 @@ class OmsorgsarbeidRepo(
     private val clock: Clock = Clock.systemUTC()
 ) {
 
-    fun persist(melding: PersistertKafkaMelding): PersistertKafkaMelding {
+    fun persist(melding: OmsorgsarbeidMelding): OmsorgsarbeidMelding {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into melding (melding, correlation_id) values (to_json(:melding::json), :correlation_id)""",
@@ -45,7 +45,7 @@ class OmsorgsarbeidRepo(
         return find(keyHolder.keys!!["id"] as UUID)
     }
 
-    fun updateStatus(melding: PersistertKafkaMelding) {
+    fun updateStatus(melding: OmsorgsarbeidMelding) {
         jdbcTemplate.update(
             """update melding_status set status = to_json(:status::json), statushistorikk = to_json(:statushistorikk::json) where id = :id""",
             MapSqlParameterSource(
@@ -58,7 +58,7 @@ class OmsorgsarbeidRepo(
         )
     }
 
-    fun find(id: UUID): PersistertKafkaMelding {
+    fun find(id: UUID): OmsorgsarbeidMelding {
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where m.id = :id""",
             mapOf<String, Any>(
@@ -68,7 +68,7 @@ class OmsorgsarbeidRepo(
         ).single()
     }
 
-    fun finnNesteUprosesserte(): PersistertKafkaMelding? {
+    fun finnNesteUprosesserte(): OmsorgsarbeidMelding? {
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where (ms.status->>'type' = 'Klar') or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of m skip locked""",
             mapOf(
@@ -78,9 +78,9 @@ class OmsorgsarbeidRepo(
         ).singleOrNull()
     }
 
-    internal class OmsorgsarbeidMessageRowMapper : RowMapper<PersistertKafkaMelding> {
-        override fun mapRow(rs: ResultSet, rowNum: Int): PersistertKafkaMelding {
-            return PersistertKafkaMelding(
+    internal class OmsorgsarbeidMessageRowMapper : RowMapper<OmsorgsarbeidMelding> {
+        override fun mapRow(rs: ResultSet, rowNum: Int): OmsorgsarbeidMelding {
+            return OmsorgsarbeidMelding(
                 id = UUID.fromString(rs.getString("id")),
                 opprettet = rs.getTimestamp("opprettet").toInstant(),
                 melding = rs.getString("melding"),

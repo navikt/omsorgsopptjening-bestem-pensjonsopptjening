@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka
 
-import io.micrometer.core.instrument.MeterRegistry
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -14,7 +14,7 @@ import org.springframework.kafka.support.Acknowledgment
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("!no-kafka")
+@Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
 class OmsorgsarbeidListener(
     private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
 ) {
@@ -23,10 +23,9 @@ class OmsorgsarbeidListener(
     }
 
     @KafkaListener(
-        containerFactory = "omsorgsArbeidKafkaListenerContainerFactory",
-        idIsGroup = false,
+        containerFactory = "listener",
         topics = [Topics.Omsorgsopptjening.NAME],
-        groupId = "\${OMSORGSOPPTJENING_BESTEM_GROUP_ID}"
+        groupId = "omsorgsarbeid-listener"
     )
     fun poll(
         consumerRecord: ConsumerRecord<String, String>,
@@ -37,7 +36,7 @@ class OmsorgsarbeidListener(
                 Mdc.scopedMdc(CorrelationId.name, consumerRecord.getOrCreateCorrelationId()) {
                     log.info("Prosesserer melding")
                     omsorgsarbeidRepo.persist(
-                        PersistertKafkaMelding(
+                        OmsorgsarbeidMelding(
                             melding = consumerRecord.value(),
                             correlationId = Mdc.getOrCreateCorrelationId(),
                         )

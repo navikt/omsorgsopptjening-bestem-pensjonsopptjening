@@ -4,30 +4,37 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import jakarta.annotation.PostConstruct
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.GyldigOpptjeningår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Application
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.KafkaConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.kafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
+import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.header.internals.RecordHeader
 import org.junit.jupiter.api.BeforeEach
+import org.junit.platform.commons.logging.LoggerFactory
 import org.mockito.BDDMockito.any
-import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
+import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.Acknowledgment
 import org.springframework.kafka.support.SendResult
 import org.springframework.kafka.test.context.EmbeddedKafka
+import org.springframework.stereotype.Component
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import java.util.concurrent.CompletableFuture
@@ -40,8 +47,13 @@ sealed class SpringContextTest {
         const val WIREMOCK_PORT = 9991
     }
 
-    @ActiveProfiles("no-kafka")
-    @SpringBootTest(classes = [App::class])
+
+    @BeforeEach
+    fun beforeEach() {
+        PostgresqlTestContainer.instance.removeDataFromDB()
+    }
+
+    @SpringBootTest(classes = [Application::class])
     class NoKafka : SpringContextTest() {
 
         @MockBean
@@ -69,12 +81,20 @@ sealed class SpringContextTest {
 
 
     @EmbeddedKafka(partitions = 1, topics = [Topics.Omsorgsopptjening.NAME])
-    @SpringBootTest(classes = [App::class])
-    @Import(KafkaIntegrationTestConfig::class, OmsorgsopptjeningProducedMessageListener::class)
+    @SpringBootTest(classes = [Application::class])
+    @ActiveProfiles("kafkaIntegrationTest")
     class WithKafka : SpringContextTest() {
 
+        @Configuration
+        @Profile("kafkaIntegrationTest")
+        class KafkaSecurityConfig {
+            @Bean
+            fun securityConfig(): KafkaConfig.SecurityConfig =
+                KafkaConfig.SecurityConfig(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "PLAINTEXT")
+        }
+
         @Autowired
-        lateinit var omsorgsgrunnlagProducer: KafkaTemplate<String, String>
+        lateinit var producer: KafkaTemplate<String, String>
 
         fun sendOmsorgsgrunnlagKafka(
             omsorgsGrunnlag: OmsorgsgrunnlagMelding
@@ -100,16 +120,40 @@ sealed class SpringContextTest {
                     )
                 )
             )
-            omsorgsgrunnlagProducer.send(pr).get()
+            producer.send(pr).get()
+        }
+
+        @Configuration
+        @Profile("kafkaIntegrationTest")
+        class OmsorgsopptjeningTopicListener {
+
+            private val records: MutableList<ConsumerRecord<String, String>> = mutableListOf()
+
+            init {
+                LoggerFactory.getLogger(this::class.java).error { "THIS IS MY $this" }
+            }
+
+            @KafkaListener(
+                containerFactory = "listener",
+                topics = [Topics.Omsorgsopptjening.NAME],
+                groupId = "test-omsorgsopptjening-topic-listener"
+            )
+            private fun poll(record: ConsumerRecord<String, String>, ack: Acknowledgment) {
+                records.add(record)
+                ack.acknowledge()
+            }
+
+            fun getFirstRecord(waitForSeconds: Int, type: KafkaMessageType): ConsumerRecord<String, String> {
+                var secondsPassed = 0
+                while (secondsPassed < waitForSeconds && records.none { it.kafkaMessageType() == type }) {
+                    Thread.sleep(1000)
+                    secondsPassed++
+                }
+
+                return records.first { it.kafkaMessageType() == type }.also { records.remove(it) }
+            }
         }
     }
-
-
-    @BeforeEach
-    fun beforeEach() {
-        PostgresqlTestContainer.instance.removeDataFromDB()
-    }
-
 
     data class PdlScenario(
         val inState: String = Scenario.STARTED,

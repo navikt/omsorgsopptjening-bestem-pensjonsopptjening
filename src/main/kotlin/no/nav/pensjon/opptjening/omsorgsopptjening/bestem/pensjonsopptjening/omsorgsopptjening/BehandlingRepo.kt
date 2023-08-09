@@ -4,7 +4,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingsutfallDb
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BeriketGrunnlagDb
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BarnetrygdGrunnlagDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.OmsorgstypeDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.VilkårsvurderingDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.toDb
@@ -100,7 +100,7 @@ internal class BehandlingRowMapper : RowMapper<BehandlingDb> {
             omsorgsyter = rs.getString("omsorgsyter"),
             omsorgsmottaker = rs.getString("omsorgsmottaker"),
             omsorgstype = OmsorgstypeDb.valueOf(rs.getString("omsorgstype")),
-            grunnlag = rs.getString("grunnlag").mapToClass(BeriketGrunnlagDb::class.java),
+            grunnlag = rs.getString("grunnlag").mapToClass(BarnetrygdGrunnlagDb::class.java),
             vilkårsvurdering = rs.getString("vilkarsvurdering").mapToClass(VilkårsvurderingDb::class.java),
             utfall = rs.getString("utfall").mapToClass(BehandlingsutfallDb::class.java),
             kafkaMeldingId = UUID.fromString(rs.getString("kafkaMeldingId"))

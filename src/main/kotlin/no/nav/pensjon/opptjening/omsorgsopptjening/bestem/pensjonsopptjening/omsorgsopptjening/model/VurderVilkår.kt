@@ -57,11 +57,11 @@ internal class VilkårsvurderingFactory(
 
     override fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): VilkarsVurdering<*> {
         return OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.vilkarsVurder(
-            grunnlag.summertAntallMånederPerOmsorgsyter()
+            grunnlag.forSummertOmsorgPerOmsorgsyter()
         )
     }
     override fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering {
-        return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(grunnlag.tilstrekkeligOmsorgsarbeid())
+        return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(grunnlag.forTilstrekkeligOmsorgsarbeid())
 
     }
 

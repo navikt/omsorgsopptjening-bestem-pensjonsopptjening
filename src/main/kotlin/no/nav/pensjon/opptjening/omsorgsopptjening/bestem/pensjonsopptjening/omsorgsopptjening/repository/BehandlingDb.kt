@@ -12,7 +12,7 @@ internal class BehandlingDb(
     val omsorgsyter: String,
     val omsorgsmottaker: String,
     val omsorgstype: OmsorgstypeDb,
-    val grunnlag: BeriketGrunnlagDb,
+    val grunnlag: BarnetrygdGrunnlagDb,
     val vilkårsvurdering: VilkårsvurderingDb,
     val utfall: BehandlingsutfallDb,
     val kafkaMeldingId: UUID,

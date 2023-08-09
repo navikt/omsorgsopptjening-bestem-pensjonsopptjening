@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate
 @Component
 class RestTemplateConfig {
     @Bean
-    fun poppTemplate(headerInterceptor: HeaderInterceptor): RestTemplate = RestTemplateBuilder()
+    fun restTemplate(headerInterceptor: HeaderInterceptor): RestTemplate = RestTemplateBuilder()
         .additionalInterceptors(headerInterceptor)
         .build()
 }

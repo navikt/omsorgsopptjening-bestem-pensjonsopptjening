@@ -3,6 +3,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
 import java.util.UUID
 
+/**
+ * En automatisk vurdering av en [omsorgsyter]s rett til omsorgsopptjening på bakgrunn av omsorgsarbeid
+ * ytt for [omsorgsmottaker] i et gitt [omsorgsår].
+ */
 data class Behandling(
     private val grunnlag: BarnetrygdGrunnlag,
     private val vurderVilkår: VurderVilkår,

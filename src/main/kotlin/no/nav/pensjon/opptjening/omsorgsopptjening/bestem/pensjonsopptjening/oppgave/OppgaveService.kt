@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.PersistertKafkaMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BarnetrygdGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
@@ -84,7 +84,7 @@ class OppgaveService(
     }
 
     @Transactional(rollbackFor = [Throwable::class])
-    fun opprett(melding: PersistertKafkaMelding): Oppgave {
+    fun opprett(melding: OmsorgsarbeidMelding): Oppgave {
         log.info("Lagrer oppgavebestilling")
         return deserialize<OmsorgsgrunnlagMelding>(melding.melding).let {
             oppgaveRepo.persist(
