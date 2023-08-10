@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.JuridiskHenvisning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
@@ -21,46 +22,48 @@ import java.util.Queue
     property = "type",
 )
 sealed class VilkårsvurderingDb {
+    @JsonTypeName("OmsorgsyterHarTilstrekkeligOmsorgsarbeid")
     internal data class OmsorgsyterHarTilstrekkeligOmsorgsarbeid(
         val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
+    @JsonTypeName("OmsorgsyterErFylt17VedUtløpAvOmsorgsår")
     internal data class OmsorgsyterErFylt17VedUtløpAvOmsorgsår(
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
-
+    @JsonTypeName("OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår")
     internal data class OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
-
+    @JsonTypeName("Eller")
     internal data class Eller(
         val eller: List<VilkårsvurderingDb>,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
-
+    @JsonTypeName("Og")
     internal data class Og(
         val og: List<VilkårsvurderingDb>,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
-
+    @JsonTypeName("OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter")
     internal data class OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter(
         val grunnlag: GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
-
+    @JsonTypeName("OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr")
     internal data class OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr(
         val grunnlag: GrunnlagVilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
-
+    @JsonTypeName("OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår")
     internal data class OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
-
+    @JsonTypeName("OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere")
     internal data class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(
         val grunnlag: GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere,
         val utfall: VilkårsvurderingUtfallDb,
@@ -148,7 +151,12 @@ private fun mapRecursive(
 internal fun List<VilkårsvurderingDb>.toDomain(): List<VilkarsVurdering<*>> {
     return map { it.toDomain() }
 }
-
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type",
+)
+@JsonTypeName("JuridiskHenvisningDb")
 data class JuridiskHenvisningDb(
     val kortTittel: String? = null,
     val dato: String? = null,

@@ -11,7 +11,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
@@ -140,7 +140,7 @@ class RetryTilSuccessTest : SpringContextTest.NoKafka() {
                 assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Innvilget::class.java, it.utfall)
+                assertInstanceOf(BehandlingUtfall.Innvilget::class.java, it.utfall)
             }
         }
         assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())

@@ -7,6 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import java.time.Month
+import java.time.YearMonth
 
 /**
  * Grunnlaget for vurdering av en [omsorgsyter]s rett til omsorgsopptjening basert på mottatt barnetrygd for
@@ -30,24 +31,24 @@ sealed class BarnetrygdGrunnlag {
         get() = grunnlag.omsorgsSaker
 
 
-    protected fun omsorgsytersAntallMånederOmsorgForOmsorgsmottaker(): Int {
-        return antallMånederOmsorgForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!
+    protected fun omsorgsytersOmsorgsmånederForOmsorgsmottaker(): Set<YearMonth> {
+        return omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!
     }
 
-    private fun antallMånederOmsorgForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Int> {
+    private fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Set<YearMonth>> {
         return grunnlag.omsorgsSaker
-            .associate { it.omsorgsyter to it.månederOmsorgFor(omsorgsmottaker) }
+            .associate { it.omsorgsyter to it.omsorgsmånederFor(omsorgsmottaker) }
     }
 
     fun forSummertOmsorgPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
-        return antallMånederOmsorgForOmsorgsmottakerPerOmsorgsyter().let {
+        return omsorgsmånederForOmsorgsmottakerPerOmsorgsyter().let {
             OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
                 omsorgsyter = omsorgsyter,
                 summert = it.map { (yter, antallMnd) ->
-                    OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.SummertOmsorgForMottakerOgÅr(
+                    OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
                         omsorgsyter = yter,
                         omsorgsmottaker = omsorgsmottaker,
-                        antallMåneder = antallMnd,
+                        omsorgsmåneder = antallMnd,
                         år = omsorgsAr
                     )
                 }
@@ -104,7 +105,7 @@ sealed class BarnetrygdGrunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
-                    antallMåneder = omsorgsytersAntallMånederOmsorgForOmsorgsmottaker()
+                    omsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
                 )
             }
         }
@@ -131,7 +132,7 @@ sealed class BarnetrygdGrunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                     omsorgsAr = omsorgsAr,
                     omsorgsmottaker = omsorgsmottaker,
-                    antallMåneder = omsorgsytersAntallMånederOmsorgForOmsorgsmottaker()
+                    omsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
                 )
             }
         }
@@ -155,7 +156,7 @@ sealed class BarnetrygdGrunnlag {
             return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsAr = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker,
-                antallMåneder = omsorgsytersAntallMånederOmsorgForOmsorgsmottaker()
+                omsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
             )
         }
     }

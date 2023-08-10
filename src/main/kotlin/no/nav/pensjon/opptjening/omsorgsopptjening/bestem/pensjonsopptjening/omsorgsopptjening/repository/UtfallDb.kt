@@ -1,7 +1,13 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
+import com.fasterxml.jackson.annotation.JsonTypeName
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerAvslått
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerInnvilget
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgAvslått
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgInnvilget
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingUtfall
 
 
 @JsonTypeInfo(
@@ -10,14 +16,22 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
     property = "type",
 )
 internal sealed class VilkårsvurderingUtfallDb {
+    @JsonTypeName("EllerAvslått")
     object EllerAvslått : VilkårsvurderingUtfallDb()
 
+    @JsonTypeName("EllerInnvilget")
     object EllerInnvilget : VilkårsvurderingUtfallDb()
 
+    @JsonTypeName("OgAvslått")
     object OgAvslått : VilkårsvurderingUtfallDb()
 
+    @JsonTypeName("OgInnvilget")
     object OgInnvilget : VilkårsvurderingUtfallDb()
+
+    @JsonTypeName("VilkårAvslag")
     data class VilkårAvslag(val henvisning: Set<JuridiskHenvisningDb>) : VilkårsvurderingUtfallDb()
+
+    @JsonTypeName("VilkårInnvilget")
     data class VilkårInnvilget(val henvisning: Set<JuridiskHenvisningDb>) : VilkårsvurderingUtfallDb()
 
 }
@@ -29,19 +43,21 @@ internal sealed class VilkårsvurderingUtfallDb {
 )
 internal sealed class BehandlingsutfallDb {
 
-    object AutomatiskGodskrivingAvslag : BehandlingsutfallDb()
+    @JsonTypeName("Avslag")
+    object Avslag : BehandlingsutfallDb()
 
-    object AutomatiskGodskrivingInnvilget : BehandlingsutfallDb()
+    @JsonTypeName("Innvilget")
+    object Innvilget : BehandlingsutfallDb()
 }
 
 internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
     return when (this) {
-        AutomatiskGodskrivingUtfall.Avslag -> {
-            BehandlingsutfallDb.AutomatiskGodskrivingAvslag
+        BehandlingUtfall.Avslag -> {
+            BehandlingsutfallDb.Avslag
         }
 
-        AutomatiskGodskrivingUtfall.Innvilget -> {
-            BehandlingsutfallDb.AutomatiskGodskrivingInnvilget
+        BehandlingUtfall.Innvilget -> {
+            BehandlingsutfallDb.Innvilget
         }
     }
 }
@@ -104,12 +120,12 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
 
 internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
     return when (this) {
-        is BehandlingsutfallDb.AutomatiskGodskrivingInnvilget -> {
-            AutomatiskGodskrivingUtfall.Innvilget
+        is BehandlingsutfallDb.Innvilget -> {
+            BehandlingUtfall.Innvilget
         }
 
-        is BehandlingsutfallDb.AutomatiskGodskrivingAvslag -> {
-            AutomatiskGodskrivingUtfall.Avslag
+        is BehandlingsutfallDb.Avslag -> {
+            BehandlingUtfall.Avslag
         }
     }
 }

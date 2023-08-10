@@ -42,14 +42,6 @@ data class EllerVurdering(
     override val utfall: VilkårsvurderingUtfall
 ) : VilkarsVurdering<List<VilkarsVurdering<*>>>()
 
-object EllerInnvilget : VilkårsvurderingUtfall.Innvilget() {
-    override fun henvisninger(): Set<JuridiskHenvisning> {
-        TODO("Not yet implemented")
-    }
-}
+object EllerInnvilget : VilkårsvurderingUtfall.Innvilget()
 
-object EllerAvslått : VilkårsvurderingUtfall.Avslag() {
-    override fun henvisninger(): Set<JuridiskHenvisning> {
-        TODO("Not yet implemented")
-    }
-}
+object EllerAvslått : VilkårsvurderingUtfall.Avslag()

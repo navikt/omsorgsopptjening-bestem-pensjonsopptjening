@@ -1,11 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 
-import net.bytebuddy.asm.Advice.Local
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.Month
+import java.time.YearMonth
 import kotlin.test.assertEquals
 
 class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
@@ -19,7 +20,10 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12125678910",
                     fødselsdato = LocalDate.of(1999, Month.JANUARY, 1)
                 ),
-                antallMåneder = 6
+                omsorgsmåneder = Periode(
+                    YearMonth.of(2000, Month.JANUARY),
+                    YearMonth.of(2000, Month.JUNE)
+                ).alleMåneder()
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)
@@ -35,7 +39,10 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12345678910",
                     fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
                 ),
-                antallMåneder = 1
+                omsorgsmåneder = Periode(
+                    YearMonth.of(2000, Month.JANUARY),
+                    YearMonth.of(2000, Month.JANUARY)
+                ).alleMåneder()
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)
@@ -51,7 +58,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12345678910",
                     fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
                 ),
-                antallMåneder = 0
+                omsorgsmåneder = emptySet()
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall)
@@ -59,7 +66,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     }
 
     @Test
-    fun `Gitt en mottaker født I desember i omsorgsår når det er minst en måned full omsorg så invilget`() {
+    fun `Gitt en mottaker født I desember i omsorgsår når det er minst en måned full omsorg i påfølgende år så invilget`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                 omsorgsAr = 2000,
@@ -67,7 +74,10 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12125678910",
                     fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1)
                 ),
-                antallMåneder = 1
+                omsorgsmåneder = Periode(
+                    YearMonth.of(2001, Month.JANUARY),
+                    YearMonth.of(2001, Month.JANUARY)
+                ).alleMåneder()
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)
@@ -75,7 +85,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     }
 
     @Test
-    fun `Gitt en mottaker født I desember i omsorgsår når det ikke er minst en måned full omsorg så avslag`() {
+    fun `Gitt en mottaker født I desember i omsorgsår når det ikke er minst en måned full omsorg i påfølgende år så avslag`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                 omsorgsAr = 2000,
@@ -83,7 +93,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12125678910",
                     fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1)
                 ),
-                antallMåneder = 0
+                omsorgsmåneder = emptySet()
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall)
@@ -102,7 +112,13 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                         fnr = "12345678910",
                         fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1)
                     ),
-                    antallMåneder = monthsFullOmsorg
+                    omsorgsmåneder = if (monthsFullOmsorg == 0) emptySet() else Periode(
+                        YearMonth.of(omsorgsår, Month.JANUARY),
+                        YearMonth.of(
+                            omsorgsår,
+                            monthsFullOmsorg
+                        )
+                    ).alleMåneder()
                 )
             ).also { vurdering ->
                 assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
@@ -125,7 +141,13 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                         fnr = "12345678910",
                         fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1)
                     ),
-                    antallMåneder = monthsFullOmsorg
+                    omsorgsmåneder = if (monthsFullOmsorg == 0) emptySet() else Periode(
+                        YearMonth.of(omsorgsår, Month.JANUARY),
+                        YearMonth.of(
+                            omsorgsår,
+                            monthsFullOmsorg
+                        )
+                    ).alleMåneder()
                 )
             ).also {
                 assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -143,7 +165,10 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     fnr = "12345678910",
                     fødselsdato = LocalDate.of(omsorgsår - 6, Month.JANUARY, 1)
                 ),
-                antallMåneder = 3
+                omsorgsmåneder = Periode(
+                    YearMonth.of(omsorgsår, Month.JANUARY),
+                    YearMonth.of(omsorgsår, Month.MARCH)
+                ).alleMåneder()
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {

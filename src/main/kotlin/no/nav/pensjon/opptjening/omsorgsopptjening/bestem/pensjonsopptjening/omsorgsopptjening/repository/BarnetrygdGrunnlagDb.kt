@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BarnetrygdGrunnlag
 
 @JsonTypeInfo(
@@ -13,18 +14,21 @@ internal sealed class BarnetrygdGrunnlagDb {
     abstract val omsorgsmottaker: PersonDb
     abstract val grunnlag: BeriketDatagrunnlagDb
 
+    @JsonTypeName("FødtDesember")
     class FødtDesember(
         override val omsorgsår: Int,
         override val omsorgsmottaker: PersonDb,
         override val grunnlag: BeriketDatagrunnlagDb
     ) : BarnetrygdGrunnlagDb()
 
+    @JsonTypeName("IkkeFødtDesember")
     data class IkkeFødtDesember(
         override val omsorgsår: Int,
         override val omsorgsmottaker: PersonDb,
         override val grunnlag: BeriketDatagrunnlagDb
     ) : BarnetrygdGrunnlagDb()
 
+    @JsonTypeName("IkkeFødtIOmsorgsår")
     data class IkkeFødtIOmsorgsår(
         override val omsorgsår: Int,
         override val omsorgsmottaker: PersonDb,

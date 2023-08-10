@@ -2,13 +2,9 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 sealed class VilkårsvurderingUtfall {
 
-    abstract fun henvisninger(): Set<JuridiskHenvisning>
     sealed class Innvilget : VilkårsvurderingUtfall() {
 
         data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Innvilget() {
-            override fun henvisninger(): Set<JuridiskHenvisning> {
-                return henvisninger
-            }
 
             companion object {
                 fun from(referanser: Set<Referanse>): Vilkår {
@@ -20,9 +16,6 @@ sealed class VilkårsvurderingUtfall {
 
     sealed class Avslag : VilkårsvurderingUtfall() {
         data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Avslag() {
-            override fun henvisninger(): Set<JuridiskHenvisning> {
-                return henvisninger
-            }
 
             companion object {
                 fun from(referanser: Set<Referanse>): Vilkår {
@@ -42,16 +35,13 @@ sealed class VilkårsvurderingUtfall {
 }
 
 sealed class BehandlingUtfall {
+    object Innvilget : BehandlingUtfall()
+    object Avslag : BehandlingUtfall()
+
     fun erInnvilget(): Boolean {
         return when (this) {
-            is AutomatiskGodskrivingUtfall.Avslag -> false
-            is AutomatiskGodskrivingUtfall.Innvilget -> true
+            is Avslag -> false
+            is Innvilget -> true
         }
     }
-}
-
-sealed class AutomatiskGodskrivingUtfall : BehandlingUtfall() {
-    object Innvilget : AutomatiskGodskrivingUtfall()
-
-    object Avslag : AutomatiskGodskrivingUtfall()
 }

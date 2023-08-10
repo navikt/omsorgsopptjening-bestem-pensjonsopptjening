@@ -10,7 +10,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
@@ -26,6 +26,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -109,7 +110,7 @@ class AvslagIkkeTilstrekkeligAntallMånederTest : SpringContextTest.NoKafka() {
                 assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall)
+                assertInstanceOf(BehandlingUtfall.Avslag::class.java, it.utfall)
 
                 assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering>() }
                 assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering>() }
@@ -126,7 +127,13 @@ class AvslagIkkeTilstrekkeligAntallMånederTest : SpringContextTest.NoKafka() {
                     ).also {
                         assertEquals(2020, it.omsorgsAr)
                         assertEquals("07081812345", it.omsorgsmottaker.fnr)
-                        assertEquals(5, it.antallMåneder)
+                        assertEquals(
+                            Periode(
+                                YearMonth.of(2020, Month.JANUARY),
+                                YearMonth.of(2020, Month.MAY)
+                            ).alleMåneder(), it.omsorgsmåneder
+                        )
+                        assertEquals(5, it.antallMåneder())
                     }
                 }
             }
@@ -181,7 +188,7 @@ class AvslagIkkeTilstrekkeligAntallMånederTest : SpringContextTest.NoKafka() {
                 assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall)
+                assertInstanceOf(BehandlingUtfall.Avslag::class.java, it.utfall)
 
                 assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering>() }
                 assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering>() }
@@ -198,7 +205,13 @@ class AvslagIkkeTilstrekkeligAntallMånederTest : SpringContextTest.NoKafka() {
                     ).also {
                         assertEquals(2020, it.omsorgsAr)
                         assertEquals("07081812345", it.omsorgsmottaker.fnr)
-                        assertEquals(5, it.antallMåneder)
+                        assertEquals(
+                            Periode(
+                                YearMonth.of(2020, Month.JANUARY),
+                                YearMonth.of(2020, Month.MAY)
+                            ).alleMåneder(), it.omsorgsmåneder
+                        )
+                        assertEquals(5, it.antallMåneder())
                     }
                 }
             }

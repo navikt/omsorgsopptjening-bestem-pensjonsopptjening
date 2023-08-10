@@ -10,7 +10,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
@@ -116,7 +116,7 @@ class InnvilgetForDetEldsteBarnetTest : SpringContextTest.NoKafka() {
                 assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Innvilget::class.java, it.utfall)
+                assertInstanceOf(BehandlingUtfall.Innvilget::class.java, it.utfall)
             }
             result[1].also {
                 assertEquals(2020, it.omsorgsAr)
@@ -124,7 +124,7 @@ class InnvilgetForDetEldsteBarnetTest : SpringContextTest.NoKafka() {
                 assertEquals("01052012345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall)
+                assertInstanceOf(BehandlingUtfall.Avslag::class.java, it.utfall)
                 assertTrue { it.vilkårsvurdering.erAvslått<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>() }
             }
             result[2].also {
@@ -133,7 +133,7 @@ class InnvilgetForDetEldsteBarnetTest : SpringContextTest.NoKafka() {
                 assertEquals("01122012345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, it.utfall)
+                assertInstanceOf(BehandlingUtfall.Avslag::class.java, it.utfall)
                 assertTrue { it.vilkårsvurdering.erAvslått<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>() }
             }
         }

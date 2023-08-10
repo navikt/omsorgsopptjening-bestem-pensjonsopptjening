@@ -10,7 +10,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
@@ -26,6 +26,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFr
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -109,7 +110,7 @@ class AvslagBarnFødtUtenforOpptjeningsårIkkeTilstrekkeligAntallMånederTest : 
                 assertEquals("07081812345", behandling.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, behandling.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, behandling.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Avslag::class.java, behandling.utfall)
+                assertInstanceOf(BehandlingUtfall.Avslag::class.java, behandling.utfall)
 
                 assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering>() }
                 assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering>() }
@@ -127,7 +128,13 @@ class AvslagBarnFødtUtenforOpptjeningsårIkkeTilstrekkeligAntallMånederTest : 
                         ).also {
                             assertEquals(it.omsorgsAr, 2020)
                             assertEquals("07081812345", it.omsorgsmottaker.fnr)
-                            assertEquals(4, it.antallMåneder)
+                            assertEquals(
+                                Periode(
+                                    YearMonth.of(2020, Month.JANUARY),
+                                    YearMonth.of(2020, Month.APRIL)
+                                ).alleMåneder(), it.omsorgsmåneder
+                            )
+                            assertEquals(4, it.antallMåneder())
                         }
                     }
             }

@@ -1,10 +1,17 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketSak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
 import java.time.YearMonth
-
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type",
+)
+@JsonTypeName("BeriketDatagrunnlagDb")
 internal data class BeriketDatagrunnlagDb(
     val omsorgsyter: PersonDb,
     val omsorgstype: OmsorgstypeDb,
@@ -33,6 +40,12 @@ internal fun BeriketDatagrunnlagDb.toDomain(): BeriketDatagrunnlag {
     )
 }
 
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type",
+)
+@JsonTypeName("BeriketOmsorgSakDb")
 internal data class BeriketOmsorgSakDb(
     val omsorgsyter: PersonDb,
     val omsorgVedtakPeriode: List<BeriketOmsorgVedtakPeriodeDb>
@@ -51,7 +64,12 @@ internal fun BeriketOmsorgSakDb.toDomain(): BeriketSak {
         omsorgVedtakPerioder = omsorgVedtakPeriode.map { it.toDomain() }
     )
 }
-
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type",
+)
+@JsonTypeName("BeriketOmsorgVedtakPeriodeDb")
 internal data class BeriketOmsorgVedtakPeriodeDb(
     val fom: String,
     val tom: String,

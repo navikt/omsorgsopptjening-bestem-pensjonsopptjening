@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.kafka
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.toKafka
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -21,7 +21,7 @@ class OmsorgsopptjeningProducer(
 ) {
 
     fun send(behandling: FullførtBehandling) {
-        require(behandling.utfall is AutomatiskGodskrivingUtfall.Innvilget) { "Should only send messages for utfall: ${AutomatiskGodskrivingUtfall.Innvilget::class.java}" }
+        require(behandling.utfall is BehandlingUtfall.Innvilget) { "Should only send messages for utfall: ${BehandlingUtfall.Innvilget::class.java}" }
 
         val key = Topics.Omsorgsopptjening.Key(
             ident = behandling.omsorgsyter

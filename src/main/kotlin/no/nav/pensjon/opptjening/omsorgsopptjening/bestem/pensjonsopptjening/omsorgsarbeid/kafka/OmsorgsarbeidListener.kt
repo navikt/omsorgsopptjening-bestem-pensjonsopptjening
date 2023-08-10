@@ -25,7 +25,7 @@ class OmsorgsarbeidListener(
     @KafkaListener(
         containerFactory = "listener",
         topics = [Topics.Omsorgsopptjening.NAME],
-        groupId = "omsorgsarbeid-listener"
+        groupId = "omsorgsopptjening-bestem-pensjonsopptjening"
     )
     fun poll(
         consumerRecord: ConsumerRecord<String, String>,

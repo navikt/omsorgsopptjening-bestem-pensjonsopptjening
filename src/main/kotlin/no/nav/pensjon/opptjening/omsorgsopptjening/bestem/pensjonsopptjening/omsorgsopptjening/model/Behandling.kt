@@ -20,11 +20,11 @@ data class Behandling(
 
     fun kafkaMeldingId() = kafkaMeldingId
 
-    fun utfall(): AutomatiskGodskrivingUtfall {
+    fun utfall(): BehandlingUtfall {
         return vilkårsvurdering().let { vilkårsvurdering ->
             when (vilkårsvurdering.utfall.erInnvilget()) {
-                true -> AutomatiskGodskrivingUtfall.Innvilget
-                false -> AutomatiskGodskrivingUtfall.Avslag
+                true -> BehandlingUtfall.Innvilget
+                false -> BehandlingUtfall.Avslag
             }
         }
     }

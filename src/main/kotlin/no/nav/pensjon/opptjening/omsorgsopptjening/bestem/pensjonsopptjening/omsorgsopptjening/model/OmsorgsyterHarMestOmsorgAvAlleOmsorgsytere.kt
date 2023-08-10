@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import java.time.YearMonth
+
 object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     ParagrafVilkår<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
@@ -28,9 +30,9 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
     data class Grunnlag(
         val omsorgsyter: Person,
-        val summert: List<SummertOmsorgForMottakerOgÅr>
+        val summert: List<OmsorgsmånederForMottakerOgÅr>
     ) : ParagrafGrunnlag() {
-        val yterTilAntall = summert.associate { it.omsorgsyter.fnr to it.antallMåneder }
+        val yterTilAntall = summert.associate { it.omsorgsyter.fnr to it.antall() }
 
         private fun andreOmsorgsytere(): Map<String, Int> {
             return yterTilAntall.filterNot { it.key == omsorgsyter.fnr }
@@ -50,10 +52,14 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     }
 
 
-    data class SummertOmsorgForMottakerOgÅr(
+    data class OmsorgsmånederForMottakerOgÅr(
         val omsorgsyter: Person,
         val omsorgsmottaker: Person,
-        val antallMåneder: Int,
+        val omsorgsmåneder: Set<YearMonth>,
         val år: Int
-    )
+    ) {
+        fun antall(): Int {
+            return omsorgsmåneder.count()
+        }
+    }
 }

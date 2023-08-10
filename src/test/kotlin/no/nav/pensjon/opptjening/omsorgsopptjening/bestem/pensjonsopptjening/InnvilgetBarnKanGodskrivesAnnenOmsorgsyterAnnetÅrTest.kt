@@ -10,7 +10,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AutomatiskGodskrivingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -99,7 +99,7 @@ class InnvilgetBarnKanGodskrivesAnnenOmsorgsyterAnnetÅrTest : SpringContextTest
                 assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Innvilget::class.java, it.utfall)
+                assertInstanceOf(BehandlingUtfall.Innvilget::class.java, it.utfall)
             }
         }
 
@@ -138,7 +138,7 @@ class InnvilgetBarnKanGodskrivesAnnenOmsorgsyterAnnetÅrTest : SpringContextTest
                 assertEquals("07081812345", it.omsorgsmottaker)
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
-                assertInstanceOf(AutomatiskGodskrivingUtfall.Innvilget::class.java, it.utfall)
+                assertInstanceOf(BehandlingUtfall.Innvilget::class.java, it.utfall)
             }
         }
     }

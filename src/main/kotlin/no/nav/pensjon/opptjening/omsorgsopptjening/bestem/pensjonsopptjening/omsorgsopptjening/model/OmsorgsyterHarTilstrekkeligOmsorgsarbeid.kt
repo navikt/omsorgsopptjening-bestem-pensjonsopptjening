@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 
 import java.time.Month
+import java.time.YearMonth
 
 /**
  * For barn fra 1 til og med 5 år må omsorgsyter minst ha 6 måneder med omsorgsarbeid for barnet
@@ -28,7 +29,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
-                   if (grunnlag.antallMåneder >= 1) {
+                   if (grunnlag.antallMåneder() >= 1) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -41,7 +42,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     Referanse.MåHaMinstHalveÅretMedOmsorg,
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
-                    if (grunnlag.antallMåneder >= 6) {
+                    if (grunnlag.antallMåneder() >= 6) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -54,7 +55,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
-                    if (grunnlag.antallMåneder >= 1) {
+                    if (grunnlag.antallMåneder() >= 1) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -73,12 +74,15 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
     sealed class Grunnlag : ParagrafGrunnlag() {
         abstract val omsorgsAr: Int
         abstract val omsorgsmottaker: Person
-        abstract val antallMåneder: Int
+        abstract val omsorgsmåneder: Set<YearMonth>
+        fun antallMåneder(): Int {
+            return omsorgsmåneder.count()
+        }
 
         data class OmsorgsmottakerFødtUtenforOmsorgsår(
             override val omsorgsAr: Int,
             override val omsorgsmottaker: Person,
-            override val antallMåneder: Int,
+            override val omsorgsmåneder: Set<YearMonth>,
         ) : Grunnlag() {
             init {
                 require(!omsorgsmottaker.erFødt(omsorgsAr))
@@ -88,7 +92,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         data class OmsorgsmottakerFødtIOmsorgsår(
             override val omsorgsAr: Int,
             override val omsorgsmottaker: Person,
-            override val antallMåneder: Int,
+            override val omsorgsmåneder: Set<YearMonth>,
         ) : Grunnlag() {
             init {
                 require(omsorgsmottaker.erFødt(omsorgsAr))
@@ -98,7 +102,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         data class OmsorgsmottakerFødtIDesemberOmsorgsår(
             override val omsorgsAr: Int,
             override val omsorgsmottaker: Person,
-            override val antallMåneder: Int,
+            override val omsorgsmåneder: Set<YearMonth>,
         ) : Grunnlag() {
             init {
                 require(omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER))

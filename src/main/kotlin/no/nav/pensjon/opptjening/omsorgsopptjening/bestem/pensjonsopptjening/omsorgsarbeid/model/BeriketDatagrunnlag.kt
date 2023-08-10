@@ -30,10 +30,12 @@ data class BeriketSak(
     val omsorgsyter: Person,
     val omsorgVedtakPerioder: List<BeriketVedtaksperiode>
 ) {
-    fun månederOmsorgFor(omsorgsmottaker: Person): Int {
+    fun omsorgsmånederFor(omsorgsmottaker: Person): Set<YearMonth> {
         return omsorgVedtakPerioder
             .filter { it.omsorgsmottaker == omsorgsmottaker }
-            .sumOf { it.periode.antallMoneder() }
+            .flatMap { it.periode.alleMåneder() }
+            .distinct()
+            .toSet()
     }
 
     fun omsorgsmottakere(): Set<Person> {
