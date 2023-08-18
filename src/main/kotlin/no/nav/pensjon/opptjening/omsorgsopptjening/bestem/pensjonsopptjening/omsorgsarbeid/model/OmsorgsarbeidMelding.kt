@@ -2,6 +2,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveDetaljer
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -20,6 +24,20 @@ data class OmsorgsarbeidMelding(
 
     fun retry(melding: String): OmsorgsarbeidMelding {
         return copy(statushistorikk = statushistorikk + status.retry(melding))
+    }
+
+    fun opprettOppgave(): Oppgave? {
+        return if (status is Status.Feilet) {
+            Oppgave(
+                detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
+                    omsorgsyter = deserialize<OmsorgsgrunnlagMelding>(melding).omsorgsyter,
+                ),
+                behandlingId = null,
+                meldingId = id!!
+            )
+        } else {
+            null
+        }
     }
 
     @JsonTypeInfo(

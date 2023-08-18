@@ -1,9 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
@@ -33,20 +32,13 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
+        @JvmField
         @RegisterExtension
-        private val wiremock = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().port(SpringContextTest.WIREMOCK_PORT))
-            .build()!!
+        val wiremock = wiremockWithPdlTransformer()
     }
-
     @Test
     fun `consume, process and send innvilget child 0 years`() {
-        wiremock.stubPdl(
-            listOf(
-                PdlScenario(body = "fnr_1bruk.json", setState = "hent barn"),
-                PdlScenario(inState = "hent barn", body = "fnr_barn_0ar_des_2020.json")
-            )
-        )
+        wiremock.stubForPdlTransformer()
         willAnswer {
             listOf(2020, 2021)
         }.given(gyldigOpptjeningår).get()

@@ -1,9 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsarbeidMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
@@ -29,7 +28,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.*
+import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
@@ -50,29 +49,13 @@ class InnvilgetOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
+        @JvmField
         @RegisterExtension
-        private val wiremock = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
-            .build()!!
+        val wiremock = wiremockWithPdlTransformer()
     }
-
     @Test
     fun test() {
-        wiremock.stubPdl(
-            listOf(
-                PdlScenario(body = "fnr_1bruk.json", setState = "hent barn 1"),
-                PdlScenario(inState = "hent barn 1", body = "fnr_barn_2ar_2020.json", setState = "hent annen forelder"),
-                PdlScenario(
-                    inState = "hent annen forelder",
-                    body = "fnr_samme_fnr_gjeldende_og_historisk.json",
-                    setState = "hent annen forelder 2"
-                ),
-                PdlScenario(
-                    inState = "hent annen forelder 2",
-                    body = "fnr_1bruk_pluss_historisk.json",
-                ),
-            )
-        )
+        wiremock.stubForPdlTransformer()
         willAnswer {
             listOf(2020, 2021)
         }.given(gyldigOpptjeningår).get()
@@ -158,14 +141,11 @@ class InnvilgetOmsorgsyterMedFlestMånederTest : SpringContextTest.NoKafka() {
                 assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>() }
 
                 it.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                    assertTrue(it.grunnlag.omsorgsyterHarFlest())
-                    assertFalse(it.grunnlag.flereHarLikeMange())
+                    assertTrue(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                    assertFalse(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
                     assertEquals(
-                        mapOf(
-                            "12345678910" to 8,
-                            "04010012797" to 7,
-                            "01018212345" to 2,
-                        ), it.grunnlag.yterTilAntall
+                        mapOf("12345678910" to 8),
+                        it.grunnlag.omsorgsytereMedFlestOmsorgsmåneder().associate { it.omsorgsyter.fnr to it.antall() }
                     )
                 }
             }

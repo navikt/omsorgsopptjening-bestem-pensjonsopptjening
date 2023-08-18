@@ -55,12 +55,12 @@ class OmsorgsarbeidMeldingService(
     ) {
         @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRES_NEW)
         fun markerForRetry(melding: OmsorgsarbeidMelding, exception: Throwable) {
-            melding.retry(exception.toString()).let {
-                if (it.status is OmsorgsarbeidMelding.Status.Feilet) {
+            melding.retry(exception.toString()).let { melding ->
+                melding.opprettOppgave()?.let {
                     log.error("Gir opp videre prosessering av melding")
-                    oppgaveService.opprett(melding)
+                    oppgaveService.opprett(it)
                 }
-                omsorgsarbeidRepo.updateStatus(it)
+                omsorgsarbeidRepo.updateStatus(melding)
             }
         }
     }
@@ -77,7 +77,7 @@ class OmsorgsarbeidMeldingService(
                     log.info("Prosesserer melding")
                     handle(melding).also { resultat ->
                         omsorgsarbeidRepo.updateStatus(melding.ferdig())
-                        resultat.forEach { //TODO forekle ved å droppe flere år?
+                        resultat.forEach {
                             when (it.erInnvilget()) {
                                 true -> {
                                     håndterInnvilgelse(it)
@@ -131,16 +131,10 @@ class OmsorgsarbeidMeldingService(
 
     private fun håndterAvslag(behandling: FullførtBehandling) {
         log.info("Håndterer avslag")
-        //TODO forhindre doble oppgaver? Vil produsere oppgave for alle omsorgsytere p.t.
-        when (behandling.skalOppretteOppgave()) {
-            true -> {
-                oppgaveService.opprett(behandling)
-            }
-
-            false -> {
-                //NOOP
-            }
-        }
+        behandling.opprettOppgave(
+            oppgaveEksistererForOmsorgsyter = oppgaveService::oppgaveEksistererForOmsorgsyterOgÅr,
+            oppgaveEksistererForOmsorgsmottaker = oppgaveService::oppgaveEksistererForOmsorgsmottakerOgÅr
+        )?.also { oppgaveService.opprett(it) }
     }
 
     private fun OmsorgsgrunnlagMelding.berikDatagrunnlag(): BeriketDatagrunnlag {

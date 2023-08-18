@@ -1,10 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BarnetrygdGrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
@@ -54,33 +50,8 @@ class OppgaveService(
     }
 
     @Transactional(rollbackFor = [Throwable::class])
-    fun opprett(behandling: FullførtBehandling): Oppgave {
-        //TODO hadde desember ref oppgavetekst/batch
-        log.info("Lagrer oppgavebestilling")
-        return when (behandling.grunnlag) {
-            is BarnetrygdGrunnlag.FødtIOmsorgsår -> {
-                OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår(
-                    omsorgsyter = behandling.omsorgsyter,
-                    omsorgsmottaker = behandling.omsorgsmottaker,
-                )
-            }
-
-            is BarnetrygdGrunnlag.IkkeFødtIOmsorgsår -> {
-                OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg(
-                    omsorgsyter = behandling.omsorgsyter,
-                    omsorgsmottaker = behandling.omsorgsmottaker,
-                    annenOmsorgsyter = behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().grunnlag.andreOmsorgsytereMedLikeMange().keys.first()
-                )
-            }
-        }.let {
-            oppgaveRepo.persist(
-                Oppgave(
-                    detaljer = it,
-                    behandlingId = behandling.id,
-                    meldingId = behandling.kafkaMeldingId
-                )
-            )
-        }
+    fun opprett(oppgave: Oppgave): Oppgave {
+        return oppgaveRepo.persist(oppgave)
     }
 
     @Transactional(rollbackFor = [Throwable::class])
@@ -98,6 +69,15 @@ class OppgaveService(
             )
         }
     }
+
+    fun oppgaveEksistererForOmsorgsyterOgÅr(omsorgsyter: String, år: Int): Boolean {
+        return oppgaveRepo.existsForOmsorgsyterOgÅr(omsorgsyter, år)
+    }
+
+    fun oppgaveEksistererForOmsorgsmottakerOgÅr(omsorgsmottaker: String, år: Int): Boolean {
+        return oppgaveRepo.existsForOmsorgsmottakerOgÅr(omsorgsmottaker, år)
+    }
+
 
     @Transactional(rollbackFor = [Throwable::class])
     fun process(): Oppgave? {

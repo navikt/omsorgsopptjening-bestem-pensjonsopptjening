@@ -1,9 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsarbeidMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
@@ -13,6 +12,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
@@ -29,7 +29,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
 import java.time.YearMonth
 import java.util.UUID
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class InnvilgetForDetEldsteBarnetTest : SpringContextTest.NoKafka() {
@@ -47,22 +46,13 @@ class InnvilgetForDetEldsteBarnetTest : SpringContextTest.NoKafka() {
     private lateinit var oppgaveRepo: OppgaveRepo
 
     companion object {
+        @JvmField
         @RegisterExtension
-        private val wiremock = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
-            .build()!!
+        val wiremock = wiremockWithPdlTransformer()
     }
-
     @Test
     fun test() {
-        wiremock.stubPdl(
-            listOf(
-                PdlScenario(body = "fnr_1bruk.json", setState = "hent barn 1"),
-                PdlScenario(inState = "hent barn 1", body = "fnr_barn_0ar_may_2020.json", setState = "hent barn 2"),
-                PdlScenario(inState = "hent barn 2", body = "fnr_barn_2ar_2020.json", setState = "hent barn 3"),
-                PdlScenario(inState = "hent barn 3", body = "fnr_barn_0ar_des_2020.json"),
-            )
-        )
+        wiremock.stubForPdlTransformer()
         willAnswer {
             listOf(2020)
         }.given(gyldigOpptjeningår).get()
@@ -138,6 +128,6 @@ class InnvilgetForDetEldsteBarnetTest : SpringContextTest.NoKafka() {
             }
         }
 
-        assertNull(oppgaveRepo.findForMelding(melding.id!!))
+        assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForMelding(melding.id!!))
     }
 }

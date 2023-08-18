@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import com.github.tomakehurst.wiremock.stubbing.Scenario
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Application
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.KafkaConfig
@@ -34,7 +33,6 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.support.Acknowledgment
 import org.springframework.kafka.support.SendResult
 import org.springframework.kafka.test.context.EmbeddedKafka
-import org.springframework.stereotype.Component
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import java.util.concurrent.CompletableFuture
@@ -155,12 +153,6 @@ sealed class SpringContextTest {
         }
     }
 
-    data class PdlScenario(
-        val inState: String = Scenario.STARTED,
-        val body: String,
-        val setState: String? = null,
-    )
-
     fun OmsorgsgrunnlagMelding.toConsumerRecord(): ConsumerRecord<String, String> {
         return ConsumerRecord(
             Topics.Omsorgsopptjening.NAME,
@@ -180,24 +172,5 @@ sealed class SpringContextTest {
                 )
             )
         }
-    }
-}
-
-
-fun WireMockExtension.stubPdl(scenario: List<SpringContextTest.PdlScenario>) {
-    val name = scenario.sumOf { it.hashCode() }
-    scenario.forEach {
-        this.stubFor(
-            WireMock.post(WireMock.urlEqualTo(SpringContextTest.PDL_PATH))
-                .inScenario(name.toString())
-                .whenScenarioStateIs(it.inState)
-                .willReturn(
-                    WireMock.aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBodyFile(it.body)
-                )
-                .willSetStateTo(it.setState)
-        )
     }
 }

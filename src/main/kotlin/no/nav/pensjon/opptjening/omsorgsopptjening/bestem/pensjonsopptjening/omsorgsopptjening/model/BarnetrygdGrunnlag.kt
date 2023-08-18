@@ -44,12 +44,12 @@ sealed class BarnetrygdGrunnlag {
         return omsorgsmånederForOmsorgsmottakerPerOmsorgsyter().let {
             OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
                 omsorgsyter = omsorgsyter,
-                summert = it.map { (yter, antallMnd) ->
+                data = it.map { (yter, antallMnd) ->
                     OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
                         omsorgsyter = yter,
                         omsorgsmottaker = omsorgsmottaker,
                         omsorgsmåneder = antallMnd,
-                        år = omsorgsAr
+                        omsorgsår = omsorgsAr
                     )
                 }
             )

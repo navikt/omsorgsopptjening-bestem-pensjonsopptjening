@@ -72,12 +72,12 @@ internal sealed class GrunnlagVilkårsvurderingDb {
 internal fun GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere.toDomain(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
     return OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
         omsorgsyter = omsorgsyter.toDomain(),
-        summert = data.map {
+        data = data.map {
             OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
                 omsorgsyter = it.omsorgsyter.toDomain(),
                 omsorgsmottaker = it.omsorgsmottaker.toDomain(),
                 omsorgsmåneder = it.omsorgsmåneder,
-                år = it.år
+                omsorgsår = it.omsorgsår
             )
         }
     )
@@ -93,18 +93,18 @@ internal data class OmsorgsyterMottakerAntallMånederDb(
     val omsorgsyter: PersonDb,
     val omsorgsmottaker: PersonDb,
     val omsorgsmåneder: Set<YearMonth>,
-    val år: Int,
+    val omsorgsår: Int,
 )
 
 internal fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere {
     return GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere(
         omsorgsyter = omsorgsyter.toDb(),
-        data = summert.map {
+        data = data.map {
             OmsorgsyterMottakerAntallMånederDb(
                 omsorgsyter = it.omsorgsyter.toDb(),
                 omsorgsmottaker = it.omsorgsmottaker.toDb(),
                 omsorgsmåneder = it.omsorgsmåneder,
-                år = it.år
+                omsorgsår = it.omsorgsår
             )
         }
     )

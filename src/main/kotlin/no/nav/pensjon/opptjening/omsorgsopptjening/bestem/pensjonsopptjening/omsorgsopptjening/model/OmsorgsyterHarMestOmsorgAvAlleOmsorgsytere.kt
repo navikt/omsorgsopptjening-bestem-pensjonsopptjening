@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import java.time.Month
 import java.time.YearMonth
 
 object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
@@ -15,7 +16,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         return setOf(
             Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder //TODO rett opp henvinsinger/presiser?
         ).let {
-            if (grunnlag.omsorgsyterHarFlest()) {
+            if (grunnlag.omsorgsyterHarFlestOmsorgsmåneder()) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -30,24 +31,29 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
     data class Grunnlag(
         val omsorgsyter: Person,
-        val summert: List<OmsorgsmånederForMottakerOgÅr>
+        val data: List<OmsorgsmånederForMottakerOgÅr> //TODO stramme opp modellen slik at det ikke er teoretisk mulig med flere mottakere?
     ) : ParagrafGrunnlag() {
-        val yterTilAntall = summert.associate { it.omsorgsyter.fnr to it.antall() }
+        private val omsorgsytereGruppertEtterOmsorgsmåneder = data
+            .groupBy { it.antall() }
+        private val omsorgsytereMedFlestOmsorgsmåneder = omsorgsytereGruppertEtterOmsorgsmåneder
+            .let { map ->
+                map[map.maxOf { it.key }]!!
+            }
 
-        private fun andreOmsorgsytere(): Map<String, Int> {
-            return yterTilAntall.filterNot { it.key == omsorgsyter.fnr }
+        fun omsorgsyterHarFlestOmsorgsmåneder(): Boolean {
+            return omsorgsytereMedFlestOmsorgsmåneder().let {
+                it.count() == 1 && it.all { it.omsorgsyter == omsorgsyter }
+            }
         }
 
-        fun andreOmsorgsytereMedLikeMange(): Map<String, Int> {
-            return andreOmsorgsytere().filter { it.value == yterTilAntall[omsorgsyter.fnr]!! }
+        fun omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder(): Boolean {
+            return omsorgsytereMedFlestOmsorgsmåneder().let {
+                it.count() > 1 && it.any { it.omsorgsyter == omsorgsyter }
+            }
         }
 
-        fun omsorgsyterHarFlest(): Boolean {
-            return andreOmsorgsytere().none { it.value >= yterTilAntall[omsorgsyter.fnr]!! }
-        }
-
-        fun flereHarLikeMange(): Boolean {
-            return andreOmsorgsytereMedLikeMange().isNotEmpty()
+        fun omsorgsytereMedFlestOmsorgsmåneder(): Set<OmsorgsmånederForMottakerOgÅr> {
+            return omsorgsytereMedFlestOmsorgsmåneder.toSet()
         }
     }
 
@@ -56,10 +62,14 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         val omsorgsyter: Person,
         val omsorgsmottaker: Person,
         val omsorgsmåneder: Set<YearMonth>,
-        val år: Int
+        val omsorgsår: Int
     ) {
         fun antall(): Int {
             return omsorgsmåneder.count()
+        }
+
+        fun haddeOmsorgIDesember(): Boolean {
+            return omsorgsmåneder.contains(YearMonth.of(omsorgsår, Month.DECEMBER))
         }
     }
 }

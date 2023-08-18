@@ -4,11 +4,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.serialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
+import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Component
+import java.lang.RuntimeException
 import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
@@ -68,14 +70,46 @@ class OppgaveRepo(
         ).single()
     }
 
-    fun findForMelding(id: UUID): Oppgave? {
+    fun findForMelding(id: UUID): List<Oppgave> {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.correlation_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId where o.meldingId = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
             OmsorgsarbeidMessageRowMapper()
-        ).singleOrNull()
+        )
+    }
+
+    fun findForBehandling(id: UUID): List<Oppgave> {
+        return jdbcTemplate.query(
+            """select o.*, os.statushistorikk, m.correlation_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId join behandling b on b.id = o.behandlingId where b.id = :id""",
+            mapOf<String, Any>(
+                "id" to id
+            ),
+            OmsorgsarbeidMessageRowMapper()
+        )
+    }
+
+    fun existsForOmsorgsyterOgÅr(omsorgsyter: String, år: Int): Boolean {
+        return jdbcTemplate.query(
+            """select count(1) as antall from oppgave o join behandling b on b.id = o.behandlingId where b.omsorgsyter = :omsorgsyter and b.omsorgs_ar = :omsorgsar""",
+            mapOf<String, Any>(
+                "omsorgsyter" to omsorgsyter,
+                "omsorgsar" to år
+            ),
+            ResultSetExtractor { rs -> if (rs.next()) rs.getInt("antall") > 0 else throw RuntimeException("Could not extract resultset") }
+        )!!
+    }
+
+    fun existsForOmsorgsmottakerOgÅr(omsorgsmottaker: String, år: Int): Boolean {
+        return jdbcTemplate.query(
+            """select count(1) as antall from oppgave o join behandling b on b.id = o.behandlingId where b.omsorgsmottaker = :omsorgsmottaker and b.omsorgs_ar = :omsorgsar""",
+            mapOf<String, Any>(
+                "omsorgsmottaker" to omsorgsmottaker,
+                "omsorgsar" to år
+            ),
+            ResultSetExtractor { rs -> if (rs.next()) rs.getInt("antall") > 0 else throw RuntimeException("Could not extract resultset") }
+        )!!
     }
 
     fun finnNesteUprosesserte(): Oppgave? {

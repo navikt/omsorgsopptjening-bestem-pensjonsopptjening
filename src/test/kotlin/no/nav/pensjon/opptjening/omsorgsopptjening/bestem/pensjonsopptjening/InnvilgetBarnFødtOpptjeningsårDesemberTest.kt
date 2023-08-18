@@ -1,9 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsarbeidMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
@@ -39,20 +38,13 @@ class InnvilgetBarnFødtOpptjeningsårDesemberTest : SpringContextTest.NoKafka()
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
+        @JvmField
         @RegisterExtension
-        private val wiremock = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
-            .build()!!
+        val wiremock = wiremockWithPdlTransformer()
     }
-
     @Test
     fun test() {
-        wiremock.stubPdl(
-            listOf(
-                PdlScenario(body = "fnr_1bruk.json", setState = "hent barn 1"),
-                PdlScenario(inState = "hent barn 1", body = "fnr_barn_0ar_des_2020.json"),
-            )
-        )
+        wiremock.stubForPdlTransformer()
         willAnswer {
             listOf(2020)
         }.given(gyldigOpptjeningår).get()

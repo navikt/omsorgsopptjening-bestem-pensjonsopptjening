@@ -1,9 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsarbeidMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
@@ -21,8 +20,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erInnvilget
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
@@ -61,29 +58,13 @@ class AvslagMangeOmsorgsmottakereHarLikeMangeMånederOmsorgTest : SpringContextT
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
+        @JvmField
         @RegisterExtension
-        private val wiremock = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
-            .build()!!
+        val wiremock = wiremockWithPdlTransformer()
     }
-
     @Test
     fun test() {
-        wiremock.stubPdl(
-            listOf(
-                PdlScenario(body = "fnr_1bruk.json", setState = "hent barn 1"),
-                PdlScenario(inState = "hent barn 1", body = "fnr_barn_2ar_2020.json", setState = "hent annen forelder"),
-                PdlScenario(
-                    inState = "hent annen forelder",
-                    body = "fnr_samme_fnr_gjeldende_og_historisk.json",
-                    setState = "hent annen forelder 2"
-                ),
-                PdlScenario(
-                    inState = "hent annen forelder 2",
-                    body = "fnr_1bruk_pluss_historisk.json",
-                ),
-            )
-        )
+        wiremock.stubForPdlTransformer()
         willAnswer {
             listOf(2020, 2021)
         }.given(gyldigOpptjeningår).get()
@@ -140,7 +121,7 @@ class AvslagMangeOmsorgsmottakereHarLikeMangeMånederOmsorgTest : SpringContextT
             )
         )
 
-        val behandling = handler.process().let { result ->
+        handler.process().let { result ->
             result.single().also {
                 assertEquals(2020, it.omsorgsAr)
                 assertEquals("12345678910", it.omsorgsyter)
@@ -158,36 +139,17 @@ class AvslagMangeOmsorgsmottakereHarLikeMangeMånederOmsorgTest : SpringContextT
                 assertTrue { it.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>() }
 
                 it.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                    assertFalse(it.grunnlag.omsorgsyterHarFlest())
-                    assertTrue(it.grunnlag.flereHarLikeMange())
+                    assertFalse(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                    assertTrue(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
                     assertEquals(
                         mapOf(
                             "12345678910" to 7,
                             "04010012797" to 7,
                             "01018212345" to 7,
-                        ), it.grunnlag.yterTilAntall
+                        ),
+                        it.grunnlag.omsorgsytereMedFlestOmsorgsmåneder().associate { it.omsorgsyter.fnr to it.antall() }
                     )
                 }
-            }
-        }
-        oppgaveRepo.findForMelding(behandling.kafkaMeldingId)!!.also { oppgave ->
-            assertInstanceOf(OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg::class.java, oppgave.detaljer).also {
-                assertEquals("12345678910", it.omsorgsyter)
-                assertEquals("07081812345", it.omsorgsmottaker)
-                assertEquals("04010012797", it.annenOmsorgsyter)
-                assertEquals("""
-                    Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.
-                """.trimIndent(), it.oppgaveTekst)
-            }
-            assertEquals(behandling.id, oppgave.behandlingId)
-            assertEquals(behandling.kafkaMeldingId, oppgave.meldingId)
-            assertEquals(correlationId, oppgave.correlationId)
-            assertInstanceOf(Oppgave.Status.Klar::class.java, oppgave.status)
-        }
-
-        oppgaveService.process()!!.also { oppgave ->
-            assertInstanceOf(Oppgave.Status.Ferdig::class.java, oppgave.status).also {
-                assertEquals("oppgaveId", it.oppgaveId)
             }
         }
     }

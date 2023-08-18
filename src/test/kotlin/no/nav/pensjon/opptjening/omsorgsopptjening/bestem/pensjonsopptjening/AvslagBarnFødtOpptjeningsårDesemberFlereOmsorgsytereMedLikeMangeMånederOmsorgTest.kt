@@ -1,9 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubPdl
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.OmsorgsarbeidMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
@@ -62,26 +61,14 @@ class AvslagBarnFødtOpptjeningsårDesemberFlereOmsorgsytereMedLikeMangeMåneder
     private lateinit var oppgaveRepo: OppgaveRepo
 
     companion object {
+        @JvmField
         @RegisterExtension
-        private val wiremock = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
-            .build()!!
+        val wiremock = wiremockWithPdlTransformer()
     }
 
     @Test
     fun test() {
-        wiremock.stubPdl(
-            listOf(
-                PdlScenario(body = "fnr_1bruk.json", setState = "hent barn 1"),
-                PdlScenario(inState = "hent barn 1", body = "fnr_barn_0ar_des_2020.json", setState = "hent forelder 2"),
-                PdlScenario(
-                    inState = "hent forelder 2",
-                    body = "fnr_samme_fnr_gjeldende_og_historisk.json",
-                    setState = "hent barn 2"
-                ),
-                PdlScenario(inState = "hent barn 2", body = "fnr_barn_0ar_des_2020.json"),
-            )
-        )
+        wiremock.stubForPdlTransformer()
         willAnswer {
             listOf(2020)
         }.given(gyldigOpptjeningår).get()
@@ -145,20 +132,24 @@ class AvslagBarnFødtOpptjeningsårDesemberFlereOmsorgsytereMedLikeMangeMåneder
                 assertTrue { behandling.vilkårsvurdering.erInnvilget<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>() }
 
                 behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                    assertFalse(it.grunnlag.omsorgsyterHarFlest())
-                    assertTrue(it.grunnlag.flereHarLikeMange())
+                    assertFalse(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                    assertTrue(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
                     assertEquals(
                         mapOf(
                             "12345678910" to 6,
                             "04010012797" to 6,
-                        ), it.grunnlag.yterTilAntall
+                        ),
+                        it.grunnlag.omsorgsytereMedFlestOmsorgsmåneder().associate { it.omsorgsyter.fnr to it.antall() }
                     )
                 }
             }
         }
 
-        oppgaveRepo.findForMelding(behandling.kafkaMeldingId)!!.also { oppgave ->
-            assertInstanceOf(OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår::class.java, oppgave.detaljer).also {
+        oppgaveRepo.findForMelding(behandling.kafkaMeldingId).single().also { oppgave ->
+            assertInstanceOf(
+                OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår::class.java,
+                oppgave.detaljer
+            ).also {
                 assertEquals("12345678910", it.omsorgsyter)
                 assertEquals("01122012345", it.omsorgsmottaker)
                 assertEquals(
@@ -171,12 +162,6 @@ class AvslagBarnFødtOpptjeningsårDesemberFlereOmsorgsytereMedLikeMangeMåneder
             assertEquals(behandling.kafkaMeldingId, oppgave.meldingId)
             assertEquals(correlationId, oppgave.correlationId.toString())
             assertInstanceOf(Oppgave.Status.Klar::class.java, oppgave.status)
-        }
-
-        oppgaveService.process()!!.also { oppgave ->
-            assertInstanceOf(Oppgave.Status.Ferdig::class.java, oppgave.status).also {
-                assertEquals("oppgaveId", it.oppgaveId)
-            }
         }
     }
 }
