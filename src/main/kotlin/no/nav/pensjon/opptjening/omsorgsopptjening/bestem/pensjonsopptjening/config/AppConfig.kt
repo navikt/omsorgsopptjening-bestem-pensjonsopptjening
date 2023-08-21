@@ -3,8 +3,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 import org.flywaydb.core.Flyway
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.jdbc.support.DatabaseStartupValidator

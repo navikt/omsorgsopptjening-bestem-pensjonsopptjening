@@ -27,7 +27,7 @@ class OmsorgsarbeidMeldingProsesseringsTråd(
             try {
                 handler.process()
             } catch (exception: Throwable) {
-                log.error("Exception caught while processing, exception:$exception")
+                log.warn("Exception caught while processing, exception:$exception")
                 Thread.sleep(1000)
             }
         }

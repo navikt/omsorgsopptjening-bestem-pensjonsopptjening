@@ -12,7 +12,6 @@ import com.github.tomakehurst.wiremock.http.ResponseDefinition
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlQuery
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
-import java.lang.RuntimeException
 
 /**
  * Velger body-fil basert på identen i requesten.
@@ -68,7 +67,7 @@ fun wiremockWithPdlTransformer() = WireMockExtension.newInstance()
 
 fun WireMockExtension.stubForPdlTransformer() {
     this.stubFor(
-        WireMock.post(WireMock.urlEqualTo(SpringContextTest.PDL_PATH))
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.PDL_PATH))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)

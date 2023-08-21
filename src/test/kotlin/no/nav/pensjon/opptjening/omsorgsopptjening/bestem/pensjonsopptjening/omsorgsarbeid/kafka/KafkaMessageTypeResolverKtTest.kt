@@ -8,8 +8,7 @@ import org.apache.kafka.common.header.internals.RecordHeaders
 import org.apache.kafka.common.record.TimestampType
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.lang.IllegalArgumentException
-import java.util.*
+import java.util.Optional
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 

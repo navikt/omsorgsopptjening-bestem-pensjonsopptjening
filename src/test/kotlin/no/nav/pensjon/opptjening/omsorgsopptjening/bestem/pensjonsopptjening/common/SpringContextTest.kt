@@ -1,7 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Application
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.KafkaConfig
@@ -43,6 +41,8 @@ sealed class SpringContextTest {
     companion object {
         const val PDL_PATH = "/graphql"
         const val WIREMOCK_PORT = 9991
+        const val BESTEM_SAK_PATH = "/pen/api/bestemsak/v1"
+        const val OPPGAVE_PATH = "/api/v1/oppgaver"
     }
 
 

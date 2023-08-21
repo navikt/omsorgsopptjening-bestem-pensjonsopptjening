@@ -91,7 +91,7 @@ class OmsorgsarbeidMeldingService(
                         }
                     }
                 } catch (exception: Throwable) {
-                    log.error("Exception caught while processing message: ${melding.id}, exeption:$exception")
+                    log.warn("Exception caught while processing message: ${melding.id}, exeption:$exception")
                     statusoppdatering.markerForRetry(melding, exception)
                     throw exception
                 }

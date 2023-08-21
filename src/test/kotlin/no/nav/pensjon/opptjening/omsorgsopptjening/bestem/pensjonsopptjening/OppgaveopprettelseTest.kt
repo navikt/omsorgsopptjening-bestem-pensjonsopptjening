@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
-import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
@@ -11,7 +10,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -22,20 +20,15 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito
-import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
-import java.time.Clock
-import java.time.Instant
 import java.time.Month
 import java.time.YearMonth
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 
-class OppgaveTest : SpringContextTest.NoKafka() {
+class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var repo: OmsorgsarbeidRepo
@@ -45,9 +38,6 @@ class OppgaveTest : SpringContextTest.NoKafka() {
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
-
-    @Autowired
-    private lateinit var oppgaveService: OppgaveService
 
     @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
@@ -606,6 +596,4 @@ class OppgaveTest : SpringContextTest.NoKafka() {
             }
         }
     }
-
-    //TODO tester for prosessering/feilhåndtering av oppgaver
 }

@@ -12,6 +12,10 @@ import java.util.UUID
     property = "type",
 )
 sealed class OppgaveDetaljer {
+
+    abstract fun mottaker(): String
+    abstract fun oppgavetekst(): String
+
     @JsonTypeName("FlereOmsorgytereMedLikeMyeOmsorgIFødselsår")
     data class FlereOmsorgytereMedLikeMyeOmsorgIFødselsår(
         val omsorgsyter: String,
@@ -19,6 +23,14 @@ sealed class OppgaveDetaljer {
     ) : OppgaveDetaljer() {
         val oppgaveTekst: String =
             """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr $omsorgsmottaker i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
+
+        override fun mottaker(): String {
+            return omsorgsyter
+        }
+
+        override fun oppgavetekst(): String {
+            return oppgaveTekst
+        }
     }
 
     @JsonTypeName("FlereOmsorgytereMedLikeMyeOmsorg")
@@ -29,6 +41,14 @@ sealed class OppgaveDetaljer {
     ) : OppgaveDetaljer() {
         val oppgaveTekst: String =
             """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr $omsorgsmottaker. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr $annenOmsorgsyter mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+
+        override fun mottaker(): String {
+            return omsorgsyter
+        }
+
+        override fun oppgavetekst(): String {
+            return oppgaveTekst
+        }
     }
 
     /**
@@ -50,6 +70,14 @@ sealed class OppgaveDetaljer {
     ) : OppgaveDetaljer() {
         val oppgaveTekst: String =
             """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
+
+        override fun mottaker(): String {
+            return omsorgsyter
+        }
+
+        override fun oppgavetekst(): String {
+            return oppgaveTekst
+        }
     }
 }
 
@@ -63,6 +91,8 @@ data class Oppgave(
     val statushistorikk: List<Status> = listOf(Status.Klar()),
 ) {
     val status = statushistorikk.last()
+    val mottaker = detaljer.mottaker()
+    val oppgavetekst = detaljer.oppgavetekst()
 
     fun ferdig(oppgaveId: String): Oppgave {
         return copy(statushistorikk = statushistorikk + status.ferdig(oppgaveId))

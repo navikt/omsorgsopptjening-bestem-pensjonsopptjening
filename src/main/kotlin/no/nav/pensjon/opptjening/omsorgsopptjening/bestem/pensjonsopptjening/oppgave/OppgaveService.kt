@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
@@ -17,6 +18,7 @@ class OppgaveService(
     private val sakKlient: BestemSakKlient,
     private val oppgaveKlient: OppgaveKlient,
     private val oppgaveRepo: OppgaveRepo,
+    private val pdlService: PdlService,
 ) {
     @Autowired
     private lateinit var statusoppdatering: Statusoppdatering
@@ -85,27 +87,25 @@ class OppgaveService(
             Mdc.scopedMdc(CorrelationId.name, oppgave.correlationId.toString()) {
                 log.info("Oppretter oppgave")
                 try {
-//                    sakKlient.kallBestemSak(
-//                        requestBody = BestemSakRequest(
-//                            aktoerId = "",
-//                            ytelseType =,
-//                            callId =,
-//                            consumerId =
-//                        )
-//                    )
-//                    val id = "" //TODO
-//                    oppgaveKlient.opprettOppgave(
-//                        aktoerId = "",
-//                        sakId = "",
-//                        beskrivelse = "",
-//                        tildeltEnhetsnr = ""
-//                    )
-                    oppgave.ferdig("oppgaveId").also {
-                        oppgaveRepo.updateStatus(it)
-                        log.info("Oppgave opprettet")
+                    pdlService.hentAktorId(oppgave.mottaker).let { aktørId ->
+                        sakKlient.bestemSak(
+                            aktørId = aktørId
+                        ).let { omsorgssak ->
+                            oppgaveKlient.opprettOppgave(
+                                aktoerId = aktørId,
+                                sakId = omsorgssak.sakId,
+                                beskrivelse = oppgave.oppgavetekst,
+                                tildeltEnhetsnr = omsorgssak.enhet
+                            ).let { oppgaveId ->
+                                oppgave.ferdig(oppgaveId).also {
+                                    oppgaveRepo.updateStatus(it)
+                                    log.info("Oppgave opprettet")
+                                }
+                            }
+                        }
                     }
                 } catch (exception: Throwable) {
-                    log.error("Exception caught while processing oppgave: ${oppgave.id}, exeption:$exception")
+                    log.warn("Exception caught while processing oppgave: ${oppgave.id}, exeption:$exception")
                     statusoppdatering.markerForRetry(oppgave, exception)
                     throw exception
                 }

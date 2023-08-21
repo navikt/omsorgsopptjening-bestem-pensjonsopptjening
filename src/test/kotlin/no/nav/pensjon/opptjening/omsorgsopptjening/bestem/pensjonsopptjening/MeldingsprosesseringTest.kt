@@ -40,7 +40,7 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 
-class RetryTest : SpringContextTest.NoKafka() {
+class MeldingsprosesseringTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var repo: OmsorgsarbeidRepo
