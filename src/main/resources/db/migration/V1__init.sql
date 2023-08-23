@@ -44,3 +44,17 @@ create table oppgave_status
     status json not null,
     statushistorikk json not null
 );
+
+create table godskriv_opptjening
+(
+    id uuid primary key default uuid_generate_v4(),
+    opprettet timestamptz default now() not null,
+    behandlingId uuid not null references behandling(id)
+);
+
+create table godskriv_opptjening_status
+(
+    id uuid not null references godskriv_opptjening(id),
+    status json not null,
+    statushistorikk json not null
+);

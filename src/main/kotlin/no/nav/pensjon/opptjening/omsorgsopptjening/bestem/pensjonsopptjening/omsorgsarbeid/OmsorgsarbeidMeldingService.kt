@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketSak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
@@ -7,7 +8,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.toDomain
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.kafka.OmsorgsopptjeningProducer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
@@ -32,9 +32,9 @@ class OmsorgsarbeidMeldingService(
     private val behandlingRepo: BehandlingRepo,
     private val gyldigOpptjeningsår: GyldigOpptjeningår,
     private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
-    private val omsorgsopptjeningProducer: OmsorgsopptjeningProducer,
     private val oppgaveService: OppgaveService,
     private val pdlService: PdlService,
+    private val godskrivOpptjeningService: GodskrivOpptjeningService,
 ) {
     @Autowired
     private lateinit var statusoppdatering: Statusoppdatering
@@ -126,7 +126,7 @@ class OmsorgsarbeidMeldingService(
 
     private fun håndterInnvilgelse(behandling: FullførtBehandling) {
         log.info("Håndterer innvilgelse")
-        omsorgsopptjeningProducer.send(behandling)
+        godskrivOpptjeningService.opprett(behandling.godskrivOpptjening())
     }
 
     private fun håndterAvslag(behandling: FullførtBehandling) {

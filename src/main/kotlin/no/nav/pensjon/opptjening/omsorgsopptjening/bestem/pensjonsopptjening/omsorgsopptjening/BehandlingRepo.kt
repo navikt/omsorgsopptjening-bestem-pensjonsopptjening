@@ -43,11 +43,11 @@ class BehandlingRepo(
                 ),
                 keyHolder
             )
-            find(keyHolder.keys!!["id"] as UUID)
+            finn(keyHolder.keys!!["id"] as UUID)
         }
     }
 
-    private fun find(id: UUID): FullførtBehandling {
+    fun finn(id: UUID): FullførtBehandling {
         return jdbcTemplate.query(
             """select * from behandling where id = :id""",
             mapOf<String, Any>(

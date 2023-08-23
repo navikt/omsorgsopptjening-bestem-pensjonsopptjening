@@ -3,36 +3,36 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Application
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.KafkaConfig
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.kafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.apache.kafka.clients.CommonClientConfigs
-import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.clients.producer.RecordMetadata
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.header.internals.RecordHeader
+import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.BeforeEach
-import org.junit.platform.commons.logging.LoggerFactory
 import org.mockito.BDDMockito.any
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
-import org.springframework.kafka.annotation.KafkaListener
+import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.support.Acknowledgment
 import org.springframework.kafka.support.SendResult
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
+import java.io.Serializable
+import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 @DirtiesContext
@@ -43,6 +43,7 @@ sealed class SpringContextTest {
         const val WIREMOCK_PORT = 9991
         const val BESTEM_SAK_PATH = "/pen/api/bestemsak/v1"
         const val OPPGAVE_PATH = "/api/v1/oppgaver"
+        const val POPP_PATH = "/api/omsorg"
     }
 
 
@@ -85,17 +86,34 @@ sealed class SpringContextTest {
 
         @Configuration
         @Profile("kafkaIntegrationTest")
-        class KafkaSecurityConfig {
+        class KafkaCfg {
+
+            @Value("\${kafka.brokers}")
+            private lateinit var kafkaBrokers: String
+
             @Bean
             fun securityConfig(): KafkaConfig.SecurityConfig =
                 KafkaConfig.SecurityConfig(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "PLAINTEXT")
+
+            @Bean
+            fun producer(securityConfig: KafkaConfig.SecurityConfig): KafkaTemplate<String, String> {
+                return KafkaTemplate(DefaultKafkaProducerFactory(producerConfig() + securityConfig))
+            }
+
+            private fun producerConfig(): Map<String, Serializable> = mapOf(
+                ProducerConfig.CLIENT_ID_CONFIG to "omsorgsopptjening-bestem-pensjonsopptjening",
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to kafkaBrokers,
+            )
         }
 
         @Autowired
         lateinit var producer: KafkaTemplate<String, String>
 
         fun sendOmsorgsgrunnlagKafka(
-            omsorgsGrunnlag: OmsorgsgrunnlagMelding
+            omsorgsGrunnlag: OmsorgsgrunnlagMelding,
+            correlationId: String = UUID.randomUUID().toString()
         ) {
             val omsorgsArbeidKey = Topics.Omsorgsopptjening.Key(
                 ident = omsorgsGrunnlag.omsorgsyter,
@@ -114,63 +132,11 @@ sealed class SpringContextTest {
                     ),
                     RecordHeader(
                         CorrelationId.name,
-                        "abc".toByteArray()
+                        correlationId.toByteArray()
                     )
                 )
             )
             producer.send(pr).get()
-        }
-
-        @Configuration
-        @Profile("kafkaIntegrationTest")
-        class OmsorgsopptjeningTopicListener {
-
-            private val records: MutableList<ConsumerRecord<String, String>> = mutableListOf()
-
-            init {
-                LoggerFactory.getLogger(this::class.java).error { "THIS IS MY $this" }
-            }
-
-            @KafkaListener(
-                containerFactory = "listener",
-                topics = [Topics.Omsorgsopptjening.NAME],
-                groupId = "test-omsorgsopptjening-topic-listener"
-            )
-            private fun poll(record: ConsumerRecord<String, String>, ack: Acknowledgment) {
-                records.add(record)
-                ack.acknowledge()
-            }
-
-            fun getFirstRecord(waitForSeconds: Int, type: KafkaMessageType): ConsumerRecord<String, String> {
-                var secondsPassed = 0
-                while (secondsPassed < waitForSeconds && records.none { it.kafkaMessageType() == type }) {
-                    Thread.sleep(1000)
-                    secondsPassed++
-                }
-
-                return records.first { it.kafkaMessageType() == type }.also { records.remove(it) }
-            }
-        }
-    }
-
-    fun OmsorgsgrunnlagMelding.toConsumerRecord(): ConsumerRecord<String, String> {
-        return ConsumerRecord(
-            Topics.Omsorgsopptjening.NAME,
-            1,
-            1,
-            serialize(
-                Topics.Omsorgsopptjening.Key(
-                    ident = omsorgsyter,
-                )
-            ),
-            serialize(this),
-        ).apply {
-            this.headers().add(
-                RecordHeader(
-                    KafkaMessageType.name,
-                    KafkaMessageType.OMSORGSGRUNNLAG.name.toByteArray()
-                )
-            )
         }
     }
 }

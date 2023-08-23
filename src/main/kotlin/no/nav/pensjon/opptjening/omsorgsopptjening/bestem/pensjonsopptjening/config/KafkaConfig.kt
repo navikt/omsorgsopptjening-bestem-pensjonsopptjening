@@ -2,10 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,10 +11,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.kafka.annotation.EnableKafka
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
-import org.springframework.kafka.core.DefaultKafkaProducerFactory
-import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.listener.ContainerProperties
-import java.io.Serializable
 import java.time.Duration
 
 @EnableKafka
@@ -60,17 +55,5 @@ class KafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers:
         ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to false,
         ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
         ConsumerConfig.MAX_POLL_RECORDS_CONFIG to 1,
-    )
-
-    @Bean("producer")
-    fun producer(securityConfig: SecurityConfig): KafkaTemplate<String, String> {
-        return KafkaTemplate(DefaultKafkaProducerFactory(omsorgsopptjeningProducerConfig() + securityConfig))
-    }
-
-    private fun omsorgsopptjeningProducerConfig(): Map<String, Serializable> = mapOf(
-        ProducerConfig.CLIENT_ID_CONFIG to "omsorgsopptjening-bestem-pensjonsopptjening",
-        ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG to StringSerializer::class.java,
-        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG to aivenBootstrapServers,
     )
 }

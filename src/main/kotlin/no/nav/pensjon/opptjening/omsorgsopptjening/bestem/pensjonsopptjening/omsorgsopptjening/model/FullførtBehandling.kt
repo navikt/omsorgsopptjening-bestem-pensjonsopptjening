@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.GodskrivOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
@@ -27,10 +28,19 @@ data class FullførtBehandling(
         return utfall.erInnvilget()
     }
 
+    fun godskrivOpptjening(): GodskrivOpptjening {
+        require(erInnvilget()) { "Kan kun godskrive opptjening for innvilget behandling!" }
+        return GodskrivOpptjening(
+            behandlingId = id,
+            meldingId = kafkaMeldingId
+        )
+    }
+
     fun opprettOppgave(
         oppgaveEksistererForOmsorgsyter: (omsorgsyter: String, år: Int) -> Boolean,
         oppgaveEksistererForOmsorgsmottaker: (omsorgsmottaker: String, år: Int) -> Boolean,
     ): Oppgave? {
+        require(!erInnvilget()) { "Kan kun opprette oppgave for avslått behandling!" }
         return avslagSkyldesFlereOmsorgsytereMedLikeMangeOmsorgsmåneder()?.let { vurdering ->
             VelgOppgaveForPersonOgInnhold(grunnlag = vurdering.grunnlag).let { oppgaveOgInnhold ->
                 val oppgaveGjelderOmsorgsyter = oppgaveOgInnhold.oppgaveForPerson() == omsorgsyter

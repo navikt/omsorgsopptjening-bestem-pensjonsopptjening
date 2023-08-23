@@ -65,7 +65,7 @@ class OppgaveRepo(
             mapOf<String, Any>(
                 "id" to id
             ),
-            OmsorgsarbeidMessageRowMapper()
+            OppgaveMapper()
         ).single()
     }
 
@@ -75,7 +75,7 @@ class OppgaveRepo(
             mapOf<String, Any>(
                 "id" to id
             ),
-            OmsorgsarbeidMessageRowMapper()
+            OppgaveMapper()
         )
     }
 
@@ -85,7 +85,7 @@ class OppgaveRepo(
             mapOf<String, Any>(
                 "id" to id
             ),
-            OmsorgsarbeidMessageRowMapper()
+            OppgaveMapper()
         )
     }
 
@@ -117,11 +117,11 @@ class OppgaveRepo(
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),
-            OmsorgsarbeidMessageRowMapper()
+            OppgaveMapper()
         ).singleOrNull()
     }
 
-    internal class OmsorgsarbeidMessageRowMapper : RowMapper<Oppgave> {
+    internal class OppgaveMapper : RowMapper<Oppgave> {
         override fun mapRow(rs: ResultSet, rowNum: Int): Oppgave {
             return Oppgave(
                 id = UUID.fromString(rs.getString("id")),

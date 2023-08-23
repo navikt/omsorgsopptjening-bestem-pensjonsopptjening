@@ -7,6 +7,7 @@ kafka:
 PDL_URL: http://localhost:9991/graphql
 BESTEMSAK_URL: http://localhost:9991/pen/api/bestemsak/v1
 OPPGAVE_URL: http://localhost:9991/api/v1/oppgaver
+POPP_URL: http://localhost:9991/api/omsorg
 
 spring.datasource:
   driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
