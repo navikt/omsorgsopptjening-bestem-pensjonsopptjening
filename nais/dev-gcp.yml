@@ -21,6 +21,8 @@ spec:
       value: https://pensjon-pen-q2.nais.preprod.local/pen/api/bestemsak/v1
     - name: OPPGAVE_URL
       value: https://oppgave.dev-fss-pub.nais.io/api/v1/oppgaver
+  envFrom:
+    - secret: unleash-next
   kafka:
     pool: nav-dev
   gcp:
@@ -43,6 +45,13 @@ spec:
     outbound:
       external:
         - host: pdl-api.dev-fss-pub.nais.io
+  unleashInstance:
+    apiVersion: unleash.nais.io/v1
+    kind: RemoteUnleash
+    name: pensjonopptjening
+  secretName: unleash-next
+  environment: development
+
   image: {{ image }}
   liveness:
     path: /actuator/health/liveness
