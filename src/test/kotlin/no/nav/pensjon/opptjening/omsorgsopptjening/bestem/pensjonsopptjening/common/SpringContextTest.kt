@@ -48,7 +48,7 @@ sealed class SpringContextTest {
 
 
     @BeforeEach
-    fun beforeEach() {
+    protected open fun beforeEach() {
         PostgresqlTestContainer.instance.removeDataFromDB()
     }
 

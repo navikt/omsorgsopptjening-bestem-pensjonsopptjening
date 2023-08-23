@@ -111,6 +111,11 @@ class OppgaveRepo(
         )!!
     }
 
+    /**
+     * Utformet for å være mekanismen som tilrettelegger for at flere podder kan prosessere data i paralell.
+     * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
+     * annen connection (pod) så lenge transaksjonen lever.
+     */
     fun finnNesteUprosesserte(): Oppgave? {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.correlation_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for update of o skip locked""",

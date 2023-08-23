@@ -85,6 +85,11 @@ class GodskrivOpptjeningRepo(
         )
     }
 
+    /**
+     * Utformet for å være mekanismen som tilrettelegger for at flere podder kan prosessere data i paralell.
+     * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
+     * annen connection (pod) så lenge transaksjonen lever.
+     */
     fun finnNesteUprosesserte(): GodskrivOpptjening? {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for update of o skip locked""",

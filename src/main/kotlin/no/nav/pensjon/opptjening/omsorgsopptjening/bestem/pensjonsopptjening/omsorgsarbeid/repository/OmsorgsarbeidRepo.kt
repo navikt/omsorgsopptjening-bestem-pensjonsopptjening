@@ -68,6 +68,11 @@ class OmsorgsarbeidRepo(
         ).single()
     }
 
+    /**
+     * Utformet for å være mekanismen som tilrettelegger for at flere podder kan prosessere data i paralell.
+     * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
+     * annen connection (pod) så lenge transaksjonen lever.
+     */
     fun finnNesteUprosesserte(): OmsorgsarbeidMelding? {
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where (ms.status->>'type' = 'Klar') or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of m skip locked""",
