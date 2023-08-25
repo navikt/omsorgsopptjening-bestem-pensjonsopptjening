@@ -4,7 +4,6 @@ import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Application
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.KafkaConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
@@ -127,11 +126,7 @@ sealed class SpringContextTest {
                 omsorgsGrunnlag.mapToJson(),
                 listOf(
                     RecordHeader(
-                        KafkaMessageType.name,
-                        KafkaMessageType.OMSORGSGRUNNLAG.name.toByteArray()
-                    ),
-                    RecordHeader(
-                        CorrelationId.name,
+                        CorrelationId.identifier,
                         correlationId.toByteArray()
                     )
                 )

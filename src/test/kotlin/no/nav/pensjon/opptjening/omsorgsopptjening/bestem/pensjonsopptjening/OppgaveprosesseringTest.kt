@@ -13,11 +13,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveService
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -33,7 +34,6 @@ import java.time.Instant
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 import kotlin.test.assertContains
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -136,11 +136,9 @@ class OppgaveprosesseringTest : SpringContextTest.NoKafka() {
 
         val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
+                innhold = OmsorgsgrunnlagMelding(
                         omsorgsyter = "12345678910",
                         omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
                         kilde = Kilde.BARNETRYGD,
                         saker = listOf(
                             OmsorgsgrunnlagMelding.Sak(
@@ -166,12 +164,12 @@ class OppgaveprosesseringTest : SpringContextTest.NoKafka() {
                                 )
                             ),
                         ),
-                        rådata = RådataFraKilde("")
+                        rådata = RådataFraKilde(""),
+                        innlesingId = InnlesingId.generate(),
+                        correlationId = CorrelationId.generate(),
                     )
                 ),
-                correlationId = UUID.randomUUID().toString(),
             )
-        )
 
         handler.process()
 
@@ -271,11 +269,9 @@ class OppgaveprosesseringTest : SpringContextTest.NoKafka() {
 
         val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
+                innhold = OmsorgsgrunnlagMelding(
                         omsorgsyter = "12345678910",
                         omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
                         kilde = Kilde.BARNETRYGD,
                         saker = listOf(
                             OmsorgsgrunnlagMelding.Sak(
@@ -301,12 +297,12 @@ class OppgaveprosesseringTest : SpringContextTest.NoKafka() {
                                 )
                             ),
                         ),
-                        rådata = RådataFraKilde("")
+                        rådata = RådataFraKilde(""),
+                        innlesingId = InnlesingId.generate(),
+                        correlationId = CorrelationId.generate(),
                     )
                 ),
-                correlationId = UUID.randomUUID().toString(),
             )
-        )
 
         handler.process()
 
@@ -368,11 +364,9 @@ class OppgaveprosesseringTest : SpringContextTest.NoKafka() {
 
         val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
+                innhold = OmsorgsgrunnlagMelding(
                         omsorgsyter = "12345678910",
                         omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
                         kilde = Kilde.BARNETRYGD,
                         saker = listOf(
                             OmsorgsgrunnlagMelding.Sak(
@@ -398,12 +392,12 @@ class OppgaveprosesseringTest : SpringContextTest.NoKafka() {
                                 )
                             ),
                         ),
-                        rådata = RådataFraKilde("")
+                        rådata = RådataFraKilde(""),
+                        innlesingId = InnlesingId.generate(),
+                        correlationId = CorrelationId.generate(),
                     )
                 ),
-                correlationId = UUID.randomUUID().toString(),
             )
-        )
 
         handler.process()
 

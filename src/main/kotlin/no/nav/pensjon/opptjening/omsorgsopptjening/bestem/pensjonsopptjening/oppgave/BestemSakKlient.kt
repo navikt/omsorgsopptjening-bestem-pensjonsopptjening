@@ -10,9 +10,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 
@@ -33,13 +31,10 @@ class BestemSakKlient(
     fun bestemSak(aktørId: String): Omsorgssak {
         return try {
             logger.info("Kaller bestemSak i PESYS")
-            val headers = HttpHeaders()
-            headers.contentType = MediaType.APPLICATION_JSON
-
             val response = restTemplate.exchange(
                 bestemSakUrl,
                 HttpMethod.POST,
-                HttpEntity(serialize(BestemSakRequest(aktørId)), headers),
+                HttpEntity(serialize(BestemSakRequest(aktørId))),
                 String::class.java
             )
             antallSakerHentet.increment()
@@ -61,7 +56,7 @@ class BestemSakKlient(
         val aktoerId: String,
     ) {
         val ytelseType: SakType = SakType.OMSORG
-        val callId: String = Mdc.getOrCreateCorrelationId()
+        val callId: String = Mdc.getCorrelationId()
         val consumerId: String = "omsorgsopptjening-bestem-pensjonsopptjening"
     }
 

@@ -10,7 +10,7 @@ import java.util.UUID
 data class Behandling(
     private val grunnlag: BarnetrygdGrunnlag,
     private val vurderVilkår: VurderVilkår,
-    private val kafkaMeldingId: UUID
+    private val meldingId: UUID
 ) {
     fun omsorgsår() = grunnlag.omsorgsAr
     fun omsorgsmottaker() = grunnlag.omsorgsmottaker
@@ -18,7 +18,7 @@ data class Behandling(
     fun omsorgstype() = grunnlag.omsorgstype
     fun grunnlag() = grunnlag
 
-    fun kafkaMeldingId() = kafkaMeldingId
+    fun meldingId() = meldingId
 
     fun utfall(): BehandlingUtfall {
         return vilkårsvurdering().let { vilkårsvurdering ->

@@ -1,10 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.RequestEntity
 import org.springframework.retry.annotation.Backoff
@@ -31,9 +28,6 @@ class PdlClient(
     fun hentPerson(graphqlQuery: String, fnr: String): PdlResponse? {
         val entity = RequestEntity<PdlQuery>(
             PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
-            HttpHeaders().apply {
-                this.add(CorrelationId.name, Mdc.getOrCreateCorrelationId())
-            },
             HttpMethod.POST,
             URI.create(pdlUrl)
         )
@@ -53,9 +47,6 @@ class PdlClient(
     internal fun hentAktorId(graphqlQuery: String, fnr: String): IdenterResponse? {
         val entity = RequestEntity<PdlQuery>(
             PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
-            HttpHeaders().apply {
-                this.add(CorrelationId.name, Mdc.getOrCreateCorrelationId())
-            },
             HttpMethod.POST,
             URI.create(pdlUrl)
         )

@@ -3,9 +3,9 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.KafkaMessageType
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -31,27 +31,16 @@ class OmsorgsarbeidListener(
         consumerRecord: ConsumerRecord<String, String>,
         acknowledgment: Acknowledgment
     ) {
-        when (consumerRecord.kafkaMessageType()) {
-            KafkaMessageType.OMSORGSGRUNNLAG -> {
-                Mdc.scopedMdc(CorrelationId.name, consumerRecord.getOrCreateCorrelationId()) {
+        deserialize<OmsorgsgrunnlagMelding>(consumerRecord.value()).also {
+            Mdc.scopedMdc(it.correlationId) { correlationId ->
+                Mdc.scopedMdc(it.innlesingId) { innlesingId ->
                     log.info("Prosesserer melding")
                     omsorgsarbeidRepo.persist(
-                        OmsorgsarbeidMelding(
-                            melding = consumerRecord.value(),
-                            correlationId = Mdc.getOrCreateCorrelationId(),
-                        )
+                        OmsorgsarbeidMelding(innhold = it)
                     )
                 }
             }
-
-            else -> {
-                //NOOP
-            }
         }
         acknowledgment.acknowledge()
-    }
-
-    private fun ConsumerRecord<*, *>.getOrCreateCorrelationId(): String {
-        return headers().lastHeader(CorrelationId.name)?.let { String(it.value()) } ?: CorrelationId.generate()
     }
 }

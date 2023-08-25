@@ -2,6 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -87,8 +89,9 @@ data class Oppgave(
     val detaljer: OppgaveDetaljer,
     val behandlingId: UUID?,
     val meldingId: UUID,
-    val correlationId: UUID? = null,
+    val correlationId: CorrelationId,
     val statushistorikk: List<Status> = listOf(Status.Klar()),
+    val innlesingId: InnlesingId
 ) {
     val status = statushistorikk.last()
     val mottaker = detaljer.mottaker()

@@ -5,7 +5,8 @@ create table melding
     id uuid primary key default uuid_generate_v4(),
     opprettet timestamptz default now() not null,
     melding json not null,
-    correlation_id varchar not null
+    correlation_id varchar not null,
+    innlesing_id varchar not null
 );
 
 create table melding_status

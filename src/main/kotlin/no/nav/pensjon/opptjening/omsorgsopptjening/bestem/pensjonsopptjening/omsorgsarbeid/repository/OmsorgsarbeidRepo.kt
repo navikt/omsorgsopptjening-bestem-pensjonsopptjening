@@ -1,9 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.deserializeList
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.serialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -23,11 +24,12 @@ class OmsorgsarbeidRepo(
     fun persist(melding: OmsorgsarbeidMelding): OmsorgsarbeidMelding {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into melding (melding, correlation_id) values (to_json(:melding::json), :correlation_id)""",
+            """insert into melding (melding, correlation_id, innlesing_id) values (to_json(:melding::json), :correlation_id, :innlesing_id)""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
-                    "melding" to melding.melding,
-                    "correlation_id" to melding.correlationId,
+                    "melding" to serialize(melding.innhold),
+                    "correlation_id" to melding.correlationId.toString(),
+                    "innlesing_id" to melding.innlesingId.toString(),
                 ),
             ),
             keyHolder
@@ -38,7 +40,7 @@ class OmsorgsarbeidRepo(
                 mapOf<String, Any>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(melding.status),
-                    "statushistorikk" to melding.statushistorikk.serialize()
+                    "statushistorikk" to melding.statushistorikk.serializeList()
                 ),
             ),
         )
@@ -52,7 +54,7 @@ class OmsorgsarbeidRepo(
                 mapOf<String, Any>(
                     "id" to melding.id!!,
                     "status" to serialize(melding.status),
-                    "statushistorikk" to melding.statushistorikk.serialize()
+                    "statushistorikk" to melding.statushistorikk.serializeList()
                 ),
             ),
         )
@@ -88,8 +90,7 @@ class OmsorgsarbeidRepo(
             return OmsorgsarbeidMelding(
                 id = UUID.fromString(rs.getString("id")),
                 opprettet = rs.getTimestamp("opprettet").toInstant(),
-                melding = rs.getString("melding"),
-                correlationId = rs.getString("correlation_id"),
+                innhold = deserialize(rs.getString("melding")),
                 statushistorikk = rs.getString("statushistorikk").deserializeList(),
             )
         }

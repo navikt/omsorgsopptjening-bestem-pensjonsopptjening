@@ -24,11 +24,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveService
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -38,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
 import java.time.YearMonth
-import java.util.UUID
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -73,45 +73,41 @@ class AvslagBarnFødtOpptjeningsårDesemberFlereOmsorgsytereMedLikeMangeMåneder
             listOf(2020)
         }.given(gyldigOpptjeningår).get()
 
-        val correlationId = UUID.randomUUID().toString()
-
-        repo.persist(
+        val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JANUARY),
-                                        tom = YearMonth.of(2021, Month.JUNE),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    )
+                innhold = OmsorgsgrunnlagMelding(
+                    omsorgsyter = "12345678910",
+                    omsorgstype = Omsorgstype.BARNETRYGD,
+                    kilde = Kilde.BARNETRYGD,
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JANUARY),
+                                    tom = YearMonth.of(2021, Month.JUNE),
+                                    prosent = 100,
+                                    omsorgsmottaker = "01122012345"
                                 )
-                            ),
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "04010012797",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JULY),
-                                        tom = YearMonth.of(2021, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    ),
-                                )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde("")
-                    )
-                ),
-                correlationId = correlationId,
-            )
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "04010012797",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JULY),
+                                    tom = YearMonth.of(2021, Month.DECEMBER),
+                                    prosent = 100,
+                                    omsorgsmottaker = "01122012345"
+                                ),
+                            )
+                        ),
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
         )
 
         val behandling = handler.process().let { result ->
@@ -145,7 +141,7 @@ class AvslagBarnFødtOpptjeningsårDesemberFlereOmsorgsytereMedLikeMangeMåneder
             }
         }
 
-        oppgaveRepo.findForMelding(behandling.kafkaMeldingId).single().also { oppgave ->
+        oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
             assertInstanceOf(
                 OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår::class.java,
                 oppgave.detaljer
@@ -159,8 +155,9 @@ class AvslagBarnFødtOpptjeningsårDesemberFlereOmsorgsytereMedLikeMangeMåneder
                 )
             }
             assertEquals(behandling.id, oppgave.behandlingId)
-            assertEquals(behandling.kafkaMeldingId, oppgave.meldingId)
-            assertEquals(correlationId, oppgave.correlationId.toString())
+            assertEquals(melding.id, oppgave.meldingId)
+            assertEquals(melding.correlationId, oppgave.correlationId)
+            assertEquals(melding.innlesingId, oppgave.innlesingId)
             assertInstanceOf(Oppgave.Status.Klar::class.java, oppgave.status)
         }
     }

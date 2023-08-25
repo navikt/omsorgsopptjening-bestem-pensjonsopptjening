@@ -13,10 +13,11 @@ import java.util.UUID
 data class OmsorgsarbeidMelding(
     val id: UUID? = null,
     val opprettet: Instant? = null,
-    val melding: String,
-    val correlationId: String,
+    val innhold: OmsorgsgrunnlagMelding,
     val statushistorikk: List<Status> = listOf(Status.Klar())
 ) {
+    val correlationId = innhold.correlationId
+    val innlesingId = innhold.innlesingId
     val status: Status get() = statushistorikk.last()
     fun ferdig(): OmsorgsarbeidMelding {
         return copy(statushistorikk = statushistorikk + status.ferdig())
@@ -30,10 +31,12 @@ data class OmsorgsarbeidMelding(
         return if (status is Status.Feilet) {
             Oppgave(
                 detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
-                    omsorgsyter = deserialize<OmsorgsgrunnlagMelding>(melding).omsorgsyter,
+                    omsorgsyter = innhold.omsorgsyter,
                 ),
                 behandlingId = null,
-                meldingId = id!!
+                meldingId = id!!,
+                correlationId = correlationId,
+                innlesingId = innlesingId
             )
         } else {
             null

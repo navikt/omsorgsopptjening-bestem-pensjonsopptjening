@@ -18,7 +18,7 @@ data class FullførtBehandling(
     val grunnlag: BarnetrygdGrunnlag,
     val utfall: BehandlingUtfall,
     val vilkårsvurdering: VilkarsVurdering<*>,
-    val kafkaMeldingId: UUID,
+    val meldingId: UUID,
 ) {
     fun kilde(): DomainKilde {
         return grunnlag.kilde
@@ -32,7 +32,9 @@ data class FullførtBehandling(
         require(erInnvilget()) { "Kan kun godskrive opptjening for innvilget behandling!" }
         return GodskrivOpptjening(
             behandlingId = id,
-            meldingId = kafkaMeldingId
+            meldingId = meldingId,
+            correlationId = grunnlag.correlationId,
+            innlesingId = grunnlag.innlesingId
         )
     }
 
@@ -76,7 +78,9 @@ data class FullførtBehandling(
             Oppgave(
                 detaljer = it,
                 behandlingId = id,
-                meldingId = kafkaMeldingId
+                meldingId = meldingId,
+                correlationId = grunnlag.correlationId,
+                innlesingId = grunnlag.innlesingId,
             )
         }
     }

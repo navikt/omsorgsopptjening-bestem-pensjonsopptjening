@@ -2,6 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import java.time.YearMonth
 
@@ -16,9 +18,10 @@ import java.time.YearMonth
 data class BeriketDatagrunnlag(
     val omsorgsyter: Person,
     val omsorgstype: DomainOmsorgstype,
-    val kjoreHash: String,
     val kilde: DomainKilde,
-    val omsorgsSaker: List<BeriketSak>
+    val omsorgsSaker: List<BeriketSak>,
+    val innlesingId: InnlesingId,
+    val correlationId: CorrelationId
 ) {
     val omsorgsytersSak = omsorgsSaker.single { it.omsorgsyter == omsorgsyter }
     val omsorgsytersOmsorgsmottakere = omsorgsytersSak.omsorgsmottakere()

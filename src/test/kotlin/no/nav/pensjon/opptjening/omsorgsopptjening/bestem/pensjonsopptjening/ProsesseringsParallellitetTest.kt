@@ -9,11 +9,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -26,7 +27,6 @@ import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.Month
 import java.time.YearMonth
-import java.util.UUID
 import kotlin.test.assertNull
 
 class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
@@ -68,11 +68,9 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
         fun `finnNesteUprosesserte låser raden slik at den ikke plukkes opp av andre connections`() {
             omsorgsarbeidRepo.persist(
                 OmsorgsarbeidMelding(
-                    melding = serialize(
-                        OmsorgsgrunnlagMelding(
+                    innhold = OmsorgsgrunnlagMelding(
                             omsorgsyter = "12345678910",
                             omsorgstype = Omsorgstype.BARNETRYGD,
-                            kjoreHash = "xxx",
                             kilde = Kilde.BARNETRYGD,
                             saker = listOf(
                                 OmsorgsgrunnlagMelding.Sak(
@@ -87,12 +85,12 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                     )
                                 ),
                             ),
-                            rådata = RådataFraKilde("")
+                            rådata = RådataFraKilde(""),
+                            innlesingId = InnlesingId.generate(),
+                            correlationId = CorrelationId.generate(),
                         )
                     ),
-                    correlationId = UUID.randomUUID().toString(),
                 )
-            )
             omsorgsarbeidMeldingService.process()
 
             //krev ny transaksjon slik at det opprettes ny connection
@@ -126,11 +124,9 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
         fun `finnNesteUprosesserte låser raden slik at den ikke plukkes opp av andre connections`() {
             omsorgsarbeidRepo.persist(
                 OmsorgsarbeidMelding(
-                    melding = serialize(
-                        OmsorgsgrunnlagMelding(
+                    innhold = OmsorgsgrunnlagMelding(
                             omsorgsyter = "12345678910",
                             omsorgstype = Omsorgstype.BARNETRYGD,
-                            kjoreHash = "xxx",
                             kilde = Kilde.BARNETRYGD,
                             saker = listOf(
                                 OmsorgsgrunnlagMelding.Sak(
@@ -145,12 +141,12 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                     )
                                 ),
                             ),
-                            rådata = RådataFraKilde("")
+                            rådata = RådataFraKilde(""),
+                            innlesingId = InnlesingId.generate(),
+                            correlationId = CorrelationId.generate(),
                         )
                     ),
-                    correlationId = UUID.randomUUID().toString(),
                 )
-            )
 
             //krev ny transaksjon slik at det opprettes ny connection
             transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW)
@@ -182,11 +178,9 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
         fun `finnNesteUprosesserte låser raden slik at den ikke plukkes opp av andre connections`() {
             omsorgsarbeidRepo.persist(
                 OmsorgsarbeidMelding(
-                    melding = serialize(
-                        OmsorgsgrunnlagMelding(
+                    innhold = OmsorgsgrunnlagMelding(
                             omsorgsyter = "12345678910",
                             omsorgstype = Omsorgstype.BARNETRYGD,
-                            kjoreHash = "xxx",
                             kilde = Kilde.BARNETRYGD,
                             saker = listOf(
                                 OmsorgsgrunnlagMelding.Sak(
@@ -212,12 +206,12 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                     )
                                 ),
                             ),
-                            rådata = RådataFraKilde("")
+                            rådata = RådataFraKilde(""),
+                            innlesingId = InnlesingId.generate(),
+                            correlationId = CorrelationId.generate(),
                         )
                     ),
-                    correlationId = UUID.randomUUID().toString(),
                 )
-            )
             omsorgsarbeidMeldingService.process()
 
             //krev ny transaksjon slik at det opprettes ny connection

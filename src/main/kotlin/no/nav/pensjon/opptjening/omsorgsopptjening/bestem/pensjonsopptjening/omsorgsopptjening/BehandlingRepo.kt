@@ -38,7 +38,7 @@ class BehandlingRepo(
                         "grunnlag" to obj.grunnlag.mapToJson(),
                         "vilkarsvurdering" to obj.vilkårsvurdering.mapToJson(),
                         "utfall" to obj.utfall.mapToJson(),
-                        "kafkaMeldingId" to obj.kafkaMeldingId
+                        "kafkaMeldingId" to obj.meldingId
                     ),
                 ),
                 keyHolder
@@ -103,7 +103,7 @@ internal class BehandlingRowMapper : RowMapper<BehandlingDb> {
             grunnlag = rs.getString("grunnlag").mapToClass(BarnetrygdGrunnlagDb::class.java),
             vilkårsvurdering = rs.getString("vilkarsvurdering").mapToClass(VilkårsvurderingDb::class.java),
             utfall = rs.getString("utfall").mapToClass(BehandlingsutfallDb::class.java),
-            kafkaMeldingId = UUID.fromString(rs.getString("kafkaMeldingId"))
+            meldingId = UUID.fromString(rs.getString("kafkaMeldingId"))
         )
     }
 }

@@ -18,11 +18,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlException
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -37,7 +38,6 @@ import java.time.Instant
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 
 
 class MeldingsprosesseringTest : SpringContextTest.NoKafka() {
@@ -116,30 +116,28 @@ class MeldingsprosesseringTest : SpringContextTest.NoKafka() {
 
         val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2018, Month.SEPTEMBER),
-                                        tom = YearMonth.of(2025, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "07081812345"
-                                    )
+                innhold = OmsorgsgrunnlagMelding(
+                    omsorgsyter = "12345678910",
+                    omsorgstype = Omsorgstype.BARNETRYGD,
+                    kilde = Kilde.BARNETRYGD,
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2018, Month.SEPTEMBER),
+                                    tom = YearMonth.of(2025, Month.DECEMBER),
+                                    prosent = 100,
+                                    omsorgsmottaker = "07081812345"
                                 )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde("")
-                    )
-                ),
-                correlationId = UUID.randomUUID().toString(),
-            )
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
         )
 
         assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
@@ -218,30 +216,28 @@ class MeldingsprosesseringTest : SpringContextTest.NoKafka() {
 
         val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2018, Month.SEPTEMBER),
-                                        tom = YearMonth.of(2025, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "07081812345"
-                                    )
+                innhold = OmsorgsgrunnlagMelding(
+                    omsorgsyter = "12345678910",
+                    omsorgstype = Omsorgstype.BARNETRYGD,
+                    kilde = Kilde.BARNETRYGD,
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2018, Month.SEPTEMBER),
+                                    tom = YearMonth.of(2025, Month.DECEMBER),
+                                    prosent = 100,
+                                    omsorgsmottaker = "07081812345"
                                 )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde("")
-                    )
-                ),
-                correlationId = UUID.randomUUID().toString(),
-            )
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
         )
 
         assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
@@ -302,33 +298,30 @@ class MeldingsprosesseringTest : SpringContextTest.NoKafka() {
             listOf(2020)
         }.given(gyldigOpptjeningår).get()
 
-        val correlationId = UUID.randomUUID().toString()
         val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2018, Month.SEPTEMBER),
-                                        tom = YearMonth.of(2025, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "07081812345"
-                                    )
+                innhold = OmsorgsgrunnlagMelding(
+                    omsorgsyter = "12345678910",
+                    omsorgstype = Omsorgstype.BARNETRYGD,
+                    kilde = Kilde.BARNETRYGD,
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2018, Month.SEPTEMBER),
+                                    tom = YearMonth.of(2025, Month.DECEMBER),
+                                    prosent = 100,
+                                    omsorgsmottaker = "07081812345"
                                 )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde("")
-                    )
-                ),
-                correlationId = correlationId,
-            )
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
         )
 
         assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
@@ -380,7 +373,8 @@ class MeldingsprosesseringTest : SpringContextTest.NoKafka() {
             }
             assertEquals(null, oppgave.behandlingId)
             assertEquals(melding.id, oppgave.meldingId)
-            assertEquals(correlationId, oppgave.correlationId.toString())
+            assertEquals(melding.correlationId, oppgave.correlationId)
+            assertEquals(melding.innlesingId, oppgave.innlesingId)
             assertInstanceOf(Oppgave.Status.Klar::class.java, oppgave.status)
         }
     }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveDetaljer
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -13,9 +15,10 @@ data class GodskrivOpptjening(
     val opprettet: Instant? = null,
     val behandlingId: UUID,
     val meldingId: UUID,
-    val correlationId: UUID? = null,
+    val correlationId: CorrelationId,
     val statushistorikk: List<Status> = listOf(Status.Klar()),
-    val omsorgsyter: String? = null
+    val omsorgsyter: String? = null,
+    val innlesingId: InnlesingId
 ) {
     val status = statushistorikk.last()
 
@@ -35,6 +38,8 @@ data class GodskrivOpptjening(
                 ),
                 behandlingId = behandlingId,
                 meldingId = meldingId,
+                correlationId = correlationId,
+                innlesingId = innlesingId,
             )
         } else {
             null

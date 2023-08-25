@@ -14,11 +14,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -28,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
 import java.time.YearMonth
-import java.util.UUID
 import kotlin.test.assertTrue
 
 class InnvilgetForDetEldsteBarnetTest : SpringContextTest.NoKafka() {
@@ -50,6 +50,7 @@ class InnvilgetForDetEldsteBarnetTest : SpringContextTest.NoKafka() {
         @RegisterExtension
         val wiremock = wiremockWithPdlTransformer()
     }
+
     @Test
     fun test() {
         wiremock.stubForPdlTransformer()
@@ -59,42 +60,40 @@ class InnvilgetForDetEldsteBarnetTest : SpringContextTest.NoKafka() {
 
         val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01052012345"
-                                    ),
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "07081812345"
-                                    ),
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JANUARY),
-                                        tom = YearMonth.of(2021, Month.JANUARY),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    )
+                innhold = OmsorgsgrunnlagMelding(
+                    omsorgsyter = "12345678910",
+                    omsorgstype = Omsorgstype.BARNETRYGD,
+                    kilde = Kilde.BARNETRYGD,
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    prosent = 100,
+                                    omsorgsmottaker = "01052012345"
+                                ),
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    prosent = 100,
+                                    omsorgsmottaker = "07081812345"
+                                ),
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JANUARY),
+                                    tom = YearMonth.of(2021, Month.JANUARY),
+                                    prosent = 100,
+                                    omsorgsmottaker = "01122012345"
                                 )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde("")
-                    )
-                ),
-                correlationId = UUID.randomUUID().toString(),
-            )
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
         )
 
 

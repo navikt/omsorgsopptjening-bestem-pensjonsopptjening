@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketSak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.YearMonth
 
 @JsonTypeInfo(
@@ -16,18 +18,20 @@ import java.time.YearMonth
 internal data class BeriketDatagrunnlagDb(
     val omsorgsyter: PersonDb,
     val omsorgstype: OmsorgstypeDb,
-    val kjoreHash: String,
     val kilde: KildeDb,
-    val omsorgsSaker: List<BeriketOmsorgSakDb>
+    val omsorgsSaker: List<BeriketOmsorgSakDb>,
+    val innlesingId: InnlesingId,
+    val correlationId: CorrelationId,
 )
 
 internal fun BeriketDatagrunnlag.toDb(): BeriketDatagrunnlagDb {
     return BeriketDatagrunnlagDb(
         omsorgsyter = omsorgsyter.toDb(),
         omsorgstype = omsorgstype.toDb(),
-        kjoreHash = kjoreHash,
         kilde = kilde.toDb(),
-        omsorgsSaker = omsorgsSaker.map { it.toDb() }
+        omsorgsSaker = omsorgsSaker.map { it.toDb() },
+        innlesingId = innlesingId,
+        correlationId = correlationId,
     )
 }
 
@@ -35,9 +39,10 @@ internal fun BeriketDatagrunnlagDb.toDomain(): BeriketDatagrunnlag {
     return BeriketDatagrunnlag(
         omsorgsyter = omsorgsyter.toDomain(),
         omsorgstype = omsorgstype.toDomain(),
-        kjoreHash = kjoreHash,
         kilde = kilde.toDomain(),
-        omsorgsSaker = omsorgsSaker.map { it.toDomain() }
+        omsorgsSaker = omsorgsSaker.map { it.toDomain() },
+        innlesingId = innlesingId,
+        correlationId = correlationId,
     )
 }
 

@@ -1,9 +1,11 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.deserializeList
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.serialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -39,7 +41,7 @@ class OppgaveRepo(
                 mapOf<String, Any>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(oppgave.status),
-                    "statushistorikk" to oppgave.statushistorikk.serialize()
+                    "statushistorikk" to oppgave.statushistorikk.serializeList()
                 ),
             ),
         )
@@ -53,7 +55,7 @@ class OppgaveRepo(
                 mapOf<String, Any>(
                     "id" to oppgave.id!!,
                     "status" to serialize(oppgave.status),
-                    "statushistorikk" to oppgave.statushistorikk.serialize()
+                    "statushistorikk" to oppgave.statushistorikk.serializeList()
                 ),
             ),
         )
@@ -61,7 +63,7 @@ class OppgaveRepo(
 
     fun find(id: UUID): Oppgave {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId where o.id = :id""",
+            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId where o.id = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -71,7 +73,7 @@ class OppgaveRepo(
 
     fun findForMelding(id: UUID): List<Oppgave> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId where o.meldingId = :id""",
+            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId where o.meldingId = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -81,7 +83,7 @@ class OppgaveRepo(
 
     fun findForBehandling(id: UUID): List<Oppgave> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId join behandling b on b.id = o.behandlingId where b.id = :id""",
+            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId join behandling b on b.id = o.behandlingId where b.id = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -118,7 +120,7 @@ class OppgaveRepo(
      */
     fun finnNesteUprosesserte(): Oppgave? {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for update of o skip locked""",
+            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for update of o skip locked""",
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),
@@ -134,8 +136,9 @@ class OppgaveRepo(
                 detaljer = deserialize(rs.getString("detaljer")),
                 behandlingId = rs.getString("behandlingId")?.let { UUID.fromString(it) },
                 meldingId = UUID.fromString(rs.getString("meldingId")),
-                correlationId = UUID.fromString(rs.getString("correlation_id")),
+                correlationId = CorrelationId.fromString(rs.getString("correlation_id")),
                 statushistorikk = rs.getString("statushistorikk").deserializeList(),
+                innlesingId = InnlesingId.fromString(rs.getString("innlesing_id"))
             )
         }
     }

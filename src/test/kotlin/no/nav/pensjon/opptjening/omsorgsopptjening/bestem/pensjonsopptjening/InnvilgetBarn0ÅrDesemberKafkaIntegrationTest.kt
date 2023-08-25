@@ -9,6 +9,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.BehandlingRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -55,7 +57,6 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
             omsorgsGrunnlag = OmsorgsgrunnlagMelding(
                 omsorgsyter = "12345678910",
                 omsorgstype = Omsorgstype.BARNETRYGD,
-                kjoreHash = "xxx",
                 kilde = Kilde.BARNETRYGD,
                 saker = listOf(
                     OmsorgsgrunnlagMelding.Sak(
@@ -70,7 +71,9 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
                         )
                     )
                 ),
-                rådata = RådataFraKilde("")
+                rådata = RådataFraKilde(""),
+                innlesingId = InnlesingId.generate(),
+                correlationId = CorrelationId.generate(),
             )
         )
 

@@ -5,6 +5,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import java.time.Month
 import java.time.YearMonth
@@ -23,8 +25,10 @@ sealed class BarnetrygdGrunnlag {
         get() = grunnlag.omsorgsyter
     val omsorgstype: DomainOmsorgstype
         get() = grunnlag.omsorgstype
-    val kjoreHash: String
-        get() = grunnlag.kjoreHash
+    val innlesingId: InnlesingId
+        get() = grunnlag.innlesingId
+    val correlationId: CorrelationId
+        get() = grunnlag.correlationId
     val kilde: DomainKilde
         get() = grunnlag.kilde
     val omsorgsSaker: List<BeriketSak>

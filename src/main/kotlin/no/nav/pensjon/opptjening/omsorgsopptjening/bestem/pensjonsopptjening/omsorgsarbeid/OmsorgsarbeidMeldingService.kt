@@ -16,8 +16,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -72,35 +70,37 @@ class OmsorgsarbeidMeldingService(
     @Transactional(rollbackFor = [Throwable::class])
     fun process(): List<FullførtBehandling> {
         return omsorgsarbeidRepo.finnNesteUprosesserte()?.let { melding ->
-            Mdc.scopedMdc(CorrelationId.name, melding.correlationId) {
-                try {
-                    log.info("Prosesserer melding")
-                    handle(melding).also { resultat ->
-                        omsorgsarbeidRepo.updateStatus(melding.ferdig())
-                        resultat.forEach {
-                            when (it.erInnvilget()) {
-                                true -> {
-                                    håndterInnvilgelse(it)
-                                }
+            Mdc.scopedMdc(melding.correlationId) {
+                Mdc.scopedMdc(melding.innlesingId) {
+                    try {
+                        log.info("Prosesserer melding")
+                        handle(melding).also { resultat ->
+                            omsorgsarbeidRepo.updateStatus(melding.ferdig())
+                            resultat.forEach {
+                                when (it.erInnvilget()) {
+                                    true -> {
+                                        håndterInnvilgelse(it)
+                                    }
 
-                                false -> {
-                                    håndterAvslag(it)
+                                    false -> {
+                                        håndterAvslag(it)
+                                    }
                                 }
+                                log.info("Melding prosessert")
                             }
-                            log.info("Melding prosessert")
                         }
+                    } catch (exception: Throwable) {
+                        log.warn("Exception caught while processing message: ${melding.id}, exeption:$exception")
+                        statusoppdatering.markerForRetry(melding, exception)
+                        throw exception
                     }
-                } catch (exception: Throwable) {
-                    log.warn("Exception caught while processing message: ${melding.id}, exeption:$exception")
-                    statusoppdatering.markerForRetry(melding, exception)
-                    throw exception
                 }
             }
         } ?: emptyList()
     }
 
     private fun handle(melding: OmsorgsarbeidMelding): List<FullførtBehandling> {
-        return deserialize<OmsorgsgrunnlagMelding>(melding.melding)
+        return melding.innhold
             .berikDatagrunnlag()
             .transformerTilBarnetrygdGrunnlag()
             .filter { barnetrygdGrunnlag ->
@@ -117,7 +117,7 @@ class OmsorgsarbeidMeldingService(
                             grunnlag = it,
                             behandlingRepo = behandlingRepo
                         ),
-                        kafkaMeldingId = melding.id!!
+                        meldingId = melding.id!!
                     )
                 )
             }
@@ -155,7 +155,6 @@ class OmsorgsarbeidMeldingService(
         return BeriketDatagrunnlag(
             omsorgsyter = persondata.finnPerson(omsorgsyter),
             omsorgstype = omsorgstype.toDomain(),
-            kjoreHash = kjoreHash,
             kilde = kilde.toDomain(),
             omsorgsSaker = saker.map { omsorgsSak ->
                 BeriketSak(
@@ -170,7 +169,9 @@ class OmsorgsarbeidMeldingService(
                     }
 
                 )
-            }
+            },
+            innlesingId = innlesingId,
+            correlationId = correlationId
         )
     }
 }

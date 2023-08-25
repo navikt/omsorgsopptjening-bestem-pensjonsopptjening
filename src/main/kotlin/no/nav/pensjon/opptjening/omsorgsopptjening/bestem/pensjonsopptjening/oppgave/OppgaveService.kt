@@ -3,9 +3,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl.PdlService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -59,14 +56,16 @@ class OppgaveService(
     @Transactional(rollbackFor = [Throwable::class])
     fun opprett(melding: OmsorgsarbeidMelding): Oppgave {
         log.info("Lagrer oppgavebestilling")
-        return deserialize<OmsorgsgrunnlagMelding>(melding.melding).let {
+        return melding.innhold.let {
             oppgaveRepo.persist(
                 Oppgave(
                     detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
                         omsorgsyter = it.omsorgsyter,
                     ),
                     behandlingId = null,
-                    meldingId = melding.id!!
+                    meldingId = melding.id!!,
+                    correlationId = melding.correlationId,
+                    innlesingId = melding.innlesingId,
                 )
             )
         }
@@ -84,30 +83,32 @@ class OppgaveService(
     @Transactional(rollbackFor = [Throwable::class])
     fun process(): Oppgave? {
         return oppgaveRepo.finnNesteUprosesserte()?.let { oppgave ->
-            Mdc.scopedMdc(CorrelationId.name, oppgave.correlationId.toString()) {
-                log.info("Oppretter oppgave")
-                try {
-                    pdlService.hentAktorId(oppgave.mottaker).let { aktørId ->
-                        sakKlient.bestemSak(
-                            aktørId = aktørId
-                        ).let { omsorgssak ->
-                            oppgaveKlient.opprettOppgave(
-                                aktoerId = aktørId,
-                                sakId = omsorgssak.sakId,
-                                beskrivelse = oppgave.oppgavetekst,
-                                tildeltEnhetsnr = omsorgssak.enhet
-                            ).let { oppgaveId ->
-                                oppgave.ferdig(oppgaveId).also {
-                                    oppgaveRepo.updateStatus(it)
-                                    log.info("Oppgave opprettet")
+            Mdc.scopedMdc(oppgave.correlationId) {
+                Mdc.scopedMdc(oppgave.innlesingId) {
+                    log.info("Oppretter oppgave")
+                    try {
+                        pdlService.hentAktorId(oppgave.mottaker).let { aktørId ->
+                            sakKlient.bestemSak(
+                                aktørId = aktørId
+                            ).let { omsorgssak ->
+                                oppgaveKlient.opprettOppgave(
+                                    aktoerId = aktørId,
+                                    sakId = omsorgssak.sakId,
+                                    beskrivelse = oppgave.oppgavetekst,
+                                    tildeltEnhetsnr = omsorgssak.enhet
+                                ).let { oppgaveId ->
+                                    oppgave.ferdig(oppgaveId).also {
+                                        oppgaveRepo.updateStatus(it)
+                                        log.info("Oppgave opprettet")
+                                    }
                                 }
                             }
                         }
+                    } catch (exception: Throwable) {
+                        log.warn("Exception caught while processing oppgave: ${oppgave.id}, exeption:$exception")
+                        statusoppdatering.markerForRetry(oppgave, exception)
+                        throw exception
                     }
-                } catch (exception: Throwable) {
-                    log.warn("Exception caught while processing oppgave: ${oppgave.id}, exeption:$exception")
-                    statusoppdatering.markerForRetry(oppgave, exception)
-                    throw exception
                 }
             }
         }

@@ -12,6 +12,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.OppgaveRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -31,7 +33,6 @@ import java.time.Instant
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -90,42 +91,38 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
 
-        val correlationId = UUID.randomUUID().toString()
-
-        repo.persist(
+        val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JANUARY),
-                                        tom = YearMonth.of(2025, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    )
+                innhold = OmsorgsgrunnlagMelding(
+                    omsorgsyter = "12345678910",
+                    omsorgstype = Omsorgstype.BARNETRYGD,
+                    kilde = Kilde.BARNETRYGD,
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JANUARY),
+                                    tom = YearMonth.of(2025, Month.DECEMBER),
+                                    prosent = 100,
+                                    omsorgsmottaker = "01122012345"
                                 )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde("")
-                    )
-                ),
-                correlationId = correlationId,
-            )
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
         )
-
 
         handler.process().single().also { behandling ->
             godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
                 assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                 assertEquals(behandling.id, it.behandlingId)
-                assertEquals(correlationId, it.correlationId.toString())
+                assertEquals(melding.correlationId, it.correlationId)
+                assertEquals(melding.innlesingId, it.innlesingId)
                 assertEquals(behandling.omsorgsyter, it.omsorgsyter)
             }
 
@@ -176,38 +173,34 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             listOf(2020)
         }.given(gyldigOpptjeningår).get()
 
-        val correlationId = UUID.randomUUID().toString()
-
         val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JANUARY),
-                                        tom = YearMonth.of(2025, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    )
+                innhold = OmsorgsgrunnlagMelding(
+                    omsorgsyter = "12345678910",
+                    omsorgstype = Omsorgstype.BARNETRYGD,
+                    kilde = Kilde.BARNETRYGD,
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JANUARY),
+                                    tom = YearMonth.of(2025, Month.DECEMBER),
+                                    prosent = 100,
+                                    omsorgsmottaker = "01122012345"
                                 )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde("")
-                    )
-                ),
-                correlationId = correlationId,
-            )
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
         )
 
 
-        handler.process().single().also { behandling ->
+        handler.process().single().also {
             assertThrows<PoppClientExecption> {
                 godskrivOpptjeningService.process()
             }
@@ -216,7 +209,10 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             assertNull(godskrivOpptjeningService.process())
             assertNotNull(godskrivOpptjeningService.process())
 
-            assertInstanceOf(GodskrivOpptjening::class.java, godskrivOpptjeningRepo.findForMelding(melding.id!!).single()).also {
+            assertInstanceOf(
+                GodskrivOpptjening::class.java,
+                godskrivOpptjeningRepo.findForMelding(melding.id!!).single()
+            ).also {
                 assertInstanceOf(GodskrivOpptjening.Status.Ferdig::class.java, it.status)
             }
         }
@@ -240,34 +236,30 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
 
-        val correlationId = UUID.randomUUID().toString()
-
-        repo.persist(
+        val melding = repo.persist(
             OmsorgsarbeidMelding(
-                melding = serialize(
-                    OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kjoreHash = "xxx",
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JANUARY),
-                                        tom = YearMonth.of(2025, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    )
+                innhold = OmsorgsgrunnlagMelding(
+                    omsorgsyter = "12345678910",
+                    omsorgstype = Omsorgstype.BARNETRYGD,
+                    kilde = Kilde.BARNETRYGD,
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JANUARY),
+                                    tom = YearMonth.of(2025, Month.DECEMBER),
+                                    prosent = 100,
+                                    omsorgsmottaker = "01122012345"
                                 )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde("")
-                    )
-                ),
-                correlationId = correlationId,
-            )
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
         )
 
 
@@ -275,7 +267,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
                 assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                 assertEquals(behandling.id, it.behandlingId)
-                assertEquals(correlationId, it.correlationId.toString())
+                assertEquals(melding.correlationId, it.correlationId)
+                assertEquals(melding.innlesingId, it.innlesingId)
                 assertEquals(behandling.omsorgsyter, it.omsorgsyter)
             }
 
@@ -304,7 +297,10 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             godskrivOpptjeningRepo.findForBehandling(behandling.id).single().also { godskrivOpptjening ->
                 assertInstanceOf(GodskrivOpptjening.Status.Feilet::class.java, godskrivOpptjening.status)
 
-                assertInstanceOf(Oppgave::class.java, oppgaveRepo.findForBehandling(behandling.id).single()).also { oppgave ->
+                assertInstanceOf(
+                    Oppgave::class.java,
+                    oppgaveRepo.findForBehandling(behandling.id).single()
+                ).also { oppgave ->
                     assertInstanceOf(OppgaveDetaljer.UspesifisertFeilsituasjon::class.java, oppgave.detaljer).also {
                         assertEquals(behandling.omsorgsyter, it.omsorgsyter)
                         assertEquals(

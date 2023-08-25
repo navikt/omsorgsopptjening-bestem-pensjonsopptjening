@@ -61,26 +61,28 @@ class GodskrivOpptjeningService(
     @Transactional(rollbackFor = [Throwable::class])
     fun process(): GodskrivOpptjening? {
         return godskrivOpptjeningRepo.finnNesteUprosesserte()?.let { godskrivOpptjening ->
-            //TODO kan vurdere å hente behandlingen med godskriv oppgjening objektet
-            behandlingRepo.finn(godskrivOpptjening.behandlingId).let { behandling ->
-                Mdc.scopedMdc(CorrelationId.name, godskrivOpptjening.correlationId.toString()) {
-                    try {
-                        log.info("Lagrer i popp")
-                        client.lagre(
-                            omsorgsyter = behandling.omsorgsyter,
-                            omsorgsÅr = behandling.omsorgsAr,
-                            omsorgstype = behandling.omsorgstype,
-                            kilde = behandling.kilde(),
-                            omsorgsmottaker = behandling.omsorgsmottaker,
-                        )
-                        godskrivOpptjening.ferdig().also {
-                            godskrivOpptjeningRepo.updateStatus(it)
-                            log.info("Lagret i popp")
+            Mdc.scopedMdc(godskrivOpptjening.correlationId) {
+                Mdc.scopedMdc(godskrivOpptjening.innlesingId) {
+                    //TODO kan vurdere å hente behandlingen med godskriv oppgjening objektet
+                    behandlingRepo.finn(godskrivOpptjening.behandlingId).let { behandling ->
+                        try {
+                            log.info("Lagrer i popp")
+                            client.lagre(
+                                omsorgsyter = behandling.omsorgsyter,
+                                omsorgsÅr = behandling.omsorgsAr,
+                                omsorgstype = behandling.omsorgstype,
+                                kilde = behandling.kilde(),
+                                omsorgsmottaker = behandling.omsorgsmottaker,
+                            )
+                            godskrivOpptjening.ferdig().also {
+                                godskrivOpptjeningRepo.updateStatus(it)
+                                log.info("Lagret i popp")
+                            }
+                        } catch (exception: Throwable) {
+                            log.warn("Exception caught while processing item: ${godskrivOpptjening.id}, exeption:$exception")
+                            statusoppdatering.markerForRetry(godskrivOpptjening, exception)
+                            throw exception
                         }
-                    } catch (exception: Throwable) {
-                        log.warn("Exception caught while processing item: ${godskrivOpptjening.id}, exeption:$exception")
-                        statusoppdatering.markerForRetry(godskrivOpptjening, exception)
-                        throw exception
                     }
                 }
             }

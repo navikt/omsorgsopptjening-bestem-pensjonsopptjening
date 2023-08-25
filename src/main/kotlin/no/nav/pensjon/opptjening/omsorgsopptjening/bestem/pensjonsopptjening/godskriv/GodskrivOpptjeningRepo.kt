@@ -1,8 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.deserializeList
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.serialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -35,7 +37,7 @@ class GodskrivOpptjeningRepo(
                 mapOf<String, Any>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(godskrivOpptjening.status),
-                    "statushistorikk" to godskrivOpptjening.statushistorikk.serialize()
+                    "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList()
                 ),
             ),
         )
@@ -49,7 +51,7 @@ class GodskrivOpptjeningRepo(
                 mapOf<String, Any>(
                     "id" to godskrivOpptjening.id!!,
                     "status" to serialize(godskrivOpptjening.status),
-                    "statushistorikk" to godskrivOpptjening.statushistorikk.serialize()
+                    "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList()
                 ),
             ),
         )
@@ -57,7 +59,7 @@ class GodskrivOpptjeningRepo(
 
     fun find(id: UUID): GodskrivOpptjening {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where o.id = :id""",
+            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where o.id = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -67,7 +69,7 @@ class GodskrivOpptjeningRepo(
 
     fun findForMelding(id: UUID): List<GodskrivOpptjening> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where m.id = :id""",
+            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where m.id = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -77,7 +79,7 @@ class GodskrivOpptjeningRepo(
 
     fun findForBehandling(id: UUID): List<GodskrivOpptjening> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk,  m.id as meldingid, m.correlation_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where b.id = :id""",
+            """select o.*, os.statushistorikk,  m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where b.id = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -92,7 +94,7 @@ class GodskrivOpptjeningRepo(
      */
     fun finnNesteUprosesserte(): GodskrivOpptjening? {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for update of o skip locked""",
+            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for update of o skip locked""",
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),
@@ -108,9 +110,10 @@ class GodskrivOpptjeningRepo(
                 opprettet = rs.getTimestamp("opprettet").toInstant(),
                 behandlingId = rs.getString("behandlingId").let { UUID.fromString(it) },
                 meldingId = UUID.fromString(rs.getString("meldingid")),
-                correlationId = UUID.fromString(rs.getString("correlation_id")),
+                correlationId = CorrelationId.fromString(rs.getString("correlation_id")),
                 statushistorikk = rs.getString("statushistorikk").deserializeList(),
-                omsorgsyter = rs.getString("omsorgsyter")
+                omsorgsyter = rs.getString("omsorgsyter"),
+                innlesingId = InnlesingId.fromString(rs.getString("innlesing_id"))
             )
         }
     }
