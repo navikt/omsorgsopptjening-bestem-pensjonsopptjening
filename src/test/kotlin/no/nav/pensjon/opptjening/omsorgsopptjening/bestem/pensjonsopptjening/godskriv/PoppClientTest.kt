@@ -107,7 +107,6 @@ class PoppClientTest : SpringContextTest.NoKafka() {
                         .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer test.token.test"))
                         .withHeader(HttpHeaders.ACCEPT, equalTo("application/json"))
                         .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
-                        .withHeader("Tema", equalTo("PEN"))
                         .withHeader("Nav-Call-Id", equalTo(correlationId.toString()))
                         .withHeader("Nav-Consumer-Id", equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
                         .withHeader("x-correlation-id", equalTo(correlationId.toString()))

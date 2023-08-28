@@ -15,8 +15,16 @@ spec:
       value: dev-fss.pdl.pdl-api
     - name: BESTEMSAK_URL
       value: https://pensjon-pen-q2.nais.preprod.local/pen/api/bestemsak/v1
+    - name: BESTEM_SAK_API_ID
+      value: dev-fss.teampensjon.pensjon-pen-q2
     - name: OPPGAVE_URL
       value: https://oppgave.dev-fss-pub.nais.io/api/v1/oppgaver
+    - name: OPPGAVE_API_ID
+      value: dev-fss.oppgavehandtering.oppgave
+    - name: POPP_URL
+      value: https://pensjon-popp-q2.dev-fss-pub.nais.io/popp/api/omsorg
+    - name: POPP_API_ID
+      value: dev-fss.pensjonopptjening.pensjon-popp-q2
   kafka:
     pool: nav-dev
   gcp:
@@ -39,6 +47,9 @@ spec:
     outbound:
       external:
         - host: pdl-api.dev-fss-pub.nais.io
+        - host: pensjon-pen-q2.nais.preprod.local
+        - host: oppgave.dev-fss-pub.nais.io
+        - host: pensjon-popp-q2.dev-fss-pub.nais.io
   image: {{ image }}
   liveness:
     path: /actuator/health/liveness

@@ -206,7 +206,6 @@ class BestemSakKlientTest : SpringContextTest.NoKafka() {
                         .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
                         .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
                         .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))
-                        .withHeader("Tema", WireMock.equalTo("PEN"))
                         .withHeader("Nav-Call-Id", WireMock.equalTo(correlationId.toString()))
                         .withHeader("Nav-Consumer-Id", WireMock.equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
                         .withHeader("x-correlation-id", WireMock.equalTo(correlationId.toString()))

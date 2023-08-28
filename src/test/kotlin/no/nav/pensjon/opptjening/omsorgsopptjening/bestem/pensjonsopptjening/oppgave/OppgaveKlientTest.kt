@@ -33,18 +33,22 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `kaster exception dersom kall ikke gikk bra`() {
-        wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(OPPGAVE_PATH))
-                .willReturn(WireMock.serverError())
-        )
+        Mdc.scopedMdc(CorrelationId.generate()) {
+            Mdc.scopedMdc(InnlesingId.generate()) {
+                wiremock.givenThat(
+                    WireMock.post(WireMock.urlPathEqualTo(OPPGAVE_PATH))
+                        .willReturn(WireMock.serverError())
+                )
 
-        assertThrows<OppgaveKlientException> {
-            client.opprettOppgave(
-                aktoerId = "interdum",
-                sakId = "habitasse",
-                beskrivelse = "ferri",
-                tildeltEnhetsnr = "ludus"
-            )
+                assertThrows<OppgaveKlientException> {
+                    client.opprettOppgave(
+                        aktoerId = "interdum",
+                        sakId = "habitasse",
+                        beskrivelse = "ferri",
+                        tildeltEnhetsnr = "ludus"
+                    )
+                }
+            }
         }
     }
 
@@ -57,10 +61,8 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
                         .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer test.token.test"))
                         .withHeader(HttpHeaders.ACCEPT, equalTo("application/json"))
                         .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
-                        .withHeader("Tema", equalTo("PEN"))
-                        .withHeader("Nav-Call-Id", equalTo(correlationId.toString()))
-                        .withHeader("Nav-Consumer-Id", equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
                         .withHeader("x-correlation-id", equalTo(correlationId.toString()))
+                        .withHeader("X-Correlation-ID", equalTo(correlationId.toString()))
                         .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
                         .withRequestBody(
                             equalToJson(

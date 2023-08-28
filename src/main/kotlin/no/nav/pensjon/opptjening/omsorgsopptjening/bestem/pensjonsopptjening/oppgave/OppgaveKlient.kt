@@ -1,13 +1,21 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -19,11 +27,12 @@ import java.time.format.DateTimeFormatter
 @Component
 class OppgaveKlient(
     @Value("\${OPPGAVE_URL}") private val oppgaveUrl: String,
-    val restTemplate: RestTemplate,
+    @Qualifier("oppgaveTokenProvider") private val tokenProvider: TokenProvider,
     private val registry: MeterRegistry,
 ) {
     private val antallOpprettedeOppgaver = registry.counter("oppgaver", "antall", "opprettet")
     private val logger = LoggerFactory.getLogger(OppgaveKlient::class.java)
+    private val restTemplate = RestTemplateBuilder().build()
 
     fun opprettOppgave(
         aktoerId: String,
@@ -38,7 +47,17 @@ class OppgaveKlient(
             tildeltEnhetsnr = tildeltEnhetsnr,
         )
         val requestBody = serialize(oppgaveRequest)
-        val httpEntity = HttpEntity(requestBody)
+        val httpEntity = HttpEntity(
+            requestBody,
+            HttpHeaders().apply {
+                add(CorrelationId.identifier, Mdc.getCorrelationId())
+                add(InnlesingId.identifier, Mdc.getInnlesingId())
+                add("X-Correlation-ID", Mdc.getCorrelationId()) //ulik casing fra CorrelationId.identifier
+                accept = listOf(MediaType.APPLICATION_JSON)
+                contentType = MediaType.APPLICATION_JSON
+                setBearerAuth(tokenProvider.getToken())
+            }
+        )
         return try {
             val response = restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OppgaveResponse::class.java)
             logger.info("Opprettet kravoppgave for sakId: $sakId")

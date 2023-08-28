@@ -1,24 +1,32 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.pdl
 
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
-import org.springframework.web.client.RestTemplate
+import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.net.URI
 
 @Component
 class PdlClient(
     @Value("\${PDL_URL}") private val pdlUrl: String,
-    private val restTemplate: RestTemplate,
+    @Qualifier("pdlTokenProvider") private val tokenProvider: TokenProvider,
     private val registry: MeterRegistry
 ) {
     private val antallPersonerHentet = registry.counter("personer", "antall", "hentet")
     private val antallAktoridHentet = registry.counter("aktorid", "antall", "hentet")
+    private val restTemplate = RestTemplateBuilder().build()
 
     @Retryable(
         maxAttempts = 4,
@@ -28,6 +36,16 @@ class PdlClient(
     fun hentPerson(graphqlQuery: String, fnr: String): PdlResponse? {
         val entity = RequestEntity<PdlQuery>(
             PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
+            HttpHeaders().apply {
+                add("Nav-Call-Id", Mdc.getCorrelationId())
+                add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
+                add("Tema", "PEN")
+                add(CorrelationId.identifier, Mdc.getCorrelationId())
+                add(InnlesingId.identifier, Mdc.getInnlesingId())
+                accept = listOf(MediaType.APPLICATION_JSON)
+                contentType = MediaType.APPLICATION_JSON
+                setBearerAuth(tokenProvider.getToken())
+            },
             HttpMethod.POST,
             URI.create(pdlUrl)
         )
@@ -47,10 +65,19 @@ class PdlClient(
     internal fun hentAktorId(graphqlQuery: String, fnr: String): IdenterResponse? {
         val entity = RequestEntity<PdlQuery>(
             PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
+            HttpHeaders().apply {
+                add("Nav-Call-Id", Mdc.getCorrelationId())
+                add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
+                add("Tema", "PEN")
+                add(CorrelationId.identifier, Mdc.getCorrelationId())
+                add(InnlesingId.identifier, Mdc.getInnlesingId())
+                accept = listOf(MediaType.APPLICATION_JSON)
+                contentType = MediaType.APPLICATION_JSON
+                setBearerAuth(tokenProvider.getToken())
+            },
             HttpMethod.POST,
             URI.create(pdlUrl)
         )
-
 
         val response = restTemplate.exchange(
             entity,

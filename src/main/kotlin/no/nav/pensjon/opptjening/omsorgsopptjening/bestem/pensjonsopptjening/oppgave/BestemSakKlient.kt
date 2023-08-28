@@ -4,24 +4,32 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import pensjon.opptjening.azure.ad.client.TokenProvider
 
 @Component
 class BestemSakKlient(
     @Value("\${BESTEMSAK_URL}") private val bestemSakUrl: String,
-    private val restTemplate: RestTemplate,
+    @Qualifier("bestemSakTokenProvider") private val tokenProvider: TokenProvider,
     private val registry: MeterRegistry
 ) {
     private val antallSakerHentet = registry.counter("saker", "antall", "hentet")
     private val logger: Logger by lazy { LoggerFactory.getLogger(BestemSakKlient::class.java) }
+    private val restTemplate = RestTemplateBuilder().build()
 
     /**
      * Henter pesys sakID for en gitt aktørID og saktype
@@ -34,7 +42,18 @@ class BestemSakKlient(
             val response = restTemplate.exchange(
                 bestemSakUrl,
                 HttpMethod.POST,
-                HttpEntity(serialize(BestemSakRequest(aktørId))),
+                HttpEntity(
+                    serialize(BestemSakRequest(aktørId)),
+                    HttpHeaders().apply {
+                        add("Nav-Call-Id", Mdc.getCorrelationId())
+                        add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
+                        add(CorrelationId.identifier, Mdc.getCorrelationId())
+                        add(InnlesingId.identifier, Mdc.getInnlesingId())
+                        accept = listOf(MediaType.APPLICATION_JSON)
+                        contentType = MediaType.APPLICATION_JSON
+                        setBearerAuth(tokenProvider.getToken())
+                    }
+                ),
                 String::class.java
             )
             antallSakerHentet.increment()
