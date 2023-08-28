@@ -1,6 +1,4 @@
-OMSORGSARBEID_TOPIC: omsorgsarbeid
 OMSORGSOPPTJENING_TOPIC: omsorgsopptjening
-OMSORGSOPPTJENING_BESTEM_GROUP_ID: omsorgsopptjening-testgruppe
 kafka:
   brokers: ${spring.embedded.kafka.brokers}
 
