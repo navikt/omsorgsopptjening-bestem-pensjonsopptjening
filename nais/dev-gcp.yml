@@ -52,6 +52,7 @@ spec:
         - host: pensjon-pen-q2.nais.preprod.local
         - host: oppgave.dev-fss-pub.nais.io
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
+        - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
   unleashInstance:
     apiVersion: unleash.nais.io/v1
     kind: RemoteUnleash
