@@ -53,13 +53,6 @@ spec:
         - host: oppgave.dev-fss-pub.nais.io
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
-  unleashInstance:
-    apiVersion: unleash.nais.io/v1
-    kind: RemoteUnleash
-    name: pensjonopptjening
-  secretName: unleash-next
-  environment: development
-
   image: {{ image }}
   liveness:
     path: /actuator/health/liveness
