@@ -25,8 +25,8 @@ spec:
       value: https://pensjon-popp-q2.dev-fss-pub.nais.io/popp/api/omsorg
     - name: POPP_API_ID
       value: dev-fss.pensjonopptjening.pensjon-popp-q2
-  #envFrom:
-  #  - secret: unleash-next
+  envFrom:
+    - secret: my-application-unleash-api-token
   kafka:
     pool: nav-dev
   gcp:
@@ -52,13 +52,14 @@ spec:
         - host: pensjon-pen-q2.nais.preprod.local
         - host: oppgave.dev-fss-pub.nais.io
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
-        #- host: pensjonopptjening-unleash-api.nav.cloud.nais.io
-  #unleashInstance:
-  #  apiVersion: unleash.nais.io/v1
-  #  kind: RemoteUnleash
-  #  name: pensjonopptjening
-  #secretName: unleash-next
-  #environment: development
+        - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
+  unleashInstance:
+    apiVersion: unleash.nais.io/v1
+    kind: RemoteUnleash
+    name: pensjonopptjening
+  secretName: unleash-next
+  environment: development
+
   image: {{ image }}
   liveness:
     path: /actuator/health/liveness
