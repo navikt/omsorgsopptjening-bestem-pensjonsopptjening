@@ -22,7 +22,6 @@ apply(plugin = "kotlin-jpa")
 
 
 group = "no.nav.pensjon.opptjening"
-java.sourceCompatibility = JavaVersion.VERSION_17
 
 java {
     toolchain {
