@@ -49,6 +49,7 @@ spec:
     outbound:
       external:
         - host: pdl-api.dev-fss-pub.nais.io
+        - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
   image: {{ image }}
   liveness:
     path: /actuator/health/liveness
