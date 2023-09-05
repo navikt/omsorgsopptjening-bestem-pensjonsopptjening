@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Application
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.KafkaConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.OmsorgsarbeidKafkaConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
@@ -91,11 +91,11 @@ sealed class SpringContextTest {
             private lateinit var kafkaBrokers: String
 
             @Bean
-            fun securityConfig(): KafkaConfig.SecurityConfig =
-                KafkaConfig.SecurityConfig(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "PLAINTEXT")
+            fun securityConfig(): OmsorgsarbeidKafkaConfig.SecurityConfig =
+                OmsorgsarbeidKafkaConfig.SecurityConfig(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "PLAINTEXT")
 
             @Bean
-            fun producer(securityConfig: KafkaConfig.SecurityConfig): KafkaTemplate<String, String> {
+            fun producer(securityConfig: OmsorgsarbeidKafkaConfig.SecurityConfig): KafkaTemplate<String, String> {
                 return KafkaTemplate(DefaultKafkaProducerFactory(producerConfig() + securityConfig))
             }
 

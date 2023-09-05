@@ -1,28 +1,32 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-data class OmsorgsarbeidMelding(
+data class GodskrivOpptjening(
     val id: UUID? = null,
     val opprettet: Instant? = null,
-    val innhold: OmsorgsgrunnlagMelding,
-    val statushistorikk: List<Status> = listOf(Status.Klar())
+    val behandlingId: UUID,
+    val meldingId: UUID,
+    val correlationId: CorrelationId,
+    val statushistorikk: List<Status> = listOf(Status.Klar()),
+    val omsorgsyter: String? = null,
+    val innlesingId: InnlesingId
 ) {
-    val correlationId = innhold.correlationId
-    val innlesingId = innhold.innlesingId
-    val status: Status get() = statushistorikk.last()
-    fun ferdig(): OmsorgsarbeidMelding {
+    val status = statushistorikk.last()
+
+    fun ferdig(): GodskrivOpptjening {
         return copy(statushistorikk = statushistorikk + status.ferdig())
     }
 
-    fun retry(melding: String): OmsorgsarbeidMelding {
+    fun retry(melding: String): GodskrivOpptjening {
         return copy(statushistorikk = statushistorikk + status.retry(melding))
     }
 
@@ -30,12 +34,12 @@ data class OmsorgsarbeidMelding(
         return if (status is Status.Feilet) {
             Oppgave(
                 detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
-                    omsorgsyter = innhold.omsorgsyter,
+                    omsorgsyter = omsorgsyter!!,
                 ),
-                behandlingId = null,
-                meldingId = id!!,
+                behandlingId = behandlingId,
+                meldingId = meldingId,
                 correlationId = correlationId,
-                innlesingId = innlesingId
+                innlesingId = innlesingId,
             )
         } else {
             null
@@ -114,4 +118,3 @@ data class OmsorgsarbeidMelding(
         ) : Status()
     }
 }
-
