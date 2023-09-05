@@ -64,6 +64,7 @@ dependencies {
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$springCloudContractVersion")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
+    implementation("io.getunleash:unleash-client-java:8.3.1")
 }
 
 tasks.test {
