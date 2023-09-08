@@ -1,6 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
+import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
@@ -8,7 +10,8 @@ import org.springframework.stereotype.Component
 @Component
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
 class GodskrivOpptjeningProcessingThread(
-    private val service: GodskrivOpptjeningService
+    private val service: GodskrivOpptjeningService,
+    private val unleash: Unleash,
 ) : Runnable {
 
     companion object {
@@ -25,7 +28,9 @@ class GodskrivOpptjeningProcessingThread(
     override fun run() {
         while (true) {
             try {
-                service.process()
+                if(unleash.isEnabled(NavUnleashConfig.Feature.GODSKRIV.toggleName)) {
+                    service.process()
+                }
             } catch (exception: Throwable) {
                 log.warn("Exception caught while processing, exception:$exception")
                 Thread.sleep(1000)
