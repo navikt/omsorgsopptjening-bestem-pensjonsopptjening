@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
@@ -43,7 +44,7 @@ class GodskrivOpptjeningService(
                                             omsorgsyter = behandling.omsorgsyter,
                                             omsorgsÅr = behandling.omsorgsAr,
                                             omsorgstype = behandling.omsorgstype,
-                                            kilde = behandling.kilde(),
+                                            kilde = DomainKilde.BARNETRYGD, //TODO bør være dette systemet?,
                                             omsorgsmottaker = behandling.omsorgsmottaker,
                                         )
                                         log.info("Lagret i popp")

@@ -12,7 +12,7 @@ object OmsorgsyterErFylt17VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorg
         return setOf(
             Referanse.OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller17
         ).let {
-            if (grunnlag.person.alderVedUtløpAv(grunnlag.omsorgsAr) >= 17) {
+            if (grunnlag.person.alderVedUtløpAv(grunnlag.omsorgsAr) >= Konstanter.OMSORGSYTER_MINIMUM_ALDER) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)

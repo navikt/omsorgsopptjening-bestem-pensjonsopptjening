@@ -13,7 +13,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -59,8 +58,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -68,7 +65,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.JUNE),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -79,7 +76,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JULY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -102,8 +99,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "04010012797",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -111,7 +106,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.JUNE),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -122,7 +117,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JULY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -164,8 +159,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -173,7 +166,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -184,13 +177,13 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "01052012345"
                                 )
                             )
@@ -224,8 +217,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "04010012797",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -233,7 +224,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -244,13 +235,13 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JUNE),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "01052012345"
                                 )
                             )
@@ -261,7 +252,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JUNE),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "01052012345"
                                 )
                             )
@@ -305,8 +296,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -314,7 +303,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -325,7 +314,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -354,8 +343,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "04010012797",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -363,7 +350,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -374,7 +361,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    prosent = 50,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -403,51 +390,49 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         repo.persist(
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JULY),
-                                        tom = YearMonth.of(2021, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    ),
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        prosent = 50,
-                                        omsorgsmottaker = "07081812345"
-                                    )
+                    omsorgsyter = "12345678910",
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JULY),
+                                    tom = YearMonth.of(2021, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "01122012345"
+                                ),
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345"
                                 )
-                            ),
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "04010012797",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JANUARY),
-                                        tom = YearMonth.of(2021, Month.JUNE),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    ),
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        prosent = 50,
-                                        omsorgsmottaker = "07081812345"
-                                    )
-                                )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde(""),
-                        innlesingId = InnlesingId.generate(),
-                        correlationId = CorrelationId.generate(),
-                    )
-                ),
-            )
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "04010012797",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JANUARY),
+                                    tom = YearMonth.of(2021, Month.JUNE),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "01122012345"
+                                ),
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345"
+                                )
+                            )
+                        ),
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
 
         handler.process().let { result ->
             assertEquals(2, result.count())
@@ -483,51 +468,49 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         repo.persist(
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
-                        omsorgsyter = "12345678910",
-                        omsorgstype = Omsorgstype.BARNETRYGD,
-                        kilde = Kilde.BARNETRYGD,
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JULY),
-                                        tom = YearMonth.of(2021, Month.DECEMBER),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    ),
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2021, Month.DECEMBER),
-                                        prosent = 50,
-                                        omsorgsmottaker = "07081812345"
-                                    )
+                    omsorgsyter = "12345678910",
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "12345678910",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JULY),
+                                    tom = YearMonth.of(2021, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "01122012345"
+                                ),
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2021, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345"
                                 )
-                            ),
-                            OmsorgsgrunnlagMelding.Sak(
-                                omsorgsyter = "04010012797",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2021, Month.JANUARY),
-                                        tom = YearMonth.of(2021, Month.JUNE),
-                                        prosent = 100,
-                                        omsorgsmottaker = "01122012345"
-                                    ),
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2021, Month.DECEMBER),
-                                        prosent = 50,
-                                        omsorgsmottaker = "07081812345"
-                                    )
-                                )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde(""),
-                        innlesingId = InnlesingId.generate(),
-                        correlationId = CorrelationId.generate(),
-                    )
-                ),
-            )
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "04010012797",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2021, Month.JANUARY),
+                                    tom = YearMonth.of(2021, Month.JUNE),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "01122012345"
+                                ),
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2021, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345"
+                                )
+                            )
+                        ),
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
 
         handler.process().let { result ->
             assertEquals(4, result.count())

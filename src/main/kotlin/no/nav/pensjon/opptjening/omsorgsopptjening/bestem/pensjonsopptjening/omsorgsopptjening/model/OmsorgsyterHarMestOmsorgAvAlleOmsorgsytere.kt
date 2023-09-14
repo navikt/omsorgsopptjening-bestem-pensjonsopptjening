@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Omsorgsmåneder
 import java.time.Month
 import java.time.YearMonth
 
@@ -61,7 +62,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     data class OmsorgsmånederForMottakerOgÅr(
         val omsorgsyter: Person,
         val omsorgsmottaker: Person,
-        val omsorgsmåneder: Set<YearMonth>,
+        val omsorgsmåneder: Omsorgsmåneder,
         val omsorgsår: Int
     ) {
         fun antall(): Int {

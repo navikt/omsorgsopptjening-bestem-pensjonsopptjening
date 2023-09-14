@@ -17,8 +17,6 @@ import java.time.YearMonth
  */
 data class BeriketDatagrunnlag(
     val omsorgsyter: Person,
-    val omsorgstype: DomainOmsorgstype,
-    val kilde: DomainKilde,
     val omsorgsSaker: List<BeriketSak>,
     val innlesingId: InnlesingId,
     val correlationId: CorrelationId
@@ -33,14 +31,6 @@ data class BeriketSak(
     val omsorgsyter: Person,
     val omsorgVedtakPerioder: List<BeriketVedtaksperiode>
 ) {
-    fun omsorgsmånederFor(omsorgsmottaker: Person): Set<YearMonth> {
-        return omsorgVedtakPerioder
-            .filter { it.omsorgsmottaker == omsorgsmottaker }
-            .flatMap { it.periode.alleMåneder() }
-            .distinct()
-            .toSet()
-    }
-
     fun omsorgsmottakere(): Set<Person> {
         return omsorgVedtakPerioder.map { it.omsorgsmottaker }.distinct().toSet()
     }
@@ -61,8 +51,30 @@ data class BeriketSak(
 data class BeriketVedtaksperiode(
     val fom: YearMonth,
     val tom: YearMonth,
-    val prosent: Int,
+    val omsorgstype: DomainOmsorgstype,
     val omsorgsmottaker: Person
 ) {
     val periode = Periode(fom, tom)
+
+    fun alleMåneder(): Set<YearMonth> {
+        return periode.alleMåneder().distinct().toSet()
+    }
+}
+
+fun List<BeriketVedtaksperiode>.alleMåneder(): Set<YearMonth> {
+    return flatMap { it.alleMåneder() }.distinct().toSet()
+}
+
+sealed class Omsorgsmåneder(
+    måneder: Set<YearMonth>
+) : Set<YearMonth> by måneder {
+    class Barnetrygd(
+        val måneder: Set<YearMonth>
+    ) : Omsorgsmåneder(måneder)
+
+    class Hjelpestønad(
+        val måneder: Set<YearMonth>,
+        val barnetrygd: Set<YearMonth>,
+        val hjelpestønad: Set<YearMonth>
+    ) : Omsorgsmåneder(måneder)
 }

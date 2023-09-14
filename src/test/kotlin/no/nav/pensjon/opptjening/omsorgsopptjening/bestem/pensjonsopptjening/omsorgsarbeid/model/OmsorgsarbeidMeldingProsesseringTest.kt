@@ -16,7 +16,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -113,8 +112,6 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -122,7 +119,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -167,7 +164,6 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(2020, it.omsorgsAr)
                 assertEquals("12345678910", it.omsorgsyter)
                 assertEquals("07081812345", it.omsorgsmottaker)
-                assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
                 assertInstanceOf(BehandlingUtfall.Innvilget::class.java, it.utfall)
                 assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
@@ -214,8 +210,6 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -223,7 +217,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -298,8 +292,6 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -307,7 +299,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )

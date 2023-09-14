@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
 import java.util.UUID
 
@@ -8,14 +9,14 @@ import java.util.UUID
  * ytt for [omsorgsmottaker] i et gitt [omsorgsår].
  */
 data class Behandling(
-    private val grunnlag: BarnetrygdGrunnlag,
+    private val grunnlag: OmsorgsopptjeningGrunnlag,
     private val vurderVilkår: VurderVilkår,
     private val meldingId: UUID
 ) {
     fun omsorgsår() = grunnlag.omsorgsAr
     fun omsorgsmottaker() = grunnlag.omsorgsmottaker
     fun omsorgsyter() = grunnlag.omsorgsyter
-    fun omsorgstype() = grunnlag.omsorgstype
+    fun omsorgstype() = vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid().omsorgstype()
     fun grunnlag() = grunnlag
 
     fun meldingId() = meldingId
@@ -29,17 +30,43 @@ data class Behandling(
         }
     }
 
+
     fun vilkårsvurdering(): VilkarsVurdering<*> {
+        return og(
+            vilkårsvurderOmsorgsyter(),
+            when (omsorgstype()) {
+                DomainOmsorgstype.BARNETRYGD -> {
+                    vilkårsvurderBarnetrygd()
+                }
+
+                DomainOmsorgstype.HJELPESTØNAD -> {
+                    vilkårsurderHjelpestønad()
+                }
+            }
+        )
+    }
+
+    private fun vilkårsvurderBarnetrygd(): VilkarsVurdering<*> {
+        return vurderVilkår.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår()
+    }
+
+    private fun vilkårsurderHjelpestønad(): VilkarsVurdering<*> {
+        return og(
+            vurderVilkår.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(),
+        )
+    }
+
+    private fun vilkårsvurderOmsorgsyter(): VilkarsVurdering<*> {
         return og(
             vurderVilkår.OmsorgsyterErFylt17VedUtløpAvOmsorgsår(),
             vurderVilkår.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(),
-            vurderVilkår.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(),
             vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
             vurderVilkår.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr()
         )
     }
+
 }
 
 

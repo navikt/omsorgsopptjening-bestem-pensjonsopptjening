@@ -123,6 +123,7 @@ private enum class PoppOmsorgType {
         fun from(domainOmsorgstype: DomainOmsorgstype): PoppOmsorgType {
             return when (domainOmsorgstype) {
                 DomainOmsorgstype.BARNETRYGD -> OBU6
+                DomainOmsorgstype.HJELPESTØNAD -> OBO6H
             }
         }
     }

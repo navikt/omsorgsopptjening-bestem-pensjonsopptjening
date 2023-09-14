@@ -1,7 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
@@ -15,15 +14,11 @@ data class FullførtBehandling(
     val omsorgsyter: String,
     val omsorgsmottaker: String,
     val omsorgstype: DomainOmsorgstype,
-    val grunnlag: BarnetrygdGrunnlag,
+    val grunnlag: OmsorgsopptjeningGrunnlag,
     val utfall: BehandlingUtfall,
     val vilkårsvurdering: VilkarsVurdering<*>,
     val meldingId: UUID,
 ) {
-    fun kilde(): DomainKilde {
-        return grunnlag.kilde
-    }
-
     fun erInnvilget(): Boolean {
         return utfall.erInnvilget()
     }
@@ -60,14 +55,14 @@ data class FullførtBehandling(
 
     private fun lagOppgave(mottakere: VelgOppgaveForPersonOgInnhold): Oppgave {
         return when (grunnlag) {
-            is BarnetrygdGrunnlag.FødtIOmsorgsår -> {
+            is OmsorgsopptjeningGrunnlag.FødtIOmsorgsår -> {
                 OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår(
                     omsorgsyter = omsorgsyter,
                     omsorgsmottaker = omsorgsmottaker,
                 )
             }
 
-            is BarnetrygdGrunnlag.IkkeFødtIOmsorgsår -> {
+            is OmsorgsopptjeningGrunnlag.IkkeFødtIOmsorgsår -> {
                 OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg(
                     omsorgsyter = omsorgsyter,
                     omsorgsmottaker = omsorgsmottaker,
@@ -122,5 +117,10 @@ data class FullførtBehandling(
         fun annenPersonForInnhold(): String {
             return prioritert.first { it.omsorgsyter.fnr != grunnlag.omsorgsyter.fnr }.omsorgsyter.fnr
         }
+    }
+
+    fun sendBrev(): Boolean {
+        //TODO hjelpestønad
+        return false
     }
 }

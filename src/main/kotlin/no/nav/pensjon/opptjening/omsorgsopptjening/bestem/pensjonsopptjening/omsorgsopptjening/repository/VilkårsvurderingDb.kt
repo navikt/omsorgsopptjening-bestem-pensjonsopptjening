@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.JuridiskHenvisning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErFylt17VedUtløpAvOmsorgsår
@@ -33,36 +34,49 @@ sealed class VilkårsvurderingDb {
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
     @JsonTypeName("OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår")
     internal data class OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
     @JsonTypeName("Eller")
     internal data class Eller(
         val eller: List<VilkårsvurderingDb>,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
     @JsonTypeName("Og")
     internal data class Og(
         val og: List<VilkårsvurderingDb>,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
     @JsonTypeName("OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter")
     internal data class OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyter(
         val grunnlag: GrunnlagVilkårsvurderingDb.KanKunGodskrivesEnOmsorgsyter,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
     @JsonTypeName("OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr")
     internal data class OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr(
         val grunnlag: GrunnlagVilkårsvurderingDb.KanKunGodskrivesEtBarnPerÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
     @JsonTypeName("OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår")
     internal data class OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
+    @JsonTypeName("OmsorgsmottakerIkkeFylt6VedUtløpAvOpptjeningsår")
+    internal data class OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(
+        val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
+        val utfall: VilkårsvurderingUtfallDb,
+    ) : VilkårsvurderingDb()
+
     @JsonTypeName("OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere")
     internal data class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(
         val grunnlag: GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere,
@@ -134,6 +148,13 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
                 utfall = utfall.toDb()
             )
         }
+
+        is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> {
+            VilkårsvurderingDb.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(
+                grunnlag = grunnlag.toDb(),
+                utfall = utfall.toDb()
+            )
+        }
     }
 }
 
@@ -151,6 +172,7 @@ private fun mapRecursive(
 internal fun List<VilkårsvurderingDb>.toDomain(): List<VilkarsVurdering<*>> {
     return map { it.toDomain() }
 }
+
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
@@ -264,6 +286,13 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
 
         is VilkårsvurderingDb.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere -> {
             OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering(
+                grunnlag = grunnlag.toDomain(),
+                utfall = utfall.toDomain()
+            )
+        }
+
+        is VilkårsvurderingDb.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad -> {
+            OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering(
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )

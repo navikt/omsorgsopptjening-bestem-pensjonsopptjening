@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-object OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
+object OmsorgsmottakerOppfyllerAlderskravForHjelpestønad : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
     override fun vilkarsVurder(grunnlag: PersonOgOmsorgsårGrunnlag): Vurdering {
         return Vurdering(
             grunnlag = grunnlag,
@@ -10,15 +10,15 @@ object OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår : ParagrafVilkår<Person
 
     override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller69
+            Referanse.HjelpestønadYtesTilMedlemUnder18,
+            Referanse.OmsorgsopptjeningGisTilOgMedKalenderårHjelpestønadFallerBort
         ).let {
-            if (grunnlag.person.alderVedUtløpAv(grunnlag.omsorgsAr) <= Konstanter.OMSORGSYTER_MAKSIMUM_ALDER) {
+            if (grunnlag.alderMottaker(mellom = Konstanter.ALDERSINTERVALL_HJELPESTØNAD)) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
             }
         }
-
     }
 
     data class Vurdering(

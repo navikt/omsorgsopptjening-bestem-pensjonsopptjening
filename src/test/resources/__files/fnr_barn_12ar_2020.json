@@ -1,0 +1,35 @@
+{
+  "data": {
+    "hentIdenter": {
+      "identer": [{
+        "ident": "03041212345",
+        "gruppe": "AKTORID"
+      }
+      ]
+    },
+    "hentPerson": {
+      "folkeregisteridentifikator": [
+        {
+          "identifikasjonsnummer": "03041212345",
+          "status": "I_BRUK",
+          "type": "FNR",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsaar": 2012,
+          "foedselsdato": "2012-04-03",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "doedsfall": []
+    }
+  }
+}

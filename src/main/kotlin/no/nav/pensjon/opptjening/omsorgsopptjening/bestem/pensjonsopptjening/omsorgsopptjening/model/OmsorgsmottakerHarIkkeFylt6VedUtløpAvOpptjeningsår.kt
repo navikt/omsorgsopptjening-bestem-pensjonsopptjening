@@ -12,7 +12,7 @@ object OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår : ParagrafVilkår<Pe
         return setOf(
             Referanse.OmsorgsmottakerErIkkeFylt6FørUtgangAvOpptjeningsår
         ).let {
-            if (grunnlag.alderMottaker(mellom = 0..5)) {
+            if (grunnlag.alderMottaker(mellom = Konstanter.ALDERSINTERVALL_BARNETRYGD)) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)

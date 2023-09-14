@@ -12,7 +12,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Disabled
@@ -58,8 +57,6 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
         sendOmsorgsgrunnlagKafka(
             omsorgsGrunnlag = OmsorgsgrunnlagMelding(
                 omsorgsyter = "12345678910",
-                omsorgstype = Omsorgstype.BARNETRYGD,
-                kilde = Kilde.BARNETRYGD,
                 saker = listOf(
                     OmsorgsgrunnlagMelding.Sak(
                         omsorgsyter = "12345678910",
@@ -67,7 +64,7 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
                             OmsorgsgrunnlagMelding.VedtakPeriode(
                                 fom = YearMonth.of(2021, Month.JANUARY),
                                 tom = YearMonth.of(2021, Month.DECEMBER),
-                                prosent = 100,
+                                omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                 omsorgsmottaker = "01122012345"
                             )
                         )

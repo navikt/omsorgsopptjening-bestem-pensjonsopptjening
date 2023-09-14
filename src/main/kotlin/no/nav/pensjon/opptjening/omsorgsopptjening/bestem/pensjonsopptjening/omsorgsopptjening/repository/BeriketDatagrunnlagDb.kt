@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketSak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.YearMonth
@@ -17,8 +18,6 @@ import java.time.YearMonth
 @JsonTypeName("BeriketDatagrunnlagDb")
 internal data class BeriketDatagrunnlagDb(
     val omsorgsyter: PersonDb,
-    val omsorgstype: OmsorgstypeDb,
-    val kilde: KildeDb,
     val omsorgsSaker: List<BeriketOmsorgSakDb>,
     val innlesingId: InnlesingId,
     val correlationId: CorrelationId,
@@ -27,8 +26,6 @@ internal data class BeriketDatagrunnlagDb(
 internal fun BeriketDatagrunnlag.toDb(): BeriketDatagrunnlagDb {
     return BeriketDatagrunnlagDb(
         omsorgsyter = omsorgsyter.toDb(),
-        omsorgstype = omsorgstype.toDb(),
-        kilde = kilde.toDb(),
         omsorgsSaker = omsorgsSaker.map { it.toDb() },
         innlesingId = innlesingId,
         correlationId = correlationId,
@@ -38,8 +35,6 @@ internal fun BeriketDatagrunnlag.toDb(): BeriketDatagrunnlagDb {
 internal fun BeriketDatagrunnlagDb.toDomain(): BeriketDatagrunnlag {
     return BeriketDatagrunnlag(
         omsorgsyter = omsorgsyter.toDomain(),
-        omsorgstype = omsorgstype.toDomain(),
-        kilde = kilde.toDomain(),
         omsorgsSaker = omsorgsSaker.map { it.toDomain() },
         innlesingId = innlesingId,
         correlationId = correlationId,
@@ -79,7 +74,7 @@ internal fun BeriketOmsorgSakDb.toDomain(): BeriketSak {
 internal data class BeriketOmsorgVedtakPeriodeDb(
     val fom: String,
     val tom: String,
-    val prosent: Int,
+    val omsorgstype: String,
     val omsorgsmottaker: PersonDb
 )
 
@@ -87,7 +82,7 @@ internal fun BeriketVedtaksperiode.toDb(): BeriketOmsorgVedtakPeriodeDb {
     return BeriketOmsorgVedtakPeriodeDb(
         fom = fom.toString(),
         tom = tom.toString(),
-        prosent = prosent,
+        omsorgstype = omsorgstype.toString(),
         omsorgsmottaker = PersonDb(
             fnr = omsorgsmottaker.fnr,
             fødselsdato = omsorgsmottaker.fødselsdato.toString()
@@ -99,7 +94,7 @@ internal fun BeriketOmsorgVedtakPeriodeDb.toDomain(): BeriketVedtaksperiode {
     return BeriketVedtaksperiode(
         fom = YearMonth.parse(fom),
         tom = YearMonth.parse(tom),
-        prosent = prosent,
+        omsorgstype = DomainOmsorgstype.valueOf(omsorgstype),
         omsorgsmottaker = omsorgsmottaker.toDomain()
     )
 }
