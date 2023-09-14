@@ -121,7 +121,7 @@ class OppgaveRepo(
      */
     fun finnNesteUprosesserte(): Oppgave? {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for update of o skip locked""",
+            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""",
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),

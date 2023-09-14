@@ -4,13 +4,13 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -56,7 +56,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
     private lateinit var oppgaveRepo: OppgaveRepo
 
     @Autowired
-    private lateinit var oppgaveService: OppgaveService
+    private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
 
 
     companion object {
@@ -170,9 +170,10 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
                 assertInstanceOf(BehandlingUtfall.Innvilget::class.java, it.utfall)
+                assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
+                assertEquals(1, godskrivOpptjeningRepo.findForBehandling(it.id).count())
             }
         }
-        assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
     }
 
     @Test

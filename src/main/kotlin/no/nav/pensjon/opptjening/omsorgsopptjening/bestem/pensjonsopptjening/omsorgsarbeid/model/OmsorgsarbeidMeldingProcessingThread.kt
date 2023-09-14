@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 
 @Component
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
-class OmsorgsarbeidMeldingProsesseringsTråd(
+class OmsorgsarbeidMeldingProcessingThread(
     private val handler: OmsorgsarbeidMeldingService,
     private val unleash: Unleash,
 

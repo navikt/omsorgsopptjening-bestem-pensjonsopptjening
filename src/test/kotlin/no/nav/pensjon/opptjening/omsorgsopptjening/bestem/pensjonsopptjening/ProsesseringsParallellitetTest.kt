@@ -23,7 +23,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.Month
 import java.time.YearMonth
@@ -93,9 +92,6 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                 )
             omsorgsarbeidMeldingService.process()
 
-            //krev ny transaksjon slik at det opprettes ny connection
-            transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW)
-
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
                 Assertions.assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte())
@@ -147,9 +143,6 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                         )
                     ),
                 )
-
-            //krev ny transaksjon slik at det opprettes ny connection
-            transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW)
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
@@ -213,9 +206,6 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                     ),
                 )
             omsorgsarbeidMeldingService.process()
-
-            //krev ny transaksjon slik at det opprettes ny connection
-            transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW)
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet

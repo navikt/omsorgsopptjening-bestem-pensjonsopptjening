@@ -94,7 +94,7 @@ class GodskrivOpptjeningRepo(
      */
     fun finnNesteUprosesserte(): GodskrivOpptjening? {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for update of o skip locked""",
+            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""",
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),

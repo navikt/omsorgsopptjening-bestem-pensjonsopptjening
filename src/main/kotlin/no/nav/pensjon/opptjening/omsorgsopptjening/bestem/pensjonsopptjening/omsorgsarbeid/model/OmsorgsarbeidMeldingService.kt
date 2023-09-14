@@ -14,11 +14,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 
 @Service
 class OmsorgsarbeidMeldingService(
@@ -28,66 +25,48 @@ class OmsorgsarbeidMeldingService(
     private val oppgaveService: OppgaveService,
     private val pdlService: PdlService,
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
+    private val transactionTemplate: TransactionTemplate
 ) {
-    @Autowired
-    private lateinit var statusoppdatering: Statusoppdatering
-
-    /**
-     * https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/annotations.html
-     *
-     * "In proxy mode (which is the default), only external method calls coming in through the proxy are intercepted.
-     * This means that self-invocation (in effect, a method within the target object calling another method of the target object)
-     * does not lead to an actual transaction at runtime even if the invoked method is marked with @Transactional.
-     * Also, the proxy must be fully initialized to provide the expected behavior, so you should not rely on this feature
-     * in your initialization code - for example, in a @PostConstruct method."
-     */
-    @Component
-    private class Statusoppdatering(
-        private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
-        private val oppgaveService: OppgaveService
-    ) {
-        @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRES_NEW)
-        fun markerForRetry(melding: OmsorgsarbeidMelding, exception: Throwable) {
-            melding.retry(exception.toString()).let { melding ->
-                melding.opprettOppgave()?.let {
-                    log.error("Gir opp videre prosessering av melding")
-                    oppgaveService.opprett(it)
-                }
-                omsorgsarbeidRepo.updateStatus(melding)
-            }
-        }
-    }
-
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
-    @Transactional(rollbackFor = [Throwable::class])
     fun process(): List<FullførtBehandling> {
-        return omsorgsarbeidRepo.finnNesteUprosesserte()?.let { melding ->
-            Mdc.scopedMdc(melding.correlationId) {
-                Mdc.scopedMdc(melding.innlesingId) {
-                    try {
-                        log.info("Prosesserer melding")
-                        handle(melding).also { resultat ->
-                            omsorgsarbeidRepo.updateStatus(melding.ferdig())
-                            resultat.forEach {
-                                when (it.erInnvilget()) {
-                                    true -> {
-                                        håndterInnvilgelse(it)
-                                    }
+        return transactionTemplate.execute {
+            omsorgsarbeidRepo.finnNesteUprosesserte()?.let { melding ->
+                Mdc.scopedMdc(melding.correlationId) {
+                    Mdc.scopedMdc(melding.innlesingId) {
+                        try {
+                            transactionTemplate.execute {
+                                log.info("Prosesserer melding")
+                                handle(melding).also { resultat ->
+                                    omsorgsarbeidRepo.updateStatus(melding.ferdig())
+                                    resultat.forEach {
+                                        when (it.erInnvilget()) {
+                                            true -> {
+                                                håndterInnvilgelse(it)
+                                            }
 
-                                    false -> {
-                                        håndterAvslag(it)
+                                            false -> {
+                                                håndterAvslag(it)
+                                            }
+                                        }
+                                        log.info("Melding prosessert")
                                     }
                                 }
-                                log.info("Melding prosessert")
                             }
+                        } catch (ex: Throwable) {
+                            transactionTemplate.execute {
+                                melding.retry(ex.toString()).let { melding ->
+                                    melding.opprettOppgave()?.let {
+                                        log.error("Gir opp videre prosessering av melding")
+                                        oppgaveService.opprett(it)
+                                    }
+                                    omsorgsarbeidRepo.updateStatus(melding)
+                                }
+                            }
+                            throw ex
                         }
-                    } catch (exception: Throwable) {
-                        log.warn("Exception caught while processing message: ${melding.id}, exeption:$exception")
-                        statusoppdatering.markerForRetry(melding, exception)
-                        throw exception
                     }
                 }
             }

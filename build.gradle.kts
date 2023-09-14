@@ -65,6 +65,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
     implementation("io.getunleash:unleash-client-java:8.3.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
 }
 
 tasks.test {
