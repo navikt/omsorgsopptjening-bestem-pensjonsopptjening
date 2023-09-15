@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -10,8 +11,8 @@ import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer
 import com.github.tomakehurst.wiremock.http.Request
 import com.github.tomakehurst.wiremock.http.ResponseDefinition
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlQuery
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
+import org.json.JSONObject
 
 /**
  * Velger body-fil basert på identen i requesten.
@@ -47,7 +48,7 @@ class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformer() {
         p3: Parameters?
     ): ResponseDefinition {
         return if (p0!!.url.equals(SpringContextTest.PDL_PATH) && p1!!.bodyFileName == null) {
-            val ident = mapper.readValue<PdlQuery>(p0.bodyAsString).variables.ident
+            val ident = mapper.readValue<JsonNode>(p0.bodyAsString).get("variables").get("ident").textValue()
             ResponseDefinitionBuilder.like(p1)
                 .withBodyFile(
                     fnrToBodyMapping[ident]

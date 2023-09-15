@@ -1,12 +1,11 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.model
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlMottatDataException
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlPerson
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlMottatDataException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -18,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.Month
 
-internal class PdlServiceTest : SpringContextTest.NoKafka() {
+internal class PersonOppslagTest : SpringContextTest.NoKafka() {
 
     @Autowired
-    lateinit var pdlService: PdlService
+    lateinit var personOppslag: PersonOppslag
 
     companion object {
         const val FNR = "11111111111"
@@ -43,9 +42,8 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                             .withBodyFile("fnr_1bruk.json")
                     )
                 )
-                val person: PdlPerson = pdlService.hentPerson(FNR)
-                assertEquals(0, person.historiskeFnr.size)
-                assertEquals("12345678910", person.gjeldendeFnr)
+                val person: Person = personOppslag.hentPerson(FNR)
+                assertEquals("12345678910", person.fnr)
             }
         }
     }
@@ -61,11 +59,8 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                             .withBodyFile("fnr_samme_fnr_gjeldende_og_historisk.json")
                     )
                 )
-                val person: PdlPerson = pdlService.hentPerson(FNR)
-
-                assertEquals(1, person.alleFnr.size)
-                assertEquals("04010012797", person.alleFnr.first().fnr)
-                assertEquals(true, person.alleFnr.first().gjeldende)
+                val person: Person = personOppslag.hentPerson(FNR)
+                assertEquals("04010012797", person.fnr)
             }
         }
     }
@@ -82,7 +77,7 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                             .withBodyFile("fnr_1opphort.json")
                     )
                 )
-                assertThrows<PdlMottatDataException> { pdlService.hentPerson(FNR) }
+                assertThrows<PersonOppslagException> { personOppslag.hentPerson(FNR) }
             }
         }
     }
@@ -98,7 +93,7 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                             .withBodyFile("fnr_0bruk_0opphort.json")
                     )
                 )
-                assertThrows<PdlMottatDataException> { pdlService.hentPerson(FNR) }
+                assertThrows<PersonOppslagException> { personOppslag.hentPerson(FNR) }
             }
         }
     }
@@ -116,7 +111,7 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                     )
                 )
 
-                assertThrows<PdlMottatDataException> { pdlService.hentPerson(FNR) }
+                assertThrows<PersonOppslagException> { personOppslag.hentPerson(FNR) }
             }
         }
     }
@@ -132,8 +127,8 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                             .withBodyFile("fodsel_1freg_0pdl.json")
                     )
                 )
-                val person: PdlPerson = pdlService.hentPerson(FNR)
-                assertEquals(LocalDate.of(1992, Month.JANUARY, 1), person.fodselsdato)
+                val person: Person = personOppslag.hentPerson(FNR)
+                assertEquals(LocalDate.of(1992, Month.JANUARY, 1), person.fødselsdato)
             }
         }
     }
@@ -149,8 +144,8 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                             .withBodyFile("fodsel_0freg_2pdl.json")
                     )
                 )
-                val person = pdlService.hentPerson(FNR)
-                assertEquals(LocalDate.of(1990, Month.JANUARY, 1), person.fodselsdato)
+                val person = personOppslag.hentPerson(FNR)
+                assertEquals(LocalDate.of(1990, Month.JANUARY, 1), person.fødselsdato)
             }
         }
     }
@@ -166,8 +161,8 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                             .withBodyFile("fodsel_1freg_2pdl.json")
                     )
                 )
-                val person = pdlService.hentPerson(FNR)
-                assertEquals(LocalDate.of(1998, Month.JANUARY, 1), person.fodselsdato)
+                val person = personOppslag.hentPerson(FNR)
+                assertEquals(LocalDate.of(1998, Month.JANUARY, 1), person.fødselsdato)
             }
         }
     }
@@ -183,8 +178,8 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                             .withBodyFile("fodsel_2freg_1pdl.json")
                     )
                 )
-                val person = pdlService.hentPerson(FNR)
-                assertEquals(LocalDate.of(1995, Month.JANUARY, 1), person.fodselsdato)
+                val person = personOppslag.hentPerson(FNR)
+                assertEquals(LocalDate.of(1995, Month.JANUARY, 1), person.fødselsdato)
             }
         }
     }

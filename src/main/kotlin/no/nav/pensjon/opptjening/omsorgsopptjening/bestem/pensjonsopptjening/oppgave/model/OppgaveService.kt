@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -17,7 +17,7 @@ class OppgaveService(
     private val sakKlient: BestemSakKlient,
     private val oppgaveKlient: OppgaveKlient,
     private val oppgaveRepo: OppgaveRepo,
-    private val pdlService: PdlService,
+    private val personOppslag: PersonOppslag,
     private val transactionTemplate: TransactionTemplate
 ) {
     companion object {
@@ -45,7 +45,7 @@ class OppgaveService(
                         try {
                             transactionTemplate.execute {
                                 log.info("Oppretter oppgave")
-                                pdlService.hentAktorId(oppgave.mottaker).let { aktørId ->
+                                personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
                                     sakKlient.bestemSak(
                                         aktørId = aktørId
                                     ).let { omsorgssak ->

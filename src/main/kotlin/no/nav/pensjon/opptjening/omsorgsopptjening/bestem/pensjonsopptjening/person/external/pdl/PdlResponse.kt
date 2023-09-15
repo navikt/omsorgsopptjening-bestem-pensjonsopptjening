@@ -5,20 +5,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class PdlResponse(val data: PdlData, private val errors: List<PdlError>? = null) {
+internal data class PdlResponse(val data: PdlData, private val errors: List<PdlError>? = null) {
     val error: PdlError? = errors?.firstOrNull()
 }
 
-data class PdlData(val hentPerson: HentPersonQueryResponse?)
+internal data class PdlData(val hentPerson: HentPersonQueryResponse?)
 
-data class HentPersonQueryResponse(
+internal data class HentPersonQueryResponse(
     val folkeregisteridentifikator: List<Folkeregisteridentifikator>,
     val foedsel: List<Foedsel>,
     val doedsfall: List<Doedsfall?>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
 )
 
-data class Folkeregisteridentifikator(
+internal data class Folkeregisteridentifikator(
     val identifikasjonsnummer: String,
     val status: Status,
     val type: Type,
@@ -26,14 +26,14 @@ data class Folkeregisteridentifikator(
     val folkeregistermetadata: Folkeregistermetadata? = null,
 )
 
-data class Foedsel(
+internal data class Foedsel(
     val foedselsaar: Int,
     val foedselsdato: String,
     val metadata: Metadata,
     val folkeregistermetadata: Folkeregistermetadata? = null,
 )
 
-data class ForelderBarnRelasjon(
+internal data class ForelderBarnRelasjon(
     val relatertPersonsIdent: String,
     val relatertPersonsRolle: String,
     val minRolleForPerson: String,
@@ -41,17 +41,17 @@ data class ForelderBarnRelasjon(
     val folkeregistermetadata: Folkeregistermetadata? = null,
 )
 
-data class Doedsfall(
+internal data class Doedsfall(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     val doedsdato: LocalDate
 )
 
-data class Metadata(val historisk: Boolean, val master: String, val endringer: List<Endring> = emptyList())
+internal data class Metadata(val historisk: Boolean, val master: String, val endringer: List<Endring> = emptyList())
 
-data class Folkeregistermetadata(val ajourholdstidspunkt: LocalDateTime? = null)
+internal data class Folkeregistermetadata(val ajourholdstidspunkt: LocalDateTime? = null)
 
-data class Endring(val registrert: LocalDateTime)
+internal data class Endring(val registrert: LocalDateTime)
 
-enum class Status { I_BRUK, OPPHOERT }
+internal enum class Status { I_BRUK, OPPHOERT }
 
-enum class Type { FNR, DNR }
+internal enum class Type { FNR, DNR }
