@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
@@ -6,9 +6,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClientExecption
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMeldingService
@@ -71,14 +68,14 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
     fun `gitt at en rad feiler, så skal den kunne retryes og gå bra på et senere tidspunkt`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(WireMock.serverError())
                 .willSetStateTo("ok")
         )
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs("ok")
                 .willReturn(WireMock.ok())
@@ -149,14 +146,14 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(WireMock.serverError())
                 .willSetStateTo("ok")
         )
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs("ok")
                 .willReturn(WireMock.ok())
@@ -220,7 +217,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
     fun `gitt at en oppgave har blitt forsøkt opprettet maks antall ganger uten hell får den status feilet og oppgave opprettes`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(WireMock.serverError())

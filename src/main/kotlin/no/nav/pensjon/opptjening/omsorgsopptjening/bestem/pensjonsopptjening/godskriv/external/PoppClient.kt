@@ -1,7 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.HentPensjonspoengClient
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.HentPensjonspoengClientException
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Pensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -19,36 +24,34 @@ import org.springframework.stereotype.Component
 import pensjon.opptjening.azure.ad.client.TokenProvider
 
 @Component
-class PoppClient(
-    @Value("\${POPP_URL}") private val url: String,
+private class PoppClient(
+    @Value("\${POPP_URL}") private val baseUrl: String,
     @Qualifier("poppTokenProvider") private val tokenProvider: TokenProvider,
-) {
+) : GodskrivOpptjeningClient, HentPensjonspoengClient {
     private val restTemplate = RestTemplateBuilder().build()
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
-    fun lagre(
+    override fun godskriv(
         omsorgsyter: String,
         omsorgsÅr: Int,
         omsorgstype: DomainOmsorgstype,
         kilde: DomainKilde,
-        omsorgsmottaker: String,
+        omsorgsmottaker: String
     ) {
-        return send(
-            Omsorg(
-                fnr = omsorgsyter,
-                ar = omsorgsÅr,
-                omsorgType = PoppOmsorgType.from(omsorgstype),
-                kilde = PoppKilde.from(kilde),
-                fnrOmsorgFor = omsorgsmottaker
+        val requestBody = serialize(
+            LagreOmsorgRequest(
+                Omsorg(
+                    fnr = omsorgsyter,
+                    ar = omsorgsÅr,
+                    omsorgType = PoppOmsorgType.from(omsorgstype),
+                    kilde = PoppKilde.from(kilde),
+                    fnrOmsorgFor = omsorgsmottaker
+                )
             )
         )
-    }
-
-    private fun send(omsorg: Omsorg) {
-        val requestBody = serialize(LagreOmsorgRequest(omsorg))
         val httpEntity = HttpEntity(
             requestBody,
             HttpHeaders().apply {
@@ -61,6 +64,7 @@ class PoppClient(
                 setBearerAuth(tokenProvider.getToken())
             }
         )
+        val url = "$baseUrl/omsorg"
         try {
             restTemplate.exchange(
                 url,
@@ -75,7 +79,65 @@ class PoppClient(
             }
         }
     }
+
+    override fun hentPensjonspoeng(fnr: String, år: Int, type: DomainOmsorgstype): Pensjonspoeng {
+        val url = "$baseUrl/pensjonspoeng?fomAr=$år&tomAr=$år&pensjonspoengType=${PoppOmsorgType.from(type)}"
+        try {
+            return restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                HttpEntity(
+                    null,
+                    HttpHeaders().apply {
+                        add("fnr", fnr)
+                        add("Nav-Call-Id", Mdc.getCorrelationId())
+                        add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
+                        add(CorrelationId.identifier, Mdc.getCorrelationId())
+                        add(InnlesingId.identifier, Mdc.getInnlesingId())
+                        accept = listOf(MediaType.APPLICATION_JSON)
+                        contentType = MediaType.APPLICATION_JSON
+                        setBearerAuth(tokenProvider.getToken())
+                    }
+                ),
+                HentPensjonspoengResponse::class.java,
+            ).let {
+                when {
+                    it.body == null -> Pensjonspoeng(år = år, poeng = 0.0, type = type)
+                    it.body!!.pensjonspoeng == null -> Pensjonspoeng(år = år, poeng = 0.0, type = type)
+                    it.body!!.pensjonspoeng!!.isEmpty() -> Pensjonspoeng(år = år, poeng = 0.0, type = type)
+                    else -> it.body!!.pensjonspoeng(år = år, type = PoppOmsorgType.from(type))
+                }
+            }
+
+        } catch (ex: Throwable) {
+            """Feil ved kall til $url, feil: $ex""".let {
+                logger.warn(it)
+                throw HentPensjonspoengClientException(it)
+            }
+        }
+    }
 }
+
+private data class HentPensjonspoengResponse(
+    val pensjonspoeng: List<Poeng>?
+) {
+    fun pensjonspoeng(år: Int, type: PoppOmsorgType): Pensjonspoeng {
+        return pensjonspoeng!!.single { it.ar == år && it.pensjonspoengType == type }.let {
+            Pensjonspoeng(
+                år = it.ar,
+                poeng = it.poeng,
+                type = it.pensjonspoengType.toDomain()
+            )
+        }
+    }
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+private data class Poeng(
+    val ar: Int,
+    val poeng: Double,
+    val pensjonspoengType: PoppOmsorgType
+)
 
 private data class LagreOmsorgRequest(val omsorg: Omsorg)
 private class LagreOmsorgRespons
@@ -118,6 +180,14 @@ private enum class PoppOmsorgType {
 
     /** Omsorg for barn under 6 år - eget vedtak  */
     OBU6;
+
+    fun toDomain(): DomainOmsorgstype {
+        return when (this) {
+            OSFE -> TODO()
+            OBO6H -> DomainOmsorgstype.HJELPESTØNAD
+            OBU6 -> DomainOmsorgstype.BARNETRYGD
+        }
+    }
 
     companion object {
         fun from(domainOmsorgstype: DomainOmsorgstype): PoppOmsorgType {

@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.GyldigOpptjeningår
@@ -34,7 +34,7 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @MockBean
-    private lateinit var poppClient: PoppClient
+    private lateinit var godskrivOpptjeningClient: GodskrivOpptjeningClient
 
     companion object {
         @JvmField
@@ -47,7 +47,7 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
     fun `consume, process and send innvilget child 0 years`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .willReturn(WireMock.ok())
         )
         willAnswer {
@@ -80,14 +80,14 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
 
         assertEquals(2, behandlingRepo.finnForOmsorgsyter("12345678910").count())
 
-        verify(poppClient).lagre(
+        verify(godskrivOpptjeningClient).godskriv(
             omsorgsyter = "12345678910",
             omsorgsÅr = 2020,
             omsorgstype = DomainOmsorgstype.BARNETRYGD,
             kilde = DomainKilde.BARNETRYGD,
             omsorgsmottaker = "01122012345"
         )
-        verify(poppClient).lagre(
+        verify(godskrivOpptjeningClient).godskriv(
             omsorgsyter = "12345678910",
             omsorgsÅr = 2021,
             omsorgstype = DomainOmsorgstype.BARNETRYGD,

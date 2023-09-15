@@ -42,7 +42,8 @@ sealed class SpringContextTest {
         const val WIREMOCK_PORT = 9991
         const val BESTEM_SAK_PATH = "/pen/api/bestemsak/v1"
         const val OPPGAVE_PATH = "/api/v1/oppgaver"
-        const val POPP_PATH = "/api/omsorg"
+        const val POPP_OMSORG_PATH = "/api/omsorg"
+        const val POPP_PENSJONSPOENG_PATH = "/api/pensjonspoeng"
     }
 
 
