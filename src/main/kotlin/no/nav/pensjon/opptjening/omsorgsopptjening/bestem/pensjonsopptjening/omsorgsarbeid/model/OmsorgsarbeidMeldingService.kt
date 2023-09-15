@@ -3,6 +3,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjon
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjoner
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
@@ -112,11 +114,31 @@ class OmsorgsarbeidMeldingService(
     }
 
     private fun OmsorgsgrunnlagMelding.berikDatagrunnlag(): BeriketDatagrunnlag {
-        val personer = hentPersoner().map {
-            pdlService.hentPerson(it)
-        }.map {
-            Person(it.gjeldendeFnr, it.fodselsdato)
-        }.toSet()
+        val personer = hentPersoner()
+            .map { pdlService.hentPerson(it) }
+            .map { person ->
+                Person(
+                    fnr = person.gjeldendeFnr,
+                    fødselsdato = person.fodselsdato,
+                    dødsdato = person.doedsdato,
+                    familierelasjoner = person.forelderBarnRelasjon
+                        .map {
+                            Familierelasjon(
+                                ident = it.relatertPersonsIdent,
+                                relasjon = when (it.relatertPersonsRolle) {
+                                    "BARN" -> Familierelasjon.Relasjon.BARN
+                                    "FAR" -> Familierelasjon.Relasjon.FAR
+                                    "MOR" -> Familierelasjon.Relasjon.MOR
+                                    "MEDMOR" -> Familierelasjon.Relasjon.MEDMOR
+                                    else -> throw RuntimeException("Ukjent familierelasjon: ${it.relatertPersonsRolle}")
+                                }
+                            )
+                        }.let {
+                            Familierelasjoner(it)
+                        }
+                )
+            }
+            .toSet()
 
         return berikDatagrunnlag(personer)
     }

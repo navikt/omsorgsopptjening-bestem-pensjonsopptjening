@@ -1,6 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.Doedsfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.ForelderBarnRelasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.GraphqlQuery
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.HentPersonQueryResponse
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.IdentGruppe
@@ -26,7 +28,8 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         return PdlPerson(
             alleFnr = historisk + gjeldende,
             fodselsdato = hentPersonQueryResponse.foedselsdato(),
-            doedsdato = bestemDoedsdato(pdlResponse.data.hentPerson.doedsfall)
+            doedsdato = bestemDoedsdato(pdlResponse.data.hentPerson.doedsfall),
+            forelderBarnRelasjon = hentPersonQueryResponse.forelderBarnRelasjon()
         )
     }
 
@@ -72,12 +75,17 @@ class PdlService(private val graphqlQuery: GraphqlQuery, private val pdlClient: 
         }
     }
 
+    private fun HentPersonQueryResponse.forelderBarnRelasjon(): List<ForelderBarnRelasjon>{
+        return forelderBarnRelasjon
+    }
+
 }
 
 data class PdlPerson(
     val alleFnr: List<PdlFnr>,
     val fodselsdato: LocalDate,
-    val doedsdato: LocalDate? = null
+    val doedsdato: LocalDate? = null,
+    val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
 ) {
     val gjeldendeFnr: String get() = alleFnr.first { it.gjeldende }.fnr
     val historiskeFnr: List<String> get() = alleFnr.filter { !it.gjeldende }.map { it.fnr }

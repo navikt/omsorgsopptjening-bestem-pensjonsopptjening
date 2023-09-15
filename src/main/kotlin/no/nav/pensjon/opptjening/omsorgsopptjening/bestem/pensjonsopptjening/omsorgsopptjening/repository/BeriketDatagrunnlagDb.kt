@@ -83,10 +83,7 @@ internal fun BeriketVedtaksperiode.toDb(): BeriketOmsorgVedtakPeriodeDb {
         fom = fom.toString(),
         tom = tom.toString(),
         omsorgstype = omsorgstype.toString(),
-        omsorgsmottaker = PersonDb(
-            fnr = omsorgsmottaker.fnr,
-            fødselsdato = omsorgsmottaker.fødselsdato.toString()
-        )
+        omsorgsmottaker = omsorgsmottaker.toDb()
     )
 }
 

@@ -32,8 +32,8 @@ class OmsorgsarbeidKafkaListener(
         acknowledgment: Acknowledgment
     ) {
         deserialize<OmsorgsgrunnlagMelding>(consumerRecord.value()).also {
-            Mdc.scopedMdc(it.correlationId) { correlationId ->
-                Mdc.scopedMdc(it.innlesingId) { innlesingId ->
+            Mdc.scopedMdc(it.correlationId) { _ ->
+                Mdc.scopedMdc(it.innlesingId) { _ ->
                     log.info("Prosesserer melding")
                     omsorgsarbeidRepo.persist(
                         OmsorgsarbeidMelding(innhold = it)

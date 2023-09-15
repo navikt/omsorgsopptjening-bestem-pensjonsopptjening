@@ -90,6 +90,13 @@ sealed class OmsorgsopptjeningGrunnlag {
         )
     }
 
+    fun forFamilierelasjon(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Grunnlag {
+        return OmsorgsyterErForelderTilMottakerAvHjelpestønad.Grunnlag(
+            omsorgsyter = omsorgsyter,
+            omsorgsmottaker = omsorgsmottaker
+        )
+    }
+
     abstract fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag
 
     /**

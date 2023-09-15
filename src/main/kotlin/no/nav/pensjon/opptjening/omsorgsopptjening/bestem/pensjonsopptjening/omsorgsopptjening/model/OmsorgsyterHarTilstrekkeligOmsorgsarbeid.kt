@@ -50,7 +50,6 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     DomainOmsorgstype.HJELPESTØNAD -> {
                         setOf(
                             Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
-                            Referanse.OmsorgsopptjeningGisTilForelderAvBarnMedForhøyetHjelpestønad,
                             Referanse.OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad
                         )
                     }

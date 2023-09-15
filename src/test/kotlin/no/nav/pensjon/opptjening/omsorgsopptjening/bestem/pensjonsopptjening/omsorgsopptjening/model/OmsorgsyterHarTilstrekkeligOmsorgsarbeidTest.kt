@@ -19,7 +19,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 omsorgsAr = 2000,
                 omsorgsmottaker = Person(
                     fnr = "12125678910",
-                    fødselsdato = LocalDate.of(1999, Month.JANUARY, 1)
+                    fødselsdato = LocalDate.of(1999, Month.JANUARY, 1),
+                    dødsdato = null,
+                    familierelasjoner = Familierelasjoner(emptyList())
                 ),
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(
@@ -40,7 +42,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 omsorgsAr = 2000,
                 omsorgsmottaker = Person(
                     fnr = "12345678910",
-                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
+                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1),
+                    dødsdato = null,
+                    familierelasjoner = Familierelasjoner(emptyList())
                 ),
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(
@@ -61,7 +65,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 omsorgsAr = 2000,
                 omsorgsmottaker = Person(
                     fnr = "12345678910",
-                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
+                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1),
+                    dødsdato = null,
+                    familierelasjoner = Familierelasjoner(emptyList())
                 ),
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     (emptySet())
@@ -79,7 +85,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 omsorgsAr = 2000,
                 omsorgsmottaker = Person(
                     fnr = "12125678910",
-                    fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1)
+                    fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1),
+                    dødsdato = null,
+                    familierelasjoner = Familierelasjoner(emptyList())
                 ),
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(
@@ -100,7 +108,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 omsorgsAr = 2000,
                 omsorgsmottaker = Person(
                     fnr = "12125678910",
-                    fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1)
+                    fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1),
+                    dødsdato = null,
+                    familierelasjoner = Familierelasjoner(emptyList())
                 ),
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(emptySet())
             )
@@ -119,7 +129,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     omsorgsAr = omsorgsår,
                     omsorgsmottaker = Person(
                         fnr = "12345678910",
-                        fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1)
+                        fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1),
+                        dødsdato = null,
+                        familierelasjoner = Familierelasjoner(emptyList())
                     ),
                     omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.Barnetrygd(emptySet()) else Omsorgsmåneder.Barnetrygd(
                         Periode(
@@ -150,7 +162,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     omsorgsAr = omsorgsår,
                     omsorgsmottaker = Person(
                         fnr = "12345678910",
-                        fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1)
+                        fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1),
+                        dødsdato = null,
+                        familierelasjoner = Familierelasjoner(emptyList())
                     ),
                     omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.Barnetrygd(emptySet()) else Omsorgsmåneder.Barnetrygd(
                         Periode(
@@ -176,7 +190,9 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 omsorgsAr = omsorgsår,
                 omsorgsmottaker = Person(
                     fnr = "12345678910",
-                    fødselsdato = LocalDate.of(omsorgsår - 6, Month.JANUARY, 1)
+                    fødselsdato = LocalDate.of(omsorgsår - 6, Month.JANUARY, 1),
+                    dødsdato = null,
+                    familierelasjoner = Familierelasjoner(emptyList())
                 ),
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(

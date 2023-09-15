@@ -53,6 +53,7 @@ data class Behandling(
     private fun vilkårsurderHjelpestønad(): VilkarsVurdering<*> {
         return og(
             vurderVilkår.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(),
+            vurderVilkår.OmsorgsyterErForelderTilMottakerAvHjelpestønad(),
         )
     }
 

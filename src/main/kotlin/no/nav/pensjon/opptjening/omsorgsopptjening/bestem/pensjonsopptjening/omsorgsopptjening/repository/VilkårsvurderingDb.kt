@@ -9,6 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErFylt17VedUtløpAvOmsorgsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
@@ -82,6 +83,12 @@ sealed class VilkårsvurderingDb {
         val grunnlag: GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
+    @JsonTypeName("OmsorgsyterErForelderTilMottakerAvHjelpestønad")
+    internal data class OmsorgsyterErForelderTilMottakerAvHjelpestønad(
+        val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsmottaker,
+        val utfall: VilkårsvurderingUtfallDb,
+    ) : VilkårsvurderingDb()
 }
 
 internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
@@ -151,6 +158,13 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
 
         is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> {
             VilkårsvurderingDb.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(
+                grunnlag = grunnlag.toDb(),
+                utfall = utfall.toDb()
+            )
+        }
+
+        is OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering -> {
+            VilkårsvurderingDb.OmsorgsyterErForelderTilMottakerAvHjelpestønad(
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -293,6 +307,13 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
 
         is VilkårsvurderingDb.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad -> {
             OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering(
+                grunnlag = grunnlag.toDomain(),
+                utfall = utfall.toDomain()
+            )
+        }
+
+        is VilkårsvurderingDb.OmsorgsyterErForelderTilMottakerAvHjelpestønad -> {
+            OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering(
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )

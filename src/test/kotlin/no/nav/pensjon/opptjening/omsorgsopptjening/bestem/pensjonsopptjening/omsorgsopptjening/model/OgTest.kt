@@ -12,19 +12,32 @@ class OgTest {
     private val omsorgsår = 2020
     private val fodselAvslag = LocalDate.of(omsorgsår - 10, Month.JANUARY, 1)
     private val fodselInnvilget = LocalDate.of(omsorgsår - 20, Month.JANUARY, 1)
+    private val personAvslag = Person(
+        fnr = "1",
+        fødselsdato = fodselAvslag,
+        dødsdato = null,
+        familierelasjoner = Familierelasjoner(emptyList())
+    )
+    private val personInnvilget =
+        Person(
+            fnr = "1",
+            fødselsdato = fodselInnvilget,
+            dødsdato = null,
+            familierelasjoner = Familierelasjoner(emptyList())
+        )
 
     @Test
     fun `all avslag is avslag`() {
         og(
             OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
-                    person = Person(fnr = "1", fødselsdato = fodselAvslag),
+                    person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
-                    person = Person(fnr = "1", fødselsdato = fodselAvslag),
+                    person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
@@ -33,18 +46,19 @@ class OgTest {
         }
     }
 
+
     @Test
     fun `one avslag is avslag`() {
         og(
             OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
-                    person = Person(fnr = "1", fødselsdato = fodselAvslag),
+                    person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
-                    person = Person(fnr = "1", fødselsdato = fodselInnvilget),
+                    person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
             ),
@@ -58,13 +72,13 @@ class OgTest {
         og(
             OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
-                    person = Person(fnr = "1", fødselsdato = fodselInnvilget),
+                    person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
             ),
             OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
-                    person = Person(fnr = "1", fødselsdato = fodselInnvilget),
+                    person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
             ),
@@ -78,14 +92,14 @@ class OgTest {
         og(
             OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
-                    person = Person(fnr = "1", fødselsdato = fodselAvslag),
+                    person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             og(
                 OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                     grunnlag = PersonOgOmsorgsårGrunnlag(
-                        person = Person(fnr = "1", fødselsdato = fodselAvslag),
+                        person = personAvslag,
                         omsorgsAr = omsorgsår
                     )
                 ),
@@ -100,14 +114,14 @@ class OgTest {
         og(
             OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
-                    person = Person(fnr = "1", fødselsdato = fodselAvslag),
+                    person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             og(
                 OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                     grunnlag = PersonOgOmsorgsårGrunnlag(
-                        person = Person(fnr = "1", fødselsdato = fodselInnvilget),
+                        person = personInnvilget,
                         omsorgsAr = omsorgsår
                     )
                 ),
@@ -122,14 +136,14 @@ class OgTest {
         og(
             OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
-                    person = Person(fnr = "1", fødselsdato = fodselInnvilget),
+                    person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
             ),
             og(
                 OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
                     grunnlag = PersonOgOmsorgsårGrunnlag(
-                        person = Person(fnr = "1", fødselsdato = fodselInnvilget),
+                        person = personInnvilget,
                         omsorgsAr = omsorgsår
                     )
                 ),

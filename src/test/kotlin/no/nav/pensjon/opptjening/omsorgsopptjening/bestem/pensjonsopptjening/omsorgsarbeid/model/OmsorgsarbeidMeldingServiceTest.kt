@@ -9,6 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erEnesteAvslag
@@ -421,7 +422,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                             )
                         ),
                         OmsorgsgrunnlagMelding.Sak(
-                            omsorgsyter = "01018212345",
+                            omsorgsyter = "01019212345",
                             vedtaksperioder = listOf(
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.NOVEMBER),
@@ -451,7 +452,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                     mapOf(
                         "12345678910" to 8,
                         "04010012797" to 7,
-                        "01018212345" to 2,
+                        "01019212345" to 2,
                     ),
                     it.grunnlag.data.associate { it.omsorgsyter.fnr to it.antall() }
                 )
@@ -501,7 +502,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                             )
                         ),
                         OmsorgsgrunnlagMelding.Sak(
-                            omsorgsyter = "01018212345",
+                            omsorgsyter = "01019212345",
                             vedtaksperioder = listOf(
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.NOVEMBER),
@@ -531,7 +532,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                     mapOf(
                         "04010012797" to 8,
                         "12345678910" to 7,
-                        "01018212345" to 2,
+                        "01019212345" to 2,
                     ),
                     it.grunnlag.data.associate { it.omsorgsyter.fnr to it.antall() }
                 )
@@ -807,7 +808,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                             )
                         ),
                         OmsorgsgrunnlagMelding.Sak(
-                            omsorgsyter = "01018212345",
+                            omsorgsyter = "01019212345",
                             vedtaksperioder = listOf(
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -838,7 +839,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                     mapOf(
                         "12345678910" to 7,
                         "04010012797" to 7,
-                        "01018212345" to 7,
+                        "01019212345" to 7,
                     ),
                     it.grunnlag.data.associate { it.omsorgsyter.fnr to it.antall() }
                 )
@@ -1024,6 +1025,49 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     }
 
     @Test
+    fun `en omsorgsyter som mottar barnetrygd for en omsorgsmottaker over 6 år med hjelpestønad skal avslås omsorgsyter og omsorgsmottaker ikke har en foreldre-barn relasjon`() {
+        repo.persist(
+            OmsorgsarbeidMelding(
+                innhold = OmsorgsgrunnlagMelding(
+                    omsorgsyter = "01019212345",
+                    saker = listOf(
+                        OmsorgsgrunnlagMelding.Sak(
+                            omsorgsyter = "01019212345",
+                            vedtaksperioder = listOf(
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2018, Month.JANUARY),
+                                    tom = YearMonth.of(2030, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "03041212345"
+                                ),
+                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                    fom = YearMonth.of(2018, Month.JANUARY),
+                                    tom = YearMonth.of(2030, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
+                                    omsorgsmottaker = "03041212345"
+                                )
+                            )
+                        ),
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        handler.process().single().also { behandling ->
+            behandling.assertAvslag(
+                omsorgsyter = "01019212345",
+                omsorgsmottaker = "03041212345",
+                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+            ).also {
+                assertTrue(it.vilkårsvurdering.erEnesteAvslag<OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering>())
+            }
+        }
+    }
+
+    @Test
     fun `en omsorgsyter som mottar barnetrygd for en omsorgsmottaker med hjelpestønad skal avslås dersom barnetrygd og hjelpestønad har et halvt år eller mindre overlappende måneder`() {
         repo.persist(
             OmsorgsarbeidMelding(
@@ -1145,23 +1189,25 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
         omsorgsmottaker: String,
         år: Int = OPPTJENINGSÅR,
         omsorgstype: DomainOmsorgstype = DomainOmsorgstype.BARNETRYGD,
-    ) {
+    ): FullførtBehandling {
         assertEquals(år, this.omsorgsAr)
         assertEquals(omsorgsyter, this.omsorgsyter)
         assertEquals(omsorgsmottaker, this.omsorgsmottaker)
         assertEquals(omsorgstype, this.omsorgstype)
         assertInstanceOf(BehandlingUtfall.Innvilget::class.java, this.utfall)
+        return this
     }
 
     private fun FullførtBehandling.assertAvslag(
         omsorgsyter: String,
         omsorgsmottaker: String,
         omsorgstype: DomainOmsorgstype = DomainOmsorgstype.BARNETRYGD,
-    ) {
+    ): FullførtBehandling {
         assertEquals(OPPTJENINGSÅR, this.omsorgsAr)
         assertEquals(omsorgsyter, this.omsorgsyter)
         assertEquals(omsorgsmottaker, this.omsorgsmottaker)
         assertEquals(omsorgstype, this.omsorgstype)
         assertInstanceOf(BehandlingUtfall.Avslag::class.java, this.utfall)
+        return this
     }
 }

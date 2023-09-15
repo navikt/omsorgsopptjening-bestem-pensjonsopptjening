@@ -32,6 +32,7 @@ class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformer() {
             "01052012345" to "fnr_barn_0ar_may_2020.json",
             "01122012345" to "fnr_barn_0ar_des_2020.json",
             "03041212345" to "fnr_barn_12ar_2020.json",
+            "01019212345" to "fodsel_1freg_0pdl.json",
         )
     }
 

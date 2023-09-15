@@ -60,7 +60,8 @@
           }
         }
       ],
-      "doedsfall": []
+      "doedsfall": [],
+      "forelderBarnRelasjon": []
     }
   }
 }

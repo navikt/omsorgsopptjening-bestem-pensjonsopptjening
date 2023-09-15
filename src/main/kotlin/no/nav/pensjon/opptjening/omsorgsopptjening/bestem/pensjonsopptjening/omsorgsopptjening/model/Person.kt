@@ -6,6 +6,8 @@ import java.time.Month
 class Person(
     val fnr: String,
     val fødselsdato: LocalDate,
+    val dødsdato: LocalDate?,
+    val familierelasjoner: Familierelasjoner
 ) {
     override fun equals(other: Any?) = this === other || (other is Person && this.fnr == other.fnr)
     override fun hashCode() = fnr.hashCode()
@@ -24,6 +26,14 @@ class Person(
 
     fun fødselsdato(): LocalDate {
         return fødselsdato
+    }
+
+    fun erBarnAv(fnr: String): Boolean {
+        return familierelasjoner.erForelder(fnr)
+    }
+
+    fun erForelderAv(fnr: String): Boolean {
+        return familierelasjoner.erBarn(fnr)
     }
 }
 

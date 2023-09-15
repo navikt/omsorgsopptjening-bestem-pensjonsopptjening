@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonOgOmsorgsårGrunnlag
@@ -68,6 +69,26 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         val omsorgsyter: PersonDb,
         val data: List<OmsorgsyterMottakerAntallMånederDb>
     ) : GrunnlagVilkårsvurderingDb()
+
+    @JsonTypeName("OmsorgsyterOgOmsorgsmottaker")
+    data class OmsorgsyterOgOmsorgsmottaker(
+        val omsorgsyter: PersonDb,
+        val omsorgsmottaker: PersonDb,
+    ) : GrunnlagVilkårsvurderingDb()
+}
+
+internal fun GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsmottaker.toDomain(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Grunnlag {
+    return OmsorgsyterErForelderTilMottakerAvHjelpestønad.Grunnlag(
+        omsorgsyter = omsorgsyter.toDomain(),
+        omsorgsmottaker = omsorgsmottaker.toDomain()
+    )
+}
+
+internal fun OmsorgsyterErForelderTilMottakerAvHjelpestønad.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsmottaker {
+    return GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsmottaker(
+        omsorgsyter = omsorgsyter.toDb(),
+        omsorgsmottaker = omsorgsmottaker.toDb()
+    )
 }
 
 internal fun GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere.toDomain(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
@@ -183,6 +204,7 @@ internal fun FullførteBehandlingerForOmsorgsmottakerDb.toDomain(): Omsorgsopptj
         erInnvilget = erInnvilget
     )
 }
+
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,

@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -13,7 +14,8 @@ data class PdlData(val hentPerson: HentPersonQueryResponse?)
 data class HentPersonQueryResponse(
     val folkeregisteridentifikator: List<Folkeregisteridentifikator>,
     val foedsel: List<Foedsel>,
-    val doedsfall: List<Doedsfall?>
+    val doedsfall: List<Doedsfall?>,
+    val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
 )
 
 data class Folkeregisteridentifikator(
@@ -27,6 +29,14 @@ data class Folkeregisteridentifikator(
 data class Foedsel(
     val foedselsaar: Int,
     val foedselsdato: String,
+    val metadata: Metadata,
+    val folkeregistermetadata: Folkeregistermetadata? = null,
+)
+
+data class ForelderBarnRelasjon(
+    val relatertPersonsIdent: String,
+    val relatertPersonsRolle: String,
+    val minRolleForPerson: String,
     val metadata: Metadata,
     val folkeregistermetadata: Folkeregistermetadata? = null,
 )
