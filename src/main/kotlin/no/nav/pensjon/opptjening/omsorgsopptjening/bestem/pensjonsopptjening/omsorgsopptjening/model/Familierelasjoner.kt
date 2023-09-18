@@ -4,26 +4,57 @@ data class Familierelasjoner(
     val relasjoner: List<Familierelasjon>
 ) {
     fun erForelder(fnr: String): Boolean {
-        return relasjoner.singleOrNull {it.ident == fnr }?.erForelder() ?: false
+        return finnForeldre().let { it.farEllerMedmor == fnr || it.mor == fnr }
     }
 
     fun erBarn(fnr: String): Boolean {
-        return relasjoner.singleOrNull {it.ident == fnr }?.erBarn() ?: false
+        return relasjoner.singleOrNull { it.ident == fnr }?.erBarn() ?: false
+    }
+
+    fun finnForeldre(): Foreldre {
+        val far = relasjoner.singleOrNull { it.erFar() }
+        val mor = relasjoner.singleOrNull { it.erMor() }
+        val medmor = relasjoner.singleOrNull { it.erMedmor() }
+
+        return when {
+            far != null -> {
+                Foreldre(
+                    farEllerMedmor = far.ident,
+                    mor = mor!!.ident,
+                )
+            }
+
+            medmor != null -> {
+                Foreldre(
+                    farEllerMedmor = medmor.ident,
+                    mor = mor!!.ident
+                )
+            }
+
+            else -> throw RuntimeException("Klarte ikke å identifisere foreldre")
+        }
     }
 }
 
 data class Familierelasjon(
     val ident: String,
     val relasjon: Relasjon
-){
-    fun erForelder() = erMor() || erFar()
+) {
     fun erBarn() = relasjon == Relasjon.BARN
-    private fun erFar() = relasjon == Relasjon.FAR
-    private fun erMor() = relasjon == Relasjon.MOR || relasjon == Relasjon.MEDMOR
+    fun erFar() = relasjon == Relasjon.FAR
+    fun erMor() = relasjon == Relasjon.MOR
+    fun erMedmor() = relasjon == Relasjon.MEDMOR
     enum class Relasjon {
         BARN,
         FAR,
         MOR,
         MEDMOR,
     }
+}
+
+data class Foreldre(
+    val farEllerMedmor: String,
+    val mor: String,
+) {
+
 }

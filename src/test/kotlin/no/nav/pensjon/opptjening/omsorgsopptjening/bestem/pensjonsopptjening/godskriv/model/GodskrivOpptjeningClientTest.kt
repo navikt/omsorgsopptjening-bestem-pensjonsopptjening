@@ -21,11 +21,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders
 import kotlin.test.assertContains
 
 class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
+
     @Autowired
+    @Qualifier("godskrivOpptjening")
     private lateinit var godskrivOpptjeningClient: GodskrivOpptjeningClient
 
     companion object {

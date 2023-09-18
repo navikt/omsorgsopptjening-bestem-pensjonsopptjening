@@ -2,9 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjon
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjoner
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
@@ -27,7 +26,9 @@ class OmsorgsarbeidMeldingService(
     private val oppgaveService: OppgaveService,
     private val personOppslag: PersonOppslag,
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
-    private val transactionTemplate: TransactionTemplate
+    private val transactionTemplate: TransactionTemplate,
+    private val brevService: BrevService,
+    private val hentPensjonspoeng: HentPensjonspoengClient,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -103,6 +104,10 @@ class OmsorgsarbeidMeldingService(
     private fun håndterInnvilgelse(behandling: FullførtBehandling) {
         log.info("Håndterer innvilgelse")
         godskrivOpptjeningService.opprett(behandling.godskrivOpptjening())
+        behandling.sendBrev(
+            hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgsarbeid,
+            hentPensjonspoengForInntekt = hentPensjonspoeng::hentPensjonspoengForInntekt,
+        )?.also { brevService.opprett(it) }
     }
 
     private fun håndterAvslag(behandling: FullførtBehandling) {

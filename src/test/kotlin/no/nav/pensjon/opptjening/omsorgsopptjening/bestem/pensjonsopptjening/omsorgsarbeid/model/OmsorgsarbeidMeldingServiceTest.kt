@@ -1,9 +1,14 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
 
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.equalTo
+import com.github.tomakehurst.wiremock.client.WireMock.get
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
@@ -985,6 +990,68 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `en omsorgsyter som mottar barnetrygd for en omsorgsmottaker over 6 år med hjelpestønad skal innvilges omsorgsopptjening dersom barnetrygd og hjelpestønad har et halvt år eller mer overlappende måneder`() {
+        wiremock.givenThat(
+            get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
+                .withHeader("fnr", equalTo("12345678910")) //mor
+                .withQueryParam("fomAr", equalTo("2019"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            """
+                            {
+                                "pensjonspoeng": [
+                                    {
+                                        "ar":2019,
+                                        "poeng":1.5,
+                                        "pensjonspoengType":"OBO6H"
+                                    }
+                                ]
+                            }
+                        """.trimIndent()
+                        )
+                )
+        )
+
+        wiremock.givenThat(
+            get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
+                .withHeader("fnr", equalTo("12345678910")) //mor
+                .withQueryParam("fomAr", equalTo("2020"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            """
+                            {
+                                "pensjonspoeng": [
+                                    {
+                                        "ar":2020,
+                                        "poeng":1.5,
+                                        "pensjonspoengType":"OBO6H"
+                                    }
+                                ]
+                            }
+                        """.trimIndent()
+                        )
+                )
+        )
+
+        wiremock.givenThat(
+            get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
+                .withHeader("fnr", equalTo("04010012797")) //far
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            """
+                            {
+                                "pensjonspoeng":null
+                            }
+                        """.trimIndent()
+                        )
+                )
+        )
+
         repo.persist(
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(

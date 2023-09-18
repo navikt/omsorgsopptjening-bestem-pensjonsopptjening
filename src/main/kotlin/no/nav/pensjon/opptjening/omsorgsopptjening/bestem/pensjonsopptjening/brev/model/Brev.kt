@@ -1,54 +1,31 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Pensjonspoeng
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-data class GodskrivOpptjening(
+data class Brev(
     val id: UUID? = null,
     val opprettet: Instant? = null,
-    val behandlingId: UUID,
+    val omsorgsyter: String,
+    val behandlingId: UUID?,
     val meldingId: UUID,
     val correlationId: CorrelationId,
     val statushistorikk: List<Status> = listOf(Status.Klar()),
-    val omsorgsyter: String? = null,
     val innlesingId: InnlesingId
 ) {
     val status = statushistorikk.last()
 
-    companion object {
-        const val OMSORGSPOENG_GODSKRIVES = 3.5
-    }
-
-    fun ferdig(): GodskrivOpptjening {
+    fun ferdig(): Brev {
         return copy(statushistorikk = statushistorikk + status.ferdig())
     }
 
-    fun retry(melding: String): GodskrivOpptjening {
+    fun retry(melding: String): Brev {
         return copy(statushistorikk = statushistorikk + status.retry(melding))
-    }
-
-    fun opprettOppgave(): Oppgave? {
-        return if (status is Status.Feilet) {
-            Oppgave(
-                detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
-                    omsorgsyter = omsorgsyter!!,
-                ),
-                behandlingId = behandlingId,
-                meldingId = meldingId,
-                correlationId = correlationId,
-                innlesingId = innlesingId,
-            )
-        } else {
-            null
-        }
     }
 
     @JsonTypeInfo(

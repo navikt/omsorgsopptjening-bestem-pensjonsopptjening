@@ -1,13 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
 
 interface HentPensjonspoengClient {
-    fun hentPensjonspoeng(fnr: String, år: Int, type: DomainOmsorgstype): Pensjonspoeng
+    fun hentPensjonspoengForOmsorgsarbeid(fnr: String, år: Int, type: DomainOmsorgstype): Pensjonspoeng.Omsorg
+    fun hentPensjonspoengForInntekt(fnr: String, år: Int): Pensjonspoeng.Inntekt
 }
-data class Pensjonspoeng(
-    val år: Int,
-    val poeng: Double,
-    val type: DomainOmsorgstype
-)
 
 data class HentPensjonspoengClientException(val msg: String) : RuntimeException(msg)
 

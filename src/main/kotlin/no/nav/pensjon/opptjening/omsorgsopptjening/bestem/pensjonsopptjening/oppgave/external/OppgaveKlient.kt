@@ -64,7 +64,7 @@ class OppgaveKlient(
             response.body!!.id.toString()
         } catch (ex: Exception) {
             """Feil ved kall til $oppgaveUrl, feil: $ex""".let {
-                logger.warn(it)
+                logger.warn(it, ex)
                 throw OppgaveKlientException(it, ex)
             }
         }

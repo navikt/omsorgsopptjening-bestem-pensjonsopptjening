@@ -2,6 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Pensjonspoeng
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import java.time.Instant
@@ -119,8 +121,70 @@ data class FullførtBehandling(
         }
     }
 
-    fun sendBrev(): Boolean {
-        //TODO hjelpestønad
-        return false
+    fun sendBrev(
+        hentPensjonspoengForOmsorgsopptjening: (fnr: String, år: Int, type: DomainOmsorgstype) -> Pensjonspoeng,
+        hentPensjonspoengForInntekt: (fnr: String, år: Int) -> Pensjonspoeng,
+    ): Brev? {
+        require(erInnvilget()) { "Kan bare sende brev for innvilget behandling!" }
+        fun omsorgspoeng(): Pensjonspoeng.Omsorg {
+            return godskrivOpptjening().let {
+                Pensjonspoeng.Omsorg(
+                    år = omsorgsAr,
+                    poeng = GodskrivOpptjening.OMSORGSPOENG_GODSKRIVES,
+                    type = omsorgstype
+                )
+            }
+        }
+
+        return when (omsorgstype) {
+            DomainOmsorgstype.BARNETRYGD -> {
+                null
+            }
+
+            DomainOmsorgstype.HJELPESTØNAD -> {
+                val foreldre = grunnlag.omsorgsmottaker.finnForeldre()
+                //TODO føles som man kanskje burde sjekke begge omsorgstyper for å unngå brev for tilfeller hvor omsorgsyter har poeng fra barnetryg for året før?
+                val omsorgsytersOmsorgspoengForegåendeÅr = hentPensjonspoengForOmsorgsopptjening(
+                    omsorgsyter,
+                    omsorgsAr - 1,
+                    omsorgstype
+                )
+                val (omsorgsytersOmsorgspoengForOmsorgsår, annenForeldersInntektspoengOmsorgsår) = when {
+                    foreldre.farEllerMedmor == omsorgsyter -> {
+                        omsorgspoeng() to hentPensjonspoengForInntekt(
+                            foreldre.mor,
+                            omsorgsAr,
+                        )
+                    }
+
+                    foreldre.mor == omsorgsyter -> {
+                        omsorgspoeng() to hentPensjonspoengForInntekt(
+                            foreldre.farEllerMedmor,
+                            omsorgsAr,
+                        )
+                    }
+
+                    else -> {
+                        throw RuntimeException("Uventet familiekonstellasjon, vilkår at foreldre er mott")
+                    }
+                }
+
+                return if (
+                    !grunnlag.omsorgsyter.erForelderAv(omsorgsmottaker) || //TODO dette henger ikke sammen med vilkårsvurderingen atm
+                    omsorgsytersOmsorgspoengForegåendeÅr.poeng == 0.0 ||
+                    omsorgsytersOmsorgspoengForOmsorgsår > annenForeldersInntektspoengOmsorgsår
+                ) {
+                    return Brev(
+                        omsorgsyter = omsorgsyter, //TODO slapp modell, hentes fra behandling i basen inntil videre, håndtering av verge/annen mottaker - annen app?
+                        behandlingId = id,
+                        meldingId = meldingId,
+                        correlationId = grunnlag.correlationId,
+                        innlesingId = grunnlag.innlesingId
+                    )
+                } else {
+                    null
+                }
+            }
+        }
     }
 }

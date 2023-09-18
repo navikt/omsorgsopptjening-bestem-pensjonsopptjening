@@ -64,7 +64,7 @@ class BestemSakKlient(
             }
         } catch (ex: Exception) {
             """Feil ved kall til ${bestemSakUrl}, feil: $ex""".let {
-                logger.warn(it)
+                logger.warn(it, ex)
                 throw BestemSakClientException(it, ex)
             }
         }

@@ -35,5 +35,9 @@ class Person(
     fun erForelderAv(fnr: String): Boolean {
         return familierelasjoner.erBarn(fnr)
     }
+
+    fun finnForeldre(): Foreldre {
+        return familierelasjoner.finnForeldre()
+    }
 }
 
