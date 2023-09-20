@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Pensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -21,6 +22,10 @@ data class GodskrivOpptjening(
     val innlesingId: InnlesingId
 ) {
     val status = statushistorikk.last()
+
+    companion object {
+        const val OMSORGSPOENG_GODSKRIVES = 3.5
+    }
 
     fun ferdig(): GodskrivOpptjening {
         return copy(statushistorikk = statushistorikk + status.ferdig())

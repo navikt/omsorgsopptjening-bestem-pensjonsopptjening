@@ -1,13 +1,13 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
@@ -20,10 +20,11 @@ import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.net.URI
 
 @Component
-class PdlClient(
+internal class PdlClient(
     @Value("\${PDL_URL}") private val pdlUrl: String,
     @Qualifier("pdlTokenProvider") private val tokenProvider: TokenProvider,
-    private val registry: MeterRegistry
+    private val registry: MeterRegistry,
+    private val graphqlQuery: GraphqlQuery,
 ) {
     private val antallPersonerHentet = registry.counter("personer", "antall", "hentet")
     private val antallAktoridHentet = registry.counter("aktorid", "antall", "hentet")
@@ -34,9 +35,9 @@ class PdlClient(
         value = [RestClientException::class, PdlException::class],
         backoff = Backoff(delay = 1500L, maxDelay = 30000L, multiplier = 2.5)
     )
-    fun hentPerson(graphqlQuery: String, fnr: String): PdlResponse? {
+    fun hentPerson(fnr: String): PdlResponse? {
         val entity = RequestEntity<PdlQuery>(
-            PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
+            PdlQuery(graphqlQuery.hentPersonQuery(), FnrVariables(ident = fnr)),
             HttpHeaders().apply {
                 add("Nav-Call-Id", Mdc.getCorrelationId())
                 add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
@@ -63,9 +64,9 @@ class PdlClient(
         return response
     }
 
-    internal fun hentAktorId(graphqlQuery: String, fnr: String): IdenterResponse? {
+    internal fun hentAktorId(fnr: String): IdenterResponse? {
         val entity = RequestEntity<PdlQuery>(
-            PdlQuery(graphqlQuery, FnrVariables(ident = fnr)),
+            PdlQuery(graphqlQuery.hentAktørIdQuery(), FnrVariables(ident = fnr)),
             HttpHeaders().apply {
                 add("Nav-Call-Id", Mdc.getCorrelationId())
                 add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
@@ -92,3 +93,23 @@ class PdlClient(
         return response
     }
 }
+
+@Component
+internal class GraphqlQuery(
+    @Value("classpath:pdl/folkeregisteridentifikator.graphql")
+    private val hentPersonQuery: Resource,
+    @Value("classpath:pdl/hentAktorId.graphql")
+    private val hentAktorIdQuery: Resource
+) {
+    fun hentPersonQuery(): String {
+        return String(hentPersonQuery.inputStream.readBytes()).replace("[\n\r]", "")
+    }
+
+    fun hentAktørIdQuery(): String {
+        return String(hentAktorIdQuery.inputStream.readBytes()).replace("[\n\r]", "")
+    }
+}
+
+private data class PdlQuery(val query: String, val variables: FnrVariables)
+
+private data class FnrVariables(val ident: String)

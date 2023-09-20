@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -10,8 +11,8 @@ import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer
 import com.github.tomakehurst.wiremock.http.Request
 import com.github.tomakehurst.wiremock.http.ResponseDefinition
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlQuery
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
+import org.json.JSONObject
 
 /**
  * Velger body-fil basert på identen i requesten.
@@ -31,6 +32,8 @@ class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformer() {
             "07081812345" to "fnr_barn_2ar_2020.json",
             "01052012345" to "fnr_barn_0ar_may_2020.json",
             "01122012345" to "fnr_barn_0ar_des_2020.json",
+            "03041212345" to "fnr_barn_12ar_2020.json",
+            "01019212345" to "fodsel_1freg_0pdl.json",
         )
     }
 
@@ -45,7 +48,7 @@ class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformer() {
         p3: Parameters?
     ): ResponseDefinition {
         return if (p0!!.url.equals(SpringContextTest.PDL_PATH) && p1!!.bodyFileName == null) {
-            val ident = mapper.readValue<PdlQuery>(p0.bodyAsString).variables.ident
+            val ident = mapper.readValue<JsonNode>(p0.bodyAsString).get("variables").get("ident").textValue()
             ResponseDefinitionBuilder.like(p1)
                 .withBodyFile(
                     fnrToBodyMapping[ident]

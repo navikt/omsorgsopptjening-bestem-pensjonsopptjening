@@ -12,7 +12,7 @@ object OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår : ParagrafVilkår<Person
         return setOf(
             Referanse.OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller69
         ).let {
-            if (grunnlag.person.alderVedUtløpAv(grunnlag.omsorgsAr) <= 69) {
+            if (grunnlag.person.alderVedUtløpAv(grunnlag.omsorgsAr) <= Konstanter.OMSORGSYTER_MAKSIMUM_ALDER) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)

@@ -10,15 +10,19 @@ import kotlin.test.assertEquals
 class OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
 
     private val årstall = LocalDate.of(2000, Month.JANUARY, 1)
+    private val person = Person(
+        fnr = "12345678910",
+        fødselsdato = årstall,
+        dødsdato = null,
+        familierelasjoner = Familierelasjoner(emptyList())
+    )
+
     @Test
     fun `should be innvilget when subject younger than 70 years`() {
 
         val vilkarsVurdering = OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = Person(
-                    fnr = "12345678910",
-                    fødselsdato = årstall
-                ),
+                person = person,
                 omsorgsAr = årstall.plusYears(69).year
             )
         )
@@ -29,10 +33,7 @@ class OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
     fun `should be avslag when subject older than 70 years`() {
         val vilkarsVurdering = OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = Person(
-                    fnr = "12345678910",
-                    fødselsdato = årstall
-                ),
+                person = person,
                 omsorgsAr = årstall.plusYears(71).year
             )
         )
@@ -50,10 +51,7 @@ class OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsårTest {
     fun `should be avslag when subject is 70 years`() {
         val vilkarsVurdering = OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = Person(
-                    fnr = "12345678910",
-                    fødselsdato = årstall
-                ),
+                person = person,
                 omsorgsAr = årstall.plusYears(70).year
             )
         )

@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
@@ -10,7 +10,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClientExecption
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
@@ -22,12 +21,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders
 import kotlin.test.assertContains
 
-class PoppClientTest : SpringContextTest.NoKafka() {
+class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
+
     @Autowired
-    private lateinit var client: PoppClient
+    @Qualifier("godskrivOpptjening")
+    private lateinit var godskrivOpptjeningClient: GodskrivOpptjeningClient
 
     companion object {
         @JvmField
@@ -42,12 +44,12 @@ class PoppClientTest : SpringContextTest.NoKafka() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
                 wiremock.givenThat(
-                    post(urlPathEqualTo(POPP_PATH))
+                    post(urlPathEqualTo(POPP_OMSORG_PATH))
                         .willReturn(serverError())
                 )
 
                 assertThrows<PoppClientExecption> {
-                    client.lagre(
+                    godskrivOpptjeningClient.godskriv(
                         omsorgsyter = "elaboraret",
                         omsorgsÅr = 6669,
                         omsorgstype = DomainOmsorgstype.BARNETRYGD,
@@ -66,7 +68,7 @@ class PoppClientTest : SpringContextTest.NoKafka() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
                 wiremock.givenThat(
-                    post(urlPathEqualTo(POPP_PATH))
+                    post(urlPathEqualTo(POPP_OMSORG_PATH))
                         .willReturn(
                             aResponse()
                                 .withStatus(512)
@@ -84,7 +86,7 @@ class PoppClientTest : SpringContextTest.NoKafka() {
                 )
 
                 assertThrows<PoppClientExecption> {
-                    client.lagre(
+                    godskrivOpptjeningClient.godskriv(
                         omsorgsyter = "elaboraret",
                         omsorgsÅr = 6669,
                         omsorgstype = DomainOmsorgstype.BARNETRYGD,
@@ -105,7 +107,7 @@ class PoppClientTest : SpringContextTest.NoKafka() {
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
                 wiremock.givenThat(
-                    post(urlPathEqualTo(POPP_PATH))
+                    post(urlPathEqualTo(POPP_OMSORG_PATH))
                         .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer test.token.test"))
                         .withHeader(HttpHeaders.ACCEPT, equalTo("application/json"))
                         .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
@@ -132,7 +134,7 @@ class PoppClientTest : SpringContextTest.NoKafka() {
                 )
 
                 assertEquals(
-                    Unit, client.lagre(
+                    Unit, godskrivOpptjeningClient.godskriv(
                         omsorgsyter = "elaboraret",
                         omsorgsÅr = 6669,
                         omsorgstype = DomainOmsorgstype.BARNETRYGD,

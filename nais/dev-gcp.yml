@@ -22,7 +22,7 @@ spec:
     - name: OPPGAVE_API_ID
       value: dev-fss.oppgavehandtering.oppgave
     - name: POPP_URL
-      value: https://pensjon-popp-q2.dev-fss-pub.nais.io/popp/api/omsorg
+      value: https://pensjon-popp-q2.dev-fss-pub.nais.io/popp/api
     - name: POPP_API_ID
       value: dev-fss.pensjonopptjening.pensjon-popp-q2
   envFrom:

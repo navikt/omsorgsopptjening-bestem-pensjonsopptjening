@@ -11,7 +11,7 @@ import pensjon.opptjening.azure.ad.client.TokenProvider
 
 @Component("pdlTokenProvider")
 @Profile("dev-gcp", "prod-gcp")
-class PdlTokenProvider(
+internal class PdlTokenProvider(
     @Value("\${PDL_API_ID}") val appId: String,
     azureAdConfig: AzureAdTokenClientConfig,
 ) : TokenProvider {

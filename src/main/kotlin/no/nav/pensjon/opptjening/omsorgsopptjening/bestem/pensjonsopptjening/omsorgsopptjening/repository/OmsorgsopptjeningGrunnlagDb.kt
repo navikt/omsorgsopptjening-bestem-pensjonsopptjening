@@ -2,14 +2,14 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BarnetrygdGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
     property = "type",
 )
-internal sealed class BarnetrygdGrunnlagDb {
+internal sealed class OmsorgsopptjeningGrunnlagDb {
     abstract val omsorgsår: Int
     abstract val omsorgsmottaker: PersonDb
     abstract val grunnlag: BeriketDatagrunnlagDb
@@ -19,43 +19,43 @@ internal sealed class BarnetrygdGrunnlagDb {
         override val omsorgsår: Int,
         override val omsorgsmottaker: PersonDb,
         override val grunnlag: BeriketDatagrunnlagDb
-    ) : BarnetrygdGrunnlagDb()
+    ) : OmsorgsopptjeningGrunnlagDb()
 
     @JsonTypeName("IkkeFødtDesember")
     data class IkkeFødtDesember(
         override val omsorgsår: Int,
         override val omsorgsmottaker: PersonDb,
         override val grunnlag: BeriketDatagrunnlagDb
-    ) : BarnetrygdGrunnlagDb()
+    ) : OmsorgsopptjeningGrunnlagDb()
 
     @JsonTypeName("IkkeFødtIOmsorgsår")
     data class IkkeFødtIOmsorgsår(
         override val omsorgsår: Int,
         override val omsorgsmottaker: PersonDb,
         override val grunnlag: BeriketDatagrunnlagDb
-    ) : BarnetrygdGrunnlagDb()
+    ) : OmsorgsopptjeningGrunnlagDb()
 }
 
-internal fun BarnetrygdGrunnlag.toDb(): BarnetrygdGrunnlagDb {
+internal fun OmsorgsopptjeningGrunnlag.toDb(): OmsorgsopptjeningGrunnlagDb {
     return when (this) {
-        is BarnetrygdGrunnlag.FødtIOmsorgsår.FødtDesember -> {
-            BarnetrygdGrunnlagDb.FødtDesember(
+        is OmsorgsopptjeningGrunnlag.FødtIOmsorgsår.FødtDesember -> {
+            OmsorgsopptjeningGrunnlagDb.FødtDesember(
                 omsorgsår = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker.toDb(),
                 grunnlag = grunnlag.toDb()
             )
         }
 
-        is BarnetrygdGrunnlag.FødtIOmsorgsår.IkkeFødtDesember -> {
-            BarnetrygdGrunnlagDb.IkkeFødtDesember(
+        is OmsorgsopptjeningGrunnlag.FødtIOmsorgsår.IkkeFødtDesember -> {
+            OmsorgsopptjeningGrunnlagDb.IkkeFødtDesember(
                 omsorgsår = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker.toDb(),
                 grunnlag = grunnlag.toDb()
             )
         }
 
-        is BarnetrygdGrunnlag.IkkeFødtIOmsorgsår -> {
-            BarnetrygdGrunnlagDb.IkkeFødtIOmsorgsår(
+        is OmsorgsopptjeningGrunnlag.IkkeFødtIOmsorgsår -> {
+            OmsorgsopptjeningGrunnlagDb.IkkeFødtIOmsorgsår(
                 omsorgsår = omsorgsAr,
                 omsorgsmottaker = omsorgsmottaker.toDb(),
                 grunnlag = grunnlag.toDb()
@@ -64,26 +64,26 @@ internal fun BarnetrygdGrunnlag.toDb(): BarnetrygdGrunnlagDb {
     }
 }
 
-internal fun BarnetrygdGrunnlagDb.toDomain(): BarnetrygdGrunnlag {
+internal fun OmsorgsopptjeningGrunnlagDb.toDomain(): OmsorgsopptjeningGrunnlag {
     return when (this) {
-        is BarnetrygdGrunnlagDb.FødtDesember -> {
-            BarnetrygdGrunnlag.FødtIOmsorgsår.FødtDesember(
+        is OmsorgsopptjeningGrunnlagDb.FødtDesember -> {
+            OmsorgsopptjeningGrunnlag.FødtIOmsorgsår.FødtDesember(
                 omsorgsAr = omsorgsår,
                 omsorgsmottaker = omsorgsmottaker.toDomain(),
                 grunnlag = grunnlag.toDomain()
             )
         }
 
-        is BarnetrygdGrunnlagDb.IkkeFødtDesember -> {
-            BarnetrygdGrunnlag.FødtIOmsorgsår.IkkeFødtDesember(
+        is OmsorgsopptjeningGrunnlagDb.IkkeFødtDesember -> {
+            OmsorgsopptjeningGrunnlag.FødtIOmsorgsår.IkkeFødtDesember(
                 omsorgsAr = omsorgsår,
                 omsorgsmottaker = omsorgsmottaker.toDomain(),
                 grunnlag = grunnlag.toDomain()
             )
         }
 
-        is BarnetrygdGrunnlagDb.IkkeFødtIOmsorgsår -> {
-            BarnetrygdGrunnlag.IkkeFødtIOmsorgsår(
+        is OmsorgsopptjeningGrunnlagDb.IkkeFødtIOmsorgsår -> {
+            OmsorgsopptjeningGrunnlag.IkkeFødtIOmsorgsår(
                 omsorgsAr = omsorgsår,
                 omsorgsmottaker = omsorgsmottaker.toDomain(),
                 grunnlag = grunnlag.toDomain()

@@ -2,14 +2,15 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.transformerTilBarnetrygdGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.tilOmsorgsopptjeningsgrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import org.slf4j.Logger
@@ -23,9 +24,11 @@ class OmsorgsarbeidMeldingService(
     private val gyldigOpptjeningsår: GyldigOpptjeningår,
     private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
     private val oppgaveService: OppgaveService,
-    private val pdlService: PdlService,
+    private val personOppslag: PersonOppslag,
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
-    private val transactionTemplate: TransactionTemplate
+    private val transactionTemplate: TransactionTemplate,
+    private val brevService: BrevService,
+    private val hentPensjonspoeng: HentPensjonspoengClient,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -76,10 +79,10 @@ class OmsorgsarbeidMeldingService(
     private fun handle(melding: OmsorgsarbeidMelding): List<FullførtBehandling> {
         return melding.innhold
             .berikDatagrunnlag()
-            .transformerTilBarnetrygdGrunnlag()
-            .filter { barnetrygdGrunnlag ->
-                gyldigOpptjeningsår.get().contains(barnetrygdGrunnlag.omsorgsAr).also {
-                    if (!it) log.info("Filtrerer vekk grunnlag for ugyldig opptjeningsår: ${barnetrygdGrunnlag.omsorgsAr}")
+            .tilOmsorgsopptjeningsgrunnlag()
+            .filter { grunnlag ->
+                gyldigOpptjeningsår.get().contains(grunnlag.omsorgsAr).also {
+                    if (!it) log.info("Filtrerer vekk grunnlag for ugyldig opptjeningsår: ${grunnlag.omsorgsAr}")
                 }
             }
             .map {
@@ -101,6 +104,10 @@ class OmsorgsarbeidMeldingService(
     private fun håndterInnvilgelse(behandling: FullførtBehandling) {
         log.info("Håndterer innvilgelse")
         godskrivOpptjeningService.opprett(behandling.godskrivOpptjening())
+        behandling.sendBrev(
+            hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgsarbeid,
+            hentPensjonspoengForInntekt = hentPensjonspoeng::hentPensjonspoengForInntekt,
+        )?.also { brevService.opprett(it) }
     }
 
     private fun håndterAvslag(behandling: FullførtBehandling) {
@@ -112,11 +119,9 @@ class OmsorgsarbeidMeldingService(
     }
 
     private fun OmsorgsgrunnlagMelding.berikDatagrunnlag(): BeriketDatagrunnlag {
-        val personer = hentPersoner().map {
-            pdlService.hentPerson(it)
-        }.map {
-            Person(it.gjeldendeFnr, it.fodselsdato)
-        }.toSet()
+        val personer = hentPersoner()
+            .map { personOppslag.hentPerson(it) }
+            .toSet()
 
         return berikDatagrunnlag(personer)
     }
@@ -128,8 +133,6 @@ class OmsorgsarbeidMeldingService(
 
         return BeriketDatagrunnlag(
             omsorgsyter = persondata.finnPerson(omsorgsyter),
-            omsorgstype = omsorgstype.toDomain(),
-            kilde = kilde.toDomain(),
             omsorgsSaker = saker.map { omsorgsSak ->
                 BeriketSak(
                     omsorgsyter = persondata.finnPerson(omsorgsSak.omsorgsyter),
@@ -137,7 +140,7 @@ class OmsorgsarbeidMeldingService(
                         BeriketVedtaksperiode(
                             fom = omsorgVedtakPeriode.fom,
                             tom = omsorgVedtakPeriode.tom,
-                            prosent = omsorgVedtakPeriode.prosent,
+                            omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain(),
                             omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker)
                         )
                     }

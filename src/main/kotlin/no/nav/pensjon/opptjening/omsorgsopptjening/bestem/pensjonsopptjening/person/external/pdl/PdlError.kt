@@ -2,11 +2,11 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class PdlError(val message: String, val extensions: Extensions)
+internal data class PdlError(val message: String, val extensions: Extensions)
 
-data class Extensions(val code: PdlErrorCode)
+internal data class Extensions(val code: PdlErrorCode)
 
-enum class PdlErrorCode {
+internal enum class PdlErrorCode {
     @JsonProperty("unauthenticated") UNAUTHENTICATED,
     @JsonProperty("unauthorized") UNAUTHORIZED,
     @JsonProperty("not_found") NOT_FOUND,

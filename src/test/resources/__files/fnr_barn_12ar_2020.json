@@ -1,0 +1,95 @@
+{
+  "data": {
+    "hentIdenter": {
+      "identer": [{
+        "ident": "03041212345",
+        "gruppe": "AKTORID"
+      }
+      ]
+    },
+    "hentPerson": {
+      "folkeregisteridentifikator": [
+        {
+          "identifikasjonsnummer": "03041212345",
+          "status": "I_BRUK",
+          "type": "FNR",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsaar": 2012,
+          "foedselsdato": "2012-04-03",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "doedsfall": [],
+      "forelderBarnRelasjon": [
+        {
+          "relatertPersonsIdent": "12345678910",
+          "relatertPersonsRolle": "MOR",
+          "minRolleForPerson": "BARN",
+          "relatertPersonUtenFolkeregisteridentifikator": null,
+          "folkeregistermetadata": {
+            "ajourholdstidspunkt": "2023-09-14T12:59:35",
+            "gyldighetstidspunkt": "2023-09-14T12:59:35",
+            "opphoerstidspunkt": null,
+            "kilde": "Dolly",
+            "aarsak": null,
+            "sekvens": null
+          },
+          "metadata": {
+            "opplysningsId": "76cefd01-c99b-45f3-a3ef-ae2d574848d1",
+            "master": "FREG",
+            "endringer": [
+              {
+                "type": "OPPRETT",
+                "registrert": "2023-09-14T13:00:32",
+                "registrertAv": "Folkeregisteret",
+                "systemkilde": "FREG",
+                "kilde": "Dolly",
+                "hendelseId": "76cefd01-c99b-45f3-a3ef-ae2d574848d1"
+              }
+            ],
+            "historisk": false
+          }
+        },
+        {
+          "relatertPersonsIdent": "04010012797",
+          "relatertPersonsRolle": "FAR",
+          "minRolleForPerson": "BARN",
+          "relatertPersonUtenFolkeregisteridentifikator": null,
+          "folkeregistermetadata": {
+            "ajourholdstidspunkt": "2023-09-14T12:59:35",
+            "gyldighetstidspunkt": "2023-09-14T12:59:35",
+            "opphoerstidspunkt": null,
+            "kilde": "Dolly",
+            "aarsak": null,
+            "sekvens": null
+          },
+          "metadata": {
+            "opplysningsId": "76cefd01-c99b-45f3-a3ef-ae2d574848d1",
+            "master": "FREG",
+            "endringer": [
+              {
+                "type": "OPPRETT",
+                "registrert": "2023-09-14T13:00:32",
+                "registrertAv": "Folkeregisteret",
+                "systemkilde": "FREG",
+                "kilde": "Dolly",
+                "hendelseId": "76cefd01-c99b-45f3-a3ef-ae2d574848d1"
+              }
+            ],
+            "historisk": false
+          }
+        }
+      ]
+    }
+  }
+}

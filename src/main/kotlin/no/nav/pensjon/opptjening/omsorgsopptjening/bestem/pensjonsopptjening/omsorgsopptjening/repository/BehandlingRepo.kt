@@ -93,7 +93,7 @@ internal class BehandlingRowMapper : RowMapper<BehandlingDb> {
             omsorgsyter = rs.getString("omsorgsyter"),
             omsorgsmottaker = rs.getString("omsorgsmottaker"),
             omsorgstype = OmsorgstypeDb.valueOf(rs.getString("omsorgstype")),
-            grunnlag = rs.getString("grunnlag").mapToClass(BarnetrygdGrunnlagDb::class.java),
+            grunnlag = rs.getString("grunnlag").mapToClass(OmsorgsopptjeningGrunnlagDb::class.java),
             vilkårsvurdering = rs.getString("vilkarsvurdering").mapToClass(VilkårsvurderingDb::class.java),
             utfall = rs.getString("utfall").mapToClass(BehandlingsutfallDb::class.java),
             meldingId = UUID.fromString(rs.getString("kafkaMeldingId"))

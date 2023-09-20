@@ -12,14 +12,18 @@ class OmsorgsyterErFylt17VedUtløpAvOmsorgsårTest {
     private val fnr = "01058512345"
     private val fødselsår = LocalDate.of(2000, Month.JANUARY, 1)
 
+    private val person = Person(
+        fnr = fnr,
+        fødselsdato = fødselsår,
+        dødsdato = null,
+        familierelasjoner = Familierelasjoner(emptyList())
+    )
+
     @Test
     fun `should be innvilget when subject has turned 17 before omsorgsår`() {
         val vilkarsVurdering = OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = Person(
-                    fnr = fnr,
-                    fødselsdato = fødselsår
-                ),
+                person = person,
                 omsorgsAr = fødselsår.plusYears(18).year
             )
         )
@@ -30,10 +34,7 @@ class OmsorgsyterErFylt17VedUtløpAvOmsorgsårTest {
     fun `should be innvilget when subject turns 17 in omsorgsår`() {
         val vilkarsVurdering = OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = Person(
-                    fnr = fnr,
-                    fødselsdato = fødselsår
-                ),
+                person = person,
                 omsorgsAr = fødselsår.plusYears(17).year
             )
         )
@@ -44,10 +45,7 @@ class OmsorgsyterErFylt17VedUtløpAvOmsorgsårTest {
     fun `should be avslag when subject has not turned 17`() {
         val vilkarsVurdering = OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
             PersonOgOmsorgsårGrunnlag(
-                person = Person(
-                    fnr = fnr,
-                    fødselsdato = fødselsår
-                ),
+                person = person,
                 omsorgsAr = fødselsår.plusYears(16).year
             )
         )

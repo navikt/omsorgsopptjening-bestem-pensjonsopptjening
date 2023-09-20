@@ -18,7 +18,7 @@ internal data class HentIdenter(
         val identer: List<IdentInformasjon>
 )
 
-data class IdentInformasjon(
+internal data class IdentInformasjon(
         val ident: String,
         val gruppe: IdentGruppe
 )

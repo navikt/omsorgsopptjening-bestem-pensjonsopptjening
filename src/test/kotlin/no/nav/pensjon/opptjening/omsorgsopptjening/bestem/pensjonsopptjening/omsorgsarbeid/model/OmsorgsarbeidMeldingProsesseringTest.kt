@@ -12,11 +12,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlException
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslagException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -113,8 +113,6 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -122,7 +120,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -137,7 +135,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
 
-        assertThrows<PdlException> {
+        assertThrows<PersonOppslagException> {
             handler.process()
         }
 
@@ -149,7 +147,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
         }
         assertEquals(emptyList<FullførtBehandling>(), behandlingRepo.finnForOmsorgsyter("12345678910"))
 
-        assertThrows<PdlException> {
+        assertThrows<PersonOppslagException> {
             handler.process()
         }
 
@@ -167,7 +165,6 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(2020, it.omsorgsAr)
                 assertEquals("12345678910", it.omsorgsyter)
                 assertEquals("07081812345", it.omsorgsmottaker)
-                assertEquals(DomainKilde.BARNETRYGD, it.kilde())
                 assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
                 assertInstanceOf(BehandlingUtfall.Innvilget::class.java, it.utfall)
                 assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
@@ -214,8 +211,6 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -223,7 +218,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -238,7 +233,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
 
-        assertThrows<PdlException> {
+        assertThrows<PersonOppslagException> {
             handler.process()
         }
         assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, repo.find(melding.id!!).status).also {
@@ -298,8 +293,6 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -307,7 +300,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345"
                                 )
                             )
@@ -322,16 +315,16 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
 
-        assertThrows<PdlException> {
+        assertThrows<PersonOppslagException> {
             handler.process()
         }
-        assertThrows<PdlException> {
+        assertThrows<PersonOppslagException> {
             handler.process()
         }
-        assertThrows<PdlException> {
+        assertThrows<PersonOppslagException> {
             handler.process()
         }
-        assertThrows<PdlException> {
+        assertThrows<PersonOppslagException> {
             handler.process()
         }
 
@@ -344,7 +337,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(3, it.maxAntallForsøk)
                 assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
                 assertEquals(
-                    "no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlException: Ugyldig ident",
+                    "PersonOppslagException(msg=Feil ved henting av person, throwable=no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException: Ugyldig ident)",
                     it.melding
                 )
             }
@@ -353,7 +346,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(3, it.maxAntallForsøk)
                 assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
                 assertEquals(
-                    "no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlException: Fant ikke person",
+                    "PersonOppslagException(msg=Feil ved henting av person, throwable=no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException: Fant ikke person)",
                     it.melding
                 )
             }

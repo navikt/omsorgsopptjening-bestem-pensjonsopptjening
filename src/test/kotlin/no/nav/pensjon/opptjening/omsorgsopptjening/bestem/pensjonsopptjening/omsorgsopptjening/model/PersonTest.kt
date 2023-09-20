@@ -11,12 +11,22 @@ class PersonTest {
     private val aprilNittenÅttiFem = LocalDate.of(1985, Month.APRIL, 1)
     private val nittenfemtiseks = LocalDate.of(1956, Month.JANUARY, 1)
 
+    private val personAprilNittenÅttiFem = Person(
+        fnr = "01048512345",
+        fødselsdato = aprilNittenÅttiFem,
+        dødsdato = null,
+        familierelasjoner = Familierelasjoner(emptyList())
+    )
+    private val personNittenFemtiSeks = Person(
+        fnr = "12345678910",
+        fødselsdato = nittenfemtiseks,
+        dødsdato = null,
+        familierelasjoner = Familierelasjoner(emptyList())
+    )
+
     @Test
     fun alder() {
-        Person(
-            fnr = "01048512345",
-            fødselsdato = aprilNittenÅttiFem
-        ).let {
+        personAprilNittenÅttiFem.let {
             assertEquals(-1, it.alderVedUtløpAv(1984))
             assertEquals(0, it.alderVedUtløpAv(1985))
             assertEquals(1, it.alderVedUtløpAv(1986))
@@ -25,10 +35,7 @@ class PersonTest {
 
     @Test
     fun erFødt() {
-        Person(
-            fnr = "01048512345",
-            fødselsdato = aprilNittenÅttiFem
-        ).let {
+        personAprilNittenÅttiFem.let {
             assertEquals(false, it.erFødt(1984))
             assertEquals(true, it.erFødt(1985))
             assertEquals(false, it.erFødt(1986))
@@ -41,42 +48,51 @@ class PersonTest {
 
     @Test
     fun fødselsdato() {
-        Person(
-            fnr = "01048512345",
-            fødselsdato = aprilNittenÅttiFem
-        ).let {
+        personAprilNittenÅttiFem.let {
             assertEquals(LocalDate.of(1985, Month.APRIL, 1), it.fødselsdato())
         }
     }
 
+
     @Test
     fun `Gitt en person med lik fnr så skal equals være true`() {
-        assertEquals(Person(fnr = "12345678910", fødselsdato = nittenfemtiseks), Person("12345678910", nittenfemtiseks))
+        assertEquals(
+            personNittenFemtiSeks,
+            Person("12345678910", nittenfemtiseks, null, Familierelasjoner(emptyList()))
+        )
     }
 
     @Test
     fun `Gitt samme person objekt så skal equals være true`() {
-        val person1 = Person(fnr = "12345678910", fødselsdato = nittenfemtiseks)
-        assertEquals(person1, person1)
+        assertEquals(personNittenFemtiSeks, personNittenFemtiSeks)
     }
 
     @Test
     fun `Gitt en person med samme fødsels nummer men annet fødelsdato enn person 2 så skal equals være true`() {
-        assertEquals(Person("12345678910", nittenfemtiseks), Person("12345678910", nittenfemtiseks.plusYears(1)))
+        assertEquals(
+            personNittenFemtiSeks,
+            Person("12345678910", nittenfemtiseks.plusYears(1), null, Familierelasjoner(emptyList()))
+        )
     }
 
     @Test
     fun `Gitt en person med annet fødsels nummer enn person 2 så skal equals være false`() {
-        assertNotEquals(Person("12345678910", nittenfemtiseks), Person("12345678911", nittenfemtiseks))
+        assertNotEquals(
+            personNittenFemtiSeks,
+            Person("12345678911", nittenfemtiseks, null, Familierelasjoner(emptyList()))
+        )
     }
 
     @Test
     fun `Gitt en person equals null skal equals være false`() {
-        assertNotEquals(Person("12345678910", nittenfemtiseks), null)
+        assertNotEquals(personNittenFemtiSeks, null)
     }
 
     @Test
     fun `Gitt to personer med samme fnr så skal hashcode være lik`() {
-        assertEquals(Person("12345678910", nittenfemtiseks).hashCode(), Person("12345678910", nittenfemtiseks).hashCode())
+        assertEquals(
+            personNittenFemtiSeks.hashCode(),
+            personNittenFemtiSeks.hashCode()
+        )
     }
 }

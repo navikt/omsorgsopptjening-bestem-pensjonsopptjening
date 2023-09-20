@@ -9,27 +9,29 @@ interface VurderVilkår {
     fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering
     fun OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(): OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering
     fun OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(): OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering
-
+    fun OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(): OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering
     fun OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr(): OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering
-    fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): VilkarsVurdering<*>
+    fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering
+    fun OmsorgsyterErForelderTilMottakerAvHjelpestønad(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering
 }
 
 internal class VilkårsvurderingFactory(
-    private val grunnlag: BarnetrygdGrunnlag,
+    private val grunnlag: OmsorgsopptjeningGrunnlag,
     private val behandlingRepo: BehandlingRepo
 ) : VurderVilkår {
     override fun OmsorgsyterErFylt17VedUtløpAvOmsorgsår(): OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering {
         return OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
-
     }
 
     override fun OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(): OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering {
         return OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
-
     }
 
     override fun OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(): OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering {
         return OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.vilkarsVurder(grunnlag.forOmsorgsmottakerOgÅr())
+    }
+    override fun OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(): OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering {
+        return OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.vilkarsVurder(grunnlag.forOmsorgsmottakerOgÅr())
     }
 
 
@@ -55,11 +57,16 @@ internal class VilkårsvurderingFactory(
             })
     }
 
-    override fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): VilkarsVurdering<*> {
+    override fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering {
         return OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.vilkarsVurder(
             grunnlag.forSummertOmsorgPerOmsorgsyter()
         )
     }
+
+    override fun OmsorgsyterErForelderTilMottakerAvHjelpestønad(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering {
+        return OmsorgsyterErForelderTilMottakerAvHjelpestønad.vilkarsVurder(grunnlag.forFamilierelasjon())
+    }
+
     override fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering {
         return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(grunnlag.forTilstrekkeligOmsorgsarbeid())
 

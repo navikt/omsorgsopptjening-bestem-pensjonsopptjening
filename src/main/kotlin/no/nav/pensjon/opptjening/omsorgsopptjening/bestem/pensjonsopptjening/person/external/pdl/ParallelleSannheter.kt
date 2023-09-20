@@ -2,9 +2,9 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import java.time.LocalDateTime
 
-const val FOLKEREGISTERET = "FREG"
+private const val FOLKEREGISTERET = "FREG"
 
-fun List<Foedsel>.avklarFoedsel(): Foedsel? {
+internal fun List<Foedsel>.avklarFoedsel(): Foedsel? {
     val foedslerSortert = sortedByDescending { it.sisteEndringstidspunktOrNull() }
     val foedselFreg = foedslerSortert.find { it.metadata harMaster FOLKEREGISTERET }
     if (foedselFreg != null) return foedselFreg

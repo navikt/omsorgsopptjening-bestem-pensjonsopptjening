@@ -5,18 +5,14 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 
 enum class DomainOmsorgstype {
     BARNETRYGD,
+    HJELPESTØNAD;
 }
 
 fun Omsorgstype.toDomain(): DomainOmsorgstype {
     return when (this) {
-        Omsorgstype.BARNETRYGD -> DomainOmsorgstype.BARNETRYGD
-        Omsorgstype.HJELPESTØNAD_SATS_3 -> TODO()
-        Omsorgstype.HJELPESTØNAD_SATS_4 -> TODO()
-    }
-}
-
-fun DomainOmsorgstype.toKafka(): Omsorgstype {
-    return when (this) {
-        DomainOmsorgstype.BARNETRYGD -> Omsorgstype.BARNETRYGD
+        Omsorgstype.DELT_BARNETRYGD -> DomainOmsorgstype.BARNETRYGD
+        Omsorgstype.FULL_BARNETRYGD -> DomainOmsorgstype.BARNETRYGD
+        Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3 -> DomainOmsorgstype.HJELPESTØNAD
+        Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_4 -> DomainOmsorgstype.HJELPESTØNAD
     }
 }

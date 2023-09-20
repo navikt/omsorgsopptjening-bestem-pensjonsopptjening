@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
@@ -6,9 +6,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClientExecption
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMeldingService
@@ -19,7 +16,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -72,14 +68,14 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
     fun `gitt at en rad feiler, så skal den kunne retryes og gå bra på et senere tidspunkt`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(WireMock.serverError())
                 .willSetStateTo("ok")
         )
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs("ok")
                 .willReturn(WireMock.ok())
@@ -98,8 +94,6 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -107,7 +101,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345"
                                 )
                             )
@@ -152,14 +146,14 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(WireMock.serverError())
                 .willSetStateTo("ok")
         )
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs("ok")
                 .willReturn(WireMock.ok())
@@ -180,8 +174,6 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -189,7 +181,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345"
                                 )
                             )
@@ -225,7 +217,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
     fun `gitt at en oppgave har blitt forsøkt opprettet maks antall ganger uten hell får den status feilet og oppgave opprettes`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .inScenario("retry")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(WireMock.serverError())
@@ -243,8 +235,6 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             OmsorgsarbeidMelding(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
-                    omsorgstype = Omsorgstype.BARNETRYGD,
-                    kilde = Kilde.BARNETRYGD,
                     saker = listOf(
                         OmsorgsgrunnlagMelding.Sak(
                             omsorgsyter = "12345678910",
@@ -252,7 +242,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
-                                    prosent = 100,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345"
                                 )
                             )

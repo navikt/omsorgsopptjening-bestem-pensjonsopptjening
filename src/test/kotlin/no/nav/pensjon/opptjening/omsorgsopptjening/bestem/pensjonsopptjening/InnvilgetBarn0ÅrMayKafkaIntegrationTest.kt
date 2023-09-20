@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.GyldigOpptjeningår
@@ -12,7 +12,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Disabled
@@ -36,7 +35,7 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @MockBean
-    private lateinit var poppClient: PoppClient
+    private lateinit var godskrivOpptjeningClient: GodskrivOpptjeningClient
 
     companion object {
         @JvmField
@@ -49,7 +48,7 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
     fun `consume, process and send innvilget child 0 years`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(POPP_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .willReturn(WireMock.ok())
         )
         willAnswer {
@@ -59,8 +58,6 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
         sendOmsorgsgrunnlagKafka(
             omsorgsGrunnlag = OmsorgsgrunnlagMelding(
                 omsorgsyter = "12345678910",
-                omsorgstype = Omsorgstype.BARNETRYGD,
-                kilde = Kilde.BARNETRYGD,
                 saker = listOf(
                     OmsorgsgrunnlagMelding.Sak(
                         omsorgsyter = "12345678910",
@@ -68,7 +65,7 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
                             OmsorgsgrunnlagMelding.VedtakPeriode(
                                 fom = YearMonth.of(2020, Month.OCTOBER),
                                 tom = YearMonth.of(2020, Month.DECEMBER),
-                                prosent = 100,
+                                omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                 omsorgsmottaker = "01052012345"
                             )
                         )
@@ -84,7 +81,7 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
 
         assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
 
-        verify(poppClient).lagre(
+        verify(godskrivOpptjeningClient).godskriv(
             omsorgsyter = "12345678910",
             omsorgsÅr = 2020,
             omsorgstype = DomainOmsorgstype.BARNETRYGD,

@@ -31,8 +31,8 @@ class NavUnleashConfig(
     enum class Feature(val toggleName: String) {
         OPPRETT_OPPGAVER("omsorgsopptjening-bestem-pensjonsopptjening-opprett-oppgaver"),
         GODSKRIV("omsorgsopptjening-bestem-pensjonsopptjening-godskriv"),
-        BEHANDLING("omsorgsopptjening-bestem-pensjonsopptjening-behandling")
-
+        BEHANDLING("omsorgsopptjening-bestem-pensjonsopptjening-behandling"),
+        BREV("omsorgsopptjening-bestem-pensjonsopptjening-brev") //TODO toggle
     }
 }
 

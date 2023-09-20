@@ -6,11 +6,11 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.TokenProviderConfig.Companion.MOCK_TOKEN
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlException
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PdlService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslagException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -20,7 +20,7 @@ import org.springframework.web.client.RestClientException
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-internal class PdlClientTest : SpringContextTest.NoKafka() {
+internal class PdlServiceTest : SpringContextTest.NoKafka() {
 
     @Autowired
     lateinit var pdlService: PdlService
@@ -175,8 +175,10 @@ internal class PdlClientTest : SpringContextTest.NoKafka() {
                     )
                 )
 
-                val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
-                assertEquals(PdlErrorCode.NOT_FOUND, error.code)
+                val error = assertThrows<PersonOppslagException> { pdlService.hentPerson(FNR) }
+                assertInstanceOf(PdlException::class.java, error.cause).also {
+                    assertEquals(PdlErrorCode.NOT_FOUND, it.code)
+                }
                 wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
             }
         }
@@ -194,8 +196,10 @@ internal class PdlClientTest : SpringContextTest.NoKafka() {
                     )
                 )
 
-                val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
-                assertEquals(PdlErrorCode.UNAUTHENTICATED, error.code)
+                val error = assertThrows<PersonOppslagException> { pdlService.hentPerson(FNR) }
+                assertInstanceOf(PdlException::class.java, error.cause).also {
+                    assertEquals(PdlErrorCode.UNAUTHENTICATED, it.code)
+                }
                 wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
             }
         }
@@ -213,8 +217,10 @@ internal class PdlClientTest : SpringContextTest.NoKafka() {
                     )
                 )
 
-                val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
-                assertEquals(PdlErrorCode.UNAUTHORIZED, error.code)
+                val error = assertThrows<PersonOppslagException> { pdlService.hentPerson(FNR) }
+                assertInstanceOf(PdlException::class.java, error.cause).also {
+                    assertEquals(PdlErrorCode.UNAUTHORIZED, it.code)
+                }
                 wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
             }
         }
@@ -232,8 +238,10 @@ internal class PdlClientTest : SpringContextTest.NoKafka() {
                     )
                 )
 
-                val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
-                assertEquals(PdlErrorCode.BAD_REQUEST, error.code)
+                val error = assertThrows<PersonOppslagException> { pdlService.hentPerson(FNR) }
+                assertInstanceOf(PdlException::class.java, error.cause).also {
+                    assertEquals(PdlErrorCode.BAD_REQUEST, it.code)
+                }
                 wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
             }
         }
