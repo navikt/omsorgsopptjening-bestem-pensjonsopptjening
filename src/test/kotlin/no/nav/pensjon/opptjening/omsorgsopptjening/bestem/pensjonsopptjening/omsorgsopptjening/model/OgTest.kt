@@ -29,13 +29,13 @@ class OgTest {
     @Test
     fun `all avslag is avslag`() {
         og(
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+            OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+            OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
@@ -50,13 +50,13 @@ class OgTest {
     @Test
     fun `one avslag is avslag`() {
         og(
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+            OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+            OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
@@ -70,13 +70,13 @@ class OgTest {
     @Test
     fun `all innvilget is innvilget`() {
         og(
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+            OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
             ),
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+            OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
@@ -90,14 +90,14 @@ class OgTest {
     @Test
     fun `nested og with all avslag is avslag`() {
         og(
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+            OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             og(
-                OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+                OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                     grunnlag = PersonOgOmsorgsårGrunnlag(
                         person = personAvslag,
                         omsorgsAr = omsorgsår
@@ -112,14 +112,14 @@ class OgTest {
     @Test
     fun `nested og with all innvilget is avslag`() {
         og(
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+            OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             og(
-                OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+                OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                     grunnlag = PersonOgOmsorgsårGrunnlag(
                         person = personInnvilget,
                         omsorgsAr = omsorgsår
@@ -134,14 +134,14 @@ class OgTest {
     @Test
     fun `nested all innvilget is innvilget`() {
         og(
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+            OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                 grunnlag = PersonOgOmsorgsårGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
             ),
             og(
-                OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(
+                OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
                     grunnlag = PersonOgOmsorgsårGrunnlag(
                         person = personInnvilget,
                         omsorgsAr = omsorgsår

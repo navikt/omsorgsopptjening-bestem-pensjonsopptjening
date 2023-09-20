@@ -4,11 +4,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 
 interface VurderVilkår {
 
-    fun OmsorgsyterErFylt17VedUtløpAvOmsorgsår(): OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering
+    fun OmsorgsyterOppfyllerAlderskrav(): OmsorgsyterOppfyllerAlderskrav.Vurdering
     fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering
     fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering
-    fun OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(): OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering
-    fun OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(): OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering
+    fun OmsorgsmottakerOppfyllerAlderskravForBarnetryg(): OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering
     fun OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(): OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering
     fun OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr(): OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering
     fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering
@@ -19,16 +18,11 @@ internal class VilkårsvurderingFactory(
     private val grunnlag: OmsorgsopptjeningGrunnlag,
     private val behandlingRepo: BehandlingRepo
 ) : VurderVilkår {
-    override fun OmsorgsyterErFylt17VedUtløpAvOmsorgsår(): OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering {
-        return OmsorgsyterErFylt17VedUtløpAvOmsorgsår.vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
+    override fun OmsorgsyterOppfyllerAlderskrav(): OmsorgsyterOppfyllerAlderskrav.Vurdering {
+        return OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
     }
-
-    override fun OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(): OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering {
-        return OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
-    }
-
-    override fun OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(): OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering {
-        return OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.vilkarsVurder(grunnlag.forOmsorgsmottakerOgÅr())
+    override fun OmsorgsmottakerOppfyllerAlderskravForBarnetryg(): OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering {
+        return OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.vilkarsVurder(grunnlag.forOmsorgsmottakerOgÅr())
     }
     override fun OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(): OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering {
         return OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.vilkarsVurder(grunnlag.forOmsorgsmottakerOgÅr())

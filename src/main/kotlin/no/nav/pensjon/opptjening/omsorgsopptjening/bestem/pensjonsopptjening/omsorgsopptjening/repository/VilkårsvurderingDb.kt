@@ -5,13 +5,12 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.JuridiskHenvisning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForBarnetrygd
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErFylt17VedUtløpAvOmsorgsår
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOppfyllerAlderskrav
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkarsVurdering
@@ -30,14 +29,8 @@ sealed class VilkårsvurderingDb {
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
-    @JsonTypeName("OmsorgsyterErFylt17VedUtløpAvOmsorgsår")
-    internal data class OmsorgsyterErFylt17VedUtløpAvOmsorgsår(
-        val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
-        val utfall: VilkårsvurderingUtfallDb,
-    ) : VilkårsvurderingDb()
-
-    @JsonTypeName("OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår")
-    internal data class OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(
+    @JsonTypeName("OmsorgsyterOppfyllerAlderskrav")
+    internal data class OmsorgsyterOppfyllerAlderskrav(
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
@@ -66,13 +59,13 @@ sealed class VilkårsvurderingDb {
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
-    @JsonTypeName("OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår")
-    internal data class OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(
+    @JsonTypeName("OmsorgsmottakerOppfyllerAlderskravForBarnetrygd")
+    internal data class OmsorgsmottakerOppfyllerAlderskravForBarnetrygd(
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
-    @JsonTypeName("OmsorgsmottakerIkkeFylt6VedUtløpAvOpptjeningsår")
+    @JsonTypeName("OmsorgsmottakerOppfyllerAlderskravForHjelpestønad")
     internal data class OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(
         val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
         val utfall: VilkårsvurderingUtfallDb,
@@ -114,15 +107,8 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering -> {
-            VilkårsvurderingDb.OmsorgsyterErFylt17VedUtløpAvOmsorgsår(
-                grunnlag = grunnlag.toDb(),
-                utfall = utfall.toDb()
-            )
-        }
-
-        is OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering -> {
-            VilkårsvurderingDb.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(
+        is OmsorgsyterOppfyllerAlderskrav.Vurdering -> {
+            VilkårsvurderingDb.OmsorgsyterOppfyllerAlderskrav(
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -142,8 +128,8 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
 
-        is OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering -> {
-            VilkårsvurderingDb.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår(
+        is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> {
+            VilkårsvurderingDb.OmsorgsmottakerOppfyllerAlderskravForBarnetrygd(
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -262,15 +248,8 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
             )
         }
 
-        is VilkårsvurderingDb.OmsorgsyterErFylt17VedUtløpAvOmsorgsår -> {
-            OmsorgsyterErFylt17VedUtløpAvOmsorgsår.Vurdering(
-                grunnlag = grunnlag.toDomain(),
-                utfall = utfall.toDomain()
-            )
-        }
-
-        is VilkårsvurderingDb.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår -> {
-            OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår.Vurdering(
+        is VilkårsvurderingDb.OmsorgsyterOppfyllerAlderskrav -> {
+            OmsorgsyterOppfyllerAlderskrav.Vurdering(
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )
@@ -291,8 +270,8 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
             )
         }
 
-        is VilkårsvurderingDb.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår -> {
-            OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår.Vurdering(
+        is VilkårsvurderingDb.OmsorgsmottakerOppfyllerAlderskravForBarnetrygd -> {
+            OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering(
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
             )

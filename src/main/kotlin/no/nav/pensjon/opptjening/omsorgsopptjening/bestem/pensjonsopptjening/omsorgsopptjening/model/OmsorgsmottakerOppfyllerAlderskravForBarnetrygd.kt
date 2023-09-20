@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-object OmsorgsyterErFylt17VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
+object OmsorgsmottakerOppfyllerAlderskravForBarnetrygd : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
     override fun vilkarsVurder(grunnlag: PersonOgOmsorgsårGrunnlag): Vurdering {
         return Vurdering(
             grunnlag = grunnlag,
@@ -10,9 +10,9 @@ object OmsorgsyterErFylt17VedUtløpAvOmsorgsår : ParagrafVilkår<PersonOgOmsorg
 
     override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller17
+            Referanse.OmsorgsmottakerErIkkeFylt6FørUtgangAvOpptjeningsår
         ).let {
-            if (grunnlag.person.alderVedUtløpAv(grunnlag.omsorgsAr) >= Konstanter.OMSORGSYTER_MINIMUM_ALDER) {
+            if (grunnlag.alderMottaker(mellom = Konstanter.ALDERSINTERVALL_BARNETRYGD)) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)

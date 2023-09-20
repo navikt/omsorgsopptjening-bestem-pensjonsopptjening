@@ -47,7 +47,7 @@ data class Behandling(
     }
 
     private fun vilkårsvurderBarnetrygd(): VilkarsVurdering<*> {
-        return vurderVilkår.OmsorgsmottakerHarIkkeFylt6VedUtløpAvOpptjeningsår()
+        return vurderVilkår.OmsorgsmottakerOppfyllerAlderskravForBarnetryg()
     }
 
     private fun vilkårsurderHjelpestønad(): VilkarsVurdering<*> {
@@ -59,8 +59,7 @@ data class Behandling(
 
     private fun vilkårsvurderOmsorgsyter(): VilkarsVurdering<*> {
         return og(
-            vurderVilkår.OmsorgsyterErFylt17VedUtløpAvOmsorgsår(),
-            vurderVilkår.OmsorgsyterErIkkeEldreEnn69VedUtløpAvOmsorgsår(),
+            vurderVilkår.OmsorgsyterOppfyllerAlderskrav(),
             vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
             vurderVilkår.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(),
