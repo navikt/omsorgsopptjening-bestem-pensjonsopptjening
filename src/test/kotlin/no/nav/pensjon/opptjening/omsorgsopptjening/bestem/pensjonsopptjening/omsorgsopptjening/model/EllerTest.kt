@@ -29,13 +29,13 @@ class EllerTest {
     fun `all avslag is avslag`() {
         eller(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
@@ -50,13 +50,13 @@ class EllerTest {
     fun `one innvilget is innvilget`() {
         eller(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
@@ -70,13 +70,13 @@ class EllerTest {
     fun `all innvilget is innvilget`() {
         eller(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
             ),
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
@@ -90,14 +90,14 @@ class EllerTest {
     fun `nested eller with all avslag is avslag`() {
         eller(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             eller(
                 OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                    grunnlag = PersonOgOmsorgsårGrunnlag(
+                    grunnlag = AldersvurderingsGrunnlag(
                         person = personAvslag,
                         omsorgsAr = omsorgsår
                     )
@@ -112,14 +112,14 @@ class EllerTest {
     fun `nested eller with all innvilget is innvilget`() {
         eller(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             eller(
                 OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                    grunnlag = PersonOgOmsorgsårGrunnlag(
+                    grunnlag = AldersvurderingsGrunnlag(
                         person = personInnvilget,
                         omsorgsAr = omsorgsår
                     )

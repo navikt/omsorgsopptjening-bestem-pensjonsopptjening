@@ -1,19 +1,20 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-object OmsorgsmottakerOppfyllerAlderskravForHjelpestønad : ParagrafVilkår<PersonOgOmsorgsårGrunnlag>() {
-    override fun vilkarsVurder(grunnlag: PersonOgOmsorgsårGrunnlag): Vurdering {
+object OmsorgsmottakerOppfyllerAlderskravForHjelpestønad : ParagrafVilkår<AldersvurderingsGrunnlag>() {
+    private val ALDERSINTERVALL_HJELPESTØNAD: IntRange = 6..18
+    override fun vilkarsVurder(grunnlag: AldersvurderingsGrunnlag): Vurdering {
         return Vurdering(
             grunnlag = grunnlag,
             utfall = bestemUtfall(grunnlag),
         )
     }
 
-    override fun <T : Vilkar<PersonOgOmsorgsårGrunnlag>> T.bestemUtfall(grunnlag: PersonOgOmsorgsårGrunnlag): VilkårsvurderingUtfall {
+    override fun <T : Vilkar<AldersvurderingsGrunnlag>> T.bestemUtfall(grunnlag: AldersvurderingsGrunnlag): VilkårsvurderingUtfall {
         return setOf(
             Referanse.HjelpestønadYtesTilMedlemUnder18,
             Referanse.OmsorgsopptjeningGisTilOgMedKalenderårHjelpestønadFallerBort
         ).let {
-            if (grunnlag.alderMottaker(mellom = Konstanter.ALDERSINTERVALL_HJELPESTØNAD)) {
+            if (grunnlag.erOppfylltFor(ALDERSINTERVALL_HJELPESTØNAD)) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -22,7 +23,8 @@ object OmsorgsmottakerOppfyllerAlderskravForHjelpestønad : ParagrafVilkår<Pers
     }
 
     data class Vurdering(
-        override val grunnlag: PersonOgOmsorgsårGrunnlag,
-        override val utfall: VilkårsvurderingUtfall
-    ) : ParagrafVurdering<PersonOgOmsorgsårGrunnlag>()
+        override val grunnlag: AldersvurderingsGrunnlag,
+        override val utfall: VilkårsvurderingUtfall,
+        val gyldigAldersintervall: IntRange = ALDERSINTERVALL_HJELPESTØNAD
+    ) : ParagrafVurdering<AldersvurderingsGrunnlag>()
 }

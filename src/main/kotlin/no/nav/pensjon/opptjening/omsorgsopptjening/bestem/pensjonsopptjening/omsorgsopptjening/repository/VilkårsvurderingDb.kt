@@ -31,7 +31,8 @@ sealed class VilkårsvurderingDb {
 
     @JsonTypeName("OmsorgsyterOppfyllerAlderskrav")
     internal data class OmsorgsyterOppfyllerAlderskrav(
-        val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
+        val grunnlag: GrunnlagVilkårsvurderingDb.AldersvurderingGrunnlag,
+        val gyldigAldersintervall: Aldersintervall,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
@@ -61,13 +62,15 @@ sealed class VilkårsvurderingDb {
 
     @JsonTypeName("OmsorgsmottakerOppfyllerAlderskravForBarnetrygd")
     internal data class OmsorgsmottakerOppfyllerAlderskravForBarnetrygd(
-        val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
+        val grunnlag: GrunnlagVilkårsvurderingDb.AldersvurderingGrunnlag,
+        val gyldigAldersintervall: Aldersintervall,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
     @JsonTypeName("OmsorgsmottakerOppfyllerAlderskravForHjelpestønad")
     internal data class OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(
-        val grunnlag: GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr,
+        val grunnlag: GrunnlagVilkårsvurderingDb.AldersvurderingGrunnlag,
+        val gyldigAldersintervall: Aldersintervall,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
@@ -110,7 +113,8 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         is OmsorgsyterOppfyllerAlderskrav.Vurdering -> {
             VilkårsvurderingDb.OmsorgsyterOppfyllerAlderskrav(
                 grunnlag = grunnlag.toDb(),
-                utfall = utfall.toDb()
+                gyldigAldersintervall = gyldigAldersintervall.toDb(),
+                utfall = utfall.toDb(),
             )
         }
 
@@ -131,6 +135,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> {
             VilkårsvurderingDb.OmsorgsmottakerOppfyllerAlderskravForBarnetrygd(
                 grunnlag = grunnlag.toDb(),
+                gyldigAldersintervall = gyldigAldersintervall.toDb(),
                 utfall = utfall.toDb()
             )
         }
@@ -145,6 +150,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> {
             VilkårsvurderingDb.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(
                 grunnlag = grunnlag.toDb(),
+                gyldigAldersintervall = gyldigAldersintervall.toDb(),
                 utfall = utfall.toDb()
             )
         }
@@ -156,6 +162,19 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             )
         }
     }
+}
+
+data class Aldersintervall(
+    val min: Int,
+    val max: Int
+)
+
+internal fun IntRange.toDb(): Aldersintervall {
+    return Aldersintervall(min = first, max = last)
+}
+
+internal fun Aldersintervall.toDomain(): IntRange {
+    return min..max
 }
 
 private fun mapRecursive(

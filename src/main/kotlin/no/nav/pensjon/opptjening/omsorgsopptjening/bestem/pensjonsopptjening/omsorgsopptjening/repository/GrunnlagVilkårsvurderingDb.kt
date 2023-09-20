@@ -8,7 +8,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.PersonOgOmsorgsårGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AldersvurderingsGrunnlag
+import org.springframework.cglib.core.Local
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
@@ -45,10 +47,11 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         ) : OmsorgBarnUnder6()
     }
 
-    @JsonTypeName("PersonOgOmsorgsÅr")
-    data class PersonOgOmsorgsÅr(
-        val person: PersonDb,
-        val omsorgsAr: Int
+    @JsonTypeName("AldersvurderingGrunnlag")
+    data class AldersvurderingGrunnlag(
+        val fnr: String,
+        val fødselsdato: LocalDate,
+        val omsorgsAr: Int,
     ) : GrunnlagVilkårsvurderingDb()
 
     @JsonTypeName("KanKunGodskrivesEnOmsorgsyter")
@@ -304,16 +307,20 @@ internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.toDomain(): Omsorgsyte
     }
 }
 
-internal fun GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr.toDomain(): PersonOgOmsorgsårGrunnlag {
-    return PersonOgOmsorgsårGrunnlag(
-        person = person.toDomain(),
+internal fun GrunnlagVilkårsvurderingDb.AldersvurderingGrunnlag.toDomain(): AldersvurderingsGrunnlag {
+    return AldersvurderingsGrunnlag(
+        person = AldersvurderingsGrunnlag.AldersvurderingsPerson(
+            fnr = fnr,
+            fødselsdato = fødselsdato,
+        ),
         omsorgsAr = omsorgsAr
     )
 }
 
-internal fun PersonOgOmsorgsårGrunnlag.toDb(): GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr {
-    return GrunnlagVilkårsvurderingDb.PersonOgOmsorgsÅr(
-        person = person.toDb(),
+internal fun AldersvurderingsGrunnlag.toDb(): GrunnlagVilkårsvurderingDb.AldersvurderingGrunnlag {
+    return GrunnlagVilkårsvurderingDb.AldersvurderingGrunnlag(
+        fnr = person.fnr,
+        fødselsdato = person.fødselsdato,
         omsorgsAr = omsorgsAr
     )
 }

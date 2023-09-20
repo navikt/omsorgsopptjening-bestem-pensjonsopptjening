@@ -23,7 +23,7 @@ class OmsorgsyterOppfyllerAlderskravTest {
     @Test
     fun `should be innvilget when subject has turned 17 before omsorgsår`() {
         val vilkarsVurdering = OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(18).year
             )
@@ -34,7 +34,7 @@ class OmsorgsyterOppfyllerAlderskravTest {
     @Test
     fun `should be innvilget when subject turns 17 in omsorgsår`() {
         val vilkarsVurdering = OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(17).year
             )
@@ -45,7 +45,7 @@ class OmsorgsyterOppfyllerAlderskravTest {
     @Test
     fun `should be avslag when subject has not turned 17`() {
         val vilkarsVurdering = OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(16).year
             )
@@ -64,7 +64,7 @@ class OmsorgsyterOppfyllerAlderskravTest {
     fun `should be innvilget when subject younger than 70 years`() {
 
         val vilkarsVurdering = OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(69).year
             )
@@ -75,7 +75,7 @@ class OmsorgsyterOppfyllerAlderskravTest {
     @Test
     fun `should be avslag when subject older than 70 years`() {
         val vilkarsVurdering = OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(71).year
             )
@@ -93,7 +93,7 @@ class OmsorgsyterOppfyllerAlderskravTest {
     @Test
     fun `should be avslag when subject is 70 years`() {
         val vilkarsVurdering = OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(70).year
             )

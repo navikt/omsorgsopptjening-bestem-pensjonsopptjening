@@ -30,13 +30,13 @@ class OgTest {
     fun `all avslag is avslag`() {
         og(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
@@ -51,13 +51,13 @@ class OgTest {
     fun `one avslag is avslag`() {
         og(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
@@ -71,13 +71,13 @@ class OgTest {
     fun `all innvilget is innvilget`() {
         og(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
             ),
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
@@ -91,14 +91,14 @@ class OgTest {
     fun `nested og with all avslag is avslag`() {
         og(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             og(
                 OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                    grunnlag = PersonOgOmsorgsårGrunnlag(
+                    grunnlag = AldersvurderingsGrunnlag(
                         person = personAvslag,
                         omsorgsAr = omsorgsår
                     )
@@ -113,14 +113,14 @@ class OgTest {
     fun `nested og with all innvilget is avslag`() {
         og(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personAvslag,
                     omsorgsAr = omsorgsår
                 )
             ),
             og(
                 OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                    grunnlag = PersonOgOmsorgsårGrunnlag(
+                    grunnlag = AldersvurderingsGrunnlag(
                         person = personInnvilget,
                         omsorgsAr = omsorgsår
                     )
@@ -135,14 +135,14 @@ class OgTest {
     fun `nested all innvilget is innvilget`() {
         og(
             OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                grunnlag = PersonOgOmsorgsårGrunnlag(
+                grunnlag = AldersvurderingsGrunnlag(
                     person = personInnvilget,
                     omsorgsAr = omsorgsår
                 )
             ),
             og(
                 OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-                    grunnlag = PersonOgOmsorgsårGrunnlag(
+                    grunnlag = AldersvurderingsGrunnlag(
                         person = personInnvilget,
                         omsorgsAr = omsorgsår
                     )

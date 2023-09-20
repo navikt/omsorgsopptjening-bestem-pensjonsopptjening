@@ -21,7 +21,7 @@ class OmsorgsmottakerOppfyllerAlderskravTest {
     @Test
     fun `oppfyller alderskrav for barnetrygd dersom barnet er mellom 0 og 5 år i omsorgsåret`() {
         val vilkarsVurdering0år = OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.year
             )
@@ -29,7 +29,7 @@ class OmsorgsmottakerOppfyllerAlderskravTest {
         assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vilkarsVurdering0år.utfall)
 
         val vilkarsVurdering5år = OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(5).year
             )
@@ -40,7 +40,7 @@ class OmsorgsmottakerOppfyllerAlderskravTest {
     @Test
     fun `oppfyller ikke alderskrav for barnetrygd dersom barnet er eldre en 5 i omsorgsåret`() {
         val vilkarsVurdering = OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(6).year
             )
@@ -51,7 +51,7 @@ class OmsorgsmottakerOppfyllerAlderskravTest {
     @Test
     fun `oppfyller alderskrav for hjelpestønad dersom barnet er mellom 6 og 18 år i omsorgsåret`() {
         val vilkarsVurdering0år = OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(6).year
             )
@@ -59,7 +59,7 @@ class OmsorgsmottakerOppfyllerAlderskravTest {
         assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vilkarsVurdering0år.utfall)
 
         val vilkarsVurdering5år = OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(18).year
             )
@@ -70,7 +70,7 @@ class OmsorgsmottakerOppfyllerAlderskravTest {
     @Test
     fun `oppfyller ikke alderskrav for hjelpestønad dersom barnet er eldre en 18 i omsorgsåret`() {
         val vilkarsVurdering = OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.vilkarsVurder(
-            PersonOgOmsorgsårGrunnlag(
+            AldersvurderingsGrunnlag(
                 person = person,
                 omsorgsAr = fødselsår.plusYears(19).year
             )

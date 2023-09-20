@@ -47,7 +47,7 @@ sealed class OmsorgsopptjeningGrunnlag {
                             .filter { it.omsorgstype == DomainOmsorgstype.HJELPESTØNAD }
                             .alleMåneder()
 
-                        if (forOmsorgsmottakerOgÅr().alderMottaker(Konstanter.ALDERSINTERVALL_BARNETRYGD)) {
+                        if (forAldersvurderingOmsorgsmottaker().erOppfylltFor(OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.ALDERSINTERVALL_BARNETRYGD)) {
                             Omsorgsmåneder.Barnetrygd(barnetrygd)
                         } else {
                             Omsorgsmåneder.Hjelpestønad(
@@ -76,15 +76,15 @@ sealed class OmsorgsopptjeningGrunnlag {
         }
     }
 
-    fun forOmsorgsyterOgÅr(): PersonOgOmsorgsårGrunnlag {
-        return PersonOgOmsorgsårGrunnlag(
+    fun forAldersvurderingOmsorgsyter(): AldersvurderingsGrunnlag {
+        return AldersvurderingsGrunnlag(
             person = omsorgsyter,
             omsorgsAr = omsorgsAr
         )
     }
 
-    fun forOmsorgsmottakerOgÅr(): PersonOgOmsorgsårGrunnlag {
-        return PersonOgOmsorgsårGrunnlag(
+    fun forAldersvurderingOmsorgsmottaker(): AldersvurderingsGrunnlag {
+        return AldersvurderingsGrunnlag(
             person = omsorgsmottaker,
             omsorgsAr = omsorgsAr
         )

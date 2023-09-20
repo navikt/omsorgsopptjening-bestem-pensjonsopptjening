@@ -19,13 +19,13 @@ internal class VilkårsvurderingFactory(
     private val behandlingRepo: BehandlingRepo
 ) : VurderVilkår {
     override fun OmsorgsyterOppfyllerAlderskrav(): OmsorgsyterOppfyllerAlderskrav.Vurdering {
-        return OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(grunnlag.forOmsorgsyterOgÅr())
+        return OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(grunnlag.forAldersvurderingOmsorgsyter())
     }
     override fun OmsorgsmottakerOppfyllerAlderskravForBarnetryg(): OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering {
-        return OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.vilkarsVurder(grunnlag.forOmsorgsmottakerOgÅr())
+        return OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.vilkarsVurder(grunnlag.forAldersvurderingOmsorgsmottaker())
     }
     override fun OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(): OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering {
-        return OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.vilkarsVurder(grunnlag.forOmsorgsmottakerOgÅr())
+        return OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.vilkarsVurder(grunnlag.forAldersvurderingOmsorgsmottaker())
     }
 
 
