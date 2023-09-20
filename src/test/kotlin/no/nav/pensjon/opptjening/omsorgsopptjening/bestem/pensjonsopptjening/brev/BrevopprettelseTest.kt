@@ -96,7 +96,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         omsorgsarbeidRepo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -174,7 +174,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         omsorgsarbeidRepo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -258,7 +258,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         omsorgsarbeidRepo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(

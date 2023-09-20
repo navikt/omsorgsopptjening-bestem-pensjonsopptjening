@@ -23,7 +23,7 @@ class OppgaveRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
     private val clock: Clock = Clock.systemUTC()
 ) {
-    fun persist(oppgave: Oppgave): Oppgave {
+    fun persist(oppgave: Oppgave.Transient): Oppgave.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into oppgave (behandlingId, meldingId, detaljer) values (:behandlingId, :meldingId, to_json(:detaljer::json))""",
@@ -49,12 +49,12 @@ class OppgaveRepo(
         return find(keyHolder.keys!!["id"] as UUID)
     }
 
-    fun updateStatus(oppgave: Oppgave) {
+    fun updateStatus(oppgave: Oppgave.Persistent) {
         jdbcTemplate.update(
             """update oppgave_status set status = to_json(:status::json), statushistorikk = to_json(:statushistorikk::json) where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
-                    "id" to oppgave.id!!,
+                    "id" to oppgave.id,
                     "status" to serialize(oppgave.status),
                     "statushistorikk" to oppgave.statushistorikk.serializeList()
                 ),
@@ -62,7 +62,7 @@ class OppgaveRepo(
         )
     }
 
-    fun find(id: UUID): Oppgave {
+    fun find(id: UUID): Oppgave.Persistent {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId where o.id = :id""",
             mapOf<String, Any>(
@@ -72,7 +72,7 @@ class OppgaveRepo(
         ).single()
     }
 
-    fun findForMelding(id: UUID): List<Oppgave> {
+    fun findForMelding(id: UUID): List<Oppgave.Persistent> {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId where o.meldingId = :id""",
             mapOf<String, Any>(
@@ -82,7 +82,7 @@ class OppgaveRepo(
         )
     }
 
-    fun findForBehandling(id: UUID): List<Oppgave> {
+    fun findForBehandling(id: UUID): List<Oppgave.Persistent> {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId join behandling b on b.id = o.behandlingId where b.id = :id""",
             mapOf<String, Any>(
@@ -119,7 +119,7 @@ class OppgaveRepo(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
-    fun finnNesteUprosesserte(): Oppgave? {
+    fun finnNesteUprosesserte(): Oppgave.Persistent? {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""",
             mapOf(
@@ -129,9 +129,9 @@ class OppgaveRepo(
         ).singleOrNull()
     }
 
-    internal class OppgaveMapper : RowMapper<Oppgave> {
-        override fun mapRow(rs: ResultSet, rowNum: Int): Oppgave {
-            return Oppgave(
+    internal class OppgaveMapper : RowMapper<Oppgave.Persistent> {
+        override fun mapRow(rs: ResultSet, rowNum: Int): Oppgave.Persistent {
+            return Oppgave.Persistent(
                 id = UUID.fromString(rs.getString("id")),
                 opprettet = rs.getTimestamp("opprettet").toInstant(),
                 detaljer = deserialize(rs.getString("detaljer")),

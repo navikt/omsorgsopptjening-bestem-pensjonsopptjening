@@ -25,7 +25,7 @@ class OppgaveService(
     }
 
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
-    fun opprett(oppgave: Oppgave): Oppgave {
+    fun opprett(oppgave: Oppgave.Transient): Oppgave {
         return oppgaveRepo.persist(oppgave)
     }
 

@@ -91,7 +91,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -135,7 +135,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                 }
             }
 
-            assertInstanceOf(GodskrivOpptjening::class.java, godskrivOpptjeningService.process()).also {
+            assertInstanceOf(GodskrivOpptjening.Persistent::class.java, godskrivOpptjeningService.process()).also {
                 assertInstanceOf(GodskrivOpptjening.Status.Ferdig::class.java, it.status)
             }
         }
@@ -171,7 +171,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -205,8 +205,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             assertNotNull(godskrivOpptjeningService.process())
 
             assertInstanceOf(
-                GodskrivOpptjening::class.java,
-                godskrivOpptjeningRepo.findForMelding(melding.id!!).single()
+                GodskrivOpptjening.Persistent::class.java,
+                godskrivOpptjeningRepo.findForMelding(melding.id).single()
             ).also {
                 assertInstanceOf(GodskrivOpptjening.Status.Ferdig::class.java, it.status)
             }
@@ -232,7 +232,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(

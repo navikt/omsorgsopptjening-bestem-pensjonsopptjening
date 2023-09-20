@@ -132,7 +132,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                         omsorgsyter = "12345678910",
                         saker = listOf(
@@ -168,13 +168,13 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 
         handler.process()
 
-        oppgaveRepo.findForMelding(melding.id!!).single().also {
+        oppgaveRepo.findForMelding(melding.id).single().also {
             assertInstanceOf(Oppgave.Status.Klar::class.java, it.status)
         }
         assertThrows<BestemSakClientException> {
             oppgaveService.process()
         }
-        oppgaveRepo.findForMelding(melding.id!!).single().also { oppgave ->
+        oppgaveRepo.findForMelding(melding.id).single().also { oppgave ->
             assertInstanceOf(Oppgave.Status.Retry::class.java, oppgave.status).also {
                 assertEquals(1, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
@@ -263,7 +263,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                         omsorgsyter = "12345678910",
                         saker = listOf(
@@ -299,7 +299,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 
         handler.process()
 
-        assertInstanceOf(Oppgave.Status.Klar::class.java, oppgaveRepo.findForMelding(melding.id!!).single().status)
+        assertInstanceOf(Oppgave.Status.Klar::class.java, oppgaveRepo.findForMelding(melding.id).single().status)
 
         assertThrows<BestemSakClientException> {
             oppgaveService.process()
@@ -307,7 +307,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(
             Oppgave.Status.Retry::class.java,
-            oppgaveRepo.findForMelding(melding.id!!).single().status
+            oppgaveRepo.findForMelding(melding.id).single().status
         ).also {
             assertEquals(1, it.antallForsøk)
         }
@@ -316,7 +316,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         assertNull(oppgaveService.process())
         assertNotNull(oppgaveService.process())
 
-        assertInstanceOf(Oppgave::class.java, oppgaveRepo.findForMelding(melding.id!!).single())
+        assertInstanceOf(Oppgave::class.java, oppgaveRepo.findForMelding(melding.id).single())
             .also {
                 assertInstanceOf(Oppgave.Status.Ferdig::class.java, it.status).also {
                     assertEquals("123", it.oppgaveId)
@@ -356,7 +356,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                         omsorgsyter = "12345678910",
                         saker = listOf(
@@ -392,14 +392,14 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 
         handler.process()
 
-        oppgaveRepo.findForMelding(melding.id!!).single().also {
+        oppgaveRepo.findForMelding(melding.id).single().also {
             assertInstanceOf(Oppgave.Status.Klar::class.java, it.status)
         }
         assertThrows<BestemSakClientException> {
             oppgaveService.process()
         }
 
-        oppgaveRepo.findForMelding(melding.id!!).single().also { oppgave ->
+        oppgaveRepo.findForMelding(melding.id).single().also { oppgave ->
             assertInstanceOf(Oppgave.Status.Retry::class.java, oppgave.status).also {
                 assertEquals(1, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
@@ -419,7 +419,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             oppgaveService.process()
         }
 
-        oppgaveRepo.findForMelding(melding.id!!).single().also { oppgave ->
+        oppgaveRepo.findForMelding(melding.id).single().also { oppgave ->
             oppgave.statushistorikk
                 .also { status ->
                     assertEquals(1, status.count { it is Oppgave.Status.Klar })

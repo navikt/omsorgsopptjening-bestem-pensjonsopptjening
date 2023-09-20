@@ -36,7 +36,7 @@ class OmsorgsarbeidKafkaListener(
                 Mdc.scopedMdc(it.innlesingId) { _ ->
                     log.info("Prosesserer melding")
                     omsorgsarbeidRepo.persist(
-                        OmsorgsarbeidMelding(innhold = it)
+                        OmsorgsarbeidMelding.Lest(innhold = it)
                     )
                 }
             }

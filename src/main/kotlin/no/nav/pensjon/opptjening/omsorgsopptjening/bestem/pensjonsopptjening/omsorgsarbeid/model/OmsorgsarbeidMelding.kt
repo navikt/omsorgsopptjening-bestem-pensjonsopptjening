@@ -9,36 +9,51 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-data class OmsorgsarbeidMelding(
-    val id: UUID? = null,
-    val opprettet: Instant? = null,
-    val innhold: OmsorgsgrunnlagMelding,
-    val statushistorikk: List<Status> = listOf(Status.Klar())
-) {
-    val correlationId = innhold.correlationId
-    val innlesingId = innhold.innlesingId
+sealed class OmsorgsarbeidMelding {
+    abstract val id: UUID?
+    abstract val opprettet: Instant?
+    abstract val innhold: OmsorgsgrunnlagMelding
+    abstract val statushistorikk: List<Status>
+    val correlationId get() = innhold.correlationId
+    val innlesingId get() = innhold.innlesingId
     val status: Status get() = statushistorikk.last()
-    fun ferdig(): OmsorgsarbeidMelding {
-        return copy(statushistorikk = statushistorikk + status.ferdig())
+
+    data class Lest(
+        override val innhold: OmsorgsgrunnlagMelding
+    ) : OmsorgsarbeidMelding() {
+        override val id: UUID? = null
+        override val opprettet: Instant? = null
+        override val statushistorikk: List<Status> = listOf(Status.Klar())
     }
 
-    fun retry(melding: String): OmsorgsarbeidMelding {
-        return copy(statushistorikk = statushistorikk + status.retry(melding))
-    }
+    data class Mottatt(
+        override val id: UUID,
+        override val opprettet: Instant,
+        override val innhold: OmsorgsgrunnlagMelding,
+        override val statushistorikk: List<Status> = listOf(Status.Klar())
+    ) : OmsorgsarbeidMelding() {
+        fun ferdig(): Mottatt {
+            return copy(statushistorikk = statushistorikk + status.ferdig())
+        }
 
-    fun opprettOppgave(): Oppgave? {
-        return if (status is Status.Feilet) {
-            Oppgave(
-                detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
-                    omsorgsyter = innhold.omsorgsyter,
-                ),
-                behandlingId = null,
-                meldingId = id!!,
-                correlationId = correlationId,
-                innlesingId = innlesingId
-            )
-        } else {
-            null
+        fun retry(melding: String): Mottatt {
+            return copy(statushistorikk = statushistorikk + status.retry(melding))
+        }
+
+        fun opprettOppgave(): Oppgave.Transient? {
+            return if (status is Status.Feilet) {
+                Oppgave.Transient(
+                    detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
+                        omsorgsyter = innhold.omsorgsyter,
+                    ),
+                    behandlingId = null,
+                    meldingId = id,
+                    correlationId = correlationId,
+                    innlesingId = innlesingId
+                )
+            } else {
+                null
+            }
         }
     }
 

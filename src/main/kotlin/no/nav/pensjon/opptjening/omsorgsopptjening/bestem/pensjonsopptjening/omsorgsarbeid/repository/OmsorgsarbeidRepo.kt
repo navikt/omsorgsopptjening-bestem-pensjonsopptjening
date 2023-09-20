@@ -21,7 +21,7 @@ class OmsorgsarbeidRepo(
     private val clock: Clock = Clock.systemUTC()
 ) {
 
-    fun persist(melding: OmsorgsarbeidMelding): OmsorgsarbeidMelding {
+    fun persist(melding: OmsorgsarbeidMelding.Lest): OmsorgsarbeidMelding.Mottatt {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into melding (melding, correlation_id, innlesing_id) values (to_json(:melding::json), :correlation_id, :innlesing_id)""",
@@ -47,12 +47,12 @@ class OmsorgsarbeidRepo(
         return find(keyHolder.keys!!["id"] as UUID)
     }
 
-    fun updateStatus(melding: OmsorgsarbeidMelding) {
+    fun updateStatus(melding: OmsorgsarbeidMelding.Mottatt) {
         jdbcTemplate.update(
             """update melding_status set status = to_json(:status::json), statushistorikk = to_json(:statushistorikk::json) where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
-                    "id" to melding.id!!,
+                    "id" to melding.id,
                     "status" to serialize(melding.status),
                     "statushistorikk" to melding.statushistorikk.serializeList()
                 ),
@@ -60,7 +60,7 @@ class OmsorgsarbeidRepo(
         )
     }
 
-    fun find(id: UUID): OmsorgsarbeidMelding {
+    fun find(id: UUID): OmsorgsarbeidMelding.Mottatt {
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where m.id = :id""",
             mapOf<String, Any>(
@@ -75,7 +75,7 @@ class OmsorgsarbeidRepo(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
-    fun finnNesteUprosesserte(): OmsorgsarbeidMelding? {
+    fun finnNesteUprosesserte(): OmsorgsarbeidMelding.Mottatt? {
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where (ms.status->>'type' = 'Klar') or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of m skip locked""",
             mapOf(
@@ -85,9 +85,9 @@ class OmsorgsarbeidRepo(
         ).singleOrNull()
     }
 
-    internal class OmsorgsarbeidMessageRowMapper : RowMapper<OmsorgsarbeidMelding> {
-        override fun mapRow(rs: ResultSet, rowNum: Int): OmsorgsarbeidMelding {
-            return OmsorgsarbeidMelding(
+    internal class OmsorgsarbeidMessageRowMapper : RowMapper<OmsorgsarbeidMelding.Mottatt> {
+        override fun mapRow(rs: ResultSet, rowNum: Int): OmsorgsarbeidMelding.Mottatt {
+            return OmsorgsarbeidMelding.Mottatt(
                 id = UUID.fromString(rs.getString("id")),
                 opprettet = rs.getTimestamp("opprettet").toInstant(),
                 innhold = deserialize(rs.getString("melding")),

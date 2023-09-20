@@ -25,9 +25,9 @@ data class FullførtBehandling(
         return utfall.erInnvilget()
     }
 
-    fun godskrivOpptjening(): GodskrivOpptjening {
+    fun godskrivOpptjening(): GodskrivOpptjening.Transient {
         require(erInnvilget()) { "Kan kun godskrive opptjening for innvilget behandling!" }
-        return GodskrivOpptjening(
+        return GodskrivOpptjening.Transient(
             behandlingId = id,
             meldingId = meldingId,
             correlationId = grunnlag.correlationId,
@@ -38,7 +38,7 @@ data class FullførtBehandling(
     fun opprettOppgave(
         oppgaveEksistererForOmsorgsyter: (omsorgsyter: String, år: Int) -> Boolean,
         oppgaveEksistererForOmsorgsmottaker: (omsorgsmottaker: String, år: Int) -> Boolean,
-    ): Oppgave? {
+    ): Oppgave.Transient? {
         require(!erInnvilget()) { "Kan kun opprette oppgave for avslått behandling!" }
         return avslagSkyldesFlereOmsorgsytereMedLikeMangeOmsorgsmåneder()?.let { vurdering ->
             VelgOppgaveForPersonOgInnhold(grunnlag = vurdering.grunnlag).let { oppgaveOgInnhold ->
@@ -55,7 +55,7 @@ data class FullførtBehandling(
         }
     }
 
-    private fun lagOppgave(mottakere: VelgOppgaveForPersonOgInnhold): Oppgave {
+    private fun lagOppgave(mottakere: VelgOppgaveForPersonOgInnhold): Oppgave.Transient {
         return when (grunnlag) {
             is OmsorgsopptjeningGrunnlag.FødtIOmsorgsår -> {
                 OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår(
@@ -72,7 +72,7 @@ data class FullførtBehandling(
                 )
             }
         }.let {
-            Oppgave(
+            Oppgave.Transient(
                 detaljer = it,
                 behandlingId = id,
                 meldingId = meldingId,

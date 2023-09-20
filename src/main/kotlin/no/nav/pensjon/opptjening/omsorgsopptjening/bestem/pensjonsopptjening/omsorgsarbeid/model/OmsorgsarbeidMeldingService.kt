@@ -76,7 +76,7 @@ class OmsorgsarbeidMeldingService(
         } ?: emptyList()
     }
 
-    private fun handle(melding: OmsorgsarbeidMelding): List<FullførtBehandling> {
+    private fun handle(melding: OmsorgsarbeidMelding.Mottatt): List<FullførtBehandling> {
         return melding.innhold
             .berikDatagrunnlag()
             .tilOmsorgsopptjeningsgrunnlag()
@@ -94,7 +94,7 @@ class OmsorgsarbeidMeldingService(
                             grunnlag = it,
                             behandlingRepo = behandlingRepo
                         ),
-                        meldingId = melding.id!!
+                        meldingId = melding.id
                     )
                 )
             }

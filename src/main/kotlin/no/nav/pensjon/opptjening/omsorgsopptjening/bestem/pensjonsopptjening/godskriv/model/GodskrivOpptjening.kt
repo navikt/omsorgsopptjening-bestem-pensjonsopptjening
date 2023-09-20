@@ -11,43 +11,66 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-data class GodskrivOpptjening(
-    val id: UUID? = null,
-    val opprettet: Instant? = null,
-    val behandlingId: UUID,
-    val meldingId: UUID,
-    val correlationId: CorrelationId,
-    val statushistorikk: List<Status> = listOf(Status.Klar()),
-    val omsorgsyter: String? = null,
-    val innlesingId: InnlesingId
-) {
-    val status = statushistorikk.last()
+sealed class GodskrivOpptjening {
+    abstract val id: UUID?
+    abstract val opprettet: Instant?
+    abstract val behandlingId: UUID
+    abstract val meldingId: UUID
+    abstract val correlationId: CorrelationId
+    abstract val statushistorikk: List<Status>
+    abstract val omsorgsyter: String?
+    abstract val innlesingId: InnlesingId
 
     companion object {
         const val OMSORGSPOENG_GODSKRIVES = 3.5
     }
-
-    fun ferdig(): GodskrivOpptjening {
-        return copy(statushistorikk = statushistorikk + status.ferdig())
+    data class Transient(
+        override val behandlingId: UUID,
+        override val meldingId: UUID,
+        override val correlationId: CorrelationId,
+        override val innlesingId: InnlesingId
+    ): GodskrivOpptjening(){
+        override val id: UUID? = null
+        override val opprettet: Instant? = null
+        override val omsorgsyter: String? = null
+        override val statushistorikk: List<Status> = listOf(Status.Klar())
+        val status get() =  statushistorikk.last()
     }
 
-    fun retry(melding: String): GodskrivOpptjening {
-        return copy(statushistorikk = statushistorikk + status.retry(melding))
-    }
+    data class Persistent(
+        override val id: UUID,
+        override val opprettet: Instant,
+        override val behandlingId: UUID,
+        override val meldingId: UUID,
+        override val correlationId: CorrelationId,
+        override val omsorgsyter: String,
+        override val innlesingId: InnlesingId,
+        override val statushistorikk: List<Status> = listOf(Status.Klar()),
+    ): GodskrivOpptjening(){
+        val status get() =  statushistorikk.last()
 
-    fun opprettOppgave(): Oppgave? {
-        return if (status is Status.Feilet) {
-            Oppgave(
-                detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
-                    omsorgsyter = omsorgsyter!!,
-                ),
-                behandlingId = behandlingId,
-                meldingId = meldingId,
-                correlationId = correlationId,
-                innlesingId = innlesingId,
-            )
-        } else {
-            null
+        fun ferdig(): Persistent {
+            return copy(statushistorikk = statushistorikk + status.ferdig())
+        }
+
+        fun retry(melding: String): Persistent {
+            return copy(statushistorikk = statushistorikk + status.retry(melding))
+        }
+
+        fun opprettOppgave(): Oppgave.Transient? {
+            return if (status is Status.Feilet) {
+                Oppgave.Transient(
+                    detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
+                        omsorgsyter = omsorgsyter,
+                    ),
+                    behandlingId = behandlingId,
+                    meldingId = meldingId,
+                    correlationId = correlationId,
+                    innlesingId = innlesingId,
+                )
+            } else {
+                null
+            }
         }
     }
 

@@ -67,7 +67,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt et barn født i desember i opptjeningsåret skal det innvilges opptjening dersom omsorgsyter har ytt omsorg i året etter opptjeningsåret (uavhengig av antall måneder)`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -114,7 +114,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt et barn født i desember i opptjeningsåret gis det ingen opptjening dersom omsorgsyter ikke har ytt omsorg i året etter omsorgsåret`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -142,7 +142,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt et barn født i andre måneder enn desember i opptjeningsåret skal det innvilges opptjening dersom omsorgsyter har ytt omsorg i opptjeningsåret (uavhengig av antall måneder) - 3 måneder`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -193,7 +193,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt et barn født i andre måneder enn desember i opptjeningsåret skal det innvilges opptjening dersom omsorgsyter har ytt omsorg i opptjeningsåret (uavhengig av antall måneder) - 7 måneder`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -244,7 +244,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt et barn født utenfor opptjeningsåret skal det innvilges opptjening dersom omsorgsyter har ytt et halvt år eller mer omsorg`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -291,7 +291,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt et barn født utenfor opptjeningsåret skal det avslås opptjening dersom omsorgsyter har ytt mindre enn et halvt år omsorg - full omsorg`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -339,7 +339,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt et barn født utenfor opptjeningsåret skal det avslås opptjening dersom omsorgsyter har ytt mindre enn et halvt år omsorg - delt omsorg`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -387,7 +387,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt at flere omsorgytere har ytt omsorg for samme barn, innvilges opptjening til omsorgsyter med flest måneder omsorg i opptjeningsåret - innvilget for omsorgsyter under behandling`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -467,7 +467,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt at flere omsorgytere har ytt omsorg for samme barn, innvilges opptjening til omsorgsyter med flest måneder omsorg i opptjeningsåret - avslag for omsorgsyter under behandling`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -548,7 +548,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt at en omsorgyter har ytt omsorg for flere barn i det samme året, innvilges opptjening for det eldste barnet hvor alle kriterer er oppfylt`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -611,7 +611,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt et barn født i desember i opptjeningsåret og flere omsorgsyter har ytt omsorg for samme barn avslås opptjening dersom en annen omsorgsyter har flere måneder med omsorg i året etter opptjeningsåret`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -674,7 +674,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt at en omsorgsyter har fått innvilget opptjening for en omsorgsmottaker, kan ikke andre omsorgstyere innvilges for den samme omsrogsmottakeren det samme året`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -703,7 +703,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
         )
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "04010012797",
                     saker = listOf(
@@ -738,7 +738,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt at en omsorgsyter er innvilget opptjening for en omsorgsmottaker, kan ikke den samme omsorgsyteren innvilges opptjening for andre omsorgsmottakere samme år`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -785,7 +785,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt at flere omsorgsytere har ytt omsorg for samme omsorgsmottaker i like mange måneder i opptjeningsåret skal opptjening avslås - omsorgsmottaker født uten for opptjeningsår`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -860,7 +860,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt at flere omsorgsytere har ytt omsorg for samme omsorgsmottaker i like mange måneder i opptjeningsåret skal opptjening avslås - omsorgsmottager født i desember i opptjeningsåret`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -926,7 +926,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
         given(gyldigOpptjeningår.get()).willReturn(listOf(2020, 2021))
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -957,7 +957,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
         )
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "04010012797",
                     saker = listOf(
@@ -1052,7 +1052,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
         )
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -1093,7 +1093,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `en omsorgsyter som mottar barnetrygd for en omsorgsmottaker over 6 år med hjelpestønad skal avslås omsorgsyter og omsorgsmottaker ikke har en foreldre-barn relasjon`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "01019212345",
                     saker = listOf(
@@ -1136,7 +1136,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `en omsorgsyter som mottar barnetrygd for en omsorgsmottaker med hjelpestønad skal avslås dersom barnetrygd og hjelpestønad har et halvt år eller mindre overlappende måneder`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -1177,7 +1177,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `en omsorgsyter som ikke mottar barnetrygd for en omsorgsmottaker med hjelpestønad skal avslås`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -1212,7 +1212,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `en omsorgsyter som mottar barnetrygd for en omsorgsmottaker under 6 år med hjelpestønad skal innvilges omsorgsopptjening for barnetrygd`() {
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(

@@ -83,28 +83,49 @@ sealed class OppgaveDetaljer {
     }
 }
 
-data class Oppgave(
-    val id: UUID? = null,
-    val opprettet: Instant? = null,
-    val detaljer: OppgaveDetaljer,
-    val behandlingId: UUID?,
-    val meldingId: UUID,
-    val correlationId: CorrelationId,
-    val statushistorikk: List<Status> = listOf(Status.Klar()),
-    val innlesingId: InnlesingId
-) {
-    val status = statushistorikk.last()
-    val mottaker = detaljer.mottaker()
-    val oppgavetekst = detaljer.oppgavetekst()
+sealed class Oppgave {
+    abstract val id: UUID?
+    abstract val opprettet: Instant?
+    abstract val detaljer: OppgaveDetaljer
+    abstract val behandlingId: UUID?
+    abstract val meldingId: UUID
+    abstract val correlationId: CorrelationId
+    abstract val statushistorikk: List<Status>
+    abstract val innlesingId: InnlesingId
 
-    fun ferdig(oppgaveId: String): Oppgave {
-        return copy(statushistorikk = statushistorikk + status.ferdig(oppgaveId))
+    val status get() = statushistorikk.last()
+    val mottaker get() = detaljer.mottaker()
+    val oppgavetekst get() = detaljer.oppgavetekst()
+
+    data class Transient(
+        override val detaljer: OppgaveDetaljer,
+        override val behandlingId: UUID?,
+        override val meldingId: UUID,
+        override val correlationId: CorrelationId,
+        override val innlesingId: InnlesingId
+    ): Oppgave() {
+        override val id: UUID? = null
+        override val opprettet: Instant? = null
+        override val statushistorikk: List<Status> = listOf(Status.Klar())
     }
+    data class Persistent(
+        override val id: UUID,
+        override val opprettet: Instant,
+        override val detaljer: OppgaveDetaljer,
+        override val behandlingId: UUID?, //kan være vi feiler før vi får behandlet
+        override val meldingId: UUID,
+        override val correlationId: CorrelationId,
+        override val statushistorikk: List<Status> = listOf(Status.Klar()),
+        override val innlesingId: InnlesingId
+    ): Oppgave(){
+        fun ferdig(oppgaveId: String): Persistent {
+            return copy(statushistorikk = statushistorikk + status.ferdig(oppgaveId))
+        }
 
-    fun retry(melding: String): Oppgave {
-        return copy(statushistorikk = statushistorikk + status.retry(melding))
+        fun retry(melding: String): Persistent {
+            return copy(statushistorikk = statushistorikk + status.retry(melding))
+        }
     }
-
     @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,

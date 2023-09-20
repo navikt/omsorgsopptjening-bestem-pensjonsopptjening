@@ -12,7 +12,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslagException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -110,7 +109,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -133,13 +132,13 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
+        assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id).status)
 
         assertThrows<PersonOppslagException> {
             handler.process()
         }
 
-        repo.find(melding.id!!).let { m ->
+        repo.find(melding.id).let { m ->
             assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, m.status).let {
                 assertEquals(1, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
@@ -151,7 +150,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             handler.process()
         }
 
-        repo.find(melding.id!!).let { m ->
+        repo.find(melding.id).let { m ->
             assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, m.status).let {
                 assertEquals(2, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
@@ -208,7 +207,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -231,28 +230,28 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
+        assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id).status)
 
         assertThrows<PersonOppslagException> {
             handler.process()
         }
-        assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, repo.find(melding.id!!).status).also {
+        assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, repo.find(melding.id).status).also {
             assertEquals(1, it.antallForsøk)
         }
 
         assertEquals(emptyList<FullførtBehandling>(), handler.process())
-        assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, repo.find(melding.id!!).status).also {
+        assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, repo.find(melding.id).status).also {
             assertEquals(1, it.antallForsøk)
         }
 
         assertEquals(emptyList<FullførtBehandling>(), handler.process())
-        assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, repo.find(melding.id!!).status).also {
+        assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, repo.find(melding.id).status).also {
             assertEquals(1, it.antallForsøk)
         }
 
         assertEquals(1, handler.process().count())
 
-        assertInstanceOf(OmsorgsarbeidMelding.Status.Ferdig::class.java, repo.find(melding.id!!).status)
+        assertInstanceOf(OmsorgsarbeidMelding.Status.Ferdig::class.java, repo.find(melding.id).status)
     }
 
     @Test
@@ -290,7 +289,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -313,7 +312,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id!!).status)
+        assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, repo.find(melding.id).status)
 
         assertThrows<PersonOppslagException> {
             handler.process()
@@ -330,7 +329,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertEquals(emptyList<FullførtBehandling>(), handler.process())
 
-        repo.find(melding.id!!).also { m ->
+        repo.find(melding.id).also { m ->
             assertInstanceOf(OmsorgsarbeidMelding.Status.Klar::class.java, m.statushistorikk[0])
             assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, m.statushistorikk[1]).also {
                 assertEquals(1, it.antallForsøk)
@@ -356,7 +355,7 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertEquals(0, behandlingRepo.finnForOmsorgsyter("12345678910").count())
 
-        oppgaveRepo.findForMelding(melding.id!!).single().also { oppgave ->
+        oppgaveRepo.findForMelding(melding.id).single().also { oppgave ->
             assertInstanceOf(OppgaveDetaljer.UspesifisertFeilsituasjon::class.java, oppgave.detaljer).also {
                 assertEquals("12345678910", it.omsorgsyter)
             }

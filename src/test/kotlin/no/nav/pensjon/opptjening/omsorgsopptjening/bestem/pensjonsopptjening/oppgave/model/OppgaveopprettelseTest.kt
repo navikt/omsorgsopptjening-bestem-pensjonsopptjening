@@ -53,7 +53,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -94,7 +94,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         }
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "04010012797",
                     saker = listOf(
@@ -154,7 +154,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -212,7 +212,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         }
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "04010012797",
                     saker = listOf(
@@ -291,7 +291,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -338,7 +338,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         }
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "04010012797",
                     saker = listOf(
@@ -386,7 +386,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(
@@ -464,7 +464,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         repo.persist(
-            OmsorgsarbeidMelding(
+            OmsorgsarbeidMelding.Lest(
                 innhold = OmsorgsgrunnlagMelding(
                     omsorgsyter = "12345678910",
                     saker = listOf(

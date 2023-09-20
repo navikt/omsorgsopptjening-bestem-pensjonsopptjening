@@ -24,11 +24,11 @@ class GodskrivOpptjeningService(
     }
 
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
-    fun opprett(godskrivOpptjening: GodskrivOpptjening): GodskrivOpptjening {
+    fun opprett(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening {
         return godskrivOpptjeningRepo.persist(godskrivOpptjening)
     }
 
-    fun process(): GodskrivOpptjening? {
+    fun process(): GodskrivOpptjening.Persistent? {
         return transactionTemplate.execute {
             godskrivOpptjeningRepo.finnNesteUprosesserte()?.let { godskrivOpptjening ->
                 Mdc.scopedMdc(godskrivOpptjening.correlationId) {
