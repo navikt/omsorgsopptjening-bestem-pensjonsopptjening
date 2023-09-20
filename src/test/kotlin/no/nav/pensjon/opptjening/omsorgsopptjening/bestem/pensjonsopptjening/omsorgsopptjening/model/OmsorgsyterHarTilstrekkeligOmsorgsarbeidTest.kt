@@ -16,14 +16,14 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     fun `Gitt en mottaker født utenfor omsorgsår når det er minst seks måneder full omsorg så invilget`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                omsorgsAr = 2000,
-                omsorgsmottaker = Person(
-                    fnr = "12125678910",
-                    fødselsdato = LocalDate.of(1999, Month.JANUARY, 1),
-                    dødsdato = null,
-                    familierelasjoner = Familierelasjoner(emptyList())
+                aldersvurderingOmsorgsmottaker = AldersvurderingsGrunnlag(
+                    person = AldersvurderingsGrunnlag.AldersvurderingsPerson(
+                        fnr = "12125678910",
+                        fødselsdato = LocalDate.of(1999, Month.JANUARY, 1)
+                    ),
+                    omsorgsAr = 2000
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                omsorgsytersOmsorgsmånederForOmsorgsmottaker = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(2000, Month.JANUARY),
                         YearMonth.of(2000, Month.JUNE)
@@ -39,14 +39,14 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     fun `Gitt en mottaker født I omsorgsår når det er minst en måned full omsorg så invilget`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
-                omsorgsAr = 2000,
-                omsorgsmottaker = Person(
-                    fnr = "12345678910",
-                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1),
-                    dødsdato = null,
-                    familierelasjoner = Familierelasjoner(emptyList())
+                aldersvurderingOmsorgsmottaker = AldersvurderingsGrunnlag(
+                    person = AldersvurderingsGrunnlag.AldersvurderingsPerson(
+                        fnr = "12345678910",
+                        fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
+                    ),
+                    omsorgsAr = 2000
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                omsorgsytersOmsorgsmånederForOmsorgsmottaker = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(2000, Month.JANUARY),
                         YearMonth.of(2000, Month.JANUARY)
@@ -62,14 +62,14 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     fun `Gitt en mottaker født I omsorgsår når det ikke er minst en måned full omsorg så avslag`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
-                omsorgsAr = 2000,
-                omsorgsmottaker = Person(
-                    fnr = "12345678910",
-                    fødselsdato = LocalDate.of(2000, Month.JANUARY, 1),
-                    dødsdato = null,
-                    familierelasjoner = Familierelasjoner(emptyList())
+                aldersvurderingOmsorgsmottaker = AldersvurderingsGrunnlag(
+                    person = AldersvurderingsGrunnlag.AldersvurderingsPerson(
+                        fnr = "12345678910",
+                        fødselsdato = LocalDate.of(2000, Month.JANUARY, 1)
+                    ),
+                    omsorgsAr = 2000
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                omsorgsytersOmsorgsmånederForOmsorgsmottaker = Omsorgsmåneder.Barnetrygd(
                     (emptySet())
                 )
             )
@@ -82,14 +82,14 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     fun `Gitt en mottaker født I desember i omsorgsår når det er minst en måned full omsorg i påfølgende år så invilget`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
-                omsorgsAr = 2000,
-                omsorgsmottaker = Person(
-                    fnr = "12125678910",
-                    fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1),
-                    dødsdato = null,
-                    familierelasjoner = Familierelasjoner(emptyList())
+                aldersvurderingOmsorgsmottaker = AldersvurderingsGrunnlag(
+                    person = AldersvurderingsGrunnlag.AldersvurderingsPerson(
+                        fnr = "12345678910",
+                        fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1)
+                    ),
+                    omsorgsAr = 2000
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                omsorgsytersOmsorgsmånederForOmsorgsmottaker = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(2001, Month.JANUARY),
                         YearMonth.of(2001, Month.JANUARY)
@@ -105,14 +105,14 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     fun `Gitt en mottaker født I desember i omsorgsår når det ikke er minst en måned full omsorg i påfølgende år så avslag`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
-                omsorgsAr = 2000,
-                omsorgsmottaker = Person(
-                    fnr = "12125678910",
-                    fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1),
-                    dødsdato = null,
-                    familierelasjoner = Familierelasjoner(emptyList())
+                aldersvurderingOmsorgsmottaker = AldersvurderingsGrunnlag(
+                    person = AldersvurderingsGrunnlag.AldersvurderingsPerson(
+                        fnr = "12345678910",
+                        fødselsdato = LocalDate.of(2000, Month.DECEMBER, 1)
+                    ),
+                    omsorgsAr = 2000
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(emptySet())
+                omsorgsytersOmsorgsmånederForOmsorgsmottaker = Omsorgsmåneder.Barnetrygd(emptySet())
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall)
@@ -126,14 +126,16 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         listOf(0, 1, 2, 3, 4, 5).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
                 grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                    omsorgsAr = omsorgsår,
-                    omsorgsmottaker = Person(
-                        fnr = "12345678910",
-                        fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1),
-                        dødsdato = null,
-                        familierelasjoner = Familierelasjoner(emptyList())
+                    aldersvurderingOmsorgsmottaker = AldersvurderingsGrunnlag(
+                        person = AldersvurderingsGrunnlag.AldersvurderingsPerson(
+                            fnr = "12345678910",
+                            fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1)
+                        ),
+                        omsorgsAr = omsorgsår
                     ),
-                    omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.Barnetrygd(emptySet()) else Omsorgsmåneder.Barnetrygd(
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker = if (monthsFullOmsorg == 0) Omsorgsmåneder.Barnetrygd(
+                        emptySet()
+                    ) else Omsorgsmåneder.Barnetrygd(
                         Periode(
                             YearMonth.of(omsorgsår, Month.JANUARY),
                             YearMonth.of(
@@ -159,14 +161,16 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         listOf(6, 7, 8, 9, 10, 11, 12).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
                 grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                    omsorgsAr = omsorgsår,
-                    omsorgsmottaker = Person(
-                        fnr = "12345678910",
-                        fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1),
-                        dødsdato = null,
-                        familierelasjoner = Familierelasjoner(emptyList())
+                    aldersvurderingOmsorgsmottaker = AldersvurderingsGrunnlag(
+                        person = AldersvurderingsGrunnlag.AldersvurderingsPerson(
+                            fnr = "12345678910",
+                            fødselsdato = LocalDate.of(omsorgsår - 2, Month.JANUARY, 1)
+                        ),
+                        omsorgsAr = omsorgsår
                     ),
-                    omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.Barnetrygd(emptySet()) else Omsorgsmåneder.Barnetrygd(
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker = if (monthsFullOmsorg == 0) Omsorgsmåneder.Barnetrygd(
+                        emptySet()
+                    ) else Omsorgsmåneder.Barnetrygd(
                         Periode(
                             YearMonth.of(omsorgsår, Month.JANUARY),
                             YearMonth.of(
@@ -187,14 +191,14 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         val omsorgsår = 2000
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
             grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                omsorgsAr = omsorgsår,
-                omsorgsmottaker = Person(
-                    fnr = "12345678910",
-                    fødselsdato = LocalDate.of(omsorgsår - 6, Month.JANUARY, 1),
-                    dødsdato = null,
-                    familierelasjoner = Familierelasjoner(emptyList())
+                aldersvurderingOmsorgsmottaker = AldersvurderingsGrunnlag(
+                    person = AldersvurderingsGrunnlag.AldersvurderingsPerson(
+                        fnr = "12345678910",
+                        fødselsdato = LocalDate.of(omsorgsår - 6, Month.JANUARY, 1)
+                    ),
+                    omsorgsAr = omsorgsår
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                omsorgsytersOmsorgsmånederForOmsorgsmottaker = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(omsorgsår, Month.JANUARY),
                         YearMonth.of(omsorgsår, Month.MARCH)

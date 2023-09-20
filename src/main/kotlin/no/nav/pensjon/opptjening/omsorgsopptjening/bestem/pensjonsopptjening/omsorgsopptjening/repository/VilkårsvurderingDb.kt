@@ -26,6 +26,7 @@ sealed class VilkårsvurderingDb {
     @JsonTypeName("OmsorgsyterHarTilstrekkeligOmsorgsarbeid")
     internal data class OmsorgsyterHarTilstrekkeligOmsorgsarbeid(
         val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6,
+        val påkrevetAntallMåneder: Int,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 
@@ -99,6 +100,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering -> {
             VilkårsvurderingDb.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(
                 grunnlag = grunnlag.toDb(),
+                påkrevetAntallMåneder = påkrevetAntallMåneder,
                 utfall = utfall.toDb()
             )
         }
@@ -256,6 +258,7 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         is VilkårsvurderingDb.OmsorgsyterHarTilstrekkeligOmsorgsarbeid -> {
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering(
                 grunnlag = grunnlag.toDomain(),
+                påkrevetAntallMåneder = påkrevetAntallMåneder,
                 utfall = utfall.toDomain()
             )
         }

@@ -15,7 +15,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder //TODO rett opp henvinsinger/presiser?
+            Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder //TODO rett opp henvinsinger/presiser hvorfor det er slik? tolkning/forskrift/lov whatever
         ).let {
             if (grunnlag.omsorgsyterHarFlestOmsorgsmåneder()) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
@@ -31,25 +31,23 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     ) : ParagrafVurdering<Grunnlag>()
 
     data class Grunnlag(
-        val omsorgsyter: Person,
+        val omsorgsyter: String,
         val data: List<OmsorgsmånederForMottakerOgÅr> //TODO stramme opp modellen slik at det ikke er teoretisk mulig med flere mottakere?
     ) : ParagrafGrunnlag() {
         private val omsorgsytereGruppertEtterOmsorgsmåneder = data
             .groupBy { it.antall() }
         private val omsorgsytereMedFlestOmsorgsmåneder = omsorgsytereGruppertEtterOmsorgsmåneder
-            .let { map ->
-                map[map.maxOf { it.key }]!!
-            }
+            .let { map -> map[map.maxOf { it.key }]!! }
 
         fun omsorgsyterHarFlestOmsorgsmåneder(): Boolean {
-            return omsorgsytereMedFlestOmsorgsmåneder().let {
-                it.count() == 1 && it.all { it.omsorgsyter == omsorgsyter }
+            return omsorgsytereMedFlestOmsorgsmåneder().let { omsorgsytere ->
+                omsorgsytere.count() == 1 && omsorgsytere.all { it.omsorgsyter == omsorgsyter }
             }
         }
 
         fun omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder(): Boolean {
-            return omsorgsytereMedFlestOmsorgsmåneder().let {
-                it.count() > 1 && it.any { it.omsorgsyter == omsorgsyter }
+            return omsorgsytereMedFlestOmsorgsmåneder().let { omsorgsytere ->
+                omsorgsytere.count() > 1 && omsorgsytere.any { it.omsorgsyter == omsorgsyter }
             }
         }
 
@@ -60,8 +58,8 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
 
     data class OmsorgsmånederForMottakerOgÅr(
-        val omsorgsyter: Person,
-        val omsorgsmottaker: Person,
+        val omsorgsyter: String,
+        val omsorgsmottaker: String,
         val omsorgsmåneder: Omsorgsmåneder,
         val omsorgsår: Int
     ) {

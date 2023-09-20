@@ -8,7 +8,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
@@ -105,7 +104,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                     ).also {
                         assertEquals(
                             Periode(2021).alleMåneder(),
-                            it.omsorgsmåneder
+                            it.omsorgsytersOmsorgsmånederForOmsorgsmottaker
                         )
                     }
                 }
@@ -184,7 +183,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                 YearMonth.of(2020, Month.OCTOBER),
                                 YearMonth.of(2020, Month.DECEMBER)
                             ).alleMåneder(),
-                            it.omsorgsmåneder
+                            it.omsorgsytersOmsorgsmånederForOmsorgsmottaker
                         )
                     }
                 }
@@ -235,7 +234,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                 YearMonth.of(2020, Month.MAY),
                                 YearMonth.of(2020, Month.DECEMBER)
                             ).alleMåneder(),
-                            it.omsorgsmåneder
+                            it.omsorgsytersOmsorgsmånederForOmsorgsmottaker
                         )
                     }
                 }
@@ -282,7 +281,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                     ).also {
                         assertEquals(
                             Periode(2020).alleMåneder(),
-                            it.omsorgsmåneder
+                            it.omsorgsytersOmsorgsmånederForOmsorgsmottaker
                         )
                     }
                 }
@@ -329,7 +328,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                     ).also {
                         assertEquals(
                             Periode(YearMonth.of(2020, Month.JANUARY), YearMonth.of(2020, Month.MAY)).alleMåneder(),
-                            it.omsorgsmåneder
+                            it.omsorgsytersOmsorgsmånederForOmsorgsmottaker
                         )
                     }
                 }
@@ -377,7 +376,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                     ).also {
                         assertEquals(
                             Periode(YearMonth.of(2020, Month.JANUARY), YearMonth.of(2020, Month.MAY)).alleMåneder(),
-                            it.omsorgsmåneder
+                            it.omsorgsytersOmsorgsmånederForOmsorgsmottaker
                         )
                     }
                 }
@@ -459,7 +458,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                         "04010012797" to 7,
                         "01019212345" to 2,
                     ),
-                    it.grunnlag.data.associate { it.omsorgsyter.fnr to it.antall() }
+                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
             }
         }
@@ -539,7 +538,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                         "12345678910" to 7,
                         "01019212345" to 2,
                     ),
-                    it.grunnlag.data.associate { it.omsorgsyter.fnr to it.antall() }
+                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
                 assertTrue(it.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>())
             }
@@ -666,7 +665,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                         "04010012797" to 5,
                         "12345678910" to 2,
                     ),
-                    it.grunnlag.data.associate { it.omsorgsyter.fnr to it.antall() }
+                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
             }
         }
@@ -846,7 +845,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                         "04010012797" to 7,
                         "01019212345" to 7,
                     ),
-                    it.grunnlag.data.associate { it.omsorgsyter.fnr to it.antall() }
+                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
             }
             assertNull(//forventer ikke oppgave siden omsorgstyer ikke mottok i desember
@@ -909,7 +908,7 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                         "12345678910" to 6,
                         "04010012797" to 6,
                     ),
-                    it.grunnlag.data.associate { it.omsorgsyter.fnr to it.antall() }
+                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
             }
             assertInstanceOf(//forventer oppgave siden omsorgsyter mokkok i desember

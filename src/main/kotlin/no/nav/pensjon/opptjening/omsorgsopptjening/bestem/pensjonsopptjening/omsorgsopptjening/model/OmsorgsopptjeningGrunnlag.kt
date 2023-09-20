@@ -63,11 +63,11 @@ sealed class OmsorgsopptjeningGrunnlag {
     fun forSummertOmsorgPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
         return omsorgsmånederForOmsorgsmottakerPerOmsorgsyter().let {
             OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
-                omsorgsyter = omsorgsyter,
+                omsorgsyter = omsorgsyter.fnr,
                 data = it.map { (yter, antallMnd) ->
                     OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
-                        omsorgsyter = yter,
-                        omsorgsmottaker = omsorgsmottaker,
+                        omsorgsyter = yter.fnr,
+                        omsorgsmottaker = omsorgsmottaker.fnr,
                         omsorgsmåneder = antallMnd,
                         omsorgsår = omsorgsAr
                     )
@@ -92,8 +92,10 @@ sealed class OmsorgsopptjeningGrunnlag {
 
     fun forFamilierelasjon(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Grunnlag {
         return OmsorgsyterErForelderTilMottakerAvHjelpestønad.Grunnlag(
-            omsorgsyter = omsorgsyter,
-            omsorgsmottaker = omsorgsmottaker
+            omsorgsyter = omsorgsyter.fnr,
+            omsorgsytersFamilierelasjoner = omsorgsyter.familierelasjoner,
+            omsorgsmottaker = omsorgsmottaker.fnr,
+            omsorgsmottakersFamilierelasjoner = omsorgsmottaker.familierelasjoner
         )
     }
 
@@ -130,9 +132,8 @@ sealed class OmsorgsopptjeningGrunnlag {
 
             override fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
-                    omsorgsAr = omsorgsAr,
-                    omsorgsmottaker = omsorgsmottaker,
-                    omsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
+                    aldersvurderingOmsorgsmottaker = forAldersvurderingOmsorgsmottaker(),
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
                 )
             }
         }
@@ -157,9 +158,8 @@ sealed class OmsorgsopptjeningGrunnlag {
 
             override fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
-                    omsorgsAr = omsorgsAr,
-                    omsorgsmottaker = omsorgsmottaker,
-                    omsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
+                    aldersvurderingOmsorgsmottaker = forAldersvurderingOmsorgsmottaker(),
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
                 )
             }
         }
@@ -181,9 +181,8 @@ sealed class OmsorgsopptjeningGrunnlag {
 
         override fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
             return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                omsorgsAr = omsorgsAr,
-                omsorgsmottaker = omsorgsmottaker,
-                omsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
+                aldersvurderingOmsorgsmottaker = forAldersvurderingOmsorgsmottaker(),
+                omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
             )
         }
     }

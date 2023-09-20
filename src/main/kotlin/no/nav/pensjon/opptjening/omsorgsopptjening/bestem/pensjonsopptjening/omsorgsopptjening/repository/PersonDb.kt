@@ -25,8 +25,7 @@ internal fun Person.toDb(): PersonDb {
         fnr = fnr,
         fødselsdato = fødselsdato.toString(),
         dødsdato = dødsdato?.toString(),
-        familierelasjoner = familierelasjoner.relasjoner
-            .associate { it.ident to it.relasjon.toString() }
+        familierelasjoner = familierelasjoner.toDb()
     )
 }
 
@@ -35,8 +34,14 @@ internal fun PersonDb.toDomain(): Person {
         fnr = fnr,
         fødselsdato = LocalDate.parse(fødselsdato),
         dødsdato = dødsdato?.let { LocalDate.parse(it) },
-        familierelasjoner = familierelasjoner
-            .map { Familierelasjon(it.key, Familierelasjon.Relasjon.valueOf(it.value)) }
-            .let { Familierelasjoner(it) }
+        familierelasjoner = familierelasjoner.toDomain()
     )
+}
+
+internal fun Familierelasjoner.toDb(): Map<String, String> {
+    return relasjoner.associate { it.ident to it.relasjon.toString() }
+}
+
+internal fun Map<String, String>.toDomain(): Familierelasjoner {
+    return Familierelasjoner(map { Familierelasjon(it.key, Familierelasjon.Relasjon.valueOf(it.value)) })
 }

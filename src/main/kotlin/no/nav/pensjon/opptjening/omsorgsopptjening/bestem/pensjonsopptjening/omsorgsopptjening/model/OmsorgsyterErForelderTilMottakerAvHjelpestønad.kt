@@ -27,11 +27,13 @@ object OmsorgsyterErForelderTilMottakerAvHjelpestønad :
     ) : ParagrafVurdering<Grunnlag>()
 
     data class Grunnlag(
-        val omsorgsyter: Person,
-        val omsorgsmottaker: Person,
+        val omsorgsyter: String,
+        val omsorgsytersFamilierelasjoner: Familierelasjoner,
+        val omsorgsmottaker: String,
+        val omsorgsmottakersFamilierelasjoner: Familierelasjoner,
     ) : ParagrafGrunnlag() {
         fun erBarnOgForelder(): Boolean {
-            return omsorgsyter.erForelderAv(omsorgsmottaker.fnr) && omsorgsmottaker.erBarnAv(omsorgsyter.fnr)
+            return omsorgsytersFamilierelasjoner.erBarn(omsorgsmottaker) && omsorgsmottakersFamilierelasjoner.erForelder(omsorgsyter)
         }
     }
 }

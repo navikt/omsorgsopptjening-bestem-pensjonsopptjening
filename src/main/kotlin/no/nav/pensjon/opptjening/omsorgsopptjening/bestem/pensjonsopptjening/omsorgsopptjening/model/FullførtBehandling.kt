@@ -109,15 +109,15 @@ data class FullførtBehandling(
         private val prioritert: List<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr> =
             grunnlag
                 .omsorgsytereMedFlestOmsorgsmåneder()
-                .sortedWith(compareBy<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr> { it.haddeOmsorgIDesember() }.thenBy { it.omsorgsyter.fnr == grunnlag.omsorgsyter.fnr })
+                .sortedWith(compareBy<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr> { it.haddeOmsorgIDesember() }.thenBy { it.omsorgsyter == grunnlag.omsorgsyter })
                 .reversed()
 
         fun oppgaveForPerson(): String {
-            return prioritert.first().omsorgsyter.fnr
+            return prioritert.first().omsorgsyter
         }
 
         fun annenPersonForInnhold(): String {
-            return prioritert.first { it.omsorgsyter.fnr != grunnlag.omsorgsyter.fnr }.omsorgsyter.fnr
+            return prioritert.first { it.omsorgsyter != grunnlag.omsorgsyter }.omsorgsyter
         }
     }
 

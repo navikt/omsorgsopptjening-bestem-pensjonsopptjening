@@ -18,7 +18,11 @@ data class AldersvurderingsGrunnlag(
     )
 
     fun erOppfylltFor(gyldigAldersintervall: IntRange): Boolean {
-        return omsorgsAr - person.fødselsdato.year in gyldigAldersintervall
+        return omsorgsAr - fødselsår() in gyldigAldersintervall
+    }
+
+    fun fødselsår(): Int {
+        return person.fødselsdato.year
     }
 
     data class AldersvurderingsPerson(

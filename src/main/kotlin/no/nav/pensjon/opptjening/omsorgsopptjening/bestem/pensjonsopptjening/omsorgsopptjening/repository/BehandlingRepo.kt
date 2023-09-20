@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import org.springframework.jdbc.core.RowMapper
@@ -93,9 +94,9 @@ internal class BehandlingRowMapper : RowMapper<BehandlingDb> {
             omsorgsyter = rs.getString("omsorgsyter"),
             omsorgsmottaker = rs.getString("omsorgsmottaker"),
             omsorgstype = OmsorgstypeDb.valueOf(rs.getString("omsorgstype")),
-            grunnlag = rs.getString("grunnlag").mapToClass(OmsorgsopptjeningGrunnlagDb::class.java),
-            vilkårsvurdering = rs.getString("vilkarsvurdering").mapToClass(VilkårsvurderingDb::class.java),
-            utfall = rs.getString("utfall").mapToClass(BehandlingsutfallDb::class.java),
+            grunnlag = deserialize(rs.getString("grunnlag")),
+            vilkårsvurdering = deserialize(rs.getString("vilkarsvurdering")),
+            utfall = deserialize(rs.getString("utfall")),
             meldingId = UUID.fromString(rs.getString("kafkaMeldingId"))
         )
     }

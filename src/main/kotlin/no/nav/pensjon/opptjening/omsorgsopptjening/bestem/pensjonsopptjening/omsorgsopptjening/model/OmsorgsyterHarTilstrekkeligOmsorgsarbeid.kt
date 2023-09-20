@@ -3,7 +3,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Omsorgsmåneder
-import java.time.Month
 
 /**
  * For barn fra 1 til og med 5 år må omsorgsyter minst ha 6 måneder med omsorgsarbeid for barnet
@@ -20,7 +19,16 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         return Vurdering(
             grunnlag = grunnlag,
             utfall = bestemUtfall(grunnlag),
+            påkrevetAntallMåneder = grunnlag.påkrevetAntallMåneder(),
         )
+    }
+
+    fun Grunnlag.påkrevetAntallMåneder(): Int {
+        return when (this) {
+            is Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> 1
+            is Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> 1
+            is Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> 6
+        }
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
@@ -30,7 +38,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
-                    if (grunnlag.antallMåneder() >= 1) {
+                    if (grunnlag.erOppfylltFor(grunnlag.påkrevetAntallMåneder())) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -54,7 +62,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                         )
                     }
                 }.let {
-                    if (grunnlag.antallMåneder() >= 6) {
+                    if (grunnlag.erOppfylltFor(grunnlag.påkrevetAntallMåneder())) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -67,7 +75,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
-                    if (grunnlag.antallMåneder() >= 1) {
+                    if (grunnlag.erOppfylltFor(grunnlag.påkrevetAntallMåneder())) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -79,7 +87,8 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
     data class Vurdering(
         override val grunnlag: Grunnlag,
-        override val utfall: VilkårsvurderingUtfall
+        override val utfall: VilkårsvurderingUtfall,
+        val påkrevetAntallMåneder: Int
     ) : ParagrafVurdering<Grunnlag>() {
         fun omsorgstype(): DomainOmsorgstype {
             return grunnlag.omsorgstype()
@@ -88,47 +97,44 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
 
     sealed class Grunnlag : ParagrafGrunnlag() {
-        abstract val omsorgsAr: Int
-        abstract val omsorgsmottaker: Person
-        abstract val omsorgsmåneder: Omsorgsmåneder
-        fun antallMåneder(): Int {
-            return omsorgsmåneder.count()
+        abstract val aldersvurderingOmsorgsmottaker: AldersvurderingsGrunnlag
+        abstract val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder
+
+        fun erOppfylltFor(påkrevetAntallMåneder: Int): Boolean {
+            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.count() >= påkrevetAntallMåneder
         }
 
         fun omsorgstype(): DomainOmsorgstype {
-            return when (omsorgsmåneder) {
+            return when (omsorgsytersOmsorgsmånederForOmsorgsmottaker) {
                 is Omsorgsmåneder.Barnetrygd -> DomainOmsorgstype.BARNETRYGD
                 is Omsorgsmåneder.Hjelpestønad -> DomainOmsorgstype.HJELPESTØNAD
             }
         }
 
         data class OmsorgsmottakerFødtUtenforOmsorgsår(
-            override val omsorgsAr: Int,
-            override val omsorgsmottaker: Person,
-            override val omsorgsmåneder: Omsorgsmåneder,
+            override val aldersvurderingOmsorgsmottaker: AldersvurderingsGrunnlag,
+            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
         ) : Grunnlag() {
             init {
-                require(!omsorgsmottaker.erFødt(omsorgsAr)) { "Ugyldig data. Omsorgsmottaker: $omsorgsmottaker er født i omsorgsår: $omsorgsAr" }
+                require(aldersvurderingOmsorgsmottaker.fødselsår() != aldersvurderingOmsorgsmottaker.omsorgsAr) { "Ugyldig data. Omsorgsmottaker: ${aldersvurderingOmsorgsmottaker.person} er født i omsorgsår: ${aldersvurderingOmsorgsmottaker.omsorgsAr}" }
             }
         }
 
         data class OmsorgsmottakerFødtIOmsorgsår(
-            override val omsorgsAr: Int,
-            override val omsorgsmottaker: Person,
-            override val omsorgsmåneder: Omsorgsmåneder,
+            override val aldersvurderingOmsorgsmottaker: AldersvurderingsGrunnlag,
+            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
         ) : Grunnlag() {
             init {
-                require(omsorgsmottaker.erFødt(omsorgsAr)) { "Ugyldig data. Omsorgsmottaker: $omsorgsmottaker er ikke født i omsorgsår: $omsorgsAr" }
+                require(aldersvurderingOmsorgsmottaker.fødselsår() == aldersvurderingOmsorgsmottaker.omsorgsAr) { "Ugyldig data. Omsorgsmottaker: ${aldersvurderingOmsorgsmottaker.person} er ikke født i omsorgsår: ${aldersvurderingOmsorgsmottaker.omsorgsAr}" }
             }
         }
 
         data class OmsorgsmottakerFødtIDesemberOmsorgsår(
-            override val omsorgsAr: Int,
-            override val omsorgsmottaker: Person,
-            override val omsorgsmåneder: Omsorgsmåneder,
+            override val aldersvurderingOmsorgsmottaker: AldersvurderingsGrunnlag,
+            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
         ) : Grunnlag() {
             init {
-                require(omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER)) { "Ugyldig data. Omsorgsmottaker: $omsorgsmottaker er ikke født desember i omsorgsår: $omsorgsAr" }
+                require(aldersvurderingOmsorgsmottaker.fødselsår() == aldersvurderingOmsorgsmottaker.omsorgsAr) { "Ugyldig data. Omsorgsmottaker: ${aldersvurderingOmsorgsmottaker.person} er ikke født desember i omsorgsår: ${aldersvurderingOmsorgsmottaker.omsorgsAr}" }
             }
         }
     }
