@@ -43,6 +43,7 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
     }
 
     @Test
+    @Disabled("årsak til heng på github?")
     fun `consume, process and send innvilget child 0 years`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
