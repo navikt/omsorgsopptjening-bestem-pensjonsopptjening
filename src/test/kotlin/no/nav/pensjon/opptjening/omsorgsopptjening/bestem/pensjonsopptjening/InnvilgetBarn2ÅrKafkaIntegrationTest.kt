@@ -43,7 +43,6 @@ internal class InnvilgetBarn2ÅrKafkaIntegrationTest : SpringContextTest.WithKaf
     }
 
     @Test
-    @Disabled("årsak til heng på github?")
     fun `konsumerer kafkamelding, prosesserer og godskriver opptjening til POPP`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
