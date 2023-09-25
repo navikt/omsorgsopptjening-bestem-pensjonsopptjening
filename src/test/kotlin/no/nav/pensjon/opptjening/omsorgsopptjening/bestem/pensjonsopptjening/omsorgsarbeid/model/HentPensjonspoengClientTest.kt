@@ -10,6 +10,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.TokenProviderConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -207,19 +208,7 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
     fun `returnerer pensjonspoeng lik 0 for forespurt år og type dersom response er tom liste`() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
-                wiremock.givenThat(
-                    get(urlPathEqualTo(POPP_PENSJONSPOENG_PATH)).willReturn(
-                        aResponse()
-                            .withHeader("Content-Type", "application/json")
-                            .withBody(
-                                """
-                        {
-                            "pensjonspoeng": []
-                        }
-                    """.trimIndent()
-                            )
-                    )
-                )
+                wiremock.ingenPensjonspoeng("12345")
 
                 assertEquals(
                     Pensjonspoeng.Omsorg(

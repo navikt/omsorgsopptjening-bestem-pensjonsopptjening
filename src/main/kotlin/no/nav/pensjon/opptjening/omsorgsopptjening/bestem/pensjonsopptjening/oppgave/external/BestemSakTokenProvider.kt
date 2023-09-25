@@ -9,10 +9,10 @@ import pensjon.opptjening.azure.ad.client.AzureAdTokenProvider
 import pensjon.opptjening.azure.ad.client.AzureAdVariableConfig
 import pensjon.opptjening.azure.ad.client.TokenProvider
 
-@Component("bestemSakTokenProvider")
+@Component("PENTokenProvider")
 @Profile("dev-gcp", "prod-gcp")
-class BestemSakTokenProvider(
-    @Value("\${BESTEM_SAK_API_ID}") val appId: String,
+class PENTokenProvider(
+    @Value("\${PEN_API_ID}") val appId: String,
     azureAdConfig: AzureAdTokenClientConfig,
 ) : TokenProvider {
     private val config: AzureAdConfig = AzureAdVariableConfig(

@@ -22,8 +22,8 @@ import pensjon.opptjening.azure.ad.client.TokenProvider
 
 @Component
 class BestemSakKlient(
-    @Value("\${BESTEMSAK_URL}") private val bestemSakUrl: String,
-    @Qualifier("bestemSakTokenProvider") private val tokenProvider: TokenProvider,
+    @Value("\${PEN_BASE_URL}") private val bestemSakUrl: String,
+    @Qualifier("PENTokenProvider") private val tokenProvider: TokenProvider,
     private val registry: MeterRegistry
 ) {
     private val antallSakerHentet = registry.counter("saker", "antall", "hentet")
@@ -36,10 +36,11 @@ class BestemSakKlient(
      * https://confluence.adeo.no/pages/viewpage.action?pageId=294133957
      * */
     fun bestemSak(aktørId: String): Omsorgssak {
+        val url = "$bestemSakUrl/api/bestemsak/v1"
         return try {
             logger.info("Kaller bestemSak i PESYS")
             val response = restTemplate.exchange(
-                bestemSakUrl,
+                url,
                 HttpMethod.POST,
                 HttpEntity(
                     serialize(BestemSakRequest(aktørId)),
@@ -63,7 +64,7 @@ class BestemSakKlient(
                 )
             }
         } catch (ex: Exception) {
-            """Feil ved kall til ${bestemSakUrl}, feil: $ex""".let {
+            """Feil ved kall til $url, feil: $ex""".let {
                 logger.warn(it, ex)
                 throw BestemSakClientException(it, ex)
             }

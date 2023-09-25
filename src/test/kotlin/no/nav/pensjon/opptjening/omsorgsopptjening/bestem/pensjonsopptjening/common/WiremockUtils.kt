@@ -12,7 +12,6 @@ import com.github.tomakehurst.wiremock.http.Request
 import com.github.tomakehurst.wiremock.http.ResponseDefinition
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
-import org.json.JSONObject
 
 /**
  * Velger body-fil basert på identen i requesten.
@@ -75,6 +74,52 @@ fun WireMockExtension.stubForPdlTransformer() {
                 WireMock.aResponse()
                     .withStatus(200)
                     .withHeader("Content-Type", "application/json")
+            )
+    )
+}
+
+fun WireMockExtension.ingenPensjonspoeng(fnr: String){
+    this.stubFor(
+        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.POPP_PENSJONSPOENG_PATH))
+            .withHeader("fnr", WireMock.equalTo(fnr))
+            .willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBody(
+                        """
+                            {
+                                "pensjonspoeng": []
+                            }
+                        """.trimIndent()
+                    )
+            )
+    )
+}
+
+fun WireMockExtension.bestemSakOk(){
+    this.stubFor(
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.BESTEM_SAK_PATH))
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-type", "application/json")
+                    .withBody(
+                        """
+                                    {
+                                        "feil":null, 
+                                        "sakInformasjonListe":[
+                                            {
+                                                "sakId":"12345",
+                                                "sakType":"OMSORG",
+                                                "sakStatus":"OPPRETTET",
+                                                "saksbehandlendeEnhetId":"4100",
+                                                "nyopprettet":false,
+                                                "tilknyttedeSaker":[]
+                                            }
+                                        ]
+                                    }
+                                """.trimIndent()
+                    )
             )
     )
 }

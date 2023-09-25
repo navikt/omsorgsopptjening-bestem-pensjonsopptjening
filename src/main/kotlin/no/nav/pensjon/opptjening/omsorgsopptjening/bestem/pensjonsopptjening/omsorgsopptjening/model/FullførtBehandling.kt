@@ -1,9 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Pensjonspoeng
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import java.time.Instant
@@ -175,11 +175,12 @@ data class FullførtBehandling(
                     omsorgsytersOmsorgspoengForOmsorgsår > annenForeldersInntektspoengOmsorgsår
                 ) {
                     return Brev(
-                        omsorgsyter = omsorgsyter, //TODO slapp modell, hentes fra behandling i basen inntil videre, håndtering av verge/annen mottaker - annen app?
+                        omsorgsyter = omsorgsyter, //TODO slapp modell, hentes fra behandling i basen inntil videre
                         behandlingId = id,
                         meldingId = meldingId,
                         correlationId = grunnlag.correlationId,
-                        innlesingId = grunnlag.innlesingId
+                        innlesingId = grunnlag.innlesingId,
+                        omsorgsår = omsorgsAr, //TODO slapp modell, hentes fra behandling i basen inntil videre
                     )
                 } else {
                     null

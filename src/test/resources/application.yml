@@ -2,7 +2,7 @@ kafka:
   brokers: ${spring.embedded.kafka.brokers}
 
 PDL_URL: http://localhost:9991/graphql
-BESTEMSAK_URL: http://localhost:9991/pen/api/bestemsak/v1
+PEN_BASE_URL: http://localhost:9991/pen
 OPPGAVE_URL: http://localhost:9991/api/v1/oppgaver
 POPP_URL: http://localhost:9991/api
 UNLEASH_SERVER_API_URL: http://localhost:9991/api

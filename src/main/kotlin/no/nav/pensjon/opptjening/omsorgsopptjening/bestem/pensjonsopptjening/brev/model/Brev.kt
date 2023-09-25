@@ -16,12 +16,13 @@ data class Brev(
     val meldingId: UUID,
     val correlationId: CorrelationId,
     val statushistorikk: List<Status> = listOf(Status.Klar()),
-    val innlesingId: InnlesingId
+    val innlesingId: InnlesingId,
+    val omsorgsår: Int,
 ) {
     val status = statushistorikk.last()
 
-    fun ferdig(): Brev {
-        return copy(statushistorikk = statushistorikk + status.ferdig())
+    fun ferdig(journalpost: Journalpost): Brev {
+        return copy(statushistorikk = statushistorikk + status.ferdig(journalpost))
     }
 
     fun retry(melding: String): Brev {
@@ -35,7 +36,7 @@ data class Brev(
     )
     sealed class Status {
 
-        open fun ferdig(): Ferdig {
+        open fun ferdig(journalpost: Journalpost): Ferdig {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Ferdig")
         }
 
@@ -47,8 +48,8 @@ data class Brev(
         data class Klar(
             val tidspunkt: Instant = Instant.now()
         ) : Status() {
-            override fun ferdig(): Ferdig {
-                return Ferdig()
+            override fun ferdig(journalpost: Journalpost): Ferdig {
+                return Ferdig(journalpost = journalpost.id)
             }
 
             override fun retry(melding: String): Status {
@@ -59,6 +60,7 @@ data class Brev(
         @JsonTypeName("Ferdig")
         data class Ferdig(
             val tidspunkt: Instant = Instant.now(),
+            val journalpost: String,
         ) : Status()
 
         @JsonTypeName("Retry")
@@ -69,8 +71,8 @@ data class Brev(
             val karanteneTil: Instant = tidspunkt.plus(5, ChronoUnit.HOURS),
             val melding: String,
         ) : Status() {
-            override fun ferdig(): Ferdig {
-                return Ferdig()
+            override fun ferdig(journalpost: Journalpost): Ferdig {
+                return Ferdig(journalpost = journalpost.id)
             }
 
             override fun retry(melding: String): Status {

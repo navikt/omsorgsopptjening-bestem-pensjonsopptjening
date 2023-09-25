@@ -6,7 +6,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
-import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -62,7 +61,7 @@ class BrevRepository(
 
     fun find(id: UUID): Brev {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where o.id = :id""",
+            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where o.id = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -72,7 +71,7 @@ class BrevRepository(
 
     fun findForMelding(id: UUID): List<Brev> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where m.id = :id""",
+            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where m.id = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -82,7 +81,7 @@ class BrevRepository(
 
     fun findForBehandling(id: UUID): List<Brev> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk,  m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where b.id = :id""",
+            """select o.*, os.statushistorikk,  m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where b.id = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -97,7 +96,7 @@ class BrevRepository(
      */
     fun finnNesteUprosesserte(): Brev? {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""",
+            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""",
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),
@@ -116,7 +115,8 @@ class BrevRepository(
                 meldingId = UUID.fromString(rs.getString("meldingid")),
                 correlationId = CorrelationId.fromString(rs.getString("correlation_id")),
                 statushistorikk = rs.getString("statushistorikk").deserializeList(),
-                innlesingId = InnlesingId.fromString(rs.getString("innlesing_id"))
+                innlesingId = InnlesingId.fromString(rs.getString("innlesing_id")),
+                omsorgsår = rs.getInt("omsorgs_ar")
             )
         }
     }

@@ -17,8 +17,8 @@ class TokenProviderConfig {
     @Bean("oppgaveTokenProvider")
     fun oppgaveTokenProvider(): TokenProvider = MockTokenProvider(MOCK_TOKEN)
 
-    @Bean("bestemSakTokenProvider")
-    fun bestemSakTokenProvider(): TokenProvider = MockTokenProvider(MOCK_TOKEN)
+    @Bean("PENTokenProvider")
+    fun PENTokenProvider(): TokenProvider = MockTokenProvider(MOCK_TOKEN)
 
 
     companion object {
