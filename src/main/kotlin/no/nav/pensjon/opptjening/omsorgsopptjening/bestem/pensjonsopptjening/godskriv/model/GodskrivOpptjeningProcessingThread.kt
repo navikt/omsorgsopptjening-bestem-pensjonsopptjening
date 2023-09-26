@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MicrometerMetrics
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component
 class GodskrivOpptjeningProcessingThread(
     private val service: GodskrivOpptjeningService,
     private val unleash: Unleash,
+    private val metrics: MicrometerMetrics,
 ) : Runnable {
 
     companion object {
@@ -29,11 +31,13 @@ class GodskrivOpptjeningProcessingThread(
         while (true) {
             try {
                 if(unleash.isEnabled(NavUnleashConfig.Feature.GODSKRIV.toggleName)) {
-                    service.process()
+                    metrics.godskrivProsessertTidsbruk.recordCallable { service.process() }
                 }
             } catch (exception: Throwable) {
-                log.warn("Exception caught while processing, exception:$exception")
-                Thread.sleep(1000)
+                metrics.godskrivFeiletTidsbruk.recordCallable {
+                    log.warn("Exception caught while processing, exception:$exception")
+                    Thread.sleep(1000)
+                }
             }
         }
     }
