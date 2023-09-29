@@ -14,7 +14,7 @@ spec:
     - name: PDL_API_ID
       value: dev-fss.pdl.pdl-api
     - name: PEN_BASE_URL
-      value: https://pensjon-pen-q2.nais.preprod.local/pen
+      value: https://pensjon-pen-q2.dev.intern.nav.no/pen
     - name: PEN_API_ID
       value: dev-fss.teampensjon.pensjon-pen-q2
     - name: OPPGAVE_URL
@@ -49,7 +49,7 @@ spec:
     outbound:
       external:
         - host: pdl-api.dev-fss-pub.nais.io
-        - host: pensjon-pen-q2.nais.preprod.local
+        - host: pensjon-pen-q2.dev.intern.nav.no
         - host: oppgave.dev-fss-pub.nais.io
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
