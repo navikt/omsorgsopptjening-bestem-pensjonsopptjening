@@ -45,7 +45,7 @@ class BrevService(
                             }
                         } catch (ex: Throwable) {
                             transactionTemplate.execute {
-                                brev.retry(ex.toString()).also {
+                                brev.retry(ex.stackTraceToString()).also {
                                     brevRepository.updateStatus(it)
                                 }
                             }

@@ -65,7 +65,7 @@ class OppgaveService(
                             }
                         } catch (ex: Throwable) {
                             transactionTemplate.execute {
-                                oppgave.retry(ex.toString()).let {
+                                oppgave.retry(ex.stackTraceToString()).let {
                                     if (it.status is Oppgave.Status.Feilet) {
                                         log.error("Gir opp videre prosessering av oppgave")
                                     }

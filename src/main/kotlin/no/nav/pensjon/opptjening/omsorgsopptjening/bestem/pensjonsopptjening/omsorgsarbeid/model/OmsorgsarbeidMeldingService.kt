@@ -60,7 +60,7 @@ class OmsorgsarbeidMeldingService(
                             }
                         } catch (ex: Throwable) {
                             transactionTemplate.execute {
-                                melding.retry(ex.toString()).let { melding ->
+                                melding.retry(ex.stackTraceToString()).let { melding ->
                                     melding.opprettOppgave()?.let {
                                         log.error("Gir opp videre prosessering av melding")
                                         oppgaveService.opprett(it)

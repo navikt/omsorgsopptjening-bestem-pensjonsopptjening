@@ -50,7 +50,7 @@ class GodskrivOpptjeningService(
                             }
                         } catch (ex: Throwable) {
                             transactionTemplate.execute {
-                                godskrivOpptjening.retry(ex.toString()).let { retry ->
+                                godskrivOpptjening.retry(ex.stackTraceToString()).let { retry ->
                                     retry.opprettOppgave()?.let {
                                         log.error("Gir opp videre prosessering av godskriv opptjening")
                                         oppgaveService.opprett(it)
