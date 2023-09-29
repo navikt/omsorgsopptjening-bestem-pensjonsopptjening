@@ -32,6 +32,7 @@ import java.time.Instant
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
+import kotlin.test.assertContains
 
 
 class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
@@ -335,18 +336,26 @@ class OmsorgsarbeidMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(1, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
                 assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
-                assertEquals(
-                    "PersonOppslagException(msg=Feil ved henting av person, throwable=no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException: Ugyldig ident)",
-                    it.melding
+                assertContains( //wrapper
+                    it.melding,
+                    "PersonOppslagException(msg=Feil ved henting av person, throwable=no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException: Ugyldig ident)"
+                )
+                assertContains( //rotårsak
+                    it.melding,
+                    "Caused by: no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException: Ugyldig ident"
                 )
             }
             assertInstanceOf(OmsorgsarbeidMelding.Status.Retry::class.java, m.statushistorikk[2]).also {
                 assertEquals(2, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
                 assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
-                assertEquals(
-                    "PersonOppslagException(msg=Feil ved henting av person, throwable=no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException: Fant ikke person)",
-                    it.melding
+                assertContains( //wrapper
+                    it.melding,
+                    "PersonOppslagException(msg=Feil ved henting av person, throwable=no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException: Fant ikke person)"
+                )
+                assertContains( //rotårsak
+                    it.melding,
+                    "Caused by: no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl.PdlException: Fant ikke person"
                 )
             }
             assertInstanceOf(OmsorgsarbeidMelding.Status.Feilet::class.java, m.status)
