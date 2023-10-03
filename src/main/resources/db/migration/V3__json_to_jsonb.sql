@@ -1,0 +1,13 @@
+alter table melding alter column melding set data type jsonb using melding::jsonb;
+alter table melding_status alter column status set data type jsonb using status::jsonb;
+alter table melding_status alter column statushistorikk set data type jsonb using statushistorikk::jsonb;
+alter table behandling alter column grunnlag set data type jsonb using grunnlag::jsonb;
+alter table behandling alter column vilkarsvurdering set data type jsonb using vilkarsvurdering::jsonb;
+alter table behandling alter column utfall set data type jsonb using utfall::jsonb;
+alter table oppgave alter column detaljer set data type jsonb using detaljer::jsonb;
+alter table oppgave_status alter column status set data type jsonb using status::jsonb;
+alter table oppgave_status alter column statushistorikk set data type jsonb using statushistorikk::jsonb;
+alter table godskriv_opptjening_status alter column status set data type jsonb using status::jsonb;
+alter table godskriv_opptjening_status alter column statushistorikk set data type jsonb using statushistorikk::jsonb;
+alter table brev_status alter column status set data type jsonb using status::jsonb;
+alter table brev_status alter column statushistorikk set data type jsonb using statushistorikk::jsonb;

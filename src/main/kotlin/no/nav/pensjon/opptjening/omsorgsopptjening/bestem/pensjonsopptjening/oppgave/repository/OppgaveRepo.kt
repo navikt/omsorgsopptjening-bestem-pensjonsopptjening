@@ -26,7 +26,7 @@ class OppgaveRepo(
     fun persist(oppgave: Oppgave.Transient): Oppgave.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into oppgave (behandlingId, meldingId, detaljer) values (:behandlingId, :meldingId, to_json(:detaljer::json))""",
+            """insert into oppgave (behandlingId, meldingId, detaljer) values (:behandlingId, :meldingId, to_jsonb(:detaljer::jsonb))""",
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to oppgave.behandlingId,
@@ -37,7 +37,7 @@ class OppgaveRepo(
             keyHolder
         )
         jdbcTemplate.update(
-            """insert into oppgave_status (id, status, statushistorikk) values (:id, to_json(:status::json), to_json(:statushistorikk::json))""",
+            """insert into oppgave_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "id" to keyHolder.keys!!["id"] as UUID,
@@ -51,7 +51,7 @@ class OppgaveRepo(
 
     fun updateStatus(oppgave: Oppgave.Persistent) {
         jdbcTemplate.update(
-            """update oppgave_status set status = to_json(:status::json), statushistorikk = to_json(:statushistorikk::json) where id = :id""",
+            """update oppgave_status set status = to_jsonb(:status::jsonb), statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "id" to oppgave.id,

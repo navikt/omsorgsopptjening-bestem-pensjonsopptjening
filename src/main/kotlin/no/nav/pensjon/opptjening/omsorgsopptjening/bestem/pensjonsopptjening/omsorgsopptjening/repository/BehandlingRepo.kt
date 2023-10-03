@@ -22,7 +22,7 @@ class BehandlingRepo(
         return behandling.toDb().let { obj ->
             val keyHolder = GeneratedKeyHolder()
             jdbcTemplate.update(
-                """insert into behandling (omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag, vilkarsvurdering, utfall, kafkaMeldingId) values (:omsorgsar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, to_json(:grunnlag::json), to_json(:vilkarsvurdering::json), to_json(:utfall::json), :kafkaMeldingId)""",
+                """insert into behandling (omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag, vilkarsvurdering, utfall, kafkaMeldingId) values (:omsorgsar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, to_jsonb(:grunnlag::jsonb), to_jsonb(:vilkarsvurdering::jsonb), to_jsonb(:utfall::jsonb), :kafkaMeldingId)""",
                 MapSqlParameterSource(
                     mapOf(
                         "omsorgsar" to obj.omsorgsAr,

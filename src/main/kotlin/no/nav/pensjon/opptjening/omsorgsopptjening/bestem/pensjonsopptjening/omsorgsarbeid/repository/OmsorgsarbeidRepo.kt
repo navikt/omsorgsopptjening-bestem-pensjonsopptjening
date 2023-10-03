@@ -24,7 +24,7 @@ class OmsorgsarbeidRepo(
     fun persist(melding: OmsorgsarbeidMelding.Lest): OmsorgsarbeidMelding.Mottatt {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into melding (melding, correlation_id, innlesing_id) values (to_json(:melding::json), :correlation_id, :innlesing_id)""",
+            """insert into melding (melding, correlation_id, innlesing_id) values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id)""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "melding" to serialize(melding.innhold),
@@ -35,7 +35,7 @@ class OmsorgsarbeidRepo(
             keyHolder
         )
         jdbcTemplate.update(
-            """insert into melding_status (id, status, statushistorikk) values (:id, to_json(:status::json), to_json(:statushistorikk::json))""",
+            """insert into melding_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "id" to keyHolder.keys!!["id"] as UUID,
@@ -49,7 +49,7 @@ class OmsorgsarbeidRepo(
 
     fun updateStatus(melding: OmsorgsarbeidMelding.Mottatt) {
         jdbcTemplate.update(
-            """update melding_status set status = to_json(:status::json), statushistorikk = to_json(:statushistorikk::json) where id = :id""",
+            """update melding_status set status = to_jsonb(:status::jsonb), statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "id" to melding.id,
