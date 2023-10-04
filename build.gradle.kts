@@ -9,6 +9,7 @@ val flywayCoreVersion = "9.16.1"
 val springKafkaTestVersion = "3.0.5"
 val springCloudContractVersion = "4.0.2"
 val testcontainersVersion = "1.17.6"
+val mockkVersion = "1.13.8"
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.8.0"
@@ -66,6 +67,7 @@ dependencies {
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
     implementation("io.getunleash:unleash-client-java:8.3.1")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    testImplementation("io.mockk:mockk:${mockkVersion}")
 }
 
 tasks.test {

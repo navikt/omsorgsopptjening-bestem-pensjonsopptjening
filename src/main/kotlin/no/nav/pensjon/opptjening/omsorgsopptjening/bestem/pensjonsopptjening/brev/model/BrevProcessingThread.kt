@@ -34,6 +34,7 @@ class BrevProcessingThread(
                     metrics.brevProsessertTidsbruk.recordCallable { service.process() }
                 }
             } catch (exception: Throwable) {
+                metrics.antallFeiledeBrev.increment()
                 metrics.brevFeiletTidsbruk.recordCallable {
                     log.warn("Exception caught while processing, exception:$exception")
                     Thread.sleep(1000)

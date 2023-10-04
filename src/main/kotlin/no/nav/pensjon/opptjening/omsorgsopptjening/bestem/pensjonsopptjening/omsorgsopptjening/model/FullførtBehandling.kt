@@ -25,6 +25,10 @@ data class FullførtBehandling(
         return utfall.erInnvilget()
     }
 
+    fun avslagsArsaker(): List<VilkarsVurdering<*>> {
+        return vilkårsvurdering.finnAlleAvslatte()
+    }
+
     fun godskrivOpptjening(): GodskrivOpptjening.Transient {
         require(erInnvilget()) { "Kan kun godskrive opptjening for innvilget behandling!" }
         return GodskrivOpptjening.Transient(

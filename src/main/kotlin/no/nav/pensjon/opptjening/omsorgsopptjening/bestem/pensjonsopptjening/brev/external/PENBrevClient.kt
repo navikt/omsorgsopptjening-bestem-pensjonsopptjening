@@ -4,6 +4,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.bre
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClientException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Journalpost
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient.Companion.logger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MicrometerMetrics
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -23,6 +24,7 @@ import pensjon.opptjening.azure.ad.client.TokenProvider
 private class PENBrevClient(
     @Value("\${PEN_BASE_URL}") private val baseUrl: String,
     @Qualifier("PENTokenProvider") private val tokenProvider: TokenProvider,
+    private val metrics: MicrometerMetrics,
 ) : BrevClient {
     private val restTemplate = RestTemplateBuilder().build()
 
@@ -56,6 +58,7 @@ private class PENBrevClient(
                 ),
                 String::class.java
             )
+            metrics.antallSendteBrev.increment()
             return Journalpost(mapper.readValue(response.body, SendBrevResponse::class.java).journalpostId)
         } catch (ex: Throwable) {
             """Feil ved kall til $url, feil: $ex""".let {

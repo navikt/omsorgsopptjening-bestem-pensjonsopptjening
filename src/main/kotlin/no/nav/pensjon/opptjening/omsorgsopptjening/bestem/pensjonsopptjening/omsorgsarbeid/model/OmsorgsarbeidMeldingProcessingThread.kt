@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MicrometerMetrics
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -31,14 +32,40 @@ class OmsorgsarbeidMeldingProcessingThread(
         while (true) {
             try {
                 if(unleash.isEnabled(NavUnleashConfig.Feature.BEHANDLING.toggleName)) {
-                    metrics.omsorgsarbeidProsessertTidsbruk.recordCallable { handler.process() }
+                    metrics.omsorgsarbeidProsessertTidsbruk.recordCallable {
+                        val fullførteBehandlinger = handler.process()
+                        if(fullførteBehandlinger.any { it.erInnvilget() }) {
+                            metrics.innvilget.increment()
+                        } else {
+                            extracted(fullførteBehandlinger)
+                        }
+                    }
                 }
             } catch (exception: Throwable) {
+                metrics.antallFeiledeOmsorgsarbeid.increment()
                 metrics.omsorgsarbeidFeiletTidsbruk.recordCallable {
                     log.warn("Exception caught while processing, exception:$exception")
                     Thread.sleep(1000)
                 }
             }
         }
+    }
+
+    private fun extracted(fullførteBehandlinger: List<FullførtBehandling>) {
+        fullførteBehandlinger.flatMap { it.avslagsArsaker() }.associateBy { it.javaClass }.values.map {
+            when (it) {
+                is EllerVurdering -> {}
+                is OgVurdering -> {}
+                is OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering -> metrics.omsorgsyterHarMestOmsorgAvAlleOmsorgsytere.increment()
+                is OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering -> metrics.omsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.increment()
+                is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering -> metrics.omsorgsyterHarTilstrekkeligOmsorgsarbeid.increment()
+                is OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering -> metrics.omsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.increment()
+                is OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering -> metrics.omsorgsyterErForelderTilMottakerAvHjelpestønad.increment()
+                is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> metrics.omsorgsmottakerOppfyllerAlderskravForHjelpestønad.increment()
+                is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> metrics.omsorgsmottakerOppfyllerAlderskravForBarnetrygd.increment()
+                is OmsorgsyterOppfyllerAlderskrav.Vurdering -> metrics.omsorgsyterOppfyllerAlderskrav.increment()
+            }
+        }
+        metrics.avslag.increment()
     }
 }

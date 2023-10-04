@@ -34,6 +34,7 @@ class GodskrivOpptjeningProcessingThread(
                     metrics.godskrivProsessertTidsbruk.recordCallable { service.process() }
                 }
             } catch (exception: Throwable) {
+                metrics.antallFeiledeGodskriving.increment()
                 metrics.godskrivFeiletTidsbruk.recordCallable {
                     log.warn("Exception caught while processing, exception:$exception")
                     Thread.sleep(1000)
