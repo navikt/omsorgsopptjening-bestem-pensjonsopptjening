@@ -32,7 +32,7 @@ class NavUnleashConfig(
         OPPRETT_OPPGAVER("omsorgsopptjening-bestem-pensjonsopptjening-opprett-oppgaver"),
         GODSKRIV("omsorgsopptjening-bestem-pensjonsopptjening-godskriv"),
         BEHANDLING("omsorgsopptjening-bestem-pensjonsopptjening-behandling"),
-        BREV("omsorgsopptjening-bestem-pensjonsopptjening-brev") //TODO toggle
+        BREV("omsorgsopptjening-bestem-pensjonsopptjening-brev")
     }
 }
 

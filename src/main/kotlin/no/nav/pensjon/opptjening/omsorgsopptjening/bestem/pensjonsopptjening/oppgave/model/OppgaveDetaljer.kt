@@ -48,19 +48,6 @@ sealed class OppgaveDetaljer {
         }
     }
 
-    /**
-     * TODO
-     * Ser ut som dette dekker caset "kunne ikke sendes til popp" + eventuelle caser som
-     * ikke gjelder første leveår + flere mottakere
-     * ikke gjelder andre år + flere mottakere
-     *
-     * Spørring:
-     * "select g from GodskriveOmsorgspoeng g where"
-     *                         + " g.skalSlettes is null"
-     *                         + " and g.statusFerdigOk is :" + GodskriveOmsorgspoeng.NQ_PARAM_FALSE
-     *                         + " and (g.kanGodskrives is :" + GodskriveOmsorgspoeng.NQ_PARAM_FALSE
-     *                         + " 	  or g.sendtTilPopp is null or g.sendtTilPopp is :" + GodskriveOmsorgspoeng.NQ_PARAM_FALSE + " )"),
-     */
     @JsonTypeName("UspesifisertFeilsituasjon")
     data class UspesifisertFeilsituasjon(
         val omsorgsyter: String,

@@ -164,13 +164,13 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
             }
         }
 
-        assertInstanceOf(Brev.Status.Klar::class.java, brevRepository.find(brev.id!!).status)
+        assertInstanceOf(Brev.Status.Klar::class.java, brevRepository.find(brev.id).status)
 
         assertThrows<BrevClientException> {
             brevService.process()
         }
 
-        brevRepository.find(brev.id!!).let { m ->
+        brevRepository.find(brev.id).let { m ->
             assertInstanceOf(Brev.Status.Retry::class.java, m.status).let {
                 assertEquals(1, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
@@ -182,7 +182,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
             brevService.process()
         }
 
-        brevRepository.find(brev.id!!).let { m ->
+        brevRepository.find(brev.id).let { m ->
             assertInstanceOf(Brev.Status.Retry::class.java, m.status).let {
                 assertEquals(2, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
@@ -190,12 +190,12 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
             }
         }
 
-        brevService.process()!!.also { brev ->
-            assertEquals(2020, brev.omsorgsår)
-            assertEquals("12345678910", brev.omsorgsyter)
-            assertEquals(behandling.id, brev.behandlingId)
-            assertEquals(behandling.meldingId, brev.meldingId)
-            assertInstanceOf(Brev.Status.Ferdig::class.java, brev.status).also {
+        brevService.process()!!.also { b ->
+            assertEquals(2020, b.omsorgsår)
+            assertEquals("12345678910", b.omsorgsyter)
+            assertEquals(behandling.id, b.behandlingId)
+            assertEquals(behandling.meldingId, b.meldingId)
+            assertInstanceOf(Brev.Status.Ferdig::class.java, b.status).also {
                 assertEquals("acoc2323o", it.journalpost)
             }
             assertEquals(1, brevRepository.findForBehandling(behandling.id).count())
@@ -259,7 +259,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
             }
         }
 
-        assertInstanceOf(Brev.Status.Klar::class.java, brevRepository.find(brev.id!!).status)
+        assertInstanceOf(Brev.Status.Klar::class.java, brevRepository.find(brev.id).status)
 
         assertThrows<BrevClientException> {
             brevService.process()
@@ -274,12 +274,12 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
             brevService.process()
         }
 
-        brevRepository.find(brev.id!!).also { brev ->
-            assertEquals(2020, brev.omsorgsår)
-            assertEquals("12345678910", brev.omsorgsyter)
-            assertEquals(behandling.id, brev.behandlingId)
-            assertEquals(behandling.meldingId, brev.meldingId)
-            assertInstanceOf(Brev.Status.Feilet::class.java, brev.status)
+        brevRepository.find(brev.id).also { b ->
+            assertEquals(2020, b.omsorgsår)
+            assertEquals("12345678910", b.omsorgsyter)
+            assertEquals(behandling.id, b.behandlingId)
+            assertEquals(behandling.meldingId, b.meldingId)
+            assertInstanceOf(Brev.Status.Feilet::class.java, b.status)
             assertEquals(1, brevRepository.findForBehandling(behandling.id).count())
         }
     }

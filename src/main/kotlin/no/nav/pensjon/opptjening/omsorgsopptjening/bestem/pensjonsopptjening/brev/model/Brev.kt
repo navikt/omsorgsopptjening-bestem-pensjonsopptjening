@@ -8,26 +8,45 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-data class Brev(
-    val id: UUID? = null,
-    val opprettet: Instant? = null,
-    val omsorgsyter: String,
-    val behandlingId: UUID?,
-    val meldingId: UUID,
-    val correlationId: CorrelationId,
-    val statushistorikk: List<Status> = listOf(Status.Klar()),
-    val innlesingId: InnlesingId,
-    val omsorgsår: Int,
-) {
-    val status = statushistorikk.last()
+sealed class Brev {
+    abstract val behandlingId: UUID
+    abstract val statushistorikk: List<Status>
+    val status: Status get() = statushistorikk.last()
 
-    fun ferdig(journalpost: Journalpost): Brev {
-        return copy(statushistorikk = statushistorikk + status.ferdig(journalpost))
+    /**
+     * Inneholder kun informasjon nok til å knytte brevet til en behandling.
+     * Alle brev som opprettes er av den samme typen, og vi trenger derfor ikke noe mer enn dette.
+     */
+    data class Transient(
+        override val behandlingId: UUID,
+    ) : Brev() {
+        override val statushistorikk: List<Status> = listOf(Status.Klar())
     }
 
-    fun retry(melding: String): Brev {
-        return copy(statushistorikk = statushistorikk + status.retry(melding))
+    /**
+     * Plukker med seg en del informasjon knyttet til aktuell [behandlingId]
+     */
+    data class Persistent(
+        val id: UUID,
+        val opprettet: Instant,
+        val omsorgsyter: String,
+        val correlationId: CorrelationId,
+        val innlesingId: InnlesingId,
+        val omsorgsår: Int,
+        val meldingId: UUID,
+        override val behandlingId: UUID,
+        override val statushistorikk: List<Status>,
+    ) : Brev() {
+
+        fun ferdig(journalpost: Journalpost): Persistent {
+            return copy(statushistorikk = statushistorikk + status.ferdig(journalpost))
+        }
+
+        fun retry(melding: String): Persistent {
+            return copy(statushistorikk = statushistorikk + status.retry(melding))
+        }
     }
+
 
     @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

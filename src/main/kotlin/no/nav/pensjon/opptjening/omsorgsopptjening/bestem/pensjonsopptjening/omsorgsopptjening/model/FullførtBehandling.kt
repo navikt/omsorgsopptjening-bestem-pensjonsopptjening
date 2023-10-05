@@ -128,7 +128,7 @@ data class FullførtBehandling(
     fun sendBrev(
         hentPensjonspoengForOmsorgsopptjening: (fnr: String, år: Int, type: DomainOmsorgstype) -> Pensjonspoeng,
         hentPensjonspoengForInntekt: (fnr: String, år: Int) -> Pensjonspoeng,
-    ): Brev? {
+    ): Brev.Transient? {
         require(erInnvilget()) { "Kan bare sende brev for innvilget behandling!" }
         fun omsorgspoeng(): Pensjonspoeng.Omsorg {
             return godskrivOpptjening().let {
@@ -178,14 +178,7 @@ data class FullførtBehandling(
                     omsorgsytersOmsorgspoengForegåendeÅr.poeng == 0.0 ||
                     omsorgsytersOmsorgspoengForOmsorgsår > annenForeldersInntektspoengOmsorgsår
                 ) {
-                    return Brev(
-                        omsorgsyter = omsorgsyter, //TODO slapp modell, hentes fra behandling i basen inntil videre
-                        behandlingId = id,
-                        meldingId = meldingId,
-                        correlationId = grunnlag.correlationId,
-                        innlesingId = grunnlag.innlesingId,
-                        omsorgsår = omsorgsAr, //TODO slapp modell, hentes fra behandling i basen inntil videre
-                    )
+                    return Brev.Transient(behandlingId = id)
                 } else {
                     null
                 }

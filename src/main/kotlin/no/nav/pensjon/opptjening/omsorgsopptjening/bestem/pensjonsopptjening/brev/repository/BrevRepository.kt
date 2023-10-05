@@ -22,7 +22,7 @@ class BrevRepository(
     private val clock: Clock = Clock.systemUTC()
 ) {
 
-    fun persist(brev: Brev): Brev {
+    fun persist(brev: Brev.Transient): Brev.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into brev (behandlingId) values (:behandlingId)""",
@@ -46,12 +46,12 @@ class BrevRepository(
         return find(keyHolder.keys!!["id"] as UUID)
     }
 
-    fun updateStatus(brev: Brev) {
+    fun updateStatus(brev: Brev.Persistent) {
         jdbcTemplate.update(
             """update brev_status set status = to_jsonb(:status::jsonb), statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
-                    "id" to brev.id!!,
+                    "id" to brev.id,
                     "status" to serialize(brev.status),
                     "statushistorikk" to brev.statushistorikk.serializeList()
                 ),
@@ -59,7 +59,7 @@ class BrevRepository(
         )
     }
 
-    fun find(id: UUID): Brev {
+    fun find(id: UUID): Brev.Persistent {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where o.id = :id""",
             mapOf<String, Any>(
@@ -69,7 +69,7 @@ class BrevRepository(
         ).single()
     }
 
-    fun findForMelding(id: UUID): List<Brev> {
+    fun findForMelding(id: UUID): List<Brev.Persistent> {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where m.id = :id""",
             mapOf<String, Any>(
@@ -79,7 +79,7 @@ class BrevRepository(
         )
     }
 
-    fun findForBehandling(id: UUID): List<Brev> {
+    fun findForBehandling(id: UUID): List<Brev.Persistent> {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk,  m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where b.id = :id""",
             mapOf<String, Any>(
@@ -94,7 +94,7 @@ class BrevRepository(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
-    fun finnNesteUprosesserte(): Brev? {
+    fun finnNesteUprosesserte(): Brev.Persistent? {
         return jdbcTemplate.query(
             """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""",
             mapOf(
@@ -105,9 +105,9 @@ class BrevRepository(
     }
 
 
-    internal class BrevMapper : RowMapper<Brev> {
-        override fun mapRow(rs: ResultSet, rowNum: Int): Brev {
-            return Brev(
+    internal class BrevMapper : RowMapper<Brev.Persistent> {
+        override fun mapRow(rs: ResultSet, rowNum: Int): Brev.Persistent {
+            return Brev.Persistent(
                 id = UUID.fromString(rs.getString("id")),
                 opprettet = rs.getTimestamp("opprettet").toInstant(),
                 omsorgsyter = rs.getString("omsorgsyter"),

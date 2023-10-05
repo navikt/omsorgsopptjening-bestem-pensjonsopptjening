@@ -18,11 +18,11 @@ class BrevService(
     private val personOppslag: PersonOppslag,
 ) {
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
-    fun opprett(brev: Brev): Brev {
+    fun opprett(brev: Brev.Transient): Brev.Persistent {
         return brevRepository.persist(brev)
     }
 
-    fun process(): Brev? {
+    fun process(): Brev.Persistent? {
         return transactionTemplate.execute {
             brevRepository.finnNesteUprosesserte()?.let { brev ->
                 Mdc.scopedMdc(brev.correlationId) {
