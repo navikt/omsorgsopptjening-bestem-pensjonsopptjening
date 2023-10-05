@@ -272,7 +272,8 @@ private fun BeriketDatagrunnlag.`avgrens for omsorgsår`(): Map<Int, BeriketData
                                         fom = it.min(),
                                         tom = it.max(),
                                         omsorgstype = barnetrygdPeriode.omsorgstype,
-                                        omsorgsmottaker = barnetrygdPeriode.omsorgsmottaker
+                                        omsorgsmottaker = barnetrygdPeriode.omsorgsmottaker,
+                                        kilde = barnetrygdPeriode.kilde,
                                     )
                                 }
                         })

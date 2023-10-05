@@ -14,6 +14,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -91,13 +92,15 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -169,13 +172,15 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -253,13 +258,15 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),

@@ -12,6 +12,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions
@@ -76,7 +77,8 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                             fom = YearMonth.of(2018, Month.SEPTEMBER),
                                             tom = YearMonth.of(2025, Month.DECEMBER),
                                             omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                            omsorgsmottaker = "07081812345"
+                                            omsorgsmottaker = "07081812345",
+                                            kilde = Kilde.BARNETRYGD,
                                         )
                                     )
                                 ),
@@ -127,7 +129,8 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                             fom = YearMonth.of(2018, Month.SEPTEMBER),
                                             tom = YearMonth.of(2025, Month.DECEMBER),
                                             omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                            omsorgsmottaker = "07081812345"
+                                            omsorgsmottaker = "07081812345",
+                                            kilde = Kilde.BARNETRYGD,
                                         )
                                     )
                                 ),
@@ -176,7 +179,8 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                             fom = YearMonth.of(2021, Month.JANUARY),
                                             tom = YearMonth.of(2021, Month.JUNE),
                                             omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                            omsorgsmottaker = "01122012345"
+                                            omsorgsmottaker = "01122012345",
+                                            kilde = Kilde.BARNETRYGD,
                                         )
                                     )
                                 ),
@@ -187,7 +191,8 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                             fom = YearMonth.of(2021, Month.JULY),
                                             tom = YearMonth.of(2021, Month.DECEMBER),
                                             omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                            omsorgsmottaker = "01122012345"
+                                            omsorgsmottaker = "01122012345",
+                                            kilde = Kilde.BARNETRYGD,
                                         ),
                                     )
                                 ),

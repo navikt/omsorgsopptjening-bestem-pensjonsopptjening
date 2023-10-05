@@ -23,6 +23,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
@@ -78,7 +79,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -125,7 +127,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2022, Month.JANUARY),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -153,7 +156,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.OCTOBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01052012345"
+                                    omsorgsmottaker = "01052012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -204,7 +208,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.MAY),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01052012345"
+                                    omsorgsmottaker = "01052012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -255,7 +260,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -302,7 +308,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.MAY),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -350,7 +357,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.MAY),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -398,13 +406,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.MAY),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JUNE),
                                     tom = YearMonth.of(2020, Month.AUGUST),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -415,13 +425,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.MAY),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.SEPTEMBER),
                                     tom = YearMonth.of(2020, Month.OCTOBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -432,7 +444,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.NOVEMBER),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -478,13 +491,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.MAY),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.SEPTEMBER),
                                     tom = YearMonth.of(2020, Month.OCTOBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -495,13 +510,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.MAY),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JUNE),
                                     tom = YearMonth.of(2020, Month.AUGUST),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -512,7 +529,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.NOVEMBER),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -559,19 +577,22 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01052012345"
+                                    omsorgsmottaker = "01052012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2021, Month.JANUARY),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -622,7 +643,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2021, Month.FEBRUARY),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -633,13 +655,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2021, Month.FEBRUARY),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2021, Month.MARCH),
                                     tom = YearMonth.of(2021, Month.MAY),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -685,7 +709,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -714,7 +739,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -749,13 +775,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01052012345"
+                                    omsorgsmottaker = "01052012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -796,7 +824,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.JULY),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -807,7 +836,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JUNE),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -818,7 +848,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.JULY),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -871,7 +902,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2021, Month.JUNE),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -882,7 +914,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2021, Month.JULY),
                                     tom = YearMonth.of(2021, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                             )
                         ),
@@ -937,7 +970,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -968,7 +1002,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2021, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -1063,13 +1098,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -1104,13 +1141,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -1147,13 +1186,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2020, Month.MAY),
                                     tom = YearMonth.of(2020, Month.JUNE),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -1188,7 +1229,8 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
-                                    omsorgsmottaker = "03041212345"
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -1223,13 +1265,15 @@ class OmsorgsarbeidMeldingServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 ),
                                 OmsorgsgrunnlagMelding.VedtakPeriode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
-                                    omsorgsmottaker = "07081812345"
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),

@@ -8,6 +8,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import java.time.YearMonth
 
 @JsonTypeInfo(
@@ -75,7 +76,8 @@ internal data class BeriketOmsorgVedtakPeriodeDb(
     val fom: String,
     val tom: String,
     val omsorgstype: String,
-    val omsorgsmottaker: PersonDb
+    val omsorgsmottaker: PersonDb,
+    val kilde: KildeDb,
 )
 
 internal fun BeriketVedtaksperiode.toDb(): BeriketOmsorgVedtakPeriodeDb {
@@ -83,7 +85,8 @@ internal fun BeriketVedtaksperiode.toDb(): BeriketOmsorgVedtakPeriodeDb {
         fom = fom.toString(),
         tom = tom.toString(),
         omsorgstype = omsorgstype.toString(),
-        omsorgsmottaker = omsorgsmottaker.toDb()
+        omsorgsmottaker = omsorgsmottaker.toDb(),
+        kilde = kilde.toDb()
     )
 }
 
@@ -92,6 +95,7 @@ internal fun BeriketOmsorgVedtakPeriodeDb.toDomain(): BeriketVedtaksperiode {
         fom = YearMonth.parse(fom),
         tom = YearMonth.parse(tom),
         omsorgstype = DomainOmsorgstype.valueOf(omsorgstype),
-        omsorgsmottaker = omsorgsmottaker.toDomain()
+        omsorgsmottaker = omsorgsmottaker.toDomain(),
+        kilde = kilde.toDomain()
     )
 }

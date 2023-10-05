@@ -52,7 +52,8 @@ data class BeriketVedtaksperiode(
     val fom: YearMonth,
     val tom: YearMonth,
     val omsorgstype: DomainOmsorgstype,
-    val omsorgsmottaker: Person
+    val omsorgsmottaker: Person,
+    val kilde: DomainKilde,
 ) {
     val periode = Periode(fom, tom)
 

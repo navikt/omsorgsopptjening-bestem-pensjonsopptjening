@@ -16,6 +16,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -102,7 +103,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -182,7 +184,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),
@@ -243,7 +246,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345"
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
                                 )
                             )
                         ),

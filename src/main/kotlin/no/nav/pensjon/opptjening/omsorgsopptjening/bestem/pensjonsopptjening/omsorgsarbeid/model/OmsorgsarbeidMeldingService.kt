@@ -141,7 +141,8 @@ class OmsorgsarbeidMeldingService(
                             fom = omsorgVedtakPeriode.fom,
                             tom = omsorgVedtakPeriode.tom,
                             omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain(),
-                            omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker)
+                            omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
+                            kilde = omsorgVedtakPeriode.kilde.toDomain()
                         )
                     }
 

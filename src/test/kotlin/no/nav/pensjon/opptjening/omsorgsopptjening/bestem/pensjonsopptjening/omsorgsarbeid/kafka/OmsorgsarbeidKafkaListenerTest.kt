@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Test
@@ -24,7 +25,8 @@ class OmsorgsarbeidKafkaListenerTest {
                             fom = YearMonth.now(),
                             tom = YearMonth.now(),
                             omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                            omsorgsmottaker = ""
+                            omsorgsmottaker = "",
+                            kilde = Kilde.BARNETRYGD,
                         )
                     )
                 ),
@@ -34,7 +36,8 @@ class OmsorgsarbeidKafkaListenerTest {
                             fom = YearMonth.now(),
                             tom = YearMonth.now(),
                             omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                            omsorgsmottaker = ""
+                            omsorgsmottaker = "",
+                            kilde = Kilde.BARNETRYGD,
                         )
                     )
                 )
