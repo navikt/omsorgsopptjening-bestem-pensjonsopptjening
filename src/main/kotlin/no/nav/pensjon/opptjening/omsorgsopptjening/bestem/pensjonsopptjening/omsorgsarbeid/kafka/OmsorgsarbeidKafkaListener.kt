@@ -55,6 +55,7 @@ class OmsorgsarbeidKafkaListener(
                 when (vedtakPeriode.omsorgstype) {
                     Omsorgstype.DELT_BARNETRYGD -> metrics.antallVedtaksperioderDeltBarnetrygd.increment()
                     Omsorgstype.FULL_BARNETRYGD -> metrics.antallVedtaksperioderFullBarnetrygd.increment()
+                    Omsorgstype.USIKKER_BARNETRYGD -> metrics.antallVedtaksperioderUsikkerBarnetrygd.increment()
                     Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3 -> metrics.antallVedtaksperioderHjelpestonadSats3.increment()
                     Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_4 -> metrics.antallVedtaksperioderHjelpestonadSats4.increment()
                 }

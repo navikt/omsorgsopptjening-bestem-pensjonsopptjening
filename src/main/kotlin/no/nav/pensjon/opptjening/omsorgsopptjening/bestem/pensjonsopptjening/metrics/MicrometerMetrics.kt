@@ -24,6 +24,7 @@ class MicrometerMetrics(private val registry: MeterRegistry) {
 
     val antallVedtaksperioderFullBarnetrygd = registry.counter("barnetrygd", "antall", "full")
     val antallVedtaksperioderDeltBarnetrygd = registry.counter("barnetrygd", "antall", "delt")
+    val antallVedtaksperioderUsikkerBarnetrygd = registry.counter("barnetrygd", "antall", "usikker")
     val antallVedtaksperioderHjelpestonadSats3 = registry.counter("barnetrygd", "antall", "hjelpestonadSats3")
     val antallVedtaksperioderHjelpestonadSats4 = registry.counter("barnetrygd", "antall", "hjelpestonadSats4")
 

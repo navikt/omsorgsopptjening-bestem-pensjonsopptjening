@@ -12,6 +12,7 @@ fun Omsorgstype.toDomain(): DomainOmsorgstype {
     return when (this) {
         Omsorgstype.DELT_BARNETRYGD -> DomainOmsorgstype.BARNETRYGD
         Omsorgstype.FULL_BARNETRYGD -> DomainOmsorgstype.BARNETRYGD
+        Omsorgstype.USIKKER_BARNETRYGD -> DomainOmsorgstype.BARNETRYGD
         Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3 -> DomainOmsorgstype.HJELPESTØNAD
         Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_4 -> DomainOmsorgstype.HJELPESTØNAD
     }
