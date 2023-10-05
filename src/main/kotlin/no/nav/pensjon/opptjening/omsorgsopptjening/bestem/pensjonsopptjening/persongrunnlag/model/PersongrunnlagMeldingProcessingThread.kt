@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 
 @Component
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
-class OmsorgsarbeidMeldingProcessingThread(
+class PersongrunnlagMeldingProcessingThread(
     private val handler: PersongrunnlagMeldingService,
     private val unleash: Unleash,
     private val metrics: MicrometerMetrics
@@ -23,8 +23,8 @@ class OmsorgsarbeidMeldingProcessingThread(
 
     @PostConstruct
     fun init() {
-        val name = "prosesser-omsorgsarbeid-melding-thread"
-        log.info("Starting new thread:$name to process omsorgsarbeid")
+        val name = "prosesser-persongrunnlag-melding-thread"
+        log.info("Starting new thread:$name to process persongrunnlag")
         Thread(this, name).start()
     }
 
