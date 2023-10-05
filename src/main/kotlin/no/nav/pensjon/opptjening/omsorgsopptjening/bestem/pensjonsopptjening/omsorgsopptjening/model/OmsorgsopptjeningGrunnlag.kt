@@ -1,12 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.BeriketDatagrunnlag
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Omsorgsmåneder
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.alleMåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.alleMåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
@@ -34,9 +34,9 @@ sealed class OmsorgsopptjeningGrunnlag {
     }
 
     private fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Omsorgsmåneder> {
-        return grunnlag.omsorgsSaker
-            .associate { sak ->
-                sak.omsorgsyter to sak.omsorgVedtakPerioder
+        return grunnlag.persongrunnlag
+            .associate { persongrunnlag ->
+                persongrunnlag.omsorgsyter to persongrunnlag.omsorgsperioder
                     .filter { it.omsorgsmottaker == omsorgsmottaker }
                     .let { vedtaksperioder ->
                         val barnetrygd = vedtaksperioder
@@ -252,8 +252,8 @@ private fun BeriketDatagrunnlag.`avgrens grunnlagsdata per omsorgsmottaker`(): M
     return omsorgsytersOmsorgsmottakere
         .sortedBy { it.fødselsdato } //eldste barn først
         .associateWith { omsorgsmottaker ->
-            copy(omsorgsSaker = omsorgsSaker
-                .map { sak -> sak.copy(omsorgVedtakPerioder = sak.omsorgVedtakPerioder.filter { it.omsorgsmottaker == omsorgsmottaker }) }
+            copy(persongrunnlag = persongrunnlag
+                .map { persongrunnlag -> persongrunnlag.copy(omsorgsperioder = persongrunnlag.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }) }
             )
         }
 }
@@ -261,14 +261,14 @@ private fun BeriketDatagrunnlag.`avgrens grunnlagsdata per omsorgsmottaker`(): M
 private fun BeriketDatagrunnlag.`avgrens for omsorgsår`(): Map<Int, BeriketDatagrunnlag> {
     return omsorgsytersOmsorgsår
         .associateWith { år ->
-            copy(omsorgsSaker = omsorgsSaker
-                .map { sak ->
-                    sak.copy(omsorgVedtakPerioder = sak.omsorgVedtakPerioder
+            copy(persongrunnlag = persongrunnlag
+                .map { persongrunnlag ->
+                    persongrunnlag.copy(omsorgsperioder = persongrunnlag.omsorgsperioder
                         .filter { it.periode.overlapper(år) }
                         .map { barnetrygdPeriode ->
                             barnetrygdPeriode.periode.overlappendeMåneder(år)
                                 .let {
-                                    BeriketVedtaksperiode(
+                                    Omsorgsperiode(
                                         fom = it.min(),
                                         tom = it.max(),
                                         omsorgstype = barnetrygdPeriode.omsorgstype,

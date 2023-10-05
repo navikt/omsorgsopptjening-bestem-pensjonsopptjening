@@ -5,15 +5,15 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.GyldigOpptjeningår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -57,13 +57,13 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
         }.given(gyldigOpptjeningår).get()
 
         sendOmsorgsgrunnlagKafka(
-            omsorgsGrunnlag = OmsorgsgrunnlagMelding(
+            omsorgsGrunnlag = PersongrunnlagMeldingKafka(
                 omsorgsyter = "12345678910",
-                saker = listOf(
-                    OmsorgsgrunnlagMelding.Sak(
+                persongrunnlag = listOf(
+                    PersongrunnlagMeldingKafka.Persongrunnlag(
                         omsorgsyter = "12345678910",
-                        vedtaksperioder = listOf(
-                            OmsorgsgrunnlagMelding.VedtakPeriode(
+                        omsorgsperioder =  listOf(
+                            PersongrunnlagMeldingKafka.Omsorgsperiode(
                                 fom = YearMonth.of(2020, Month.OCTOBER),
                                 tom = YearMonth.of(2020, Month.DECEMBER),
                                 omsorgstype = Omsorgstype.FULL_BARNETRYGD,

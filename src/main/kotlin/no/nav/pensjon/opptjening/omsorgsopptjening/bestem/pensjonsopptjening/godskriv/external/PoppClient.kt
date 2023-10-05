@@ -2,11 +2,11 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.HentPensjonspoengClient
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.HentPensjonspoengClientException
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.Pensjonspoeng
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClientException
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Pensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -76,7 +76,7 @@ internal class PoppClient(
         }
     }
 
-    override fun hentPensjonspoengForOmsorgsarbeid(fnr: String, år: Int, type: DomainOmsorgstype): Pensjonspoeng.Omsorg {
+    override fun hentPensjonspoengForOmsorgstype(fnr: String, år: Int, type: DomainOmsorgstype): Pensjonspoeng.Omsorg {
         val url = "$baseUrl/pensjonspoeng?fomAr=$år&tomAr=$år&pensjonspoengType=${PoppOmsorgType.from(type)}"
         try {
             return restTemplate.exchange(

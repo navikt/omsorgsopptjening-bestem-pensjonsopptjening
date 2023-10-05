@@ -1,12 +1,12 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.kafka
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MicrometerMetrics
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component
 
 @Component
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
-class OmsorgsarbeidKafkaListener(
-    private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
+class PersongrunnlagKafkaListener(
+    private val persongrunnlagRepo: PersongrunnlagRepo,
     private val metrics: MicrometerMetrics,
 ) {
     companion object {
@@ -35,24 +35,24 @@ class OmsorgsarbeidKafkaListener(
         acknowledgment: Acknowledgment
     ) {
         metrics.antallLesteMeldinger.increment()
-        deserialize<OmsorgsgrunnlagMelding>(consumerRecord.value()).also { omsorgsgrunnlagMelding ->
-            Mdc.scopedMdc(omsorgsgrunnlagMelding.correlationId) { _ ->
-                Mdc.scopedMdc(omsorgsgrunnlagMelding.innlesingId) { _ ->
+        deserialize<PersongrunnlagMeldingKafka>(consumerRecord.value()).also { persongrunnlagMelding ->
+            Mdc.scopedMdc(persongrunnlagMelding.correlationId) { _ ->
+                Mdc.scopedMdc(persongrunnlagMelding.innlesingId) { _ ->
                     log.info("Prosesserer melding")
-                    omsorgsarbeidRepo.persist(
-                        OmsorgsarbeidMelding.Lest(innhold = omsorgsgrunnlagMelding)
+                    persongrunnlagRepo.persist(
+                        PersongrunnlagMelding.Lest(innhold = persongrunnlagMelding)
                     )
                 }
             }
             acknowledgment.acknowledge()
-            tellOmsorgstyper(omsorgsgrunnlagMelding)
+            tellOmsorgstyper(persongrunnlagMelding)
         }
     }
 
-    fun tellOmsorgstyper(omsorgsgrunnlagMelding: OmsorgsgrunnlagMelding) {
-        omsorgsgrunnlagMelding.saker.forEach { sak ->
-            sak.vedtaksperioder.forEach { vedtakPeriode ->
-                when (vedtakPeriode.omsorgstype) {
+    fun tellOmsorgstyper(melding: PersongrunnlagMeldingKafka) {
+        melding.persongrunnlag.forEach { persongrunnlag ->
+            persongrunnlag.omsorgsperioder.forEach { omsorgsperiode ->
+                when (omsorgsperiode.omsorgstype) {
                     Omsorgstype.DELT_BARNETRYGD -> metrics.antallVedtaksperioderDeltBarnetrygd.increment()
                     Omsorgstype.FULL_BARNETRYGD -> metrics.antallVedtaksperioderFullBarnetrygd.increment()
                     Omsorgstype.USIKKER_BARNETRYGD -> metrics.antallVedtaksperioderUsikkerBarnetrygd.increment()

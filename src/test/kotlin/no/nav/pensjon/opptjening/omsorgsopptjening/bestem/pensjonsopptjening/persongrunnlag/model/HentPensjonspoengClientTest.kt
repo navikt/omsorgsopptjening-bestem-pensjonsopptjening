@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
@@ -88,7 +88,7 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
                         poeng = 1.5,
                         type = DomainOmsorgstype.BARNETRYGD
                     ),
-                    hentPensjonspoengClient.hentPensjonspoengForOmsorgsarbeid(
+                    hentPensjonspoengClient.hentPensjonspoengForOmsorgstype(
                         fnr = "12345",
                         år = 2020,
                         type = DomainOmsorgstype.BARNETRYGD
@@ -101,7 +101,7 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
                         poeng = 2.8,
                         type = DomainOmsorgstype.BARNETRYGD
                     ),
-                    hentPensjonspoengClient.hentPensjonspoengForOmsorgsarbeid(
+                    hentPensjonspoengClient.hentPensjonspoengForOmsorgstype(
                         fnr = "12345",
                         år = 2021,
                         type = DomainOmsorgstype.BARNETRYGD
@@ -114,7 +114,7 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
                         poeng = 3.7,
                         type = DomainOmsorgstype.HJELPESTØNAD
                     ),
-                    hentPensjonspoengClient.hentPensjonspoengForOmsorgsarbeid(
+                    hentPensjonspoengClient.hentPensjonspoengForOmsorgstype(
                         fnr = "12345",
                         år = 2022,
                         type = DomainOmsorgstype.HJELPESTØNAD
@@ -183,7 +183,7 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
                         poeng = 0.0,
                         type = DomainOmsorgstype.BARNETRYGD
                     ),
-                    hentPensjonspoengClient.hentPensjonspoengForOmsorgsarbeid(
+                    hentPensjonspoengClient.hentPensjonspoengForOmsorgstype(
                         fnr = "12345",
                         år = 2020,
                         type = DomainOmsorgstype.BARNETRYGD
@@ -216,7 +216,7 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
                         poeng = 0.0,
                         type = DomainOmsorgstype.BARNETRYGD
                     ),
-                    hentPensjonspoengClient.hentPensjonspoengForOmsorgsarbeid(
+                    hentPensjonspoengClient.hentPensjonspoengForOmsorgstype(
                         fnr = "12345",
                         år = 2020,
                         type = DomainOmsorgstype.BARNETRYGD
@@ -271,7 +271,7 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
                 )
 
                 assertThrows<HentPensjonspoengClientException> {
-                    hentPensjonspoengClient.hentPensjonspoengForOmsorgsarbeid(
+                    hentPensjonspoengClient.hentPensjonspoengForOmsorgstype(
                         fnr = "12345",
                         år = 2020,
                         type = DomainOmsorgstype.HJELPESTØNAD

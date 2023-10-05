@@ -12,17 +12,17 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.GyldigOpptjeningår
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMeldingService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -44,13 +44,13 @@ import kotlin.test.assertContains
 class BrevProsesseringTest : SpringContextTest.NoKafka() {
 
     @Autowired
-    private lateinit var omsorgsarbeidRepo: OmsorgsarbeidRepo
+    private lateinit var persongrunnlagRepo: PersongrunnlagRepo
 
     @Autowired
     private lateinit var behandlingRepo: BehandlingRepo
 
     @Autowired
-    private lateinit var omsorgsarbeidMeldingService: OmsorgsarbeidMeldingService
+    private lateinit var persongrunnlagMeldingService: PersongrunnlagMeldingService
 
     @MockBean
     private lateinit var clock: Clock
@@ -127,22 +127,22 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
         given(gyldigOpptjeningår.get()).willReturn(listOf(2020))
 
-        val (behandling, brev) = omsorgsarbeidRepo.persist(
-            OmsorgsarbeidMelding.Lest(
-                innhold = OmsorgsgrunnlagMelding(
+        val (behandling, brev) = persongrunnlagRepo.persist(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
-                    saker = listOf(
-                        OmsorgsgrunnlagMelding.Sak(
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            vedtaksperioder = listOf(
-                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                 ),
-                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
@@ -158,7 +158,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                 )
             ),
         ).let {
-            omsorgsarbeidMeldingService.process().single().let { behandling ->
+            persongrunnlagMeldingService.process().single().let { behandling ->
                 Assertions.assertTrue(behandling.erInnvilget())
                 behandling to brevRepository.findForBehandling(behandling.id).singleOrNull()!!
             }
@@ -222,22 +222,22 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
         given(gyldigOpptjeningår.get()).willReturn(listOf(2020))
 
-        val (behandling, brev) = omsorgsarbeidRepo.persist(
-            OmsorgsarbeidMelding.Lest(
-                innhold = OmsorgsgrunnlagMelding(
+        val (behandling, brev) = persongrunnlagRepo.persist(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
-                    saker = listOf(
-                        OmsorgsgrunnlagMelding.Sak(
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            vedtaksperioder = listOf(
-                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                 ),
-                                OmsorgsgrunnlagMelding.VedtakPeriode(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
@@ -253,7 +253,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                 )
             ),
         ).let {
-            omsorgsarbeidMeldingService.process().single().let { behandling ->
+            persongrunnlagMeldingService.process().single().let { behandling ->
                 Assertions.assertTrue(behandling.erInnvilget())
                 behandling to brevRepository.findForBehandling(behandling.id).singleOrNull()!!
             }

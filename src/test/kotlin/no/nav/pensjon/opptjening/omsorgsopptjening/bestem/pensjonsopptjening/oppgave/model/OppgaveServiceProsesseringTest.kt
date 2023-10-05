@@ -5,17 +5,17 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.GyldigOpptjeningår
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMeldingService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakClientException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -40,10 +40,10 @@ import kotlin.test.assertNull
 class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 
     @Autowired
-    private lateinit var repo: OmsorgsarbeidRepo
+    private lateinit var repo: PersongrunnlagRepo
 
     @Autowired
-    private lateinit var handler: OmsorgsarbeidMeldingService
+    private lateinit var handler: PersongrunnlagMeldingService
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
@@ -133,14 +133,14 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding.Lest(
-                innhold = OmsorgsgrunnlagMelding(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
                         omsorgsyter = "12345678910",
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
+                        persongrunnlag = listOf(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
                                 omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
+                                omsorgsperioder =  listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
                                         fom = YearMonth.of(2020, Month.JANUARY),
                                         tom = YearMonth.of(2020, Month.DECEMBER),
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
@@ -149,10 +149,10 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                     )
                                 )
                             ),
-                            OmsorgsgrunnlagMelding.Sak(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
                                 omsorgsyter = "04010012797",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
+                                omsorgsperioder =  listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
                                         fom = YearMonth.of(2020, Month.JANUARY),
                                         tom = YearMonth.of(2020, Month.DECEMBER),
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
@@ -266,14 +266,14 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding.Lest(
-                innhold = OmsorgsgrunnlagMelding(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
                         omsorgsyter = "12345678910",
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
+                        persongrunnlag = listOf(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
                                 omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
+                                omsorgsperioder =  listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
                                         fom = YearMonth.of(2020, Month.JANUARY),
                                         tom = YearMonth.of(2020, Month.DECEMBER),
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
@@ -282,10 +282,10 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                     )
                                 )
                             ),
-                            OmsorgsgrunnlagMelding.Sak(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
                                 omsorgsyter = "04010012797",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
+                                omsorgsperioder =  listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
                                         fom = YearMonth.of(2020, Month.JANUARY),
                                         tom = YearMonth.of(2020, Month.DECEMBER),
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
@@ -361,14 +361,14 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         }.given(gyldigOpptjeningår).get()
 
         val melding = repo.persist(
-            OmsorgsarbeidMelding.Lest(
-                innhold = OmsorgsgrunnlagMelding(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
                         omsorgsyter = "12345678910",
-                        saker = listOf(
-                            OmsorgsgrunnlagMelding.Sak(
+                        persongrunnlag = listOf(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
                                 omsorgsyter = "12345678910",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
+                                omsorgsperioder =  listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
                                         fom = YearMonth.of(2020, Month.JANUARY),
                                         tom = YearMonth.of(2020, Month.DECEMBER),
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
@@ -377,10 +377,10 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                     )
                                 )
                             ),
-                            OmsorgsgrunnlagMelding.Sak(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
                                 omsorgsyter = "04010012797",
-                                vedtaksperioder = listOf(
-                                    OmsorgsgrunnlagMelding.VedtakPeriode(
+                                omsorgsperioder =  listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
                                         fom = YearMonth.of(2020, Month.JANUARY),
                                         tom = YearMonth.of(2020, Month.DECEMBER),
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,

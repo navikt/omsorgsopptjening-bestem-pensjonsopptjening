@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.kafka
 
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -17,7 +17,7 @@ import java.time.Duration
 @EnableKafka
 @Configuration
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
-class OmsorgsarbeidKafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers: String) {
+class PersongrunnlagKafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers: String) {
     @Bean
     @Profile("dev-gcp", "prod-gcp")
     fun securityConfig(

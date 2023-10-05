@@ -1,6 +1,6 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
@@ -16,12 +16,12 @@ import java.time.Instant
 import java.util.UUID
 
 @Component
-class OmsorgsarbeidRepo(
+class PersongrunnlagRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
     private val clock: Clock = Clock.systemUTC()
 ) {
 
-    fun persist(melding: OmsorgsarbeidMelding.Lest): OmsorgsarbeidMelding.Mottatt {
+    fun persist(melding: PersongrunnlagMelding.Lest): PersongrunnlagMelding.Mottatt {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into melding (melding, correlation_id, innlesing_id) values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id)""",
@@ -47,7 +47,7 @@ class OmsorgsarbeidRepo(
         return find(keyHolder.keys!!["id"] as UUID)
     }
 
-    fun updateStatus(melding: OmsorgsarbeidMelding.Mottatt) {
+    fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
         jdbcTemplate.update(
             """update melding_status set status = to_jsonb(:status::jsonb), statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
             MapSqlParameterSource(
@@ -60,13 +60,13 @@ class OmsorgsarbeidRepo(
         )
     }
 
-    fun find(id: UUID): OmsorgsarbeidMelding.Mottatt {
+    fun find(id: UUID): PersongrunnlagMelding.Mottatt {
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where m.id = :id""",
             mapOf<String, Any>(
                 "id" to id
             ),
-            OmsorgsarbeidMessageRowMapper()
+            PersongrunnlagMeldingMapper()
         ).single()
     }
 
@@ -75,19 +75,19 @@ class OmsorgsarbeidRepo(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
-    fun finnNesteUprosesserte(): OmsorgsarbeidMelding.Mottatt? {
+    fun finnNesteUprosesserte(): PersongrunnlagMelding.Mottatt? {
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where (ms.status->>'type' = 'Klar') or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of m skip locked""",
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),
-            OmsorgsarbeidMessageRowMapper()
+            PersongrunnlagMeldingMapper()
         ).singleOrNull()
     }
 
-    internal class OmsorgsarbeidMessageRowMapper : RowMapper<OmsorgsarbeidMelding.Mottatt> {
-        override fun mapRow(rs: ResultSet, rowNum: Int): OmsorgsarbeidMelding.Mottatt {
-            return OmsorgsarbeidMelding.Mottatt(
+    internal class PersongrunnlagMeldingMapper : RowMapper<PersongrunnlagMelding.Mottatt> {
+        override fun mapRow(rs: ResultSet, rowNum: Int): PersongrunnlagMelding.Mottatt {
+            return PersongrunnlagMelding.Mottatt(
                 id = UUID.fromString(rs.getString("id")),
                 opprettet = rs.getTimestamp("opprettet").toInstant(),
                 innhold = deserialize(rs.getString("melding")),

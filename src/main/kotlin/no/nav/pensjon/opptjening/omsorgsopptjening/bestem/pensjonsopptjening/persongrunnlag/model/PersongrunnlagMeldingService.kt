@@ -1,7 +1,7 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
@@ -12,17 +12,17 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 
 @Service
-class OmsorgsarbeidMeldingService(
+class PersongrunnlagMeldingService(
     private val behandlingRepo: BehandlingRepo,
     private val gyldigOpptjeningsår: GyldigOpptjeningår,
-    private val omsorgsarbeidRepo: OmsorgsarbeidRepo,
+    private val persongrunnlagRepo: PersongrunnlagRepo,
     private val oppgaveService: OppgaveService,
     private val personOppslag: PersonOppslag,
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
@@ -36,14 +36,14 @@ class OmsorgsarbeidMeldingService(
 
     fun process(): List<FullførtBehandling> {
         return transactionTemplate.execute {
-            omsorgsarbeidRepo.finnNesteUprosesserte()?.let { melding ->
+            persongrunnlagRepo.finnNesteUprosesserte()?.let { melding ->
                 Mdc.scopedMdc(melding.correlationId) {
                     Mdc.scopedMdc(melding.innlesingId) {
                         try {
                             transactionTemplate.execute {
                                 log.info("Prosesserer melding")
                                 handle(melding).also { resultat ->
-                                    omsorgsarbeidRepo.updateStatus(melding.ferdig())
+                                    persongrunnlagRepo.updateStatus(melding.ferdig())
                                     resultat.forEach {
                                         when (it.erInnvilget()) {
                                             true -> {
@@ -65,7 +65,7 @@ class OmsorgsarbeidMeldingService(
                                         log.error("Gir opp videre prosessering av melding")
                                         oppgaveService.opprett(it)
                                     }
-                                    omsorgsarbeidRepo.updateStatus(melding)
+                                    persongrunnlagRepo.updateStatus(melding)
                                 }
                             }
                             throw ex
@@ -76,7 +76,7 @@ class OmsorgsarbeidMeldingService(
         } ?: emptyList()
     }
 
-    private fun handle(melding: OmsorgsarbeidMelding.Mottatt): List<FullførtBehandling> {
+    private fun handle(melding: PersongrunnlagMelding.Mottatt): List<FullførtBehandling> {
         return melding.innhold
             .berikDatagrunnlag()
             .tilOmsorgsopptjeningsgrunnlag()
@@ -105,7 +105,7 @@ class OmsorgsarbeidMeldingService(
         log.info("Håndterer innvilgelse")
         godskrivOpptjeningService.opprett(behandling.godskrivOpptjening())
         behandling.sendBrev(
-            hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgsarbeid,
+            hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgstype,
             hentPensjonspoengForInntekt = hentPensjonspoeng::hentPensjonspoengForInntekt,
         )?.also { brevService.opprett(it) }
     }
@@ -118,7 +118,7 @@ class OmsorgsarbeidMeldingService(
         )?.also { oppgaveService.opprett(it) }
     }
 
-    private fun OmsorgsgrunnlagMelding.berikDatagrunnlag(): BeriketDatagrunnlag {
+    private fun PersongrunnlagMeldingKafka.berikDatagrunnlag(): BeriketDatagrunnlag {
         val personer = hentPersoner()
             .map { personOppslag.hentPerson(it) }
             .toSet()
@@ -126,18 +126,18 @@ class OmsorgsarbeidMeldingService(
         return berikDatagrunnlag(personer)
     }
 
-    private fun OmsorgsgrunnlagMelding.berikDatagrunnlag(persondata: Set<Person>): BeriketDatagrunnlag {
+    private fun PersongrunnlagMeldingKafka.berikDatagrunnlag(persondata: Set<Person>): BeriketDatagrunnlag {
         fun Set<Person>.finnPerson(fnr: String): Person {
             return single { it.fnr == fnr }
         }
 
         return BeriketDatagrunnlag(
             omsorgsyter = persondata.finnPerson(omsorgsyter),
-            omsorgsSaker = saker.map { omsorgsSak ->
-                BeriketSak(
-                    omsorgsyter = persondata.finnPerson(omsorgsSak.omsorgsyter),
-                    omsorgVedtakPerioder = omsorgsSak.vedtaksperioder.map { omsorgVedtakPeriode ->
-                        BeriketVedtaksperiode(
+            persongrunnlag = persongrunnlag.map { persongrunnlag ->
+                Persongrunnlag(
+                    omsorgsyter = persondata.finnPerson(persongrunnlag.omsorgsyter),
+                    omsorgsperioder = persongrunnlag.omsorgsperioder.map { omsorgVedtakPeriode ->
+                        Omsorgsperiode(
                             fom = omsorgVedtakPeriode.fom,
                             tom = omsorgVedtakPeriode.tom,
                             omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain(),

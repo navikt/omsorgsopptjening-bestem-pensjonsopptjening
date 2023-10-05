@@ -1,26 +1,26 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-sealed class OmsorgsarbeidMelding {
+sealed class PersongrunnlagMelding {
     abstract val id: UUID?
     abstract val opprettet: Instant?
-    abstract val innhold: OmsorgsgrunnlagMelding
+    abstract val innhold: PersongrunnlagMeldingKafka
     abstract val statushistorikk: List<Status>
     val correlationId get() = innhold.correlationId
     val innlesingId get() = innhold.innlesingId
     val status: Status get() = statushistorikk.last()
 
     data class Lest(
-        override val innhold: OmsorgsgrunnlagMelding
-    ) : OmsorgsarbeidMelding() {
+        override val innhold: PersongrunnlagMeldingKafka
+    ) : PersongrunnlagMelding() {
         override val id: UUID? = null
         override val opprettet: Instant? = null
         override val statushistorikk: List<Status> = listOf(Status.Klar())
@@ -29,9 +29,9 @@ sealed class OmsorgsarbeidMelding {
     data class Mottatt(
         override val id: UUID,
         override val opprettet: Instant,
-        override val innhold: OmsorgsgrunnlagMelding,
+        override val innhold: PersongrunnlagMeldingKafka,
         override val statushistorikk: List<Status> = listOf(Status.Klar())
-    ) : OmsorgsarbeidMelding() {
+    ) : PersongrunnlagMelding() {
         fun ferdig(): Mottatt {
             return copy(statushistorikk = statushistorikk + status.ferdig())
         }

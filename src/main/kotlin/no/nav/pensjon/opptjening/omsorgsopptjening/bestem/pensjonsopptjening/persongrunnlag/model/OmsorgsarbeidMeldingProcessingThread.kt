@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 @Component
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
 class OmsorgsarbeidMeldingProcessingThread(
-    private val handler: OmsorgsarbeidMeldingService,
+    private val handler: PersongrunnlagMeldingService,
     private val unleash: Unleash,
     private val metrics: MicrometerMetrics
     ) : Runnable {

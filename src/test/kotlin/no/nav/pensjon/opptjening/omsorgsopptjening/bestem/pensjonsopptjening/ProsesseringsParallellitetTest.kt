@@ -4,16 +4,16 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.GyldigOpptjeningår
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMelding
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.OmsorgsarbeidMeldingService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.repository.OmsorgsarbeidRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -31,10 +31,10 @@ import kotlin.test.assertNull
 class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
 
     @Autowired
-    private lateinit var omsorgsarbeidRepo: OmsorgsarbeidRepo
+    private lateinit var persongrunnlagRepo: PersongrunnlagRepo
 
     @Autowired
-    private lateinit var omsorgsarbeidMeldingService: OmsorgsarbeidMeldingService
+    private lateinit var persongrunnlagMeldingService: PersongrunnlagMeldingService
 
     @Autowired
     private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
@@ -65,31 +65,31 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
     inner class GodskrivOpptjening {
         @Test
         fun `finnNesteUprosesserte låser raden slik at den ikke plukkes opp av andre connections`() {
-            omsorgsarbeidRepo.persist(
-                OmsorgsarbeidMelding.Lest(
-                    innhold = OmsorgsgrunnlagMelding(
-                            omsorgsyter = "12345678910",
-                            saker = listOf(
-                                OmsorgsgrunnlagMelding.Sak(
-                                    omsorgsyter = "12345678910",
-                                    vedtaksperioder = listOf(
-                                        OmsorgsgrunnlagMelding.VedtakPeriode(
-                                            fom = YearMonth.of(2018, Month.SEPTEMBER),
-                                            tom = YearMonth.of(2025, Month.DECEMBER),
-                                            omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                            omsorgsmottaker = "07081812345",
-                                            kilde = Kilde.BARNETRYGD,
-                                        )
+            persongrunnlagRepo.persist(
+                PersongrunnlagMelding.Lest(
+                    innhold = PersongrunnlagMeldingKafka(
+                        omsorgsyter = "12345678910",
+                        persongrunnlag = listOf(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
+                                omsorgsyter = "12345678910",
+                                omsorgsperioder = listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                        fom = YearMonth.of(2018, Month.SEPTEMBER),
+                                        tom = YearMonth.of(2025, Month.DECEMBER),
+                                        omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                        omsorgsmottaker = "07081812345",
+                                        kilde = Kilde.BARNETRYGD,
                                     )
-                                ),
+                                )
                             ),
-                            rådata = RådataFraKilde(""),
-                            innlesingId = InnlesingId.generate(),
-                            correlationId = CorrelationId.generate(),
-                        )
+                        ),
+                        rådata = RådataFraKilde(""),
+                        innlesingId = InnlesingId.generate(),
+                        correlationId = CorrelationId.generate(),
+                    )
                     ),
                 )
-            omsorgsarbeidMeldingService.process()
+            persongrunnlagMeldingService.process()
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
@@ -117,48 +117,48 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
     inner class Omsorgsarbeid {
         @Test
         fun `finnNesteUprosesserte låser raden slik at den ikke plukkes opp av andre connections`() {
-            omsorgsarbeidRepo.persist(
-                OmsorgsarbeidMelding.Lest(
-                    innhold = OmsorgsgrunnlagMelding(
-                            omsorgsyter = "12345678910",
-                            saker = listOf(
-                                OmsorgsgrunnlagMelding.Sak(
-                                    omsorgsyter = "12345678910",
-                                    vedtaksperioder = listOf(
-                                        OmsorgsgrunnlagMelding.VedtakPeriode(
-                                            fom = YearMonth.of(2018, Month.SEPTEMBER),
-                                            tom = YearMonth.of(2025, Month.DECEMBER),
-                                            omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                            omsorgsmottaker = "07081812345",
-                                            kilde = Kilde.BARNETRYGD,
-                                        )
+            persongrunnlagRepo.persist(
+                PersongrunnlagMelding.Lest(
+                    innhold = PersongrunnlagMeldingKafka(
+                        omsorgsyter = "12345678910",
+                        persongrunnlag = listOf(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
+                                omsorgsyter = "12345678910",
+                                omsorgsperioder = listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                        fom = YearMonth.of(2018, Month.SEPTEMBER),
+                                        tom = YearMonth.of(2025, Month.DECEMBER),
+                                        omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                        omsorgsmottaker = "07081812345",
+                                        kilde = Kilde.BARNETRYGD,
                                     )
-                                ),
+                                )
                             ),
-                            rådata = RådataFraKilde(""),
-                            innlesingId = InnlesingId.generate(),
-                            correlationId = CorrelationId.generate(),
-                        )
+                        ),
+                        rådata = RådataFraKilde(""),
+                        innlesingId = InnlesingId.generate(),
+                        correlationId = CorrelationId.generate(),
+                    )
                     ),
                 )
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
-                Assertions.assertNotNull(omsorgsarbeidRepo.finnNesteUprosesserte())
+                Assertions.assertNotNull(persongrunnlagRepo.finnNesteUprosesserte())
 
                 //opprett ny transaksjon mens den forrige fortsatt lever
                 transactionTemplate.execute {
                     //skal ikke finne noe siden raden er låst pga "select for update skip locked"
-                    assertNull(omsorgsarbeidRepo.finnNesteUprosesserte())
+                    assertNull(persongrunnlagRepo.finnNesteUprosesserte())
                 }
                 //fortsatt samme transaksjon
-                Assertions.assertNotNull(omsorgsarbeidRepo.finnNesteUprosesserte())
+                Assertions.assertNotNull(persongrunnlagRepo.finnNesteUprosesserte())
             } //rad ikke låst lenger ved transaksjon slutt
 
 
             //ny transaksjon finner raden da den ikke lenger er låst
             transactionTemplate.execute {
-                Assertions.assertNotNull(omsorgsarbeidRepo.finnNesteUprosesserte())
+                Assertions.assertNotNull(persongrunnlagRepo.finnNesteUprosesserte())
             }
         }
     }
@@ -167,43 +167,43 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
     inner class Oppgave {
         @Test
         fun `finnNesteUprosesserte låser raden slik at den ikke plukkes opp av andre connections`() {
-            omsorgsarbeidRepo.persist(
-                OmsorgsarbeidMelding.Lest(
-                    innhold = OmsorgsgrunnlagMelding(
-                            omsorgsyter = "12345678910",
-                            saker = listOf(
-                                OmsorgsgrunnlagMelding.Sak(
-                                    omsorgsyter = "12345678910",
-                                    vedtaksperioder = listOf(
-                                        OmsorgsgrunnlagMelding.VedtakPeriode(
-                                            fom = YearMonth.of(2021, Month.JANUARY),
-                                            tom = YearMonth.of(2021, Month.JUNE),
-                                            omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                            omsorgsmottaker = "01122012345",
-                                            kilde = Kilde.BARNETRYGD,
-                                        )
+            persongrunnlagRepo.persist(
+                PersongrunnlagMelding.Lest(
+                    innhold = PersongrunnlagMeldingKafka(
+                        omsorgsyter = "12345678910",
+                        persongrunnlag = listOf(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
+                                omsorgsyter = "12345678910",
+                                omsorgsperioder = listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                        fom = YearMonth.of(2021, Month.JANUARY),
+                                        tom = YearMonth.of(2021, Month.JUNE),
+                                        omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                        omsorgsmottaker = "01122012345",
+                                        kilde = Kilde.BARNETRYGD,
                                     )
-                                ),
-                                OmsorgsgrunnlagMelding.Sak(
-                                    omsorgsyter = "04010012797",
-                                    vedtaksperioder = listOf(
-                                        OmsorgsgrunnlagMelding.VedtakPeriode(
-                                            fom = YearMonth.of(2021, Month.JULY),
-                                            tom = YearMonth.of(2021, Month.DECEMBER),
-                                            omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                            omsorgsmottaker = "01122012345",
-                                            kilde = Kilde.BARNETRYGD,
-                                        ),
-                                    )
-                                ),
+                                )
                             ),
-                            rådata = RådataFraKilde(""),
-                            innlesingId = InnlesingId.generate(),
-                            correlationId = CorrelationId.generate(),
-                        )
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
+                                omsorgsyter = "04010012797",
+                                omsorgsperioder = listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                        fom = YearMonth.of(2021, Month.JULY),
+                                        tom = YearMonth.of(2021, Month.DECEMBER),
+                                        omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                        omsorgsmottaker = "01122012345",
+                                        kilde = Kilde.BARNETRYGD,
+                                    ),
+                                )
+                            ),
+                        ),
+                        rådata = RådataFraKilde(""),
+                        innlesingId = InnlesingId.generate(),
+                        correlationId = CorrelationId.generate(),
+                    )
                     ),
                 )
-            omsorgsarbeidMeldingService.process()
+            persongrunnlagMeldingService.process()
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet

@@ -2,13 +2,12 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketDatagrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketSak
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.BeriketVedtaksperiode
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.BeriketDatagrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Persongrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import java.time.YearMonth
 
 @JsonTypeInfo(
@@ -19,7 +18,7 @@ import java.time.YearMonth
 @JsonTypeName("BeriketDatagrunnlagDb")
 internal data class BeriketDatagrunnlagDb(
     val omsorgsyter: PersonDb,
-    val omsorgsSaker: List<BeriketOmsorgSakDb>,
+    val persongrunnlag: List<BeriketPersongrunnlagDb>,
     val innlesingId: InnlesingId,
     val correlationId: CorrelationId,
 )
@@ -27,7 +26,7 @@ internal data class BeriketDatagrunnlagDb(
 internal fun BeriketDatagrunnlag.toDb(): BeriketDatagrunnlagDb {
     return BeriketDatagrunnlagDb(
         omsorgsyter = omsorgsyter.toDb(),
-        omsorgsSaker = omsorgsSaker.map { it.toDb() },
+        persongrunnlag = persongrunnlag.map { it.toDb() },
         innlesingId = innlesingId,
         correlationId = correlationId,
     )
@@ -36,7 +35,7 @@ internal fun BeriketDatagrunnlag.toDb(): BeriketDatagrunnlagDb {
 internal fun BeriketDatagrunnlagDb.toDomain(): BeriketDatagrunnlag {
     return BeriketDatagrunnlag(
         omsorgsyter = omsorgsyter.toDomain(),
-        omsorgsSaker = omsorgsSaker.map { it.toDomain() },
+        persongrunnlag = persongrunnlag.map { it.toDomain() },
         innlesingId = innlesingId,
         correlationId = correlationId,
     )
@@ -47,23 +46,23 @@ internal fun BeriketDatagrunnlagDb.toDomain(): BeriketDatagrunnlag {
     include = JsonTypeInfo.As.PROPERTY,
     property = "type",
 )
-@JsonTypeName("BeriketOmsorgSakDb")
-internal data class BeriketOmsorgSakDb(
+@JsonTypeName("BeriketPersongrunnlagDb")
+internal data class BeriketPersongrunnlagDb(
     val omsorgsyter: PersonDb,
-    val omsorgVedtakPeriode: List<BeriketOmsorgVedtakPeriodeDb>
+    val omsorgVedtakPeriode: List<BeriketOmsorgsperiodeDb>
 )
 
-internal fun BeriketSak.toDb(): BeriketOmsorgSakDb {
-    return BeriketOmsorgSakDb(
+internal fun Persongrunnlag.toDb(): BeriketPersongrunnlagDb {
+    return BeriketPersongrunnlagDb(
         omsorgsyter = omsorgsyter.toDb(),
-        omsorgVedtakPeriode = omsorgVedtakPerioder.map { it.toDb() }
+        omsorgVedtakPeriode = omsorgsperioder.map { it.toDb() }
     )
 }
 
-internal fun BeriketOmsorgSakDb.toDomain(): BeriketSak {
-    return BeriketSak(
+internal fun BeriketPersongrunnlagDb.toDomain(): Persongrunnlag {
+    return Persongrunnlag(
         omsorgsyter = omsorgsyter.toDomain(),
-        omsorgVedtakPerioder = omsorgVedtakPeriode.map { it.toDomain() }
+        omsorgsperioder = omsorgVedtakPeriode.map { it.toDomain() }
     )
 }
 @JsonTypeInfo(
@@ -71,8 +70,8 @@ internal fun BeriketOmsorgSakDb.toDomain(): BeriketSak {
     include = JsonTypeInfo.As.PROPERTY,
     property = "type",
 )
-@JsonTypeName("BeriketOmsorgVedtakPeriodeDb")
-internal data class BeriketOmsorgVedtakPeriodeDb(
+@JsonTypeName("BeriketOmsorgsperiodeDb")
+internal data class BeriketOmsorgsperiodeDb(
     val fom: String,
     val tom: String,
     val omsorgstype: String,
@@ -80,8 +79,8 @@ internal data class BeriketOmsorgVedtakPeriodeDb(
     val kilde: KildeDb,
 )
 
-internal fun BeriketVedtaksperiode.toDb(): BeriketOmsorgVedtakPeriodeDb {
-    return BeriketOmsorgVedtakPeriodeDb(
+internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
+    return BeriketOmsorgsperiodeDb(
         fom = fom.toString(),
         tom = tom.toString(),
         omsorgstype = omsorgstype.toString(),
@@ -90,8 +89,8 @@ internal fun BeriketVedtaksperiode.toDb(): BeriketOmsorgVedtakPeriodeDb {
     )
 }
 
-internal fun BeriketOmsorgVedtakPeriodeDb.toDomain(): BeriketVedtaksperiode {
-    return BeriketVedtaksperiode(
+internal fun BeriketOmsorgsperiodeDb.toDomain(): Omsorgsperiode {
+    return Omsorgsperiode(
         fom = YearMonth.parse(fom),
         tom = YearMonth.parse(tom),
         omsorgstype = DomainOmsorgstype.valueOf(omsorgstype),

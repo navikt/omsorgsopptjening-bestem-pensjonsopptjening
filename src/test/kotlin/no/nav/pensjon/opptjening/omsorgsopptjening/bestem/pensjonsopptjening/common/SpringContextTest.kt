@@ -2,10 +2,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Application
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.kafka.OmsorgsarbeidKafkaConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.kafka.PersongrunnlagKafkaConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.OmsorgsgrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -93,11 +93,11 @@ sealed class SpringContextTest {
             private lateinit var kafkaBrokers: String
 
             @Bean
-            fun securityConfig(): OmsorgsarbeidKafkaConfig.SecurityConfig =
-                OmsorgsarbeidKafkaConfig.SecurityConfig(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "PLAINTEXT")
+            fun securityConfig(): PersongrunnlagKafkaConfig.SecurityConfig =
+                PersongrunnlagKafkaConfig.SecurityConfig(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG to "PLAINTEXT")
 
             @Bean
-            fun producer(securityConfig: OmsorgsarbeidKafkaConfig.SecurityConfig): KafkaTemplate<String, String> {
+            fun producer(securityConfig: PersongrunnlagKafkaConfig.SecurityConfig): KafkaTemplate<String, String> {
                 return KafkaTemplate(DefaultKafkaProducerFactory(producerConfig() + securityConfig))
             }
 
@@ -113,7 +113,7 @@ sealed class SpringContextTest {
         lateinit var producer: KafkaTemplate<String, String>
 
         fun sendOmsorgsgrunnlagKafka(
-            omsorgsGrunnlag: OmsorgsgrunnlagMelding,
+            omsorgsGrunnlag: PersongrunnlagMeldingKafka,
             correlationId: String = UUID.randomUUID().toString()
         ) {
             val omsorgsArbeidKey = Topics.Omsorgsopptjening.Key(
