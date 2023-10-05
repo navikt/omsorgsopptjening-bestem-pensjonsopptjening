@@ -48,8 +48,6 @@ sealed class PersongrunnlagMelding {
                     ),
                     behandlingId = null,
                     meldingId = id,
-                    correlationId = correlationId,
-                    innlesingId = innlesingId
                 )
             } else {
                 null

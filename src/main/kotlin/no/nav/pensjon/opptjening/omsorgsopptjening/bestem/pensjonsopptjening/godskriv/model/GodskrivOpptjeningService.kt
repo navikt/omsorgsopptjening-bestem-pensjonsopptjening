@@ -24,7 +24,7 @@ class GodskrivOpptjeningService(
     }
 
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
-    fun opprett(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening {
+    fun opprett(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening.Persistent {
         return godskrivOpptjeningRepo.persist(godskrivOpptjening)
     }
 

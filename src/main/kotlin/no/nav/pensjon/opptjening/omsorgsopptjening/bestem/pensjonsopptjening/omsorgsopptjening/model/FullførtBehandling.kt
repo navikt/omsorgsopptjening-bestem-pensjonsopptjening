@@ -31,12 +31,7 @@ data class FullførtBehandling(
 
     fun godskrivOpptjening(): GodskrivOpptjening.Transient {
         require(erInnvilget()) { "Kan kun godskrive opptjening for innvilget behandling!" }
-        return GodskrivOpptjening.Transient(
-            behandlingId = id,
-            meldingId = meldingId,
-            correlationId = grunnlag.correlationId,
-            innlesingId = grunnlag.innlesingId
-        )
+        return GodskrivOpptjening.Transient(behandlingId = id)
     }
 
     fun opprettOppgave(
@@ -80,8 +75,6 @@ data class FullførtBehandling(
                 detaljer = it,
                 behandlingId = id,
                 meldingId = meldingId,
-                correlationId = grunnlag.correlationId,
-                innlesingId = grunnlag.innlesingId,
             )
         }
     }

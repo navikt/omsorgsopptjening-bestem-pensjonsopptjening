@@ -9,40 +9,35 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 sealed class Oppgave {
-    abstract val id: UUID?
-    abstract val opprettet: Instant?
     abstract val detaljer: OppgaveDetaljer
-    abstract val behandlingId: UUID?
+    abstract val behandlingId: UUID? //kan være null dersom alt feiler fra start
     abstract val meldingId: UUID
-    abstract val correlationId: CorrelationId
     abstract val statushistorikk: List<Status>
-    abstract val innlesingId: InnlesingId
 
     val status get() = statushistorikk.last()
     val mottaker get() = detaljer.mottaker()
     val oppgavetekst get() = detaljer.oppgavetekst()
 
+    /**
+     * Knytter oppgaven og [detaljer] til aktuell [behandlingId] og/eller [meldingId].
+     */
     data class Transient(
         override val detaljer: OppgaveDetaljer,
         override val behandlingId: UUID?,
         override val meldingId: UUID,
-        override val correlationId: CorrelationId,
-        override val innlesingId: InnlesingId
     ) : Oppgave() {
-        override val id: UUID? = null
-        override val opprettet: Instant? = null
         override val statushistorikk: List<Status> = listOf(Status.Klar())
     }
 
     data class Persistent(
-        override val id: UUID,
-        override val opprettet: Instant,
+        val id: UUID,
+        val opprettet: Instant,
+        val correlationId: CorrelationId,
+        val innlesingId: InnlesingId,
         override val detaljer: OppgaveDetaljer,
         override val behandlingId: UUID?, //kan være vi feiler før vi får behandlet
         override val meldingId: UUID,
-        override val correlationId: CorrelationId,
         override val statushistorikk: List<Status> = listOf(Status.Klar()),
-        override val innlesingId: InnlesingId
     ) : Oppgave() {
         fun ferdig(oppgaveId: String): Persistent {
             return copy(statushistorikk = statushistorikk + status.ferdig(oppgaveId))

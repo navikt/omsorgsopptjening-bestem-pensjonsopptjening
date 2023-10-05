@@ -11,42 +11,34 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 sealed class GodskrivOpptjening {
-    abstract val id: UUID?
-    abstract val opprettet: Instant?
     abstract val behandlingId: UUID
-    abstract val meldingId: UUID
-    abstract val correlationId: CorrelationId
     abstract val statushistorikk: List<Status>
-    abstract val omsorgsyter: String?
-    abstract val innlesingId: InnlesingId
 
     companion object {
         const val OMSORGSPOENG_GODSKRIVES = 3.5
     }
+
+    val status get() = statushistorikk.last()
+
+    /**
+     * Inneholder bare nok informasjon til å koble godskriving til aktuell [behandlingId].
+     */
     data class Transient(
         override val behandlingId: UUID,
-        override val meldingId: UUID,
-        override val correlationId: CorrelationId,
-        override val innlesingId: InnlesingId
-    ): GodskrivOpptjening(){
-        override val id: UUID? = null
-        override val opprettet: Instant? = null
-        override val omsorgsyter: String? = null
+    ) : GodskrivOpptjening() {
         override val statushistorikk: List<Status> = listOf(Status.Klar())
-        val status get() =  statushistorikk.last()
     }
 
     data class Persistent(
-        override val id: UUID,
-        override val opprettet: Instant,
+        val id: UUID,
+        val opprettet: Instant,
+        val meldingId: UUID,
+        val correlationId: CorrelationId,
+        val omsorgsyter: String,
+        val innlesingId: InnlesingId,
         override val behandlingId: UUID,
-        override val meldingId: UUID,
-        override val correlationId: CorrelationId,
-        override val omsorgsyter: String,
-        override val innlesingId: InnlesingId,
         override val statushistorikk: List<Status> = listOf(Status.Klar()),
-    ): GodskrivOpptjening(){
-        val status get() =  statushistorikk.last()
+    ) : GodskrivOpptjening() {
 
         fun ferdig(): Persistent {
             return copy(statushistorikk = statushistorikk + status.ferdig())
@@ -64,8 +56,6 @@ sealed class GodskrivOpptjening {
                     ),
                     behandlingId = behandlingId,
                     meldingId = meldingId,
-                    correlationId = correlationId,
-                    innlesingId = innlesingId,
                 )
             } else {
                 null
