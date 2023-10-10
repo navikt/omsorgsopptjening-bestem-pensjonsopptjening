@@ -3,19 +3,19 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val domeneVersion = "1.0.60"
 val azureAdClient = "0.0.7"
 val jacksonVersion = "2.14.2"
-val logbackEncoderVersion = "7.3"
-val postgresqlVersion = "42.5.4"
+val logbackEncoderVersion = "7.4"
+val postgresqlVersion = "42.6.0"
 val flywayCoreVersion = "9.16.1"
-val springKafkaTestVersion = "3.0.5"
-val springCloudContractVersion = "4.0.2"
-val testcontainersVersion = "1.17.6"
+val springKafkaTestVersion = "3.0.11"
+val springCloudContractVersion = "4.0.4"
+val testcontainersVersion = "1.19.1"
 val mockkVersion = "1.13.8"
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.10"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.8.0"
-    id("org.jetbrains.kotlin.plugin.jpa") version "1.8.0"
-    id("org.springframework.boot") version "3.0.3"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.9.10"
+    id("org.jetbrains.kotlin.plugin.jpa") version "1.9.10"
+    id("org.springframework.boot") version "3.1.4"
     id("com.github.ben-manes.versions") version "0.49.0"
 }
 
