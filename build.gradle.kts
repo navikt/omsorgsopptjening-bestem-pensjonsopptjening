@@ -10,8 +10,12 @@ val springKafkaTestVersion = "3.0.11"
 val springCloudContractVersion = "4.0.4"
 val testcontainersVersion = "1.19.1"
 val mockkVersion = "1.13.8"
+val assertJVersion = "3.24.2"
 
-val snakeYamlVersion = "1.33" // latest is 2.2, but spring uses 1.x
+val snakeYamlVersion = "1.33" // siste er 2.x, men spring bruker 1.x
+val snappyJavaVersion = "1.1.10.5"
+val httpClient5Version = "5.2.1"
+val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.10"
@@ -50,6 +54,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework:spring-aspects")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+    implementation("io.getunleash:unleash-client-java:8.3.1")
+
     // Internal libraries
     implementation("no.nav.pensjon.opptjening:omsorgsopptjening-domene-lib:$domeneVersion")
     implementation("no.nav.pensjonopptjening:pensjon-opptjening-azure-ad-client:$azureAdClient")
@@ -65,17 +71,20 @@ dependencies {
     // transitive dependency overrides
     implementation("org.yaml:snakeyaml:$snakeYamlVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion")
+    implementation("org.apache.httpcomponents.client5:httpclient5:$httpClient5Version")
+    implementation("org.apache.httpcomponents:httpclient:$httpClientVersion")
 
     // Test
     testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$springCloudContractVersion")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
-    implementation("io.getunleash:unleash-client-java:8.3.1")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     testImplementation("io.mockk:mockk:${mockkVersion}")
+    testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.1")
+    testImplementation("org.assertj:assertj-core:$assertJVersion")
 }
 
 tasks.test {
