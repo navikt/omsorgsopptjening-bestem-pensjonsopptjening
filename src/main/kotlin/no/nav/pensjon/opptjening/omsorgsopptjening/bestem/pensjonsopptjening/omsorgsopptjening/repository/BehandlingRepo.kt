@@ -3,7 +3,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToClass
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -11,7 +10,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Component
 import java.sql.ResultSet
-import java.util.UUID
+import java.util.*
 
 @Component
 class BehandlingRepo(
