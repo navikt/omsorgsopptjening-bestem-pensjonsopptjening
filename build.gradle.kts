@@ -12,7 +12,7 @@ val testcontainersVersion = "1.19.1"
 val mockkVersion = "1.13.8"
 val assertJVersion = "3.24.2"
 
-val snakeYamlVersion = "1.33" // siste er 2.x, men spring bruker 1.x
+val snakeYamlVersion = "2.0" // siste er 2.x, men spring bruker 1.x
 val snappyJavaVersion = "1.1.10.5"
 val httpClient5Version = "5.2.1"
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
