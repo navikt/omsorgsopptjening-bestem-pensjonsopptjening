@@ -12,7 +12,7 @@ val testcontainersVersion = "1.17.6"
 val mockkVersion = "1.13.8"
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.8.0"
+    id("org.jetbrains.kotlin.jvm") version "1.9.10"
     id("org.jetbrains.kotlin.plugin.spring") version "1.8.0"
     id("org.jetbrains.kotlin.plugin.jpa") version "1.8.0"
     id("org.springframework.boot") version "3.0.3"
