@@ -2,14 +2,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val domeneVersion = "1.0.60"
 val azureAdClient = "0.0.7"
-val jacksonVersion = "2.14.2"
+val jacksonVersion = "2.15.2"
 val logbackEncoderVersion = "7.4"
 val postgresqlVersion = "42.6.0"
-val flywayCoreVersion = "9.16.1"
+val flywayCoreVersion = "9.22.2"
 val springKafkaTestVersion = "3.0.11"
 val springCloudContractVersion = "4.0.4"
 val testcontainersVersion = "1.19.1"
 val mockkVersion = "1.13.8"
+
+val snakeYamlVersion = "1.33" // latest is 2.2, but spring uses 1.x
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.10"
@@ -59,6 +61,11 @@ dependencies {
     // DB
     implementation("org.postgresql:postgresql:$postgresqlVersion")
     implementation("org.flywaydb:flyway-core:$flywayCoreVersion")
+
+    // transitive dependency overrides
+    implementation("org.yaml:snakeyaml:$snakeYamlVersion")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+
     // Test
     testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
     testImplementation(kotlin("test"))
