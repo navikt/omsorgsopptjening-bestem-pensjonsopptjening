@@ -2,7 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MicrometerMetrics
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.BrevProcessingMetricsFeilmåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.BrevProcessingMetricsMåling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -13,7 +14,8 @@ import org.springframework.stereotype.Component
 class BrevProcessingThread(
     private val service: BrevService,
     private val unleash: Unleash,
-    private val metrics: MicrometerMetrics,
+    private val brevProcessingMetricsMåling: BrevProcessingMetricsMåling,
+    private val brevProcessingMetricsFeilmåling: BrevProcessingMetricsFeilmåling,
 ) : Runnable {
 
     companion object {
@@ -31,11 +33,10 @@ class BrevProcessingThread(
         while (true) {
             try {
                 if (unleash.isEnabled(NavUnleashConfig.Feature.BREV.toggleName)) {
-                    metrics.brevProsessertTidsbruk.recordCallable { service.process() }
+                    brevProcessingMetricsMåling.mål { service.process() }
                 }
             } catch (exception: Throwable) {
-                metrics.antallFeiledeBrev.increment()
-                metrics.brevFeiletTidsbruk.recordCallable {
+                brevProcessingMetricsFeilmåling.målfeil {
                     log.warn("Exception caught while processing, exception:$exception")
                     Thread.sleep(1000)
                 }

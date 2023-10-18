@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MicrometerMetrics
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -27,7 +26,6 @@ import java.time.format.DateTimeFormatter
 class OppgaveKlient(
     @Value("\${OPPGAVE_URL}") private val oppgaveUrl: String,
     @Qualifier("oppgaveTokenProvider") private val tokenProvider: TokenProvider,
-    private val metrics: MicrometerMetrics,
 ) {
     private val logger = LoggerFactory.getLogger(OppgaveKlient::class.java)
     private val restTemplate = RestTemplateBuilder().build()
@@ -59,7 +57,6 @@ class OppgaveKlient(
         return try {
             val response = restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OppgaveResponse::class.java)
             logger.info("Opprettet kravoppgave for sakId: $sakId")
-            metrics.antallOpprettedeOppgaver.increment()
             response.body!!.id.toString()
         } catch (ex: Exception) {
             """Feil ved kall til $oppgaveUrl, feil: $ex""".let {

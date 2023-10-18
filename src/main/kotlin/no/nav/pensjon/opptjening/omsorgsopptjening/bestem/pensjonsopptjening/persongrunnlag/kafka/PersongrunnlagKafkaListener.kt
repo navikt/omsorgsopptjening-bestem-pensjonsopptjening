@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
 class PersongrunnlagKafkaListener(
     private val persongrunnlagRepo: PersongrunnlagRepo,
-    private val metrics: MicrometerMetrics,
+    private val omsorgsarbeidListenerMetricsMåling: OmsorgsarbeidListenerMetricsMåling
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
@@ -45,21 +45,7 @@ class PersongrunnlagKafkaListener(
                 }
             }
             acknowledgment.acknowledge()
-            tellOmsorgstyper(persongrunnlagMelding)
-        }
-    }
-
-    fun tellOmsorgstyper(melding: PersongrunnlagMeldingKafka) {
-        melding.persongrunnlag.forEach { persongrunnlag ->
-            persongrunnlag.omsorgsperioder.forEach { omsorgsperiode ->
-                when (omsorgsperiode.omsorgstype) {
-                    Omsorgstype.DELT_BARNETRYGD -> metrics.antallVedtaksperioderDeltBarnetrygd.increment()
-                    Omsorgstype.FULL_BARNETRYGD -> metrics.antallVedtaksperioderFullBarnetrygd.increment()
-                    Omsorgstype.USIKKER_BARNETRYGD -> metrics.antallVedtaksperioderUsikkerBarnetrygd.increment()
-                    Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3 -> metrics.antallVedtaksperioderHjelpestonadSats3.increment()
-                    Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_4 -> metrics.antallVedtaksperioderHjelpestonadSats4.increment()
-                }
-            }
+            omsorgsarbeidListenerMetricsMåling.mål { omsorgsgrunnlagMelding }
         }
     }
 }

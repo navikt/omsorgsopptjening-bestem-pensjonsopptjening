@@ -2,7 +2,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MicrometerMetrics
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetricsFeilmåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetricsMåling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -13,8 +14,9 @@ import org.springframework.stereotype.Component
 class GodskrivOpptjeningProcessingThread(
     private val service: GodskrivOpptjeningService,
     private val unleash: Unleash,
-    private val metrics: MicrometerMetrics,
-) : Runnable {
+    private val godskrivProcessingMetricsMåling: GodskrivProcessingMetricsMåling,
+    private val godskrivProcessingMetricsFeilmåling: GodskrivProcessingMetricsFeilmåling,
+    ) : Runnable {
 
     companion object {
         val log = LoggerFactory.getLogger(this::class.java)!!
@@ -31,13 +33,12 @@ class GodskrivOpptjeningProcessingThread(
         while (true) {
             try {
                 if(unleash.isEnabled(NavUnleashConfig.Feature.GODSKRIV.toggleName)) {
-                    metrics.godskrivProsessertTidsbruk.recordCallable { service.process() }
+                    godskrivProcessingMetricsMåling.mål { service.process() }
                 }
             } catch (exception: Throwable) {
-                metrics.antallFeiledeGodskriving.increment()
-                metrics.godskrivFeiletTidsbruk.recordCallable {
-                    log.warn("Exception caught while processing, exception:$exception")
-                    Thread.sleep(1000)
+                godskrivProcessingMetricsFeilmåling.målfeil {
+                        log.warn("Exception caught while processing, exception:$exception")
+                        Thread.sleep(1000)
                 }
             }
         }
