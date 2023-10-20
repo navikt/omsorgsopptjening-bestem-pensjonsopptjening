@@ -15,7 +15,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
 import java.time.YearMonth
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     @Autowired
@@ -94,6 +95,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -101,6 +103,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -174,6 +177,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -181,6 +185,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -260,6 +265,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -267,6 +273,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),

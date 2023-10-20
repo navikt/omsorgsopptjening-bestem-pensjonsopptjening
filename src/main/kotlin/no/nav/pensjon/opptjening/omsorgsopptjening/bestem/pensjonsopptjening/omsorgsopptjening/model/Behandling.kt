@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import java.util.UUID
 
 /**
@@ -60,6 +60,7 @@ data class Behandling(
     private fun vilkårsvurderOmsorgsyter(): VilkarsVurdering<*> {
         return og(
             vurderVilkår.OmsorgsyterOppfyllerAlderskrav(),
+            vurderVilkår.OmsorgsyterErMedlemAvFolketrygden(),
             vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
             vurderVilkår.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(),

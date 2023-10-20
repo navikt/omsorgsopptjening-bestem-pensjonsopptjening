@@ -12,17 +12,17 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -39,6 +39,7 @@ import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import kotlin.test.assertContains
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 
 class BrevProsesseringTest : SpringContextTest.NoKafka() {
@@ -141,6 +142,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -148,6 +150,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -236,6 +239,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -243,6 +247,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),

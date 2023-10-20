@@ -4,15 +4,17 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.JuridiskHenvisning
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForBarnetrygd
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOppfyllerAlderskrav
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemAvFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOppfyllerAlderskrav
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkarsVurdering
 import java.util.LinkedList
 import java.util.Queue
@@ -84,6 +86,13 @@ sealed class VilkårsvurderingDb {
     @JsonTypeName("OmsorgsyterErForelderTilMottakerAvHjelpestønad")
     internal data class OmsorgsyterErForelderTilMottakerAvHjelpestønad(
         val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsmottaker,
+        val utfall: VilkårsvurderingUtfallDb,
+    ) : VilkårsvurderingDb()
+
+    @JsonTypeName("OmsorgsyterErMedlemIFolketrygden")
+    internal data class OmsorgsyterErMedlemIFolketrygden(
+        val grunnlag: GrunnlagVilkårsvurderingDb.MedlemIFolketrygden,
+        val påkrevetAntallMåneder: Int,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 }
@@ -161,6 +170,14 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
             VilkårsvurderingDb.OmsorgsyterErForelderTilMottakerAvHjelpestønad(
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
+            )
+        }
+
+        is OmsorgsyterErMedlemAvFolketrygden.Vurdering -> {
+            VilkårsvurderingDb.OmsorgsyterErMedlemIFolketrygden(
+                grunnlag = grunnlag.toDb(),
+                påkrevetAntallMåneder = påkrevetAntallMåneder,
+                utfall = utfall.toDb(),
             )
         }
     }
@@ -317,6 +334,64 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
             OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering(
                 grunnlag = grunnlag.toDomain(),
                 utfall = utfall.toDomain()
+            )
+        }
+
+        is VilkårsvurderingDb.OmsorgsyterErMedlemIFolketrygden -> {
+            OmsorgsyterErMedlemAvFolketrygden.Vurdering(
+                grunnlag = grunnlag.toDomain(),
+                utfall = utfall.toDomain(),
+                påkrevetAntallMåneder = påkrevetAntallMåneder,
+            )
+        }
+    }
+}
+
+internal fun VilkårsvurderingDb.OmsorgsyterErMedlemIFolketrygden.toDomain(): OmsorgsyterErMedlemAvFolketrygden.Vurdering {
+    return OmsorgsyterErMedlemAvFolketrygden.Vurdering(
+        grunnlag = grunnlag.toDomain(),
+        utfall = utfall.toDomain(),
+        påkrevetAntallMåneder = påkrevetAntallMåneder,
+    )
+}
+
+internal fun GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.toDomain(): OmsorgsyterErMedlemAvFolketrygden.Grunnlag {
+    return when (this) {
+        is GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtDesemberOmsorgsår -> {
+            OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
+                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder)
+            )
+        }
+
+        is GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtOmsorgsår -> {
+            OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
+                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder)
+            )
+        }
+
+        is GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedleskapBarnFødtUtenforOmsorgsår -> {
+            OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
+                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder)
+            )
+        }
+    }
+}
+
+internal fun OmsorgsyterErMedlemAvFolketrygden.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.MedlemIFolketrygden {
+    return when(this){
+        is OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> {
+            GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtDesemberOmsorgsår(
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder
+            )
+        }
+        is OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> {
+            GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtOmsorgsår(
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder
+            )
+        }
+        is OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> {
+            GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedleskapBarnFødtUtenforOmsorgsår(
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder
             )
         }
     }

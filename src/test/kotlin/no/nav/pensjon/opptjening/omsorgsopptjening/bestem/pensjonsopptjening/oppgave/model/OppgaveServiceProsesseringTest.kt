@@ -5,17 +5,17 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakClientException
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakClientException
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -35,6 +35,7 @@ import java.time.temporal.ChronoUnit
 import kotlin.test.assertContains
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 
 class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
@@ -146,6 +147,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
+                                        medlemskap = MedlemIFolketrygden.Ukjent,
                                     )
                                 )
                             ),
@@ -158,6 +160,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                     )
                                 )
                             ),
@@ -279,6 +282,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                     )
                                 )
                             ),
@@ -291,6 +295,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                     )
                                 )
                             ),
@@ -374,6 +379,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                     )
                                 )
                             ),
@@ -386,6 +392,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                     )
                                 )
                             ),

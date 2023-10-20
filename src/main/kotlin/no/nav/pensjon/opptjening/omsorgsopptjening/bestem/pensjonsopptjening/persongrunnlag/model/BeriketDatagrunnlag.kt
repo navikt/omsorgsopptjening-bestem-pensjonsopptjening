@@ -54,6 +54,7 @@ data class Omsorgsperiode(
     val omsorgstype: DomainOmsorgstype,
     val omsorgsmottaker: Person,
     val kilde: DomainKilde,
+    val medlemskap: Medlemskap,
 ) {
     val periode = Periode(fom, tom)
 

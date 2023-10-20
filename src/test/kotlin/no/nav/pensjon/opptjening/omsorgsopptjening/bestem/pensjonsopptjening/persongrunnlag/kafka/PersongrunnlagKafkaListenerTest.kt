@@ -1,17 +1,22 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.kafka
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
+import io.mockk.verify
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MicrometerMetrics
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Test
 import java.time.YearMonth
-import java.util.*
+import java.util.UUID
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 class PersongrunnlagKafkaListenerTest {
     @Test
@@ -27,7 +32,8 @@ class PersongrunnlagKafkaListenerTest {
                             omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                             omsorgsmottaker = "",
                             kilde = Kilde.BARNETRYGD,
-                        )
+                            medlemskap = MedlemIFolketrygden.Ukjent,
+                            )
                     )
                 ),
                 PersongrunnlagMeldingKafka.Persongrunnlag(
@@ -38,6 +44,7 @@ class PersongrunnlagKafkaListenerTest {
                             omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                             omsorgsmottaker = "",
                             kilde = Kilde.BARNETRYGD,
+                            medlemskap = MedlemIFolketrygden.Ukjent,
                         )
                     )
                 )

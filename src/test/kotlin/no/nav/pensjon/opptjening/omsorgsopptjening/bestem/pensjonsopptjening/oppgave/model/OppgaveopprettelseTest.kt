@@ -3,16 +3,16 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
 import java.time.YearMonth
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 
 class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
@@ -67,6 +68,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -79,6 +81,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -110,6 +113,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -122,6 +126,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -172,6 +177,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -184,6 +190,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -191,6 +198,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -233,6 +241,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -245,6 +254,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JUNE),
@@ -252,6 +262,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -264,6 +275,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -316,6 +328,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -328,6 +341,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -365,6 +379,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -377,6 +392,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -415,6 +431,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -422,6 +439,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -434,6 +452,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -441,6 +460,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -497,6 +517,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -504,6 +525,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),
@@ -516,6 +538,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -523,6 +546,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                 )
                             )
                         ),

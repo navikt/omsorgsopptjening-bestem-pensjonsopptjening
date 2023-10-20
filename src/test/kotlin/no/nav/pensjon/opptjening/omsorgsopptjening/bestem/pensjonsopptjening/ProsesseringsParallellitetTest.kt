@@ -4,16 +4,16 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -27,6 +27,7 @@ import org.springframework.transaction.support.TransactionTemplate
 import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertNull
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
 
@@ -79,6 +80,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
+                                        medlemskap = MedlemIFolketrygden.Ukjent,
                                     )
                                 )
                             ),
@@ -131,6 +133,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                     )
                                 )
                             ),
@@ -181,6 +184,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "01122012345",
                                         kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                     )
                                 )
                             ),
@@ -193,6 +197,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "01122012345",
                                         kilde = Kilde.BARNETRYGD,
+medlemskap = MedlemIFolketrygden.Ukjent,
                                     ),
                                 )
                             ),
