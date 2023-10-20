@@ -118,7 +118,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
@@ -126,6 +126,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -218,14 +219,15 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -302,14 +304,15 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.SEPTEMBER),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),

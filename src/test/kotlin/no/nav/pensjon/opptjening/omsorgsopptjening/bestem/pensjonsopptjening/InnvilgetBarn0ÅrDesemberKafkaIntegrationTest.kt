@@ -70,6 +70,7 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
                                 omsorgsmottaker = "01122012345",
                                 kilde = Kilde.BARNETRYGD,
                                 medlemskap = MedlemIFolketrygden.Ukjent,
+                                utbetalt = 7234
                             )
                         )
                     )

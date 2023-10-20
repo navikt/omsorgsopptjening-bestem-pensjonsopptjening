@@ -143,6 +143,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -150,7 +151,8 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -239,7 +241,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -247,7 +250,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),

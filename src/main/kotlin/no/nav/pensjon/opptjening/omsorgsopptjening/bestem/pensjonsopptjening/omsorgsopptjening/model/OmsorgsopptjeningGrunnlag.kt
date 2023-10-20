@@ -37,6 +37,11 @@ sealed class OmsorgsopptjeningGrunnlag {
                                       .map { it.periode.alleMåneder() }.flatten().toSet())
     }
 
+    protected fun omsorgsytersUtbetalingsmåneder(): Utbetalingsmåneder {
+        return Utbetalingsmåneder(grunnlag.omsorgsytersPersongrunnlag.omsorgsperioder.filter { it.utbetalt > 0 }
+                                      .map { it.periode.alleMåneder() }.flatten().toSet())
+    }
+
     private fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Omsorgsmåneder> {
         return grunnlag.persongrunnlag
             .associate { persongrunnlag ->
@@ -109,6 +114,7 @@ sealed class OmsorgsopptjeningGrunnlag {
     abstract fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag
 
     abstract fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Grunnlag
+    abstract fun forMottarBarnetrygd(): OmsorgsyterMottarBarnetrgyd.Grunnlag
 
     /**
      * Hvor mye omsorgsarbeid som kreves for å kunne motta omsorgsopptjening avhenger av når barnet er født på året,
@@ -151,6 +157,12 @@ sealed class OmsorgsopptjeningGrunnlag {
                     omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder()
                 )
             }
+
+            override fun forMottarBarnetrygd(): OmsorgsyterMottarBarnetrgyd.Grunnlag {
+                return OmsorgsyterMottarBarnetrgyd.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
+                    omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder()
+                )
+            }
         }
 
         data class FødtDesember(
@@ -179,8 +191,14 @@ sealed class OmsorgsopptjeningGrunnlag {
             }
 
             override fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Grunnlag {
-                return OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
+                return OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
                     omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder()
+                )
+            }
+
+            override fun forMottarBarnetrygd(): OmsorgsyterMottarBarnetrgyd.Grunnlag {
+                return OmsorgsyterMottarBarnetrgyd.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
+                    omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder()
                 )
             }
         }
@@ -208,8 +226,14 @@ sealed class OmsorgsopptjeningGrunnlag {
         }
 
         override fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Grunnlag {
-            return OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
+            return OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder()
+            )
+        }
+
+        override fun forMottarBarnetrygd(): OmsorgsyterMottarBarnetrgyd.Grunnlag {
+            return OmsorgsyterMottarBarnetrgyd.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
+                omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder()
             )
         }
     }
@@ -301,7 +325,8 @@ private fun BeriketDatagrunnlag.`avgrens for omsorgsår`(): Map<Int, BeriketData
                                         omsorgstype = barnetrygdPeriode.omsorgstype,
                                         omsorgsmottaker = barnetrygdPeriode.omsorgsmottaker,
                                         kilde = barnetrygdPeriode.kilde,
-                                        medlemskap = barnetrygdPeriode.medlemskap
+                                        medlemskap = barnetrygdPeriode.medlemskap,
+                                        utbetalt = barnetrygdPeriode.utbetalt,
                                     )
                                 }
                         })

@@ -77,7 +77,8 @@ internal data class BeriketOmsorgsperiodeDb(
     val omsorgstype: String,
     val omsorgsmottaker: PersonDb,
     val kilde: KildeDb,
-    val medlemskap: MedlemskapDb
+    val medlemskap: MedlemskapDb,
+    val utbetalt: Int,
 )
 
 internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
@@ -87,7 +88,8 @@ internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
         omsorgstype = omsorgstype.toString(),
         omsorgsmottaker = omsorgsmottaker.toDb(),
         kilde = kilde.toDb(),
-        medlemskap = medlemskap.toDb()
+        medlemskap = medlemskap.toDb(),
+        utbetalt = utbetalt,
     )
 }
 
@@ -98,6 +100,7 @@ internal fun BeriketOmsorgsperiodeDb.toDomain(): Omsorgsperiode {
         omsorgstype = DomainOmsorgstype.valueOf(omsorgstype),
         omsorgsmottaker = omsorgsmottaker.toDomain(),
         kilde = kilde.toDomain(),
-        medlemskap = medlemskap.toDomain()
+        medlemskap = medlemskap.toDomain(),
+        utbetalt = utbetalt,
     )
 }

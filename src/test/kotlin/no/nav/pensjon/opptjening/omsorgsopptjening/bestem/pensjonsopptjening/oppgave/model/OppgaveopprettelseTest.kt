@@ -61,7 +61,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.JUNE),
@@ -69,19 +69,21 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JULY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -106,27 +108,29 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.JUNE),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JULY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -170,27 +174,29 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -198,7 +204,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -234,27 +241,29 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JUNE),
@@ -262,20 +271,22 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "01018212345",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JUNE),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -321,27 +332,29 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -372,27 +385,29 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -424,14 +439,15 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.JULY),
                                     tom = YearMonth.of(2021, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -439,20 +455,22 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2021, Month.JUNE),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -460,7 +478,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -510,14 +529,15 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                     persongrunnlag = listOf(
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "12345678910",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.JULY),
                                     tom = YearMonth.of(2021, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -525,20 +545,22 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
-                            omsorgsperioder =  listOf(
+                            omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2021, Month.JUNE),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -546,7 +568,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),

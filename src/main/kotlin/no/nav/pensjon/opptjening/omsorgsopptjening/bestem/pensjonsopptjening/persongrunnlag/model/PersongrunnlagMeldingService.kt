@@ -143,7 +143,8 @@ class PersongrunnlagMeldingService(
                             omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain(),
                             omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
                             kilde = omsorgVedtakPeriode.kilde.toDomain(),
-                            medlemskap = omsorgVedtakPeriode.medlemskap.toDomain()
+                            medlemskap = omsorgVedtakPeriode.medlemskap.toDomain(),
+                            utbetalt = omsorgVedtakPeriode.utbetalt,
                         )
                     }
 

@@ -14,6 +14,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemAvFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOppfyllerAlderskrav
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
@@ -76,6 +77,7 @@ class PersongrunnlagMeldingProcessingThread(
                 is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> metrics.omsorgsmottakerOppfyllerAlderskravForBarnetrygd.increment()
                 is OmsorgsyterOppfyllerAlderskrav.Vurdering -> metrics.omsorgsyterOppfyllerAlderskrav.increment()
                 is OmsorgsyterErMedlemAvFolketrygden.Vurdering -> TODO()
+                is OmsorgsyterMottarBarnetrgyd.Vurdering -> TODO()
             }
         }
         metrics.avslag.increment()

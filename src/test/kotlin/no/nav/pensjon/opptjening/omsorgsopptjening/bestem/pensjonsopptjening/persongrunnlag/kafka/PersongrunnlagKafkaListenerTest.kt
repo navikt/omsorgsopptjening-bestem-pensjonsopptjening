@@ -25,7 +25,7 @@ class PersongrunnlagKafkaListenerTest {
             omsorgsyter = "",
             persongrunnlag = listOf(
                 PersongrunnlagMeldingKafka.Persongrunnlag(
-                    omsorgsyter = "", omsorgsperioder =  listOf(
+                    omsorgsyter = "", omsorgsperioder = listOf(
                         PersongrunnlagMeldingKafka.Omsorgsperiode(
                             fom = YearMonth.now(),
                             tom = YearMonth.now(),
@@ -33,11 +33,12 @@ class PersongrunnlagKafkaListenerTest {
                             omsorgsmottaker = "",
                             kilde = Kilde.BARNETRYGD,
                             medlemskap = MedlemIFolketrygden.Ukjent,
-                            )
+                            utbetalt = 7234
+                        )
                     )
                 ),
                 PersongrunnlagMeldingKafka.Persongrunnlag(
-                    omsorgsyter = "", omsorgsperioder =  listOf(
+                    omsorgsyter = "", omsorgsperioder = listOf(
                         PersongrunnlagMeldingKafka.Omsorgsperiode(
                             fom = YearMonth.now(),
                             tom = YearMonth.now(),
@@ -45,6 +46,7 @@ class PersongrunnlagKafkaListenerTest {
                             omsorgsmottaker = "",
                             kilde = Kilde.BARNETRYGD,
                             medlemskap = MedlemIFolketrygden.Ukjent,
+                            utbetalt = 7234
                         )
                     )
                 )
@@ -67,9 +69,9 @@ class PersongrunnlagKafkaListenerTest {
 
         listener.tellOmsorgstyper(PersongrunnlagMelding)
 
-        verify(exactly = 1) { metrics.antallVedtaksperioderFullBarnetrygd.increment()  }
-        verify(exactly = 1) { metrics.antallVedtaksperioderDeltBarnetrygd.increment()  }
-        verify(exactly = 0) { metrics.antallVedtaksperioderHjelpestonadSats3.increment()  }
-        verify(exactly = 0) { metrics.antallVedtaksperioderHjelpestonadSats4.increment()  }
+        verify(exactly = 1) { metrics.antallVedtaksperioderFullBarnetrygd.increment() }
+        verify(exactly = 1) { metrics.antallVedtaksperioderDeltBarnetrygd.increment() }
+        verify(exactly = 0) { metrics.antallVedtaksperioderHjelpestonadSats3.increment() }
+        verify(exactly = 0) { metrics.antallVedtaksperioderHjelpestonadSats4.increment() }
     }
 }

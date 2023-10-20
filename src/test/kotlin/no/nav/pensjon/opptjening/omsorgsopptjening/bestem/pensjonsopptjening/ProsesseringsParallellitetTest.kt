@@ -81,6 +81,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
                                         medlemskap = MedlemIFolketrygden.Ukjent,
+                                        utbetalt = 7234
                                     )
                                 )
                             ),
@@ -89,8 +90,8 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                         innlesingId = InnlesingId.generate(),
                         correlationId = CorrelationId.generate(),
                     )
-                    ),
-                )
+                ),
+            )
             persongrunnlagMeldingService.process()
 
             transactionTemplate.execute {
@@ -133,7 +134,8 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                        medlemskap = MedlemIFolketrygden.Ukjent,
+                                        utbetalt = 7234
                                     )
                                 )
                             ),
@@ -142,8 +144,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                         innlesingId = InnlesingId.generate(),
                         correlationId = CorrelationId.generate(),
                     )
-                    ),
-                )
+                ),
+            )
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
@@ -184,7 +186,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "01122012345",
                                         kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                        medlemskap = MedlemIFolketrygden.Ukjent,
+                                        utbetalt = 7234
                                     )
                                 )
                             ),
@@ -197,7 +200,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "01122012345",
                                         kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                        medlemskap = MedlemIFolketrygden.Ukjent,
+                                        utbetalt = 7234
                                     ),
                                 )
                             ),
@@ -206,8 +210,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                         innlesingId = InnlesingId.generate(),
                         correlationId = CorrelationId.generate(),
                     )
-                    ),
-                )
+                ),
+            )
             persongrunnlagMeldingService.process()
 
             transactionTemplate.execute {

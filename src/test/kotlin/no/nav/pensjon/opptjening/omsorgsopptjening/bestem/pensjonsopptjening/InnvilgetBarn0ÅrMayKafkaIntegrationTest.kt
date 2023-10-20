@@ -63,7 +63,7 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
                 persongrunnlag = listOf(
                     PersongrunnlagMeldingKafka.Persongrunnlag(
                         omsorgsyter = "12345678910",
-                        omsorgsperioder =  listOf(
+                        omsorgsperioder = listOf(
                             PersongrunnlagMeldingKafka.Omsorgsperiode(
                                 fom = YearMonth.of(2020, Month.OCTOBER),
                                 tom = YearMonth.of(2020, Month.DECEMBER),
@@ -71,6 +71,7 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
                                 omsorgsmottaker = "01052012345",
                                 kilde = Kilde.BARNETRYGD,
                                 medlemskap = MedlemIFolketrygden.Ukjent,
+                                utbetalt = 7234
                             )
                         )
                     )

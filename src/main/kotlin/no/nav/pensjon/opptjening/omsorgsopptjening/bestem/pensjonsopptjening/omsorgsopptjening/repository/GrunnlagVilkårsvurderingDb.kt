@@ -9,7 +9,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsmåneder
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
@@ -90,10 +89,29 @@ internal sealed class GrunnlagVilkårsvurderingDb {
             override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
         ) : MedlemIFolketrygden()
 
-        @JsonTypeName("MedleskapBarnFødtUtenforOmsorgsår")
-        data class MedleskapBarnFødtUtenforOmsorgsår(
+        @JsonTypeName("MedlemskapBarnFødtUtenforOmsorgsår")
+        data class MedlemskapBarnFødtUtenforOmsorgsår(
             override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
         ) : MedlemIFolketrygden()
+    }
+
+    internal sealed class MottarBarnetrygd : GrunnlagVilkårsvurderingDb() {
+        abstract val omsorgsytersUtbetalingsmåneder: Set<YearMonth>
+
+        @JsonTypeName("MottarBarnetrygdBarnFødtOmsorgsår")
+        data class MottarBarnetrygdBarnFødtOmsorgsår(
+            override val omsorgsytersUtbetalingsmåneder: Set<YearMonth>,
+        ) : MottarBarnetrygd()
+
+        @JsonTypeName("MottarBarnetrygdBarnFødtDesemberOmsorgsår")
+        data class MottarBarnetrygdBarnFødtDesemberOmsorgsår(
+            override val omsorgsytersUtbetalingsmåneder: Set<YearMonth>,
+        ) : MottarBarnetrygd()
+
+        @JsonTypeName("MottarBarnetrygdBarnFødtUtenforOmsorgsår")
+        data class MottarBarnetrygdBarnFødtUtenforOmsorgsår(
+            override val omsorgsytersUtbetalingsmåneder: Set<YearMonth>,
+        ) : MottarBarnetrygd()
     }
 }
 

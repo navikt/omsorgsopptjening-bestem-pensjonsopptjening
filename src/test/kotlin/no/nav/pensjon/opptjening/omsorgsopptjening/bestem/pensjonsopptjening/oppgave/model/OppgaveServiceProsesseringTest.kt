@@ -136,41 +136,43 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
-                        omsorgsyter = "12345678910",
-                        persongrunnlag = listOf(
-                            PersongrunnlagMeldingKafka.Persongrunnlag(
-                                omsorgsyter = "12345678910",
-                                omsorgsperioder =  listOf(
-                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                        omsorgsmottaker = "07081812345",
-                                        kilde = Kilde.BARNETRYGD,
-                                        medlemskap = MedlemIFolketrygden.Ukjent,
-                                    )
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
-                            ),
-                            PersongrunnlagMeldingKafka.Persongrunnlag(
-                                omsorgsyter = "04010012797",
-                                omsorgsperioder =  listOf(
-                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                        omsorgsmottaker = "07081812345",
-                                        kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
-                                    )
-                                )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde(""),
-                        innlesingId = InnlesingId.generate(),
-                        correlationId = CorrelationId.generate(),
-                    )
-                ),
-            )
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "04010012797",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
+                                )
+                            )
+                        ),
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
 
         handler.process()
 
@@ -271,41 +273,43 @@ medlemskap = MedlemIFolketrygden.Ukjent,
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
-                        omsorgsyter = "12345678910",
-                        persongrunnlag = listOf(
-                            PersongrunnlagMeldingKafka.Persongrunnlag(
-                                omsorgsyter = "12345678910",
-                                omsorgsperioder =  listOf(
-                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                        omsorgsmottaker = "07081812345",
-                                        kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
-                                    )
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
-                            ),
-                            PersongrunnlagMeldingKafka.Persongrunnlag(
-                                omsorgsyter = "04010012797",
-                                omsorgsperioder =  listOf(
-                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                        omsorgsmottaker = "07081812345",
-                                        kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
-                                    )
-                                )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde(""),
-                        innlesingId = InnlesingId.generate(),
-                        correlationId = CorrelationId.generate(),
-                    )
-                ),
-            )
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "04010012797",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
+                                )
+                            )
+                        ),
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
 
         handler.process()
 
@@ -368,41 +372,43 @@ medlemskap = MedlemIFolketrygden.Ukjent,
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
-                        omsorgsyter = "12345678910",
-                        persongrunnlag = listOf(
-                            PersongrunnlagMeldingKafka.Persongrunnlag(
-                                omsorgsyter = "12345678910",
-                                omsorgsperioder =  listOf(
-                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                        omsorgsmottaker = "07081812345",
-                                        kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
-                                    )
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
-                            ),
-                            PersongrunnlagMeldingKafka.Persongrunnlag(
-                                omsorgsyter = "04010012797",
-                                omsorgsperioder =  listOf(
-                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                        fom = YearMonth.of(2020, Month.JANUARY),
-                                        tom = YearMonth.of(2020, Month.DECEMBER),
-                                        omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                        omsorgsmottaker = "07081812345",
-                                        kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
-                                    )
-                                )
-                            ),
+                            )
                         ),
-                        rådata = RådataFraKilde(""),
-                        innlesingId = InnlesingId.generate(),
-                        correlationId = CorrelationId.generate(),
-                    )
-                ),
-            )
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "04010012797",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
+                                )
+                            )
+                        ),
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
 
         handler.process()
 

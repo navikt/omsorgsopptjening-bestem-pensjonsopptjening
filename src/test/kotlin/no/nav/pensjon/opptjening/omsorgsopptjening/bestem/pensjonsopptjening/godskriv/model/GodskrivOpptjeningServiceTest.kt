@@ -107,6 +107,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -188,7 +189,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),
@@ -251,7 +253,8 @@ medlemskap = MedlemIFolketrygden.Ukjent,
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
-medlemskap = MedlemIFolketrygden.Ukjent,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 7234
                                 )
                             )
                         ),

@@ -61,6 +61,7 @@ data class Behandling(
         return og(
             vurderVilkår.OmsorgsyterOppfyllerAlderskrav(),
             vurderVilkår.OmsorgsyterErMedlemAvFolketrygden(),
+            vurderVilkår.OmsorgsyterMottarBarnetrgyd(),
             vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
             vurderVilkår.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(),
