@@ -71,11 +71,11 @@ fun List<Omsorgsperiode>.alleMåneder(): Set<YearMonth> {
 sealed class Omsorgsmåneder(
     måneder: Set<YearMonth>
 ) : Set<YearMonth> by måneder {
-    class Barnetrygd(
+    data class Barnetrygd(
         val måneder: Set<YearMonth>
     ) : Omsorgsmåneder(måneder)
 
-    class Hjelpestønad(
+    data class Hjelpestønad(
         val måneder: Set<YearMonth>,
         val barnetrygd: Set<YearMonth>,
         val hjelpestønad: Set<YearMonth>

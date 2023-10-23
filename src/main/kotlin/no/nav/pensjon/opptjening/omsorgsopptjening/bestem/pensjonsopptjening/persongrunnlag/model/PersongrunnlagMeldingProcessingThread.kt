@@ -12,6 +12,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemAvFolketrygden
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarGyldigOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
@@ -78,6 +79,7 @@ class PersongrunnlagMeldingProcessingThread(
                 is OmsorgsyterOppfyllerAlderskrav.Vurdering -> metrics.omsorgsyterOppfyllerAlderskrav.increment()
                 is OmsorgsyterErMedlemAvFolketrygden.Vurdering -> TODO()
                 is OmsorgsyterMottarBarnetrgyd.Vurdering -> TODO()
+                is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> TODO()
             }
         }
         metrics.avslag.increment()

@@ -115,6 +115,7 @@ sealed class OmsorgsopptjeningGrunnlag {
 
     abstract fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Grunnlag
     abstract fun forMottarBarnetrygd(): OmsorgsyterMottarBarnetrgyd.Grunnlag
+    abstract fun forGyldigOmsorgsarbeid(): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag
 
     /**
      * Hvor mye omsorgsarbeid som kreves for å kunne motta omsorgsopptjening avhenger av når barnet er født på året,
@@ -163,6 +164,14 @@ sealed class OmsorgsopptjeningGrunnlag {
                     omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder()
                 )
             }
+
+            override fun forGyldigOmsorgsarbeid(): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
+                return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
+                    omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder(),
+                    omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder(),
+                    omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
+                )
+            }
         }
 
         data class FødtDesember(
@@ -201,6 +210,14 @@ sealed class OmsorgsopptjeningGrunnlag {
                     omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder()
                 )
             }
+
+            override fun forGyldigOmsorgsarbeid(): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
+                return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
+                    omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder(),
+                    omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder(),
+                    omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
+                )
+            }
         }
     }
 
@@ -234,6 +251,14 @@ sealed class OmsorgsopptjeningGrunnlag {
         override fun forMottarBarnetrygd(): OmsorgsyterMottarBarnetrgyd.Grunnlag {
             return OmsorgsyterMottarBarnetrgyd.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
                 omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder()
+            )
+        }
+
+        override fun forGyldigOmsorgsarbeid(): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
+            return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder(),
+                omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder(),
+                omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
             )
         }
     }

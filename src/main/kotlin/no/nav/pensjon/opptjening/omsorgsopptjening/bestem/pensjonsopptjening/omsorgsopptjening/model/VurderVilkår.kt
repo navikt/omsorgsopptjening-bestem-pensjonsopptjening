@@ -14,6 +14,7 @@ interface VurderVilkår {
     fun OmsorgsyterErForelderTilMottakerAvHjelpestønad(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering
     fun OmsorgsyterErMedlemAvFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Vurdering
     fun OmsorgsyterMottarBarnetrgyd() : OmsorgsyterMottarBarnetrgyd.Vurdering
+    fun OmsorgsyterHarGyldigOmsorgsarbeid() : OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering
 }
 
 internal class VilkårsvurderingFactory(
@@ -69,6 +70,10 @@ internal class VilkårsvurderingFactory(
 
     override fun OmsorgsyterMottarBarnetrgyd(): OmsorgsyterMottarBarnetrgyd.Vurdering {
         return OmsorgsyterMottarBarnetrgyd.vilkarsVurder(grunnlag.forMottarBarnetrygd())
+    }
+
+    override fun OmsorgsyterHarGyldigOmsorgsarbeid(): OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering {
+        return OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(grunnlag.forGyldigOmsorgsarbeid())
     }
 
     override fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering {
