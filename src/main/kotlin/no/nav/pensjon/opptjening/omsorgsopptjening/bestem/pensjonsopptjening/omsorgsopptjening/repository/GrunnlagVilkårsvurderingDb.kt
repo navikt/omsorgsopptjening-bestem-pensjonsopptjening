@@ -98,33 +98,33 @@ internal sealed class GrunnlagVilkårsvurderingDb {
     }
 
     internal sealed class MottarBarnetrygd : GrunnlagVilkårsvurderingDb() {
-        abstract val omsorgsytersUtbetalingsmåneder: Set<YearMonth>
+        abstract val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>
 
         @JsonTypeName("MottarBarnetrygdBarnFødtOmsorgsår")
         data class MottarBarnetrygdBarnFødtOmsorgsår(
-            override val omsorgsytersUtbetalingsmåneder: Set<YearMonth>,
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
         ) : MottarBarnetrygd()
 
         @JsonTypeName("MottarBarnetrygdBarnFødtDesemberOmsorgsår")
         data class MottarBarnetrygdBarnFødtDesemberOmsorgsår(
-            override val omsorgsytersUtbetalingsmåneder: Set<YearMonth>,
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
         ) : MottarBarnetrygd()
 
         @JsonTypeName("MottarBarnetrygdBarnFødtUtenforOmsorgsår")
         data class MottarBarnetrygdBarnFødtUtenforOmsorgsår(
-            override val omsorgsytersUtbetalingsmåneder: Set<YearMonth>,
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
         ) : MottarBarnetrygd()
     }
 
     internal sealed class GyldigOmsorgsarbeid : GrunnlagVilkårsvurderingDb() {
         abstract val omsorgsytersMedlemskapsmåneder: Set<YearMonth>
-        abstract val omsorgsytersUtbetalingsmåneder: Set<YearMonth>
+        abstract val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>
         abstract val omsorgsytersOmsorgsmåneder: YtelseMånederDb
         abstract val gyldigeOmsorgsmåneder: Set<YearMonth>
         @JsonTypeName("GyldigOmsorgsarbeidBarnFødtOmsorgsår")
         data class GyldigOmsorgsarbeidBarnFødtOmsorgsår(
             override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-            override val omsorgsytersUtbetalingsmåneder: Set<YearMonth>,
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
             override val omsorgsytersOmsorgsmåneder: YtelseMånederDb,
             override val gyldigeOmsorgsmåneder: Set<YearMonth>,
         ) : GyldigOmsorgsarbeid()
@@ -132,7 +132,7 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         @JsonTypeName("GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår")
         data class GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår(
             override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-            override val omsorgsytersUtbetalingsmåneder: Set<YearMonth>,
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
             override val omsorgsytersOmsorgsmåneder: YtelseMånederDb,
             override val gyldigeOmsorgsmåneder: Set<YearMonth>,
         ) : GyldigOmsorgsarbeid()
@@ -140,7 +140,7 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         @JsonTypeName("GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår")
         data class GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår(
             override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-            override val omsorgsytersUtbetalingsmåneder: Set<YearMonth>,
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
             override val omsorgsytersOmsorgsmåneder: YtelseMånederDb,
             override val gyldigeOmsorgsmåneder: Set<YearMonth>,
         ) : GyldigOmsorgsarbeid()

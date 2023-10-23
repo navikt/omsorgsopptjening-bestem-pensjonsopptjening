@@ -56,6 +56,7 @@ data class Omsorgsperiode(
     val kilde: DomainKilde,
     val medlemskap: Medlemskap,
     val utbetalt: Int,
+    val landstilknytning: Landstilknytning
 ) {
     val periode = Periode(fom, tom)
 

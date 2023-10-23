@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Persongrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -65,6 +66,7 @@ internal fun BeriketPersongrunnlagDb.toDomain(): Persongrunnlag {
         omsorgsperioder = omsorgVedtakPeriode.map { it.toDomain() }
     )
 }
+
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
@@ -79,6 +81,7 @@ internal data class BeriketOmsorgsperiodeDb(
     val kilde: KildeDb,
     val medlemskap: MedlemskapDb,
     val utbetalt: Int,
+    val landstilknytning: LandstilknytningDb
 )
 
 internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
@@ -90,6 +93,7 @@ internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
         kilde = kilde.toDb(),
         medlemskap = medlemskap.toDb(),
         utbetalt = utbetalt,
+        landstilknytning = landstilknytning.toDb(),
     )
 }
 
@@ -102,5 +106,6 @@ internal fun BeriketOmsorgsperiodeDb.toDomain(): Omsorgsperiode {
         kilde = kilde.toDomain(),
         medlemskap = medlemskap.toDomain(),
         utbetalt = utbetalt,
+        landstilknytning = landstilknytning.toDomain(),
     )
 }

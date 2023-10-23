@@ -11,6 +11,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Test
@@ -33,7 +34,8 @@ class PersongrunnlagKafkaListenerTest {
                             omsorgsmottaker = "",
                             kilde = Kilde.BARNETRYGD,
                             medlemskap = MedlemIFolketrygden.Ukjent,
-                            utbetalt = 7234
+                            utbetalt = 7234,
+                            landstilknytning = Landstilknytning.NORGE
                         )
                     )
                 ),
@@ -46,7 +48,8 @@ class PersongrunnlagKafkaListenerTest {
                             omsorgsmottaker = "",
                             kilde = Kilde.BARNETRYGD,
                             medlemskap = MedlemIFolketrygden.Ukjent,
-                            utbetalt = 7234
+                            utbetalt = 7234,
+                            landstilknytning = Landstilknytning.NORGE
                         )
                     )
                 )

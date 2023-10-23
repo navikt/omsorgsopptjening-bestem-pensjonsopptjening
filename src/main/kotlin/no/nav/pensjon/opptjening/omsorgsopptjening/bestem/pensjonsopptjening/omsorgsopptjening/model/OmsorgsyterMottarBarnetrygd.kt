@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Landstilknytning
 import java.time.YearMonth
 
 object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd.Grunnlag>() {
@@ -71,7 +72,7 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
         abstract val omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder
 
         fun erOppfylltFor(påkrevetAntallMåneder: Int): Boolean {
-            return omsorgsytersUtbetalingsmåneder.count() >= påkrevetAntallMåneder
+            return omsorgsytersUtbetalingsmåneder.gyldige.count() >= påkrevetAntallMåneder
         }
 
         data class OmsorgsmottakerFødtUtenforOmsorgsår(
@@ -89,6 +90,27 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
 }
 
 data class Utbetalingsmåneder(
-    val måneder: Set<YearMonth>
-) : Set<YearMonth> by måneder
+    val måneder: Set<Utbetalingsmåned>,
+    val gyldige: Set<YearMonth> = måneder.filter { it.erOppfylt() }.map { it.måned }.toSet()
+) : Set<YearMonth> by gyldige //TODO
+
+data class Utbetalingsmåned(
+    val måned: YearMonth,
+    val utbetalt: Int,
+    val landstilknytning: Landstilknytning
+){
+    fun erOppfylt(): Boolean {
+        return when(landstilknytning){
+            Landstilknytning.Eøs.NorgePrimærland -> {
+                utbetalt > 0
+            }
+            Landstilknytning.Eøs.NorgeSekundærland -> {
+                utbetalt >= 0
+            }
+            Landstilknytning.Norge -> {
+                utbetalt > 0
+            }
+        }
+    }
+}
 

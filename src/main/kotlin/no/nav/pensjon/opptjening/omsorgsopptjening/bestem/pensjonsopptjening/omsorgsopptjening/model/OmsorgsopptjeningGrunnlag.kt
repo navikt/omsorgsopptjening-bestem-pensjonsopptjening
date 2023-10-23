@@ -38,8 +38,17 @@ sealed class OmsorgsopptjeningGrunnlag {
     }
 
     protected fun omsorgsytersUtbetalingsmåneder(): Utbetalingsmåneder {
-        return Utbetalingsmåneder(grunnlag.omsorgsytersPersongrunnlag.omsorgsperioder.filter { it.utbetalt > 0 }
-                                      .map { it.periode.alleMåneder() }.flatten().toSet())
+        return Utbetalingsmåneder(
+            grunnlag.omsorgsytersPersongrunnlag.omsorgsperioder.map { omsorgsperiode ->
+                omsorgsperiode.alleMåneder().map {
+                    Utbetalingsmåned(
+                        måned = it,
+                        utbetalt = omsorgsperiode.utbetalt,
+                        landstilknytning = omsorgsperiode.landstilknytning
+                    )
+                }
+            }.flatten().toSet()
+        )
     }
 
     private fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Omsorgsmåneder> {
@@ -352,6 +361,7 @@ private fun BeriketDatagrunnlag.`avgrens for omsorgsår`(): Map<Int, BeriketData
                                         kilde = barnetrygdPeriode.kilde,
                                         medlemskap = barnetrygdPeriode.medlemskap,
                                         utbetalt = barnetrygdPeriode.utbetalt,
+                                        landstilknytning = barnetrygdPeriode.landstilknytning,
                                     )
                                 }
                         })

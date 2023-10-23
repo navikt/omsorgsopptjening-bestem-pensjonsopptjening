@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
+
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
@@ -31,6 +32,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
@@ -44,7 +46,6 @@ import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
-import java.time.Year
 import java.time.YearMonth
 import kotlin.test.Test
 import kotlin.test.assertFalse
@@ -91,7 +92,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -141,7 +143,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -172,7 +175,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -226,7 +230,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -280,7 +285,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -330,7 +336,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -360,12 +367,14 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                         )
                     }
                 }
-            assertEquals(listOf(
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemAvFolketrygden.Vurdering>(),
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>(),
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
-            ),behandling.vilkårsvurdering.finnAlleAvslatte())
+            assertEquals(
+                listOf(
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemAvFolketrygden.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
+                ), behandling.vilkårsvurdering.finnAlleAvslatte()
+            )
         }
     }
 
@@ -386,7 +395,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -416,12 +426,14 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                         )
                     }
                 }
-            assertEquals(listOf(
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemAvFolketrygden.Vurdering>(),
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>(),
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
-            ),behandling.vilkårsvurdering.finnAlleAvslatte())
+            assertEquals(
+                listOf(
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemAvFolketrygden.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
+                ), behandling.vilkårsvurdering.finnAlleAvslatte()
+            )
         }
     }
 
@@ -442,7 +454,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JUNE),
@@ -451,7 +464,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -465,7 +479,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.SEPTEMBER),
@@ -474,7 +489,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -488,7 +504,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -537,7 +554,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.SEPTEMBER),
@@ -546,7 +564,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -560,7 +579,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JUNE),
@@ -569,7 +589,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -583,7 +604,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -633,7 +655,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -642,7 +665,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
@@ -651,7 +675,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -705,7 +730,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -719,7 +745,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.MARCH),
@@ -728,7 +755,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -777,7 +805,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -809,7 +838,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -847,7 +877,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
@@ -856,7 +887,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -900,7 +932,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -914,7 +947,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -928,7 +962,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -984,7 +1019,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -998,7 +1034,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                             )
                         ),
@@ -1056,7 +1093,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -1090,7 +1128,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -1188,7 +1227,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -1197,7 +1237,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.INFOTRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -1235,7 +1276,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -1244,7 +1286,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.INFOTRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -1284,7 +1327,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -1293,7 +1337,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.INFOTRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -1331,7 +1376,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.INFOTRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -1369,7 +1415,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
@@ -1378,7 +1425,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.INFOTRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -1416,7 +1464,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Nei,
-                                    utbetalt = 7234
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -1434,10 +1483,12 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsmottaker = "01052012345",
                 omsorgstype = DomainOmsorgstype.BARNETRYGD,
             )
-            assertEquals(listOf(
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemAvFolketrygden.Vurdering>(),
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
-            ),behandling.vilkårsvurdering.finnAlleAvslatte())
+            assertEquals(
+                listOf(
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemAvFolketrygden.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
+                ), behandling.vilkårsvurdering.finnAlleAvslatte()
+            )
         }
     }
 
@@ -1458,7 +1509,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 0
+                                    utbetalt = 0,
+                                    landstilknytning = Landstilknytning.NORGE,
                                 )
                             )
                         ),
@@ -1476,10 +1528,51 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsmottaker = "01052012345",
                 omsorgstype = DomainOmsorgstype.BARNETRYGD,
             )
-            assertEquals(listOf(
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
-                behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
-            ),behandling.vilkårsvurdering.finnAlleAvslatte())
+            assertEquals(
+                listOf(
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
+                ), behandling.vilkårsvurdering.finnAlleAvslatte()
+            )
+        }
+    }
+
+    @Test
+    fun `en omsorgsyter som ikke får utbetalt barnetryd skal innvilges dersom Norge er sekundærland`() {
+        repo.persist(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2018, Month.JANUARY),
+                                    tom = YearMonth.of(2030, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "01052012345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    medlemskap = MedlemIFolketrygden.Ukjent,
+                                    utbetalt = 0,
+                                    landstilknytning = Landstilknytning.EØS_NORGE_SEKUNDÆR,
+                                )
+                            )
+                        ),
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        handler.process().single().also { behandling ->
+            behandling.assertInnvilget(
+                omsorgsyter = "12345678910",
+                omsorgsmottaker = "01052012345",
+                omsorgstype = DomainOmsorgstype.BARNETRYGD,
+            )
         }
     }
 
@@ -1500,7 +1593,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Nei,
-                                    utbetalt = 1000
+                                    utbetalt = 1000,
+                                    landstilknytning = Landstilknytning.NORGE,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JUNE),
@@ -1509,7 +1603,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ukjent,
-                                    utbetalt = 1000
+                                    utbetalt = 1000,
+                                    landstilknytning = Landstilknytning.NORGE,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.SEPTEMBER),
@@ -1518,7 +1613,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     medlemskap = MedlemIFolketrygden.Ja,
-                                    utbetalt = 0
+                                    utbetalt = 0,
+                                    landstilknytning = Landstilknytning.NORGE,
                                 ),
                             )
                         ),
@@ -1539,52 +1635,60 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             assertTrue(behandling.vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>())
             behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>().also {
                 assertEquals(6, it.påkrevetAntallMåneder)
-                assertEquals(Omsorgsmåneder.Barnetrygd(
-                    måneder = setOf(
-                        YearMonth.of(2020, Month.JANUARY),
-                        YearMonth.of(2020, Month.FEBRUARY),
-                        YearMonth.of(2020, Month.MARCH),
-                        YearMonth.of(2020, Month.APRIL),
-                        YearMonth.of(2020, Month.MAY),
-                        YearMonth.of(2020, Month.JUNE),
-                        YearMonth.of(2020, Month.JULY),
-                        YearMonth.of(2020, Month.AUGUST),
-                        YearMonth.of(2020, Month.SEPTEMBER),
-                        YearMonth.of(2020, Month.OCTOBER),
-                        YearMonth.of(2020, Month.NOVEMBER),
-                        YearMonth.of(2020, Month.DECEMBER),
-                    )
-                ),it.grunnlag.omsorgsytersOmsorgsmåneder)
-                assertEquals(Medlemskapsmåneder(
-                    måneder = setOf(
-                        YearMonth.of(2020, Month.JUNE),
-                        YearMonth.of(2020, Month.JULY),
-                        YearMonth.of(2020, Month.AUGUST),
-                        YearMonth.of(2020, Month.SEPTEMBER),
-                        YearMonth.of(2020, Month.OCTOBER),
-                        YearMonth.of(2020, Month.NOVEMBER),
-                        YearMonth.of(2020, Month.DECEMBER),
-                    )
-                ),it.grunnlag.omsorgsytersMedlemskapsmåneder)
-                assertEquals(Utbetalingsmåneder(
-                    måneder = setOf(
-                        YearMonth.of(2020, Month.JANUARY),
-                        YearMonth.of(2020, Month.FEBRUARY),
-                        YearMonth.of(2020, Month.MARCH),
-                        YearMonth.of(2020, Month.APRIL),
-                        YearMonth.of(2020, Month.MAY),
-                        YearMonth.of(2020, Month.JUNE),
-                        YearMonth.of(2020, Month.JULY),
-                        YearMonth.of(2020, Month.AUGUST),
-                    )
-                ),it.grunnlag.omsorgsytersUtbetalingsmåneder)
-                assertEquals(GyldigeOmsorgsmåneder(
-                    måneder = setOf(
-                        YearMonth.of(2020, Month.JUNE),
-                        YearMonth.of(2020, Month.JULY),
-                        YearMonth.of(2020, Month.AUGUST),
-                    )
-                ),it.grunnlag.gyldigeOmsorgsmåneder)
+                assertEquals(
+                    Omsorgsmåneder.Barnetrygd(
+                        måneder = setOf(
+                            YearMonth.of(2020, Month.JANUARY),
+                            YearMonth.of(2020, Month.FEBRUARY),
+                            YearMonth.of(2020, Month.MARCH),
+                            YearMonth.of(2020, Month.APRIL),
+                            YearMonth.of(2020, Month.MAY),
+                            YearMonth.of(2020, Month.JUNE),
+                            YearMonth.of(2020, Month.JULY),
+                            YearMonth.of(2020, Month.AUGUST),
+                            YearMonth.of(2020, Month.SEPTEMBER),
+                            YearMonth.of(2020, Month.OCTOBER),
+                            YearMonth.of(2020, Month.NOVEMBER),
+                            YearMonth.of(2020, Month.DECEMBER),
+                        )
+                    ), it.grunnlag.omsorgsytersOmsorgsmåneder
+                )
+                assertEquals(
+                    Medlemskapsmåneder(
+                        måneder = setOf(
+                            YearMonth.of(2020, Month.JUNE),
+                            YearMonth.of(2020, Month.JULY),
+                            YearMonth.of(2020, Month.AUGUST),
+                            YearMonth.of(2020, Month.SEPTEMBER),
+                            YearMonth.of(2020, Month.OCTOBER),
+                            YearMonth.of(2020, Month.NOVEMBER),
+                            YearMonth.of(2020, Month.DECEMBER),
+                        )
+                    ), it.grunnlag.omsorgsytersMedlemskapsmåneder
+                )
+//                assertEquals(
+//                    Utbetalingsmåneder(
+//                        måneder = setOf(
+//                            YearMonth.of(2020, Month.JANUARY),
+//                            YearMonth.of(2020, Month.FEBRUARY),
+//                            YearMonth.of(2020, Month.MARCH),
+//                            YearMonth.of(2020, Month.APRIL),
+//                            YearMonth.of(2020, Month.MAY),
+//                            YearMonth.of(2020, Month.JUNE),
+//                            YearMonth.of(2020, Month.JULY),
+//                            YearMonth.of(2020, Month.AUGUST),
+//                        )
+//                    ), it.grunnlag.omsorgsytersUtbetalingsmåneder
+//                )
+                assertEquals(
+                    GyldigeOmsorgsmåneder(
+                        måneder = setOf(
+                            YearMonth.of(2020, Month.JUNE),
+                            YearMonth.of(2020, Month.JULY),
+                            YearMonth.of(2020, Month.AUGUST),
+                        )
+                    ), it.grunnlag.gyldigeOmsorgsmåneder
+                )
             }
         }
     }

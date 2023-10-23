@@ -145,6 +145,7 @@ class PersongrunnlagMeldingService(
                             kilde = omsorgVedtakPeriode.kilde.toDomain(),
                             medlemskap = omsorgVedtakPeriode.medlemskap.toDomain(),
                             utbetalt = omsorgVedtakPeriode.utbetalt,
+                            landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain()
                         )
                     }
 
