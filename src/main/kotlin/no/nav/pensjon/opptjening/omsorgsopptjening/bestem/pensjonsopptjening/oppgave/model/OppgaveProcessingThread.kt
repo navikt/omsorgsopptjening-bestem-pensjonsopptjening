@@ -2,19 +2,21 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MicrometerMetrics
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetricsFeilmåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetricsMåling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import java.util.concurrent.TimeUnit
 
 @Component
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
 class OppgaveProcessingThread(
     private val service: OppgaveService,
     private val unleash: Unleash,
-    private val metrics: MicrometerMetrics,
+    private val oppgaveProcessingMetricsMåling: OppgaveProcessingMetricsMåling,
+    private val oppgaveProcessingMetricsFeilmåling: OppgaveProcessingMetricsFeilmåling
+
 ) : Runnable {
 
     companion object {
@@ -32,15 +34,15 @@ class OppgaveProcessingThread(
         while (true) {
             try {
                 if(unleash.isEnabled(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName)){
-                    metrics.oppgaverProsessertTidsbruk.recordCallable{  service.process() }
+                    oppgaveProcessingMetricsMåling.mål {
+                        service.process()
+                    }
                 }
             } catch (exception: Throwable) {
-                metrics.oppgaverFeiletTidsbruk.recordCallable {
+                oppgaveProcessingMetricsFeilmåling.målfeil {
                     log.warn("Exception caught while processing, exception:$exception")
                     Thread.sleep(1000)
                 }
-                metrics.antallFeiledeOppgaver.increment()
-                metrics.oppgaverFeiletTidsbruk.totalTime(TimeUnit.MILLISECONDS)
             }
         }
     }
