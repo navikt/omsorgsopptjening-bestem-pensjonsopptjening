@@ -101,7 +101,7 @@ data class Utbetalingsmåned(
 ){
     fun erOppfylt(): Boolean {
         return when(landstilknytning){
-            Landstilknytning.Eøs.NorgePrimærland -> {
+            Landstilknytning.Eøs.UkjentPrimærOgSekundærLand -> {
                 utbetalt > 0
             }
             Landstilknytning.Eøs.NorgeSekundærland -> {

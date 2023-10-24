@@ -5,9 +5,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 sealed class Landstilknytning {
     sealed class Eøs : Landstilknytning() {
         /**
-         * Norge er hovedansvarlig for utbetaling av ytelse og utbetaling skjer på samme måte som for [Norge]
+         * Vi kjenner ikke, eller har ikke nok informasjon til å utlede primær/sekundærland.
          */
-        object NorgePrimærland : Eøs()
+        object UkjentPrimærOgSekundærLand : Eøs()
 
         /**
          * Norge er medansvarlig for utbetaling av ytelse og utbetaler differansen mellom annet lands ytelse og
@@ -25,7 +25,7 @@ sealed class Landstilknytning {
 
 internal fun LandstilknytningKafka.toDomain(): Landstilknytning {
     return when (this) {
-        LandstilknytningKafka.EØS_NORGE_PRIMÆR -> Landstilknytning.Eøs.NorgePrimærland
+        LandstilknytningKafka.EØS_UKJENT_PRIMÆR_OG_SEKUNDÆR_LAND -> Landstilknytning.Eøs.UkjentPrimærOgSekundærLand
         LandstilknytningKafka.EØS_NORGE_SEKUNDÆR -> Landstilknytning.Eøs.NorgeSekundærland
         LandstilknytningKafka.NORGE -> Landstilknytning.Norge
     }
