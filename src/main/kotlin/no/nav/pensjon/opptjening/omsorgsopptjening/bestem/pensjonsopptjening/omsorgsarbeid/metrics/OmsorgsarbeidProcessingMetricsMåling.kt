@@ -43,6 +43,9 @@ class OmsorgsarbeidProcessingMetricsMåling(registry: MeterRegistry):
                 is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> omsorgsmottakerOppfyllerAlderskravForHjelpestønad.increment()
                 is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> omsorgsmottakerOppfyllerAlderskravForBarnetrygd.increment()
                 is OmsorgsyterOppfyllerAlderskrav.Vurdering -> omsorgsyterOppfyllerAlderskrav.increment()
+                is OmsorgsyterErMedlemAvFolketrygden.Vurdering -> TODO()
+                is OmsorgsyterMottarBarnetrgyd.Vurdering -> TODO()
+                is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> TODO()
             }
         }
         avslag.increment()

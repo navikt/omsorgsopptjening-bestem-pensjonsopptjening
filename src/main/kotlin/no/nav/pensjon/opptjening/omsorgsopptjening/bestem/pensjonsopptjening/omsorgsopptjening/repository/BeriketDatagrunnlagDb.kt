@@ -3,9 +3,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.BeriketDatagrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Persongrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Landstilknytning
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Persongrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.YearMonth
@@ -65,6 +66,7 @@ internal fun BeriketPersongrunnlagDb.toDomain(): Persongrunnlag {
         omsorgsperioder = omsorgVedtakPeriode.map { it.toDomain() }
     )
 }
+
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
@@ -77,6 +79,9 @@ internal data class BeriketOmsorgsperiodeDb(
     val omsorgstype: String,
     val omsorgsmottaker: PersonDb,
     val kilde: KildeDb,
+    val medlemskap: MedlemskapDb,
+    val utbetalt: Int,
+    val landstilknytning: LandstilknytningDb
 )
 
 internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
@@ -85,7 +90,10 @@ internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
         tom = tom.toString(),
         omsorgstype = omsorgstype.toString(),
         omsorgsmottaker = omsorgsmottaker.toDb(),
-        kilde = kilde.toDb()
+        kilde = kilde.toDb(),
+        medlemskap = medlemskap.toDb(),
+        utbetalt = utbetalt,
+        landstilknytning = landstilknytning.toDb(),
     )
 }
 
@@ -95,6 +103,9 @@ internal fun BeriketOmsorgsperiodeDb.toDomain(): Omsorgsperiode {
         tom = YearMonth.parse(tom),
         omsorgstype = DomainOmsorgstype.valueOf(omsorgstype),
         omsorgsmottaker = omsorgsmottaker.toDomain(),
-        kilde = kilde.toDomain()
+        kilde = kilde.toDomain(),
+        medlemskap = medlemskap.toDomain(),
+        utbetalt = utbetalt,
+        landstilknytning = landstilknytning.toDomain(),
     )
 }

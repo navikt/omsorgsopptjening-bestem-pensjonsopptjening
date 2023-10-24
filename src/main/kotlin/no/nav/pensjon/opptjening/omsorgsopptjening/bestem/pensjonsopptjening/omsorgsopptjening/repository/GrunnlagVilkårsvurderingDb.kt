@@ -2,13 +2,15 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AldersvurderingsGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AldersvurderingsGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsmåneder
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
@@ -75,6 +77,74 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         val omsorgsmottaker: String,
         val omsorgsmottakersFamilierelasjoner: Map<String, String>,
     ) : GrunnlagVilkårsvurderingDb()
+
+    internal sealed class MedlemIFolketrygden : GrunnlagVilkårsvurderingDb() {
+        abstract val omsorgsytersMedlemskapsmåneder: Set<YearMonth>
+
+        @JsonTypeName("MedlemskapBarnFødtOmsorgsår")
+        data class MedlemskapBarnFødtOmsorgsår(
+            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
+        ) : MedlemIFolketrygden()
+
+        @JsonTypeName("MedlemskapBarnFødtDesemberOmsorgsår")
+        data class MedlemskapBarnFødtDesemberOmsorgsår(
+            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
+        ) : MedlemIFolketrygden()
+
+        @JsonTypeName("MedlemskapBarnFødtUtenforOmsorgsår")
+        data class MedlemskapBarnFødtUtenforOmsorgsår(
+            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
+        ) : MedlemIFolketrygden()
+    }
+
+    internal sealed class MottarBarnetrygd : GrunnlagVilkårsvurderingDb() {
+        abstract val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>
+
+        @JsonTypeName("MottarBarnetrygdBarnFødtOmsorgsår")
+        data class MottarBarnetrygdBarnFødtOmsorgsår(
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
+        ) : MottarBarnetrygd()
+
+        @JsonTypeName("MottarBarnetrygdBarnFødtDesemberOmsorgsår")
+        data class MottarBarnetrygdBarnFødtDesemberOmsorgsår(
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
+        ) : MottarBarnetrygd()
+
+        @JsonTypeName("MottarBarnetrygdBarnFødtUtenforOmsorgsår")
+        data class MottarBarnetrygdBarnFødtUtenforOmsorgsår(
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
+        ) : MottarBarnetrygd()
+    }
+
+    internal sealed class GyldigOmsorgsarbeid : GrunnlagVilkårsvurderingDb() {
+        abstract val omsorgsytersMedlemskapsmåneder: Set<YearMonth>
+        abstract val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>
+        abstract val omsorgsytersOmsorgsmåneder: YtelseMånederDb
+        abstract val gyldigeOmsorgsmåneder: Set<YearMonth>
+        @JsonTypeName("GyldigOmsorgsarbeidBarnFødtOmsorgsår")
+        data class GyldigOmsorgsarbeidBarnFødtOmsorgsår(
+            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
+            override val omsorgsytersOmsorgsmåneder: YtelseMånederDb,
+            override val gyldigeOmsorgsmåneder: Set<YearMonth>,
+        ) : GyldigOmsorgsarbeid()
+
+        @JsonTypeName("GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår")
+        data class GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår(
+            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
+            override val omsorgsytersOmsorgsmåneder: YtelseMånederDb,
+            override val gyldigeOmsorgsmåneder: Set<YearMonth>,
+        ) : GyldigOmsorgsarbeid()
+
+        @JsonTypeName("GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår")
+        data class GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår(
+            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
+            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
+            override val omsorgsytersOmsorgsmåneder: YtelseMånederDb,
+            override val gyldigeOmsorgsmåneder: Set<YearMonth>,
+        ) : GyldigOmsorgsarbeid()
+    }
 }
 
 internal fun GrunnlagVilkårsvurderingDb.OmsorgsyterOgOmsorgsmottaker.toDomain(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Grunnlag {
