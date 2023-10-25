@@ -10,8 +10,8 @@ spec:
     apiVersion: unleash.nais.io/v1
     kind: RemoteUnleash
     name: pensjonopptjening
-  secretName: my-application-unleash-api-token
+  secretName: unleash-api-token
 
   # Specify which environment the API token should be created for.
   # Can be one of: development, or production.
-  environment: development
+  environment: production

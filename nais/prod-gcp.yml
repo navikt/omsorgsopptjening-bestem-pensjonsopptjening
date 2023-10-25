@@ -8,27 +8,27 @@ metadata:
 spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
-      value: dev-gcp
+      value: prod-gcp
     - name: PDL_URL
-      value: https://pdl-api.dev-fss-pub.nais.io/graphql
+      value: https://pdl-api.prod-fss-pub.nais.io/graphql
     - name: PDL_API_ID
-      value: dev-fss.pdl.pdl-api
+      value: prod-fss.pdl.pdl-api
     - name: PEN_BASE_URL
-      value: https://pensjon-pen-q2.dev-fss-pub.nais.io/pen
+      value: https://pensjon-pen.prod-fss-pub.nais.io/pen
     - name: PEN_API_ID
-      value: dev-fss.teampensjon.pensjon-pen-q2
+      value: prod-fss.teampensjon.pensjon-pen
     - name: OPPGAVE_URL
-      value: https://oppgave.dev-fss-pub.nais.io/api/v1/oppgaver
+      value: https://oppgave.prod-fss-pub.nais.io/api/v1/oppgaver
     - name: OPPGAVE_API_ID
-      value: dev-fss.oppgavehandtering.oppgave
+      value: prod-fss.oppgavehandtering.oppgave
     - name: POPP_URL
-      value: https://pensjon-popp-q2.dev-fss-pub.nais.io/popp/api
+      value: https://pensjon-popp.prod-fss-pub.nais.io/popp/api
     - name: POPP_API_ID
-      value: dev-fss.pensjonopptjening.pensjon-popp-q2
+      value: prod-fss.pensjonopptjening.pensjon-popp
   envFrom:
     - secret: unleash-api-token
   kafka:
-    pool: nav-dev
+    pool: nav-prod
   gcp:
     sqlInstances:
       - type: POSTGRES_14
@@ -48,10 +48,10 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: pdl-api.dev-fss-pub.nais.io
-        - host: pensjon-pen-q2.dev-fss-pub.nais.io
-        - host: oppgave.dev-fss-pub.nais.io
-        - host: pensjon-popp-q2.dev-fss-pub.nais.io
+        - host: pdl-api.prod-fss-pub.nais.io
+        - host: pensjon-pen.prod-fss-pub.nais.io
+        - host: oppgave.prod-fss-pub.nais.io
+        - host: pensjon-popp.prod-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
   image: {{ image }}
   liveness:

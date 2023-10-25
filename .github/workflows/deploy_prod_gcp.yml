@@ -1,4 +1,4 @@
-name: Bygg og deploy omsorgsopptjening-bestem-pensjonsopptjening til dev-gcp
+name: Bygg og deploy omsorgsopptjening-bestem-pensjonsopptjening til prod-gcp
 
 on:
   push:
@@ -47,11 +47,11 @@ jobs:
           docker push ${{ env.IMAGE }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # DEPLOYER dev-gcp
-      - name: 'Deploy omsorgsopptjening-bestem-pensjonsopptjening to dev-gcp'
+      # DEPLOYER prod-gcp
+      - name: 'Deploy omsorgsopptjening-bestem-pensjonsopptjening to prod-gcp'
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          RESOURCE: nais/dev-gcp.yml,nais/unleash-apitoken-dev-gcp.yml
-          CLUSTER: dev-gcp
+          RESOURCE: nais/prod-gcp.yml,nais/unleash-apitoken-prod-gcp.yml
+          CLUSTER: prod-gcp
           IMAGE: ${{ env.IMAGE_GHCR }}
