@@ -1,0 +1,1 @@
+alter table brev drop column kort_status;

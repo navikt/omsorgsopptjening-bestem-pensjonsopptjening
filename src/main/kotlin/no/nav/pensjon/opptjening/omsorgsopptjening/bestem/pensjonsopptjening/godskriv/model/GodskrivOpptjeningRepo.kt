@@ -32,12 +32,13 @@ class GodskrivOpptjeningRepo(
             keyHolder
         )
         jdbcTemplate.update(
-            """insert into godskriv_opptjening_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
+            """insert into godskriv_opptjening_status (id, status, statushistorikk,kort_status) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb),:kort_status)""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(godskrivOpptjening.status),
-                    "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList()
+                    "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
+                    "kort_status" to godskrivOpptjening.kortStatus.toString(),
                 ),
             ),
         )
@@ -46,12 +47,13 @@ class GodskrivOpptjeningRepo(
 
     fun updateStatus(godskrivOpptjening: GodskrivOpptjening.Persistent) {
         jdbcTemplate.update(
-            """update godskriv_opptjening_status set status = to_jsonb(:status::jsonb), statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
+            """update godskriv_opptjening_status set status = to_jsonb(:status::jsonb), statushistorikk = to_jsonb(:statushistorikk::jsonb),kort_status = :kort_status where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "id" to godskrivOpptjening.id,
                     "status" to serialize(godskrivOpptjening.status),
-                    "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList()
+                    "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
+                    "kort_status" to godskrivOpptjening.kortStatus.toString(),
                 ),
             ),
         )

@@ -14,6 +14,8 @@ sealed class PersongrunnlagMelding {
     abstract val opprettet: Instant?
     abstract val innhold: PersongrunnlagMeldingKafka
     abstract val statushistorikk: List<Status>
+    abstract val kortStatus: KortStatus
+
     val correlationId get() = innhold.correlationId
     val innlesingId get() = innhold.innlesingId
     val status: Status get() = statushistorikk.last()
@@ -24,20 +26,22 @@ sealed class PersongrunnlagMelding {
         override val id: UUID? = null
         override val opprettet: Instant? = null
         override val statushistorikk: List<Status> = listOf(Status.Klar())
+        override val kortStatus : KortStatus = KortStatus.LEST
     }
 
     data class Mottatt(
         override val id: UUID,
         override val opprettet: Instant,
         override val innhold: PersongrunnlagMeldingKafka,
-        override val statushistorikk: List<Status> = listOf(Status.Klar())
+        override val statushistorikk: List<Status> = listOf(Status.Klar()),
+        override val kortStatus: KortStatus = KortStatus.MOTTATT
     ) : PersongrunnlagMelding() {
         fun ferdig(): Mottatt {
-            return copy(statushistorikk = statushistorikk + status.ferdig())
+            return copy(statushistorikk = statushistorikk + status.ferdig(), kortStatus = KortStatus.FERDIG)
         }
 
         fun retry(melding: String): Mottatt {
-            return copy(statushistorikk = statushistorikk + status.retry(melding))
+            return copy(statushistorikk = statushistorikk + status.retry(melding), kortStatus = KortStatus.RETRY)
         }
 
         fun opprettOppgave(): Oppgave.Transient? {
@@ -125,6 +129,10 @@ sealed class PersongrunnlagMelding {
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
         ) : Status()
+    }
+
+    enum class KortStatus {
+        LEST, MOTTATT, KLAR, RETRY, FEILET, FERDIG
     }
 }
 

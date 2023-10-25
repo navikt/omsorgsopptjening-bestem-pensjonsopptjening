@@ -35,12 +35,13 @@ class PersongrunnlagRepo(
             keyHolder
         )
         jdbcTemplate.update(
-            """insert into melding_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
+            """insert into melding_status (id, status, statushistorikk, kort_status) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb),:kort_status)""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(melding.status),
-                    "statushistorikk" to melding.statushistorikk.serializeList()
+                    "statushistorikk" to melding.statushistorikk.serializeList(),
+                    "kort_status" to melding.kortStatus.toString(),
                 ),
             ),
         )
