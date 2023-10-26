@@ -20,6 +20,9 @@ class OmsorgsarbeidProcessingMetricsMåling(registry: MeterRegistry):
     private val omsorgsmottakerOppfyllerAlderskravForHjelpestønad = registry.counter("avslag", "antall", "OmsorgsmottakerOppfyllerAlderskravForHjelpestønad")
     private val omsorgsmottakerOppfyllerAlderskravForBarnetrygd = registry.counter("avslag", "antall", "OmsorgsmottakerOppfyllerAlderskravForBarnetrygd")
     private val omsorgsyterOppfyllerAlderskrav = registry.counter("avslag", "antall", "OmsorgsyterOppfyllerAlderskrav")
+    private val omsorgsyterErMedlemAvFolketrygden = registry.counter("avslag", "antall", "OmsorgsyterErMedlemAvFolketrygden")
+    private val omsorgsyterMottarBarnetrygd = registry.counter("avslag", "antall", "OmsorgsyterMottarBarnetrgyd")
+    private val omsorgsyterHarGyldigOmsorgsarbeid = registry.counter("avslag", "antall", "OmsorgsyterHarGyldigOmsorgsarbeid")
     override fun mål(lambda: () -> List<FullførtBehandling>): List<FullførtBehandling> {
         val fullførteBehandlinger = omsorgsarbeidProsessertTidsbruk.recordCallable(lambda)
         
@@ -43,9 +46,9 @@ class OmsorgsarbeidProcessingMetricsMåling(registry: MeterRegistry):
                 is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> omsorgsmottakerOppfyllerAlderskravForHjelpestønad.increment()
                 is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> omsorgsmottakerOppfyllerAlderskravForBarnetrygd.increment()
                 is OmsorgsyterOppfyllerAlderskrav.Vurdering -> omsorgsyterOppfyllerAlderskrav.increment()
-                is OmsorgsyterErMedlemAvFolketrygden.Vurdering -> TODO()
-                is OmsorgsyterMottarBarnetrgyd.Vurdering -> TODO()
-                is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> TODO()
+                is OmsorgsyterErMedlemAvFolketrygden.Vurdering -> omsorgsyterErMedlemAvFolketrygden.increment()
+                is OmsorgsyterMottarBarnetrgyd.Vurdering -> omsorgsyterMottarBarnetrygd.increment()
+                is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> omsorgsyterHarGyldigOmsorgsarbeid.increment()
             }
         }
         avslag.increment()
