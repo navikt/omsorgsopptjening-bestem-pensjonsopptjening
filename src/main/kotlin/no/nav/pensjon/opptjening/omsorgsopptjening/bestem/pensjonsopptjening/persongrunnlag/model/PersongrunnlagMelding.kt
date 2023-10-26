@@ -12,7 +12,7 @@ import java.util.UUID
 
 sealed class PersongrunnlagMelding {
     abstract val id: UUID?
-    abstract val opprettet: Instant?
+    abstract val opprettet: Instant
     abstract val innhold: PersongrunnlagMeldingKafka
     abstract val statushistorikk: List<Status>
 
@@ -74,7 +74,7 @@ sealed class PersongrunnlagMelding {
 
         @JsonTypeName("Klar")
         data class Klar(
-            val tidspunkt: Instant = Instant.now()
+            val tidspunkt: Instant = now()
         ) : Status() {
             override fun ferdig(): Ferdig {
                 return Ferdig()

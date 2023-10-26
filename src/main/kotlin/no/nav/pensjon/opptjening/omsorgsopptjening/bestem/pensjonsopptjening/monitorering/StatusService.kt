@@ -38,15 +38,12 @@ class StatusService(
     }
 
     fun meldingErForGammel(persongrunnlagMelding: PersongrunnlagMelding) : Boolean {
-        val opprettet: Instant = persongrunnlagMelding.opprettet!! // not null i databasen, så vil alltid ha en verdi
-        println("XXXY: $opprettet")
+        val opprettet: Instant = persongrunnlagMelding.opprettet
         return opprettet < now().minus(400.days.toJavaDuration())
     }
 
     fun feiledeMeldinger() : Boolean {
-        // melding.id = melding_status.id && melding_status = FEILET
-        persongrunnlagRepo.antallMedStatus(PersongrunnlagMelding.Status.Feilet::class)
-        return false;
+        return persongrunnlagRepo.antallMedStatus(PersongrunnlagMelding.Status.Feilet::class) > 0
     }
 
     fun ubehandledeMeldinger() : Boolean {

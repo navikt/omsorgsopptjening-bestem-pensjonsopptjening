@@ -45,7 +45,6 @@ sealed class GodskrivOpptjening {
         }
 
         fun retry(melding: String): Persistent {
-            // TODO: status kan være feilet
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 

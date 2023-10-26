@@ -93,7 +93,7 @@ object StatusServiceTest {
         val melding = personGrunnlagMelding(now().minus(700.days.toJavaDuration()))
         val mottatt = personGrunnlagRepo.persist(melding)
         val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Ingen meldinger"))
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Siste melding er for gammel"))
     }
 
     @Test
@@ -101,9 +101,12 @@ object StatusServiceTest {
     fun testMeldingFeilet() {
         val melding = personGrunnlagMelding(now().minus(300.days.toJavaDuration()))
         val mottatt = personGrunnlagRepo.persist(melding)
-        mottatt.status.retry("1").retry("2").retry("3").retry("feil");
-        personGrunnlagRepo.updateStatus(mottatt)
+        val mottatt1 = mottatt.copy(statushistorikk = mottatt.statushistorikk + mottatt.status.retry("1"))
+        val mottatt2 = mottatt1.copy(statushistorikk = mottatt1.statushistorikk + mottatt1.status.retry("2"))
+        val mottatt3 = mottatt2.copy(statushistorikk = mottatt2.statushistorikk + mottatt2.status.retry("3"))
+        val feilet = mottatt3.copy(statushistorikk = mottatt3.statushistorikk + mottatt3.status.retry("feilet"))
+        personGrunnlagRepo.updateStatus(feilet)
         val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Ingen meldinger"))
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes feilede persongrunnlagmeldinger"))
     }
 }
