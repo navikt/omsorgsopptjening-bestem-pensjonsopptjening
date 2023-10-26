@@ -13,10 +13,3 @@ fun Kilde.toDomain(): DomainKilde {
         Kilde.INFOTRYGD -> DomainKilde.INFOTRYGD
     }
 }
-
-fun DomainKilde.toKafka(): Kilde {
-    return when(this){
-        DomainKilde.BARNETRYGD -> Kilde.BARNETRYGD
-        DomainKilde.INFOTRYGD -> Kilde.INFOTRYGD
-    }
-}

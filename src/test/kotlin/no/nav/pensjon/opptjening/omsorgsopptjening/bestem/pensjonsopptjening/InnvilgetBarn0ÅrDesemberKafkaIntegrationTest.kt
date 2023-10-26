@@ -6,7 +6,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -91,14 +90,12 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
             omsorgsyter = "12345678910",
             omsorgsÅr = 2020,
             omsorgstype = DomainOmsorgstype.BARNETRYGD,
-            kilde = DomainKilde.BARNETRYGD,
             omsorgsmottaker = "01122012345"
         )
         verify(godskrivOpptjeningClient).godskriv(
             omsorgsyter = "12345678910",
             omsorgsÅr = 2021,
             omsorgstype = DomainOmsorgstype.BARNETRYGD,
-            kilde = DomainKilde.BARNETRYGD,
             omsorgsmottaker = "01122012345"
         )
     }

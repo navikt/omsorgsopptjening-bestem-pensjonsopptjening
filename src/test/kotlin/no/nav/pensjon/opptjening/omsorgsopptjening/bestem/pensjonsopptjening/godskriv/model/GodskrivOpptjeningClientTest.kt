@@ -11,7 +11,6 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClientExecption
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -53,7 +52,6 @@ class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
                         omsorgsyter = "elaboraret",
                         omsorgsÅr = 6669,
                         omsorgstype = DomainOmsorgstype.BARNETRYGD,
-                        kilde = DomainKilde.BARNETRYGD,
                         omsorgsmottaker = "nunc"
                     )
                 }.also {
@@ -90,7 +88,6 @@ class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
                         omsorgsyter = "elaboraret",
                         omsorgsÅr = 6669,
                         omsorgstype = DomainOmsorgstype.BARNETRYGD,
-                        kilde = DomainKilde.BARNETRYGD,
                         omsorgsmottaker = "nunc"
                     )
                 }.also {
@@ -123,7 +120,7 @@ class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
                                         "fnr":"elaboraret",
                                         "ar":6669,
                                         "omsorgType":"OBU6",
-                                        "kilde":"BA",
+                                        "kilde":"OMSORGSOPPTJENING",
                                         "fnrOmsorgFor":"nunc"
                                     }
                                 }
@@ -138,7 +135,6 @@ class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
                         omsorgsyter = "elaboraret",
                         omsorgsÅr = 6669,
                         omsorgstype = DomainOmsorgstype.BARNETRYGD,
-                        kilde = DomainKilde.BARNETRYGD,
                         omsorgsmottaker = "nunc"
                     )
                 )

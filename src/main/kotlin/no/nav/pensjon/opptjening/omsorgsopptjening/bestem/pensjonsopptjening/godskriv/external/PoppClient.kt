@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClientException
@@ -34,7 +33,6 @@ internal class PoppClient(
         omsorgsyter: String,
         omsorgsÅr: Int,
         omsorgstype: DomainOmsorgstype,
-        kilde: DomainKilde,
         omsorgsmottaker: String
     ) {
         val requestBody = serialize(
@@ -43,7 +41,7 @@ internal class PoppClient(
                     fnr = omsorgsyter,
                     ar = omsorgsÅr,
                     omsorgType = PoppOmsorgType.from(omsorgstype),
-                    kilde = PoppKilde.from(kilde),
+                    kilde = PoppKilde.OMSORGSOPPTJENING,
                     fnrOmsorgFor = omsorgsmottaker
                 )
             )
@@ -194,23 +192,9 @@ private data class Omsorg(
 
 private enum class PoppKilde {
     /**
-     * Infotrygd
+     * Denne applikasjonen
      */
-    IT,
-
-    /**
-     * Barnetrygd Systemet
-     */
-    BA;
-
-    companion object {
-        fun from(domainKilde: DomainKilde): PoppKilde {
-            return when (domainKilde) {
-                DomainKilde.BARNETRYGD -> BA
-                DomainKilde.INFOTRYGD -> IT
-            }
-        }
-    }
+    OMSORGSOPPTJENING;
 }
 
 private enum class PoppOmsorgType {
