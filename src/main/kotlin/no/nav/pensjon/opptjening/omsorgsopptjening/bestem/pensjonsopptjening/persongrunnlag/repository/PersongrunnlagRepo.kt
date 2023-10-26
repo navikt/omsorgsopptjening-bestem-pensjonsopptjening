@@ -14,6 +14,7 @@ import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
+import kotlin.reflect.KClass
 
 @Component
 class PersongrunnlagRepo(
@@ -24,24 +25,24 @@ class PersongrunnlagRepo(
     fun persist(melding: PersongrunnlagMelding.Lest): PersongrunnlagMelding.Mottatt {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into melding (melding, correlation_id, innlesing_id) values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id)""",
+            """insert into melding (melding, correlation_id, innlesing_id, opprettet) values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz)""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "melding" to serialize(melding.innhold),
                     "correlation_id" to melding.correlationId.toString(),
                     "innlesing_id" to melding.innlesingId.toString(),
+                    "opprettet" to melding.opprettet.toString(),
                 ),
             ),
             keyHolder
         )
         jdbcTemplate.update(
-            """insert into melding_status (id, status, statushistorikk, kort_status) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb),:kort_status)""",
+            """insert into melding_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(melding.status),
                     "statushistorikk" to melding.statushistorikk.serializeList(),
-                    "kort_status" to melding.kortStatus.toString(),
                 ),
             ),
         )
@@ -84,6 +85,26 @@ class PersongrunnlagRepo(
             ),
             PersongrunnlagMeldingMapper()
         ).singleOrNull()
+    }
+
+    fun finnSiste() : PersongrunnlagMelding? {
+        return jdbcTemplate.query(
+            """select m.*, ms.statushistorikk from melding m, melding_status ms
+                |where m.id = ms.id order by m.opprettet desc limit 1""".trimMargin(),
+            PersongrunnlagMeldingMapper()
+        ).singleOrNull()
+    }
+
+    fun antallMedStatus(kclass: KClass<*>) : Long {
+        val name = kclass.simpleName!!
+        println("XXXX: $name")
+        return jdbcTemplate.queryForObject(
+            """select count(*) from melding_status where (status->>'type' = :type)""",
+            mapOf(
+                "type" to name
+            ),
+            Long::class.java
+        )!!
     }
 
     internal class PersongrunnlagMeldingMapper : RowMapper<PersongrunnlagMelding.Mottatt> {

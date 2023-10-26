@@ -1,1 +1,0 @@
-alter table brev_status add column kort_status varchar(10) not null;

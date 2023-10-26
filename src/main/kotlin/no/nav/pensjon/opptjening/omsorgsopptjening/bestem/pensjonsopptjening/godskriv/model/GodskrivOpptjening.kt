@@ -13,7 +13,6 @@ import java.util.UUID
 sealed class GodskrivOpptjening {
     abstract val behandlingId: UUID
     abstract val statushistorikk: List<Status>
-    abstract val kortStatus: KortStatus
 
     companion object {
         const val OMSORGSPOENG_GODSKRIVES = 3.5
@@ -28,7 +27,6 @@ sealed class GodskrivOpptjening {
         override val behandlingId: UUID,
     ) : GodskrivOpptjening() {
         override val statushistorikk: List<Status> = listOf(Status.Klar())
-        override val kortStatus = KortStatus.KLAR
     }
 
     data class Persistent(
@@ -40,16 +38,15 @@ sealed class GodskrivOpptjening {
         val innlesingId: InnlesingId,
         override val behandlingId: UUID,
         override val statushistorikk: List<Status> = listOf(Status.Klar()),
-        override val kortStatus : KortStatus = KortStatus.KLAR,
     ) : GodskrivOpptjening() {
 
         fun ferdig(): Persistent {
-            return copy(statushistorikk = statushistorikk + status.ferdig(), kortStatus = KortStatus.FERDIG)
+            return copy(statushistorikk = statushistorikk + status.ferdig())
         }
 
         fun retry(melding: String): Persistent {
             // TODO: status kan være feilet
-            return copy(statushistorikk = statushistorikk + status.retry(melding), kortStatus = KortStatus.RETRY)
+            return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 
         fun opprettOppgave(): Oppgave.Transient? {
@@ -137,8 +134,5 @@ sealed class GodskrivOpptjening {
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
         ) : Status()
-    }
-    enum class KortStatus {
-        KLAR, FERDIG, RETRY, FEILET
     }
 }

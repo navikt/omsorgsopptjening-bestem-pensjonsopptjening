@@ -37,13 +37,12 @@ class OppgaveRepo(
             keyHolder
         )
         jdbcTemplate.update(
-            """insert into oppgave_status (id, status, statushistorikk,kort_status) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb),:kort_status)""",
+            """insert into oppgave_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(oppgave.status),
                     "statushistorikk" to oppgave.statushistorikk.serializeList(),
-                    "kort_status" to oppgave.kortStatus.toString(),
                 ),
             ),
         )

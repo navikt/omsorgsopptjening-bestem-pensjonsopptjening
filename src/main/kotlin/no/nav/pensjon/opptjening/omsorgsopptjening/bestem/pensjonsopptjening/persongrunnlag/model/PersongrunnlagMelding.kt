@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import java.time.Instant
+import java.time.Instant.now
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
@@ -14,19 +15,17 @@ sealed class PersongrunnlagMelding {
     abstract val opprettet: Instant?
     abstract val innhold: PersongrunnlagMeldingKafka
     abstract val statushistorikk: List<Status>
-    abstract val kortStatus: KortStatus
 
     val correlationId get() = innhold.correlationId
     val innlesingId get() = innhold.innlesingId
     val status: Status get() = statushistorikk.last()
 
     data class Lest(
-        override val innhold: PersongrunnlagMeldingKafka
+        override val innhold: PersongrunnlagMeldingKafka,
+        override val opprettet: Instant = now()
     ) : PersongrunnlagMelding() {
         override val id: UUID? = null
-        override val opprettet: Instant? = null
         override val statushistorikk: List<Status> = listOf(Status.Klar())
-        override val kortStatus : KortStatus = KortStatus.LEST
     }
 
     data class Mottatt(
@@ -34,14 +33,13 @@ sealed class PersongrunnlagMelding {
         override val opprettet: Instant,
         override val innhold: PersongrunnlagMeldingKafka,
         override val statushistorikk: List<Status> = listOf(Status.Klar()),
-        override val kortStatus: KortStatus = KortStatus.MOTTATT
     ) : PersongrunnlagMelding() {
         fun ferdig(): Mottatt {
-            return copy(statushistorikk = statushistorikk + status.ferdig(), kortStatus = KortStatus.FERDIG)
+            return copy(statushistorikk = statushistorikk + status.ferdig())
         }
 
         fun retry(melding: String): Mottatt {
-            return copy(statushistorikk = statushistorikk + status.retry(melding), kortStatus = KortStatus.RETRY)
+            return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 
         fun opprettOppgave(): Oppgave.Transient? {
@@ -129,10 +127,6 @@ sealed class PersongrunnlagMelding {
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
         ) : Status()
-    }
-
-    enum class KortStatus {
-        LEST, MOTTATT, KLAR, RETRY, FEILET, FERDIG
     }
 }
 

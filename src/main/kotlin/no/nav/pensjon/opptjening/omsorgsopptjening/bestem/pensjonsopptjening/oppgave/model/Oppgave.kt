@@ -13,7 +13,6 @@ sealed class Oppgave {
     abstract val behandlingId: UUID? //kan være null dersom alt feiler fra start
     abstract val meldingId: UUID
     abstract val statushistorikk: List<Status>
-    abstract val kortStatus : KortStatus
 
     val status get() = statushistorikk.last()
     val mottaker get() = detaljer.mottaker()
@@ -28,7 +27,6 @@ sealed class Oppgave {
         override val meldingId: UUID,
     ) : Oppgave() {
         override val statushistorikk: List<Status> = listOf(Status.Klar())
-        override val kortStatus : KortStatus = KortStatus.KLAR
     }
 
     data class Persistent(
@@ -40,14 +38,13 @@ sealed class Oppgave {
         override val behandlingId: UUID?, //kan være vi feiler før vi får behandlet
         override val meldingId: UUID,
         override val statushistorikk: List<Status> = listOf(Status.Klar()),
-        override val kortStatus: KortStatus = KortStatus.KLAR,
     ) : Oppgave() {
         fun ferdig(oppgaveId: String): Persistent {
-            return copy(statushistorikk = statushistorikk + status.ferdig(oppgaveId), kortStatus = KortStatus.FERDIG)
+            return copy(statushistorikk = statushistorikk + status.ferdig(oppgaveId))
         }
 
         fun retry(melding: String): Persistent {
-            return copy(statushistorikk = statushistorikk + status.retry(melding), kortStatus = KortStatus.RETRY)
+            return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
     }
 
@@ -122,9 +119,5 @@ sealed class Oppgave {
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
         ) : Status()
-    }
-
-    enum class KortStatus {
-        KLAR, FERDIG, RETRY, FEILET
     }
 }
