@@ -16,12 +16,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.*
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import java.lang.RuntimeException
 import java.time.Instant
 import java.time.Instant.now
 import java.time.Month
 import java.time.YearMonth
-import java.util.*
+import javax.sql.DataSource
 import kotlin.time.Duration.Companion.days
 import kotlin.time.toJavaDuration
 
@@ -33,10 +32,11 @@ object StatusServiceTest {
     private lateinit var personGrunnlagRepo: PersongrunnlagRepo
     private lateinit var behandlingRepo: BehandlingRepo
     private lateinit var statusService: StatusService
+    private lateinit var dataSource : DataSource
 
     @BeforeAll
     fun beforeAll() {
-        val dataSource = PostgresqlTestContainer.createInstance("test-status")
+        dataSource = PostgresqlTestContainer.createInstance("test-status")
         val flyway =
             Flyway.configure()
                 .dataSource(dataSource)
@@ -48,6 +48,11 @@ object StatusServiceTest {
         personGrunnlagRepo = PersongrunnlagRepo(NamedParameterJdbcTemplate(dataSource))
         behandlingRepo = BehandlingRepo(NamedParameterJdbcTemplate(dataSource))
         statusService = StatusService(oppgaveRepo, behandlingRepo, personGrunnlagRepo)
+    }
+
+    @BeforeEach
+    fun beforeEach() {
+        PostgresqlTestContainer.removeDataFromDB(dataSource)
     }
 
     private fun personGrunnlagMelding(opprettet: Instant): PersongrunnlagMelding.Lest {
@@ -79,7 +84,6 @@ object StatusServiceTest {
         )
     }
 
-
     @Test
     @Order(1)
     fun testIngenPersonStatusMeldinger() {
@@ -108,5 +112,14 @@ object StatusServiceTest {
         personGrunnlagRepo.updateStatus(feilet)
         val status = statusService.checkStatus()
         assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes feilede persongrunnlagmeldinger"))
+    }
+
+    @Test
+    @Order(3)
+    fun testGammelMeldingIkkeFerdig() {
+        val melding = personGrunnlagMelding(now().minus(5.days.toJavaDuration()))
+        val mottatt = personGrunnlagRepo.persist(melding)
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle meldinger som ikke er ferdig behandlet"))
     }
 }

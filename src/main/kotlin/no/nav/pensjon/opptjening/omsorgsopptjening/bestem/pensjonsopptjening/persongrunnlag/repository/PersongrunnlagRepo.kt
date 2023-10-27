@@ -95,6 +95,32 @@ class PersongrunnlagRepo(
         ).singleOrNull()
     }
 
+    fun finnEldsteMedStatus(kclass: KClass<*>) : PersongrunnlagMelding? {
+        val name = kclass.simpleName!!
+        return jdbcTemplate.query(
+            """select m.*, ms.statushistorikk from melding m, melding_status ms
+                |where m.id = ms.id and (status->>'type' = :type) 
+                |order by m.opprettet asc limit 1""".trimMargin(),
+            mapOf(
+                "type" to name
+            ),
+            PersongrunnlagMeldingMapper()
+        ).singleOrNull()
+    }
+
+    fun finnEldsteSomIkkeErFerdig() : PersongrunnlagMelding? {
+        val name = PersongrunnlagMelding.Status.Ferdig::class.simpleName!!
+        return jdbcTemplate.query(
+            """select m.*, ms.statushistorikk from melding m, melding_status ms
+                |where m.id = ms.id and (status->>'type' <> :type) 
+                |order by m.opprettet asc limit 1""".trimMargin(),
+            mapOf(
+                "type" to name
+            ),
+            PersongrunnlagMeldingMapper()
+        ).singleOrNull()
+    }
+
     fun antallMedStatus(kclass: KClass<*>) : Long {
         val name = kclass.simpleName!!
         println("XXXX: $name")

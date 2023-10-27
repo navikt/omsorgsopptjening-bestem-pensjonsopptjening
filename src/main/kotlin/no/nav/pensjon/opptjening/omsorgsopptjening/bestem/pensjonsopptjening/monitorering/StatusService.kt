@@ -24,6 +24,8 @@ class StatusService(
     fun checkStatus(): ApplicationStatus {
 
         val sisteMelding = persongrunnlagRepo.finnSiste()
+        val eldsteUbehandlede : PersongrunnlagMelding? = persongrunnlagRepo.finnEldsteSomIkkeErFerdig()
+
         if (sisteMelding == null) {
             return ApplicationStatus.Feil("Ingen meldinger")
         } else {
@@ -32,6 +34,9 @@ class StatusService(
             }
             if (feiledeMeldinger()) {
                 return ApplicationStatus.Feil("Det finnes feilede persongrunnlagmeldinger")
+            }
+            if (forGammelSomIkkeErFerdig(eldsteUbehandlede)) {
+                return ApplicationStatus.Feil("Det finnes gamle meldinger som ikke er ferdig behandlet")
             }
         }
         return ApplicationStatus.Feil("ikke implementert")
@@ -46,9 +51,9 @@ class StatusService(
         return persongrunnlagRepo.antallMedStatus(PersongrunnlagMelding.Status.Feilet::class) > 0
     }
 
-    fun ubehandledeMeldinger() : Boolean {
-        // melding.id = melding_status.id && melding.timestamp < 2 dager && melding.status != FERDIG
-        return false;
+    fun forGammelSomIkkeErFerdig(persongrunnlagMelding: PersongrunnlagMelding?) : Boolean {
+        return persongrunnlagMelding != null
+                && persongrunnlagMelding.opprettet < now().minus(2.days.toJavaDuration())
     }
 
     // behandling:

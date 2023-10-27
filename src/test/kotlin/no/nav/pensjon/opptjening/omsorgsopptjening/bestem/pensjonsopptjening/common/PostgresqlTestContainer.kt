@@ -23,24 +23,9 @@ class PostgresqlTestContainer private constructor(image: String) : PostgreSQLCon
     }
 
     fun removeDataFromDB() {
-
-        dataSource.connection.apply {
-            createStatement().execute(
-                """           
-                        DELETE FROM BREV_STATUS;
-                        DELETE FROM BREV;
-                        DELETE FROM GODSKRIV_OPPTJENING_STATUS;   
-                        DELETE FROM GODSKRIV_OPPTJENING;
-                        DELETE FROM OPPGAVE_STATUS;
-                        DELETE FROM OPPGAVE;
-                        DELETE FROM BEHANDLING;
-                        DELETE FROM MELDING_STATUS;
-                        DELETE FROM MELDING;
-                    """
-            )
-            close()
-        }
+        removeDataFromDB(dataSource)
     }
+
 
     companion object {
         val instance: PostgresqlTestContainer = PostgresqlTestContainer("postgres:14.7-alpine")
@@ -59,5 +44,23 @@ class PostgresqlTestContainer private constructor(image: String) : PostgreSQLCon
             return dataSource
         }
 
+        fun removeDataFromDB(dataSource: DataSource) {
+            dataSource.connection.apply {
+                createStatement().execute(
+                    """           
+                        DELETE FROM BREV_STATUS;
+                        DELETE FROM BREV;
+                        DELETE FROM GODSKRIV_OPPTJENING_STATUS;   
+                        DELETE FROM GODSKRIV_OPPTJENING;
+                        DELETE FROM OPPGAVE_STATUS;
+                        DELETE FROM OPPGAVE;
+                        DELETE FROM BEHANDLING;
+                        DELETE FROM MELDING_STATUS;
+                        DELETE FROM MELDING;
+                    """
+                )
+                close()
+            }
+        }
     }
 }
