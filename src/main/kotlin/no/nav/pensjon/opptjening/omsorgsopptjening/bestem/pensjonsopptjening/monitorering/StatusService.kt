@@ -38,6 +38,9 @@ class StatusService(
             if (forGammelSomIkkeErFerdig(eldsteUbehandlede)) {
                 return ApplicationStatus.Feil("Det finnes gamle meldinger som ikke er ferdig behandlet")
             }
+            if (gamleOppgaverSomIkkeErFerdig()) {
+                return ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet")
+            }
         }
         return ApplicationStatus.Feil("ikke implementert")
     }
@@ -69,11 +72,10 @@ class StatusService(
         return false;
     }
 
-    fun ubehandledeOppgaver() : Boolean {
-        // oppgave.opprettet < 2 måneder?
-        // oppgave.id = oppgave_status.id
-        // oppgave_status.kort_status != FERDIG
-        return false
+    fun gamleOppgaverSomIkkeErFerdig() : Boolean {
+        var oppgave = oppgaveRepo.finnEldsteUbehandledeOppgave()
+        println("OPPGAVE: $oppgave")
+        return (oppgave != null && oppgave.opprettet < now().minus(60.days.toJavaDuration()))
     }
 
     fun ubehandledGodskrivOpptjening() : Boolean {
@@ -81,10 +83,7 @@ class StatusService(
         // godskriv_opptjening.opprettet < 1 uke?
         return false;
     }
-
 }
-
-
 
 sealed class ApplicationStatus {
     data object OK : ApplicationStatus()

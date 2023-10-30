@@ -1,12 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.*
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -16,7 +11,7 @@ import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 @Component
 class OppgaveRepo(
@@ -129,8 +124,38 @@ class OppgaveRepo(
         ).singleOrNull()
     }
 
+    fun finnEldsteUbehandledeOppgave(): Oppgave.Persistent? {
+        return jdbcTemplate.query(
+            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id 
+            |from oppgave o, oppgave_status os, melding m
+            |where o.id = os.id and m.id = o.meldingId
+            |order by o.opprettet asc limit 1""".trimMargin(),
+//            |and (os.status->>'type' <> :ferdig) order by o.opprettet asc limit 1""".trimMargin(),
+            mapOf(
+                "ferdig" to Oppgave.Status.Ferdig::class.simpleName
+            ), OppgaveMapper()
+        ).singleOrNull()
+    }
+
+    fun finnOppgaverIForLangKarantene(): Oppgave? {
+        return jdbcTemplate.query(
+            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id 
+            |from oppgave o, oppgave_status os, melding m
+            |where o.id = os.id and m.id = o.meldingId
+            |and (os.status->>'type' <> :karanteneTil) order by o.opprettet asc limit 1""".trimMargin(),
+            mapOf(
+                "ferdig" to Instant.now(clock).toString()
+            ), OppgaveMapper()
+        ).singleOrNull()
+    }
+
+
     internal class OppgaveMapper : RowMapper<Oppgave.Persistent> {
+
         override fun mapRow(rs: ResultSet, rowNum: Int): Oppgave.Persistent {
+
+            println("*** Deserialize oppgave: ${rs.getString("statushistorikk")}")
+
             return Oppgave.Persistent(
                 id = UUID.fromString(rs.getString("id")),
                 opprettet = rs.getTimestamp("opprettet").toInstant(),
