@@ -24,6 +24,7 @@ internal class PersonOppslagTest : SpringContextTest.NoKafka() {
     companion object {
         const val FNR = "11111111111"
 
+        @JvmField
         @RegisterExtension
         val wiremock = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))

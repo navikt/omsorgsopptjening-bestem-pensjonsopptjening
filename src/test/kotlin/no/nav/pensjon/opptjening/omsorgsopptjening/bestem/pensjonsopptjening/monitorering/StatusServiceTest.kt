@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.mo
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
@@ -32,6 +31,8 @@ import kotlin.time.toJavaDuration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 object StatusServiceTest {
 
+    inline val Int.daysAgo get() = now().minus(this.days.toJavaDuration())
+
     private lateinit var oppgaveRepo: OppgaveRepo
     private lateinit var personGrunnlagRepo: PersongrunnlagRepo
     private lateinit var behandlingRepo: BehandlingRepo
@@ -39,6 +40,7 @@ object StatusServiceTest {
 
     private lateinit var statusService: StatusService
     private lateinit var dataSource: DataSource
+    private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
 
     @BeforeAll
     fun beforeAll() {
@@ -50,7 +52,7 @@ object StatusServiceTest {
                 .load()
         flyway.migrate()
 
-        val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+        jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
         oppgaveRepo = OppgaveRepo(jdbcTemplate)
         personGrunnlagRepo = PersongrunnlagRepo(jdbcTemplate)
         behandlingRepo = BehandlingRepo(jdbcTemplate)
@@ -101,7 +103,7 @@ object StatusServiceTest {
     @Test
     @Order(2)
     fun testForGammeMelding() {
-        val melding = personGrunnlagMelding(now().minus(700.days.toJavaDuration()))
+        val melding = personGrunnlagMelding(700.daysAgo)
         val mottatt = personGrunnlagRepo.persist(melding)
         val status = statusService.checkStatus()
         assertThat(status).isEqualTo(ApplicationStatus.Feil("Siste melding er for gammel"))
@@ -110,25 +112,29 @@ object StatusServiceTest {
     @Test
     @Order(3)
     fun testMeldingFeilet() {
-        val melding = personGrunnlagMelding(now().minus(300.days.toJavaDuration()))
-        val mottatt = personGrunnlagRepo.persist(melding)
-        val mottatt1 = mottatt.copy(statushistorikk = mottatt.statushistorikk + mottatt.status.retry("1"))
-        val mottatt2 = mottatt1.copy(statushistorikk = mottatt1.statushistorikk + mottatt1.status.retry("2"))
-        val mottatt3 = mottatt2.copy(statushistorikk = mottatt2.statushistorikk + mottatt2.status.retry("3"))
-        val feilet = mottatt3.copy(statushistorikk = mottatt3.statushistorikk + mottatt3.status.retry("feilet"))
+        val mottatt = lagOgLagreMelding(opprettet = 300.daysAgo)
+        val feilet = endreStatusTilFeilet(mottatt)
         personGrunnlagRepo.updateStatus(feilet)
-        println("::::1")
-        NamedParameterJdbcTemplate(dataSource).queryForList("select * from melding_status", emptyMap<String,Any>()).forEach {println(it)}
-        println("::::2")
         val status = statusService.checkStatus()
         assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes feilede persongrunnlagmeldinger"))
+    }
+
+    private fun lagOgLagreMelding(opprettet: Instant = now()): PersongrunnlagMelding.Mottatt {
+        val melding = personGrunnlagMelding(opprettet)
+        return personGrunnlagRepo.persist(melding)
+    }
+
+    private fun endreStatusTilFeilet(mottatt: PersongrunnlagMelding.Mottatt): PersongrunnlagMelding.Mottatt {
+        fun retry(mottatt: PersongrunnlagMelding.Mottatt): PersongrunnlagMelding.Mottatt {
+            return mottatt.copy(statushistorikk = mottatt.statushistorikk + mottatt.status.retry("mock"))
+        }
+        return retry(retry(retry(retry(mottatt))))
     }
 
     @Test
     @Order(3)
     fun testGammelMeldingIkkeFerdig() {
-        val melding = personGrunnlagMelding(now().minus(5.days.toJavaDuration()))
-        val mottatt = personGrunnlagRepo.persist(melding)
+        lagOgLagreMelding(5.daysAgo)
         val status = statusService.checkStatus()
         assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle meldinger som ikke er ferdig behandlet"))
     }
@@ -143,76 +149,114 @@ object StatusServiceTest {
 
         val uuid1 = UUID.randomUUID()
 
-        jdbcTemplate.update(
-            """insert into behandling (id, opprettet, omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag,vilkarsvurdering, utfall, kafkaMeldingId) 
-                |values (:id, (:opprettet)::timestamptz, :omsorgs_ar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, cast (:grunnlag as json), cast (:vilkarsvurdering as json), cast (:utfall as json), :kafkaMeldingId)""".trimMargin(),
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to uuid1,
-                    "opprettet" to now().toString(),
-                    "omsorgs_ar" to 1337,
-                    "omsorgsyter" to "x",
-                    "omsorgsmottaker" to "x",
-                    "omsorgstype" to "x",
-                    "grunnlag" to "{}",
-                    "vilkarsvurdering" to "{}",
-                    "utfall" to "{}",
-                    "kafkaMeldingId" to mottatt.id,
-                ),
-            ),
-        )
+        lagreDummyBehandling(uuid1, mottatt)
+        lagreDummyOppgave(uuid1, mottatt)
 
+        lagreDummyOppgaveStatus(jdbcTemplate, uuid1)
 
+        printDatabaseContent(jdbcTemplate)
+
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet"))
+    }
+
+    private fun lagreDummyOppgave(
+        uuid1: UUID,
+        mottatt: PersongrunnlagMelding.Mottatt
+    ) {
         jdbcTemplate.update(
             """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer) values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json) )""",
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to uuid1,
                     "behandlingId" to uuid1,
-                    "opprettet" to now().minus(200.days.toJavaDuration()).toString(),
+                    "opprettet" to 200.daysAgo.toString(),
                     "meldingId" to mottatt.id,
                     "detaljer" to """{"type":"UspesifisertFeilsituasjon", "omsorgsyter":"12345123451"}"""
                 ),
             ),
         )
-
-        jdbcTemplate.update(
-            """insert into oppgave_status (id, status, statushistorikk) 
-                |values (:id, cast(:status as json), cast (:statushistorikk as json))""".trimMargin(),
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to uuid1,
-                    "status" to """{"type": "Klar"}""",
-                    "statushistorikk" to """[{"type": "Klar", "tidspunkt": "2023-10-30T08:46:19.690871Z"}]"""
-                ),
-            ),
-        )
-
-        jdbcTemplate.queryForList("select * from melding", emptyMap<String,Any>()).forEach {println(it)}
-        jdbcTemplate.queryForList("select * from oppgave", emptyMap<String,Any>()).forEach {println(it)}
-        jdbcTemplate.queryForList("select * from oppgave_status", emptyMap<String,Any>()).forEach {println(it)}
-
-        val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet"))
     }
 
 
     @Test
     @Order(4)
     fun testGammelGodskrivingIkkeFerdig() {
-        val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+        val uuid1 = UUID.randomUUID()
 
         val melding = personGrunnlagMelding(now())
         val mottatt = personGrunnlagRepo.persist(melding)
 
-        val uuid1 = UUID.randomUUID()
+        lagreDummyBehandling(uuid1, mottatt)
 
+        lagreOppgave(uuid1, mottatt)
+
+        lagreDummyOppgaveStatus(jdbcTemplate, uuid1)
+        lagreGodskrivOpptjening(uuid1)
+        lagreGodskrivOpptjeningStatus(uuid1)
+
+        printDatabaseContent(jdbcTemplate)
+
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet"))
+    }
+
+    private fun lagreOppgave(
+        id: UUID?,
+        mottatt: PersongrunnlagMelding.Mottatt
+    ) {
         jdbcTemplate.update(
-            """insert into behandling (id, opprettet, omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag,vilkarsvurdering, utfall, kafkaMeldingId) 
-                |values (:id, (:opprettet)::timestamptz, :omsorgs_ar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, cast (:grunnlag as json), cast (:vilkarsvurdering as json), cast (:utfall as json), :kafkaMeldingId)""".trimMargin(),
+            """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer) values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json) )""",
+            MapSqlParameterSource(
+                mapOf<String, Any?>(
+                    "id" to id,
+                    "behandlingId" to id,
+                    "opprettet" to now().minus(2.minutes.toJavaDuration()).toString(),
+                    "meldingId" to mottatt.id,
+                    "detaljer" to """{"type":"UspesifisertFeilsituasjon", "omsorgsyter":"12345123451"}"""
+                ),
+            ),
+        )
+    }
+
+    private fun lagreGodskrivOpptjening(uuid1: UUID?) {
+        jdbcTemplate.update(
+            """insert into godskriv_opptjening (id, opprettet, behandlingId) 
+                    |values (:id, (:opprettet)::timestamptz, :behandlingId)""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to uuid1,
+                    "opprettet" to 10.daysAgo.toString(),
+                    "behandlingId" to uuid1,
+                ),
+            ),
+        )
+    }
+
+    private fun lagreDummyOppgaveStatus(id: UUID) {
+        jdbcTemplate.update(
+            """insert into oppgave_status (id, status, statushistorikk) 
+                    |values (:id, cast(:status as json), cast (:statushistorikk as json))""".trimMargin(),
+            MapSqlParameterSource(
+                mapOf<String, Any?>(
+                    "id" to id,
+                    "status" to """{"type": "Klar"}""",
+                    "statushistorikk" to """[{"type": "Klar", "tidspunkt": "2023-10-30T08:46:19.690871Z"}]"""
+                ),
+            ),
+        )
+    }
+
+    private fun lagreDummyBehandling(
+        id: UUID,
+        mottatt: PersongrunnlagMelding.Mottatt
+    ) {
+        jdbcTemplate.update(
+            """insert into behandling (id, opprettet, omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag,vilkarsvurdering, utfall, kafkaMeldingId) 
+                    |values (:id, (:opprettet)::timestamptz, :omsorgs_ar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, cast (:grunnlag as json), cast (:vilkarsvurdering as json), cast (:utfall as json), :kafkaMeldingId)""".trimMargin(),
+            MapSqlParameterSource(
+                mapOf<String, Any?>(
+                    "id" to id,
                     "opprettet" to now().toString(),
                     "omsorgs_ar" to 1337,
                     "omsorgsyter" to "x",
@@ -225,62 +269,27 @@ object StatusServiceTest {
                 ),
             ),
         )
+    }
 
-
-        jdbcTemplate.update(
-            """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer) values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json) )""",
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to uuid1,
-                    "behandlingId" to uuid1,
-                    "opprettet" to now().minus(2.minutes.toJavaDuration()).toString(),
-                    "meldingId" to mottatt.id,
-                    "detaljer" to """{"type":"UspesifisertFeilsituasjon", "omsorgsyter":"12345123451"}"""
-                ),
-            ),
-        )
-
-        jdbcTemplate.update(
-            """insert into oppgave_status (id, status, statushistorikk) 
-                |values (:id, cast(:status as json), cast (:statushistorikk as json))""".trimMargin(),
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to uuid1,
-                    "status" to """{"type": "Klar"}""",
-                    "statushistorikk" to """[{"type": "Klar", "tidspunkt": "2023-10-30T08:46:19.690871Z"}]"""
-                ),
-            ),
-        )
-
-        jdbcTemplate.update(
-            """insert into godskriv_opptjening (id, opprettet, behandlingId) 
-                |values (:id, (:opprettet)::timestamptz, :behandlingId)""".trimMargin(),
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to uuid1,
-                    "opprettet" to now().minus(10.days.toJavaDuration()).toString(),
-                    "behandlingId" to uuid1,
-                ),
-            ),
-        )
-
+    private fun lagreGodskrivOpptjeningStatus(
+        godskrivOpptjeningId: UUID
+    ) {
         jdbcTemplate.update(
             """insert into godskriv_opptjening_status (id, status, statushistorikk) 
-                |values (:id, cast (:status as json), cast (:statushistorikk as json))""".trimMargin(),
+                    |values (:id, cast (:status as json), cast (:statushistorikk as json))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
-                    "id" to uuid1,
+                    "id" to godskrivOpptjeningId,
                     "status" to """{"type":"x"}""",
                     "statushistorikk" to """[]""",
                 ),
             ),
         )
+    }
 
-        jdbcTemplate.queryForList("select * from melding", emptyMap<String,Any>()).forEach {println(it)}
-        jdbcTemplate.queryForList("select * from oppgave", emptyMap<String,Any>()).forEach {println(it)}
-        jdbcTemplate.queryForList("select * from oppgave_status", emptyMap<String,Any>()).forEach {println(it)}
-
-        val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet"))
+    private fun printDatabaseContent(jdbcTemplate: NamedParameterJdbcTemplate) {
+        jdbcTemplate.queryForList("select * from melding", emptyMap<String, Any>()).forEach { println(it) }
+        jdbcTemplate.queryForList("select * from oppgave", emptyMap<String, Any>()).forEach { println(it) }
+        jdbcTemplate.queryForList("select * from oppgave_status", emptyMap<String, Any>()).forEach { println(it) }
     }
 }

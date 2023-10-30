@@ -28,6 +28,7 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
     companion object {
         const val FNR = "11111111111"
 
+        @JvmField
         @RegisterExtension
         val wiremock = WireMockExtension.newInstance()
             .options(wireMockConfig().port(WIREMOCK_PORT))
