@@ -53,7 +53,7 @@ data class Behandling(
     private fun vilkårsurderHjelpestønad(): VilkarsVurdering<*> {
         return og(
             vurderVilkår.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(),
-            vurderVilkår.OmsorgsyterErForelderTilMottakerAvHjelpestønad(),
+            //vurderVilkår.OmsorgsyterErForelderTilMottakerAvHjelpestønad(), dette var ikke et kriterium i batch
         )
     }
 
