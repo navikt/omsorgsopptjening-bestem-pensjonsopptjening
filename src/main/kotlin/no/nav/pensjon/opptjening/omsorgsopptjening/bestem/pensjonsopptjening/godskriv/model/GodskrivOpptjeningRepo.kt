@@ -102,6 +102,28 @@ class GodskrivOpptjeningRepo(
         ).singleOrNull()
     }
 
+    fun finnEldsteIkkeFerdig(): GodskrivOpptjening.Persistent? {
+        return jdbcTemplate.query(
+            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
+                |from godskriv_opptjening o,godskriv_opptjening_status os, behandling b,melding m
+                |where o.id = os.id and b.id = o.behandlingId and m.id = b.kafkaMeldingId  
+                |and (os.status->>'type' <> 'Ferdig') order by o.opprettet asc limit 1""".trimMargin(),
+            GodskrivOpptjeningMapper()
+        ).singleOrNull()
+    }
+
+    fun finnEttEllerAnnetKarantene(): GodskrivOpptjening.Persistent? {
+        return jdbcTemplate.query(
+            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
+                |from godskriv_opptjening o,godskriv_opptjening_status os, behandling b,melding m
+                |where o.id = os.id and b.id = o.behandlingId and m.id = b.kafkaMeldingId  
+                |and (os.status->>'type' <> 'Ferdig') and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""".trimMargin(),
+            mapOf(
+                "now" to Instant.now(clock).toString()
+            ),
+            GodskrivOpptjeningMapper()
+        ).singleOrNull()
+    }
 
     internal class GodskrivOpptjeningMapper : RowMapper<GodskrivOpptjening.Persistent> {
         override fun mapRow(rs: ResultSet, rowNum: Int): GodskrivOpptjening.Persistent {

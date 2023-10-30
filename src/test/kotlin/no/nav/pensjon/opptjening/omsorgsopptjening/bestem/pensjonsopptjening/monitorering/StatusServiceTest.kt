@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.monitorering
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
@@ -10,23 +11,19 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.Instant
 import java.time.Instant.now
 import java.time.Month
 import java.time.YearMonth
-import java.util.UUID
+import java.util.*
 import javax.sql.DataSource
 import kotlin.time.Duration.Companion.days
 import kotlin.time.toJavaDuration
@@ -38,6 +35,8 @@ object StatusServiceTest {
     private lateinit var oppgaveRepo: OppgaveRepo
     private lateinit var personGrunnlagRepo: PersongrunnlagRepo
     private lateinit var behandlingRepo: BehandlingRepo
+    private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
+
     private lateinit var statusService: StatusService
     private lateinit var dataSource: DataSource
 
@@ -195,4 +194,91 @@ object StatusServiceTest {
         assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet"))
     }
 
+
+    @Test
+    @Order(4)
+    fun testGammelGodskrivingIkkeFerdig() {
+        val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+
+        val melding = personGrunnlagMelding(now())
+        val mottatt = personGrunnlagRepo.persist(melding)
+
+        val uuid1 = UUID.randomUUID()
+
+        jdbcTemplate.update(
+            """insert into behandling (id, opprettet, omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag,vilkarsvurdering, utfall, kafkaMeldingId) 
+                |values (:id, (:opprettet)::timestamptz, :omsorgs_ar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, cast (:grunnlag as json), cast (:vilkarsvurdering as json), cast (:utfall as json), :kafkaMeldingId)""".trimMargin(),
+            MapSqlParameterSource(
+                mapOf<String, Any?>(
+                    "id" to uuid1,
+                    "opprettet" to now().toString(),
+                    "omsorgs_ar" to 1337,
+                    "omsorgsyter" to "x",
+                    "omsorgsmottaker" to "x",
+                    "omsorgstype" to "x",
+                    "grunnlag" to "{}",
+                    "vilkarsvurdering" to "{}",
+                    "utfall" to "{}",
+                    "kafkaMeldingId" to mottatt.id,
+                ),
+            ),
+        )
+
+
+        jdbcTemplate.update(
+            """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer) values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json) )""",
+            MapSqlParameterSource(
+                mapOf<String, Any?>(
+                    "id" to uuid1,
+                    "behandlingId" to uuid1,
+                    "opprettet" to now().minus(2.minutes.toJavaDuration()).toString(),
+                    "meldingId" to mottatt.id,
+                    "detaljer" to """{"type":"UspesifisertFeilsituasjon", "omsorgsyter":"12345123451"}"""
+                ),
+            ),
+        )
+
+        jdbcTemplate.update(
+            """insert into oppgave_status (id, status, statushistorikk) 
+                |values (:id, cast(:status as json), cast (:statushistorikk as json))""".trimMargin(),
+            MapSqlParameterSource(
+                mapOf<String, Any?>(
+                    "id" to uuid1,
+                    "status" to """{"type": "Klar"}""",
+                    "statushistorikk" to """[{"type": "Klar", "tidspunkt": "2023-10-30T08:46:19.690871Z"}]"""
+                ),
+            ),
+        )
+
+        jdbcTemplate.update(
+            """insert into godskriv_opptjening (id, opprettet, behandlingId) 
+                |values (:id, (:opprettet)::timestamptz, :behandlingId)""".trimMargin(),
+            MapSqlParameterSource(
+                mapOf<String, Any?>(
+                    "id" to uuid1,
+                    "opprettet" to now().minus(10.days.toJavaDuration()).toString(),
+                    "behandlingId" to uuid1,
+                ),
+            ),
+        )
+
+        jdbcTemplate.update(
+            """insert into godskriv_opptjening_status (id, status, statushistorikk) 
+                |values (:id, cast (:status as json), cast (:statushistorikk as json))""".trimMargin(),
+            MapSqlParameterSource(
+                mapOf<String, Any?>(
+                    "id" to uuid1,
+                    "status" to """{"type":"x"}""",
+                    "statushistorikk" to """[]""",
+                ),
+            ),
+        )
+
+        jdbcTemplate.queryForList("select * from melding", emptyMap<String,Any>()).forEach {println(it)}
+        jdbcTemplate.queryForList("select * from oppgave", emptyMap<String,Any>()).forEach {println(it)}
+        jdbcTemplate.queryForList("select * from oppgave_status", emptyMap<String,Any>()).forEach {println(it)}
+
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet"))
+    }
 }

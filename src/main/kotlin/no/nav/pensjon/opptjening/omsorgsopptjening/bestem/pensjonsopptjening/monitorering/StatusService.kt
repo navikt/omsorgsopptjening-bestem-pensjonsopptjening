@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.monitorering
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
@@ -15,7 +16,8 @@ import kotlin.time.toJavaDuration
 class StatusService(
     private val oppgaveRepo: OppgaveRepo,
     private val behandlingRepo: BehandlingRepo,
-    private val persongrunnlagRepo: PersongrunnlagRepo
+    private val persongrunnlagRepo: PersongrunnlagRepo,
+    private val godskrivOpptjeningRepo: GodskrivOpptjeningRepo,
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
@@ -40,6 +42,9 @@ class StatusService(
             }
             if (gamleOppgaverSomIkkeErFerdig()) {
                 return ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet")
+            }
+            if (ubehandledGodskrivOpptjening()) {
+                return ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet")
             }
         }
         return ApplicationStatus.Feil("ikke implementert")
@@ -79,9 +84,8 @@ class StatusService(
     }
 
     fun ubehandledGodskrivOpptjening() : Boolean {
-        // godskriv_opptjening_status.kort_status != FERDIG
-        // godskriv_opptjening.opprettet < 1 uke?
-        return false;
+        val godskriving = godskrivOpptjeningRepo.finnEldsteIkkeFerdig()
+        return godskriving != null && godskriving.opprettet < now().minus(7.days.toJavaDuration())
     }
 }
 
