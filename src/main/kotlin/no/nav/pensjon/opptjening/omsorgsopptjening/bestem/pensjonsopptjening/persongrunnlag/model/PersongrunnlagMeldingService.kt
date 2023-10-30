@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
@@ -29,6 +30,7 @@ class PersongrunnlagMeldingService(
     private val transactionTemplate: TransactionTemplate,
     private val brevService: BrevService,
     private val hentPensjonspoeng: HentPensjonspoengClient,
+    private val medlemskapOppslag: MedlemskapOppslag,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -42,7 +44,7 @@ class PersongrunnlagMeldingService(
                         try {
                             transactionTemplate.execute {
                                 log.info("Prosesserer melding")
-                                handle(melding).also { resultat ->
+                                behandle(melding).also { resultat ->
                                     persongrunnlagRepo.updateStatus(melding.ferdig())
                                     resultat.forEach {
                                         when (it.erInnvilget()) {
@@ -76,7 +78,7 @@ class PersongrunnlagMeldingService(
         } ?: emptyList()
     }
 
-    private fun handle(melding: PersongrunnlagMelding.Mottatt): List<FullførtBehandling> {
+    private fun behandle(melding: PersongrunnlagMelding.Mottatt): List<FullførtBehandling> {
         return melding.innhold
             .berikDatagrunnlag()
             .tilOmsorgsopptjeningsgrunnlag()
@@ -134,8 +136,10 @@ class PersongrunnlagMeldingService(
         return BeriketDatagrunnlag(
             omsorgsyter = persondata.finnPerson(omsorgsyter),
             persongrunnlag = persongrunnlag.map { persongrunnlag ->
+                val omsorgsyter = persondata.finnPerson(persongrunnlag.omsorgsyter)
+                val medlemskap = medlemskapOppslag.hentMedlemskap(omsorgsyter.fnr)
                 Persongrunnlag(
-                    omsorgsyter = persondata.finnPerson(persongrunnlag.omsorgsyter),
+                    omsorgsyter = omsorgsyter,
                     omsorgsperioder = persongrunnlag.omsorgsperioder.map { omsorgVedtakPeriode ->
                         Omsorgsperiode(
                             fom = omsorgVedtakPeriode.fom,
@@ -143,7 +147,7 @@ class PersongrunnlagMeldingService(
                             omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain(),
                             omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
                             kilde = omsorgVedtakPeriode.kilde.toDomain(),
-                            medlemskap = omsorgVedtakPeriode.medlemskap.toDomain(),
+                            medlemskap = medlemskap,
                             utbetalt = omsorgVedtakPeriode.utbetalt,
                             landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain()
                         )

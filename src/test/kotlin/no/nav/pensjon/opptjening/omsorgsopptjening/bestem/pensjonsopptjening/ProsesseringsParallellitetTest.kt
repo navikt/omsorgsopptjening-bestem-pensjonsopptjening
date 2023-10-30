@@ -14,7 +14,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -81,7 +80,6 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
-                                        medlemskap = MedlemIFolketrygden.Ukjent,
                                         utbetalt = 7234,
                                         landstilknytning = Landstilknytning.NORGE
                                     )
@@ -136,7 +134,6 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
-                                        medlemskap = MedlemIFolketrygden.Ukjent,
                                         utbetalt = 7234,
                                 landstilknytning = Landstilknytning.NORGE
                                     )
@@ -189,7 +186,6 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "01122012345",
                                         kilde = Kilde.BARNETRYGD,
-                                        medlemskap = MedlemIFolketrygden.Ukjent,
                                         utbetalt = 7234,
                                 landstilknytning = Landstilknytning.NORGE
                                     )
@@ -204,7 +200,6 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                         omsorgsmottaker = "01122012345",
                                         kilde = Kilde.BARNETRYGD,
-                                        medlemskap = MedlemIFolketrygden.Ukjent,
                                         utbetalt = 7234,
                                 landstilknytning = Landstilknytning.NORGE
                                     ),

@@ -13,7 +13,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -70,7 +69,6 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
                                 omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                 omsorgsmottaker = "01052012345",
                                 kilde = Kilde.BARNETRYGD,
-                                medlemskap = MedlemIFolketrygden.Ukjent,
                                 utbetalt = 7234,
                                 landstilknytning = Landstilknytning.NORGE
                             )

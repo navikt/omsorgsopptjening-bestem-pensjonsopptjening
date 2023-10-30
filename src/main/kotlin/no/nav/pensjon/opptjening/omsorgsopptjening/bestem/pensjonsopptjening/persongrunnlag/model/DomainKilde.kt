@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 enum class DomainKilde {
     BARNETRYGD,
     INFOTRYGD,
+    INFOTRYGD_UTTREKK_PENSJONSTRYGDET,
 }
 fun Kilde.toDomain(): DomainKilde {
     return when (this) {
