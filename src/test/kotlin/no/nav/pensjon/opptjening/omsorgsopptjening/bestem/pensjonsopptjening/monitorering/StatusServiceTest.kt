@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.monitorering
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -11,9 +12,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.MedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.*
@@ -26,6 +25,7 @@ import java.time.YearMonth
 import java.util.*
 import javax.sql.DataSource
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -50,10 +50,12 @@ object StatusServiceTest {
                 .load()
         flyway.migrate()
 
-        oppgaveRepo = OppgaveRepo(NamedParameterJdbcTemplate(dataSource))
-        personGrunnlagRepo = PersongrunnlagRepo(NamedParameterJdbcTemplate(dataSource))
-        behandlingRepo = BehandlingRepo(NamedParameterJdbcTemplate(dataSource))
-        statusService = StatusService(oppgaveRepo, behandlingRepo, personGrunnlagRepo)
+        val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+        oppgaveRepo = OppgaveRepo(jdbcTemplate)
+        personGrunnlagRepo = PersongrunnlagRepo(jdbcTemplate)
+        behandlingRepo = BehandlingRepo(jdbcTemplate)
+        godskrivOpptjeningRepo = GodskrivOpptjeningRepo(jdbcTemplate)
+        statusService = StatusService(oppgaveRepo, behandlingRepo, personGrunnlagRepo, godskrivOpptjeningRepo)
     }
 
     @BeforeEach
