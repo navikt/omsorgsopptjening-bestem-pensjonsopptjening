@@ -23,6 +23,11 @@ class MicrometerStatusMalere(private val registry: MeterRegistry) {
             .builder("pensjonopptjening_applikasjonsstatus_ukjent") { antallMangler() }
             .tag("status","ukjent")
             .register(registry)
+        // TODO: skrive om til å bli penere + test
+        Gauge
+            .builder("pensjonopptjening_applikasjonsstatus_sum") { antallOk() + antallFeil() + antallMangler() }
+            .tag("status","ukjent")
+            .register(registry)
     }
 
     fun oppdater(status: ApplicationStatus) {
