@@ -200,7 +200,7 @@ object StatusServiceTest {
     @Order(1)
     fun testIngenPersonStatusMeldinger() {
         val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Ingen meldinger"))
+        assertThat(status).isEqualTo(ApplicationStatus.IkkeKjort)
     }
 
     @Test

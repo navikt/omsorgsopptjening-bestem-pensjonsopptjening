@@ -31,7 +31,7 @@ class StatusService(
         val eldsteUbehandlede : PersongrunnlagMelding? = persongrunnlagRepo.finnEldsteSomIkkeErFerdig()
 
         if (sisteMelding == null) {
-            return ApplicationStatus.Feil("Ingen meldinger")
+            return ApplicationStatus.IkkeKjort
         } else {
             if (meldingErForGammel(sisteMelding)) {
                 return ApplicationStatus.Feil("Siste melding er for gammel")
