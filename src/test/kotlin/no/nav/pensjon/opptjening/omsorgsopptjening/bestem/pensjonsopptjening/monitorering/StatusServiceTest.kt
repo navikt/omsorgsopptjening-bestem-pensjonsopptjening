@@ -205,6 +205,15 @@ object StatusServiceTest {
 
     @Test
     @Order(2)
+    fun testOK() {
+        val melding = personGrunnlagMelding(now())
+        personGrunnlagRepo.persist(melding)
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.OK)
+    }
+
+    @Test
+    @Order(3)
     fun testForGammeMelding() {
         val melding = personGrunnlagMelding(700.daysAgo)
         personGrunnlagRepo.persist(melding)
@@ -213,7 +222,7 @@ object StatusServiceTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     fun testMeldingFeilet() {
         val mottatt = lagOgLagreMelding(opprettet = 300.daysAgo)
         val feilet = endreStatusTilFeilet(mottatt)
@@ -223,7 +232,7 @@ object StatusServiceTest {
     }
 
     @Test
-    @Order(3)
+    @Order(5)
     fun testGammelMeldingIkkeFerdig() {
         lagOgLagreMelding(5.daysAgo)
         val status = statusService.checkStatus()
@@ -231,7 +240,7 @@ object StatusServiceTest {
     }
 
     @Test
-    @Order(4)
+    @Order(6)
     fun testGammelOppgaveIkkeFerdig() {
         val melding = personGrunnlagMelding(now())
         val mottatt = personGrunnlagRepo.persist(melding)
@@ -252,7 +261,7 @@ object StatusServiceTest {
 
 
     @Test
-    @Order(4)
+    @Order(7)
     fun testGammelGodskrivingIkkeFerdig() {
         val uuid1 = UUID.randomUUID()
 

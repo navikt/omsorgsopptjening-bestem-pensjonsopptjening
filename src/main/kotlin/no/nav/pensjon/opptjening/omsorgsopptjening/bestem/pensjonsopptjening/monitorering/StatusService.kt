@@ -49,12 +49,12 @@ class StatusService(
                 return ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet")
             }
         }
-        return ApplicationStatus.Feil("ikke implementert")
+        return ApplicationStatus.OK
     }
 
     fun meldingErForGammel(persongrunnlagMelding: PersongrunnlagMelding) : Boolean {
         val opprettet: Instant = persongrunnlagMelding.opprettet
-        return opprettet < now().minus(400.days.toJavaDuration())
+        return opprettet < 400.daysAgo
     }
 
     fun feiledeMeldinger() : Boolean {
