@@ -24,14 +24,13 @@ import java.time.YearMonth
 import java.util.*
 import javax.sql.DataSource
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 object StatusServiceTest {
 
-    inline val Int.daysAgo get() = now().minus(this.days.toJavaDuration())
+    inline val Int.daysAgo: Instant get() = now().minus(this.days.toJavaDuration())
 
     private lateinit var oppgaveRepo: OppgaveRepo
     private lateinit var personGrunnlagRepo: PersongrunnlagRepo
@@ -104,7 +103,7 @@ object StatusServiceTest {
     @Order(2)
     fun testForGammeMelding() {
         val melding = personGrunnlagMelding(700.daysAgo)
-        val mottatt = personGrunnlagRepo.persist(melding)
+        personGrunnlagRepo.persist(melding)
         val status = statusService.checkStatus()
         assertThat(status).isEqualTo(ApplicationStatus.Feil("Siste melding er for gammel"))
     }
@@ -142,27 +141,26 @@ object StatusServiceTest {
     @Test
     @Order(4)
     fun testGammelOppgaveIkkeFerdig() {
-        val jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
-
         val melding = personGrunnlagMelding(now())
         val mottatt = personGrunnlagRepo.persist(melding)
 
         val uuid1 = UUID.randomUUID()
 
         lagreDummyBehandling(uuid1, mottatt)
-        lagreDummyOppgave(uuid1, mottatt)
+        lagreDummyOppgave(uuid1, mottatt, 200.daysAgo)
 
-        lagreDummyOppgaveStatus(jdbcTemplate, uuid1)
+        lagreDummyOppgaveStatus(uuid1)
 
-        printDatabaseContent(jdbcTemplate)
+        printDatabaseContent()
 
         val status = statusService.checkStatus()
         assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet"))
     }
 
-    private fun lagreDummyOppgave(
+    private fun lagreDummyOppgave( // 200.daysAgo.toString(),
         uuid1: UUID,
-        mottatt: PersongrunnlagMelding.Mottatt
+        mottatt: PersongrunnlagMelding.Mottatt,
+        opprettet: Instant,
     ) {
         jdbcTemplate.update(
             """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer) values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json) )""",
@@ -170,7 +168,7 @@ object StatusServiceTest {
                 mapOf<String, Any?>(
                     "id" to uuid1,
                     "behandlingId" to uuid1,
-                    "opprettet" to 200.daysAgo.toString(),
+                    "opprettet" to opprettet.toString(),
                     "meldingId" to mottatt.id,
                     "detaljer" to """{"type":"UspesifisertFeilsituasjon", "omsorgsyter":"12345123451"}"""
                 ),
@@ -188,46 +186,31 @@ object StatusServiceTest {
         val mottatt = personGrunnlagRepo.persist(melding)
 
         lagreDummyBehandling(uuid1, mottatt)
+        lagreDummyOppgave(uuid1, mottatt, now())
+        lagreDummyOppgaveStatus(uuid1)
+        lagreDummyGodskrivOpptjening(uuid1, uuid1, 10.daysAgo)
+        lagreDummyGodskrivOpptjeningStatus(uuid1)
 
-        lagreOppgave(uuid1, mottatt)
-
-        lagreDummyOppgaveStatus(jdbcTemplate, uuid1)
-        lagreGodskrivOpptjening(uuid1)
-        lagreGodskrivOpptjeningStatus(uuid1)
-
-        printDatabaseContent(jdbcTemplate)
+        printDatabaseContent()
 
         val status = statusService.checkStatus()
         assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet"))
     }
 
-    private fun lagreOppgave(
-        id: UUID?,
-        mottatt: PersongrunnlagMelding.Mottatt
-    ) {
-        jdbcTemplate.update(
-            """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer) values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json) )""",
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to id,
-                    "behandlingId" to id,
-                    "opprettet" to now().minus(2.minutes.toJavaDuration()).toString(),
-                    "meldingId" to mottatt.id,
-                    "detaljer" to """{"type":"UspesifisertFeilsituasjon", "omsorgsyter":"12345123451"}"""
-                ),
-            ),
-        )
-    }
 
-    private fun lagreGodskrivOpptjening(uuid1: UUID?) {
+    private fun lagreDummyGodskrivOpptjening(
+        uuid1: UUID,
+        behandlingId: UUID,
+        opprettet: Instant /* = now() */
+    ) { // 10.daysAgo.toString()
         jdbcTemplate.update(
             """insert into godskriv_opptjening (id, opprettet, behandlingId) 
                     |values (:id, (:opprettet)::timestamptz, :behandlingId)""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to uuid1,
-                    "opprettet" to 10.daysAgo.toString(),
-                    "behandlingId" to uuid1,
+                    "opprettet" to opprettet.toString(),
+                    "behandlingId" to behandlingId,
                 ),
             ),
         )
@@ -271,7 +254,7 @@ object StatusServiceTest {
         )
     }
 
-    private fun lagreGodskrivOpptjeningStatus(
+    private fun lagreDummyGodskrivOpptjeningStatus(
         godskrivOpptjeningId: UUID
     ) {
         jdbcTemplate.update(
@@ -287,9 +270,22 @@ object StatusServiceTest {
         )
     }
 
-    private fun printDatabaseContent(jdbcTemplate: NamedParameterJdbcTemplate) {
-        jdbcTemplate.queryForList("select * from melding", emptyMap<String, Any>()).forEach { println(it) }
-        jdbcTemplate.queryForList("select * from oppgave", emptyMap<String, Any>()).forEach { println(it) }
-        jdbcTemplate.queryForList("select * from oppgave_status", emptyMap<String, Any>()).forEach { println(it) }
+    private fun printDatabaseContent() {
+        println("Database content:")
+        jdbcTemplate.queryForList("select * from melding", emptyMap<String, Any>()).forEach { println(" melding $it") }
+        jdbcTemplate.queryForList("select * from melding_status", emptyMap<String, Any>())
+            .forEach { println(" melding_status $it") }
+        jdbcTemplate.queryForList("select * from oppgave", emptyMap<String, Any>()).forEach { println(" oppgave $it") }
+        jdbcTemplate.queryForList("select * from oppgave_status", emptyMap<String, Any>())
+            .forEach { println(" oppgave_status $it") }
+        jdbcTemplate.queryForList("select * from behandling", emptyMap<String, Any>())
+            .forEach { println(" behandling $it") }
+        jdbcTemplate.queryForList("select * from godskriv_opptjening", emptyMap<String, Any>())
+            .forEach { println(" godskriv_opptjening $it") }
+        jdbcTemplate.queryForList("select * from godskriv_opptjening_status", emptyMap<String, Any>())
+            .forEach { println(" godskriv_opptjening_status $it") }
+        jdbcTemplate.queryForList("select * from brev", emptyMap<String, Any>()).forEach { println(" brev $it") }
+        jdbcTemplate.queryForList("select * from brev_status", emptyMap<String, Any>())
+            .forEach { println(" brev_status $it") }
     }
 }
