@@ -19,6 +19,8 @@ class StatusService(
     private val persongrunnlagRepo: PersongrunnlagRepo,
     private val godskrivOpptjeningRepo: GodskrivOpptjeningRepo,
 ) {
+    private inline val Int.daysAgo: Instant get() = now().minus(this.days.toJavaDuration())
+
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
     }
@@ -60,32 +62,17 @@ class StatusService(
     }
 
     fun forGammelSomIkkeErFerdig(persongrunnlagMelding: PersongrunnlagMelding?) : Boolean {
-        return persongrunnlagMelding != null
-                && persongrunnlagMelding.opprettet < now().minus(2.days.toJavaDuration())
-    }
-
-    // behandling:
-    fun behandlingEttEllerAnnet() : Boolean {
-        // TODO: Finne ut hva man skal sjekke her
-        // behandling.meldingId = melding.id
-        return false;
-    }
-
-    fun oppgaveEttEllerAnnet() : Boolean {
-        // TODO: Finne ut hva man skal sjekke her
-        // oppgave.meldingId = melding.id
-        return false;
+        return persongrunnlagMelding != null && persongrunnlagMelding.opprettet < 2.daysAgo
     }
 
     fun gamleOppgaverSomIkkeErFerdig() : Boolean {
         var oppgave = oppgaveRepo.finnEldsteUbehandledeOppgave()
-        println("OPPGAVE: $oppgave")
-        return (oppgave != null && oppgave.opprettet < now().minus(60.days.toJavaDuration()))
+        return oppgave != null && oppgave.opprettet < 60.daysAgo
     }
 
     fun ubehandledGodskrivOpptjening() : Boolean {
         val godskriving = godskrivOpptjeningRepo.finnEldsteIkkeFerdig()
-        return godskriving != null && godskriving.opprettet < now().minus(7.days.toJavaDuration())
+        return godskriving != null && godskriving.opprettet < 7.daysAgo
     }
 }
 

@@ -30,7 +30,7 @@ import kotlin.time.toJavaDuration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 object StatusServiceTest {
 
-    inline val Int.daysAgo: Instant get() = now().minus(this.days.toJavaDuration())
+    private inline val Int.daysAgo: Instant get() = now().minus(this.days.toJavaDuration())
 
     private lateinit var oppgaveRepo: OppgaveRepo
     private lateinit var personGrunnlagRepo: PersongrunnlagRepo
@@ -93,32 +93,6 @@ object StatusServiceTest {
         )
     }
 
-    @Test
-    @Order(1)
-    fun testIngenPersonStatusMeldinger() {
-        val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Ingen meldinger"))
-    }
-
-    @Test
-    @Order(2)
-    fun testForGammeMelding() {
-        val melding = personGrunnlagMelding(700.daysAgo)
-        personGrunnlagRepo.persist(melding)
-        val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Siste melding er for gammel"))
-    }
-
-    @Test
-    @Order(3)
-    fun testMeldingFeilet() {
-        val mottatt = lagOgLagreMelding(opprettet = 300.daysAgo)
-        val feilet = endreStatusTilFeilet(mottatt)
-        personGrunnlagRepo.updateStatus(feilet)
-        val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes feilede persongrunnlagmeldinger"))
-    }
-
     private fun lagOgLagreMelding(opprettet: Instant = now()): PersongrunnlagMelding.Mottatt {
         val melding = personGrunnlagMelding(opprettet)
         return personGrunnlagRepo.persist(melding)
@@ -131,44 +105,17 @@ object StatusServiceTest {
         return retry(retry(retry(retry(mottatt))))
     }
 
-    @Test
-    @Order(3)
-    fun testGammelMeldingIkkeFerdig() {
-        lagOgLagreMelding(5.daysAgo)
-        val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle meldinger som ikke er ferdig behandlet"))
-    }
-
-    @Test
-    @Order(4)
-    fun testGammelOppgaveIkkeFerdig() {
-        val melding = personGrunnlagMelding(now())
-        val mottatt = personGrunnlagRepo.persist(melding)
-
-        val uuid1 = UUID.randomUUID()
-
-        lagreDummyBehandling(uuid1, mottatt)
-        lagreDummyOppgave(uuid1, mottatt, 200.daysAgo)
-
-        lagreDummyOppgaveStatus(uuid1)
-
-        printDatabaseContent()
-
-        val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet"))
-    }
-
-    private fun lagreDummyOppgave( // 200.daysAgo.toString(),
-        uuid1: UUID,
+    private fun lagreDummyOppgave(
+        id: UUID,
         mottatt: PersongrunnlagMelding.Mottatt,
-        opprettet: Instant,
+        opprettet: Instant = now(),
     ) {
         jdbcTemplate.update(
             """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer) values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json) )""",
             MapSqlParameterSource(
                 mapOf<String, Any?>(
-                    "id" to uuid1,
-                    "behandlingId" to uuid1,
+                    "id" to id,
+                    "behandlingId" to id,
                     "opprettet" to opprettet.toString(),
                     "meldingId" to mottatt.id,
                     "detaljer" to """{"type":"UspesifisertFeilsituasjon", "omsorgsyter":"12345123451"}"""
@@ -177,33 +124,11 @@ object StatusServiceTest {
         )
     }
 
-
-    @Test
-    @Order(4)
-    fun testGammelGodskrivingIkkeFerdig() {
-        val uuid1 = UUID.randomUUID()
-
-        val melding = personGrunnlagMelding(now())
-        val mottatt = personGrunnlagRepo.persist(melding)
-
-        lagreDummyBehandling(uuid1, mottatt)
-        lagreDummyOppgave(uuid1, mottatt, now())
-        lagreDummyOppgaveStatus(uuid1)
-        lagreDummyGodskrivOpptjening(uuid1, uuid1, 10.daysAgo)
-        lagreDummyGodskrivOpptjeningStatus(uuid1)
-
-        printDatabaseContent()
-
-        val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet"))
-    }
-
-
     private fun lagreDummyGodskrivOpptjening(
         uuid1: UUID,
         behandlingId: UUID,
-        opprettet: Instant /* = now() */
-    ) { // 10.daysAgo.toString()
+        opprettet: Instant = now()
+    ) {
         jdbcTemplate.update(
             """insert into godskriv_opptjening (id, opprettet, behandlingId) 
                     |values (:id, (:opprettet)::timestamptz, :behandlingId)""".trimMargin(),
@@ -269,6 +194,81 @@ object StatusServiceTest {
                 ),
             ),
         )
+    }
+
+    @Test
+    @Order(1)
+    fun testIngenPersonStatusMeldinger() {
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Ingen meldinger"))
+    }
+
+    @Test
+    @Order(2)
+    fun testForGammeMelding() {
+        val melding = personGrunnlagMelding(700.daysAgo)
+        personGrunnlagRepo.persist(melding)
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Siste melding er for gammel"))
+    }
+
+    @Test
+    @Order(3)
+    fun testMeldingFeilet() {
+        val mottatt = lagOgLagreMelding(opprettet = 300.daysAgo)
+        val feilet = endreStatusTilFeilet(mottatt)
+        personGrunnlagRepo.updateStatus(feilet)
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes feilede persongrunnlagmeldinger"))
+    }
+
+    @Test
+    @Order(3)
+    fun testGammelMeldingIkkeFerdig() {
+        lagOgLagreMelding(5.daysAgo)
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle meldinger som ikke er ferdig behandlet"))
+    }
+
+    @Test
+    @Order(4)
+    fun testGammelOppgaveIkkeFerdig() {
+        val melding = personGrunnlagMelding(now())
+        val mottatt = personGrunnlagRepo.persist(melding)
+
+        val uuid = UUID.randomUUID()
+
+        lagreDummyBehandling(uuid, mottatt)
+        lagreDummyOppgave(uuid, mottatt, 200.daysAgo)
+
+        lagreDummyOppgaveStatus(uuid)
+
+        printDatabaseContent()
+
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet"))
+    }
+
+
+
+    @Test
+    @Order(4)
+    fun testGammelGodskrivingIkkeFerdig() {
+        val uuid1 = UUID.randomUUID()
+
+        val melding = personGrunnlagMelding(now())
+        val mottatt = personGrunnlagRepo.persist(melding)
+
+        lagreDummyBehandling(uuid1, mottatt)
+        lagreDummyOppgave(uuid1, mottatt, now())
+        lagreDummyOppgaveStatus(uuid1)
+        lagreDummyGodskrivOpptjening(uuid1, uuid1, 10.daysAgo)
+        lagreDummyGodskrivOpptjeningStatus(uuid1)
+
+        printDatabaseContent()
+
+        val status = statusService.checkStatus()
+        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet"))
     }
 
     private fun printDatabaseContent() {
