@@ -40,6 +40,7 @@ import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.given
 import org.mockito.kotlin.any
@@ -1229,6 +1230,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     }
 
     @Test
+    @Disabled("Ikke et kriterium i BPEN030 - se OmsorgsyterErForelderTilMottakerAvHjelpestønad og relatert bruk")
     fun `en omsorgsyter som mottar barnetrygd for en omsorgsmottaker over 6 år med hjelpestønad skal avslås omsorgsyter og omsorgsmottaker ikke har en foreldre-barn relasjon`() {
         repo.persist(
             PersongrunnlagMelding.Lest(
