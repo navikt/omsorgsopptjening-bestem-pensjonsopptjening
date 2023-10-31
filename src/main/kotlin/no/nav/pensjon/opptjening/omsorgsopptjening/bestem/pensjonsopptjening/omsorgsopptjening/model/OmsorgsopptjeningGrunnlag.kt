@@ -2,9 +2,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Hjelpestønadperiode.Companion.omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.alleMåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
@@ -27,27 +28,23 @@ sealed class OmsorgsopptjeningGrunnlag {
     val correlationId: CorrelationId
         get() = grunnlag.correlationId
 
+    val omsorgstype: DomainOmsorgstype by lazy {
+        when (forAldersvurderingOmsorgsmottaker().erOppfylltFor(OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.ALDERSINTERVALL_BARNETRYGD)) {
+            true -> DomainOmsorgstype.BARNETRYGD
+            false -> DomainOmsorgstype.HJELPESTØNAD
+        }
+    }
+
     protected fun omsorgsytersOmsorgsmånederForOmsorgsmottaker(): Omsorgsmåneder {
         return omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!
     }
 
     protected fun omsorgsytersMedlemskapsmåneder(): Medlemskapsmåneder {
-        return Medlemskapsmåneder(grunnlag.omsorgsytersPersongrunnlag.omsorgsperioder.filter { it.medlemskap.erMedlem() }
-                                      .map { it.periode.alleMåneder() }.flatten().toSet())
+        return grunnlag.omsorgsytersMedlemskapsmåneder
     }
 
     protected fun omsorgsytersUtbetalingsmåneder(): Utbetalingsmåneder {
-        return Utbetalingsmåneder(
-            grunnlag.omsorgsytersPersongrunnlag.omsorgsperioder.map { omsorgsperiode ->
-                omsorgsperiode.alleMåneder().map {
-                    Utbetalingsmåned(
-                        måned = it,
-                        utbetalt = omsorgsperiode.utbetalt,
-                        landstilknytning = omsorgsperiode.landstilknytning
-                    )
-                }
-            }.flatten().toSet()
-        )
+        return grunnlag.omsorgsytersUtbetalingsmåneder
     }
 
     private fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Omsorgsmåneder> {
@@ -57,20 +54,17 @@ sealed class OmsorgsopptjeningGrunnlag {
                        persongrunnlag.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker },
                        persongrunnlag.hjelpestønadperioder.filter { it.omsorgsmottaker == omsorgsmottaker }
                 ).let { (omsorgsyter, omsorgsperioder, hjelpestønadperioder) ->
-                    val barnetrygd = omsorgsperioder.alleMåneder()
-                    val hjelpestønad = hjelpestønadperioder.alleMåneder()
+                    val barnetrygd = omsorgsperioder.omsorgsmåneder()
+                    val hjelpestønad = hjelpestønadperioder.omsorgsmåneder(barnetrygd)
 
-                    if (forAldersvurderingOmsorgsmottaker().erOppfylltFor(
-                            OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.ALDERSINTERVALL_BARNETRYGD
-                        )
-                    ) {
-                        omsorgsyter to Omsorgsmåneder.Barnetrygd(barnetrygd)
-                    } else {
-                        omsorgsyter to Omsorgsmåneder.Hjelpestønad(
-                            måneder = barnetrygd.intersect(hjelpestønad),
-                            barnetrygd = barnetrygd,
-                            hjelpestønad = hjelpestønad
-                        )
+                    when (omsorgstype) {
+                        DomainOmsorgstype.BARNETRYGD -> {
+                            omsorgsyter to barnetrygd
+                        }
+
+                        DomainOmsorgstype.HJELPESTØNAD -> {
+                            omsorgsyter to hjelpestønad
+                        }
                     }
                 }
             }
@@ -152,7 +146,6 @@ sealed class OmsorgsopptjeningGrunnlag {
 
             override fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
-                    aldersvurderingOmsorgsmottaker = forAldersvurderingOmsorgsmottaker(),
                     omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
                 )
             }
@@ -198,7 +191,6 @@ sealed class OmsorgsopptjeningGrunnlag {
 
             override fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
                 return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
-                    aldersvurderingOmsorgsmottaker = forAldersvurderingOmsorgsmottaker(),
                     omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
                 )
             }
@@ -241,7 +233,6 @@ sealed class OmsorgsopptjeningGrunnlag {
 
         override fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
             return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                aldersvurderingOmsorgsmottaker = forAldersvurderingOmsorgsmottaker(),
                 omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker()
             )
         }

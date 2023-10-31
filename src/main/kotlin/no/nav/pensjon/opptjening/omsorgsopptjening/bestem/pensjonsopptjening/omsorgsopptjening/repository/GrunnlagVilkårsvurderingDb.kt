@@ -3,14 +3,12 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AldersvurderingsGrunnlag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåneder
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsmåneder
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
@@ -22,25 +20,21 @@ import java.util.UUID
 )
 internal sealed class GrunnlagVilkårsvurderingDb {
     internal sealed class OmsorgBarnUnder6 : GrunnlagVilkårsvurderingDb() {
-        abstract val aldersvurderingOmsorgsmottaker: AldersvurderingGrunnlag
-        abstract val omsorgsytersOmsorgsmånederForOmsorgsmottaker: YtelseMånederDb
+        abstract val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb
 
         @JsonTypeName("OmsorgBarnFødtOmsorgsår")
         data class OmsorgBarnFødtOmsorgsår(
-            override val aldersvurderingOmsorgsmottaker: AldersvurderingGrunnlag,
-            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: YtelseMånederDb,
+            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb,
         ) : OmsorgBarnUnder6()
 
         @JsonTypeName("OmsorgBarnFødtDesemberOmsorgsår")
         data class OmsorgBarnFødtDesemberOmsorgsår(
-            override val aldersvurderingOmsorgsmottaker: AldersvurderingGrunnlag,
-            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: YtelseMånederDb,
+            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb,
         ) : OmsorgBarnUnder6()
 
         @JsonTypeName("OmsorgBarnFødtUtenforOmsorgsår")
         data class OmsorgBarnFødtUtenforOmsorgsår(
-            override val aldersvurderingOmsorgsmottaker: AldersvurderingGrunnlag,
-            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: YtelseMånederDb,
+            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb,
         ) : OmsorgBarnUnder6()
     }
 
@@ -119,30 +113,27 @@ internal sealed class GrunnlagVilkårsvurderingDb {
     internal sealed class GyldigOmsorgsarbeid : GrunnlagVilkårsvurderingDb() {
         abstract val omsorgsytersMedlemskapsmåneder: Set<YearMonth>
         abstract val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>
-        abstract val omsorgsytersOmsorgsmåneder: YtelseMånederDb
-        abstract val gyldigeOmsorgsmåneder: Set<YearMonth>
+        abstract val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb
+
         @JsonTypeName("GyldigOmsorgsarbeidBarnFødtOmsorgsår")
         data class GyldigOmsorgsarbeidBarnFødtOmsorgsår(
             override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
             override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
-            override val omsorgsytersOmsorgsmåneder: YtelseMånederDb,
-            override val gyldigeOmsorgsmåneder: Set<YearMonth>,
+            override val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb,
         ) : GyldigOmsorgsarbeid()
 
         @JsonTypeName("GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår")
         data class GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår(
             override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
             override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
-            override val omsorgsytersOmsorgsmåneder: YtelseMånederDb,
-            override val gyldigeOmsorgsmåneder: Set<YearMonth>,
+            override val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb,
         ) : GyldigOmsorgsarbeid()
 
         @JsonTypeName("GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår")
         data class GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår(
             override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
             override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
-            override val omsorgsytersOmsorgsmåneder: YtelseMånederDb,
-            override val gyldigeOmsorgsmåneder: Set<YearMonth>,
+            override val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb,
         ) : GyldigOmsorgsarbeid()
     }
 }
@@ -188,7 +179,7 @@ internal fun GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere.toDomain(): Omso
 internal data class OmsorgsyterMottakerAntallMånederDb(
     val omsorgsyter: String,
     val omsorgsmottaker: String,
-    val omsorgsmåneder: YtelseMånederDb,
+    val omsorgsmåneder: OmsorgsmånederDb,
     val omsorgsår: Int,
 )
 
@@ -325,21 +316,18 @@ internal fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.toDb(): GrunnlagV
     return when (this) {
         is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> {
             GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtOmsorgsår(
-                aldersvurderingOmsorgsmottaker = aldersvurderingOmsorgsmottaker.toDb(),
                 omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDb(),
             )
         }
 
         is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> {
             GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtUtenforOmsorgsår(
-                aldersvurderingOmsorgsmottaker = aldersvurderingOmsorgsmottaker.toDb(),
                 omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDb()
             )
         }
 
         is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> {
             GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtDesemberOmsorgsår(
-                aldersvurderingOmsorgsmottaker = aldersvurderingOmsorgsmottaker.toDb(),
                 omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDb()
             )
         }
@@ -350,14 +338,12 @@ internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.toDomain(): Omsorgsyte
     return when (this) {
         is GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtOmsorgsår -> {
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
-                aldersvurderingOmsorgsmottaker = aldersvurderingOmsorgsmottaker.toDomain(),
                 omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain()
             )
         }
 
         is GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtUtenforOmsorgsår -> {
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                aldersvurderingOmsorgsmottaker = aldersvurderingOmsorgsmottaker.toDomain(),
                 omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain()
 
             )
@@ -365,7 +351,6 @@ internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.toDomain(): Omsorgsyte
 
         is GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtDesemberOmsorgsår -> {
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
-                aldersvurderingOmsorgsmottaker = aldersvurderingOmsorgsmottaker.toDomain(),
                 omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain(),
             )
         }
@@ -390,56 +375,27 @@ internal fun AldersvurderingsGrunnlag.toDb(): GrunnlagVilkårsvurderingDb.Alders
     )
 }
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type",
+internal data class OmsorgsmånederDb(
+    val omsorgsmåneder: Set<YearMonth>,
+    val type: OmsorgstypeDb,
 )
-sealed class YtelseMånederDb {
-    @JsonTypeName("Barnetrygdmåneder")
-    data class BarnetrygdMånederDb(
-        val omsorgsmåneder: Set<YearMonth>,
-    ) : YtelseMånederDb()
 
-    @JsonTypeName("BarnetrygdOgHjelpestønadMånederDb")
-    data class BarnetrygdOgHjelpestønadMånederDb(
-        val omsorgsmåneder: Set<YearMonth>,
-        val barnetrygdmåneder: Set<YearMonth>,
-        val hjelpestønadmåneder: Set<YearMonth>,
-    ) : YtelseMånederDb()
-}
-
-internal fun Omsorgsmåneder.toDb(): YtelseMånederDb {
+internal fun Omsorgsmåneder.toDb(): OmsorgsmånederDb {
     return when (this) {
         is Omsorgsmåneder.Barnetrygd -> {
-            YtelseMånederDb.BarnetrygdMånederDb(this)
+            OmsorgsmånederDb(this.alleMåneder(), OmsorgstypeDb.BARNETRYGD)
         }
 
         is Omsorgsmåneder.Hjelpestønad -> {
-            YtelseMånederDb.BarnetrygdOgHjelpestønadMånederDb(
-                omsorgsmåneder = this.måneder,
-                barnetrygdmåneder = this.barnetrygd,
-                hjelpestønadmåneder = this.hjelpestønad,
-            )
+            OmsorgsmånederDb(this.alleMåneder(), OmsorgstypeDb.HJELPESTØNAD)
         }
     }
 }
 
-internal fun YtelseMånederDb.toDomain(): Omsorgsmåneder {
-    return when (this) {
-        is YtelseMånederDb.BarnetrygdMånederDb -> {
-            Omsorgsmåneder.Barnetrygd(
-                måneder = this.omsorgsmåneder
-            )
-        }
-
-        is YtelseMånederDb.BarnetrygdOgHjelpestønadMånederDb -> {
-            Omsorgsmåneder.Hjelpestønad(
-                måneder = this.omsorgsmåneder,
-                barnetrygd = this.barnetrygdmåneder,
-                hjelpestønad = this.hjelpestønadmåneder,
-            )
-        }
+internal fun OmsorgsmånederDb.toDomain(): Omsorgsmåneder {
+    return when (this.type) {
+        OmsorgstypeDb.BARNETRYGD -> Omsorgsmåneder.Barnetrygd(this.omsorgsmåneder)
+        OmsorgstypeDb.HJELPESTØNAD -> Omsorgsmåneder.Hjelpestønad(this.omsorgsmåneder)
     }
 }
 

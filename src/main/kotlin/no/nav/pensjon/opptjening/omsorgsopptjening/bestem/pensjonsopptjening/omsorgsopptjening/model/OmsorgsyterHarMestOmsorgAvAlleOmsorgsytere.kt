@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsmåneder
 import java.time.Month
 import java.time.YearMonth
 
@@ -64,11 +63,11 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         val omsorgsår: Int
     ) {
         fun antall(): Int {
-            return omsorgsmåneder.count()
+            return omsorgsmåneder.alleMåneder().count()
         }
 
         fun haddeOmsorgIDesember(): Boolean {
-            return omsorgsmåneder.contains(YearMonth.of(omsorgsår, Month.DECEMBER))
+            return omsorgsmåneder.alleMåneder().contains(YearMonth.of(omsorgsår, Month.DECEMBER))
         }
     }
 }

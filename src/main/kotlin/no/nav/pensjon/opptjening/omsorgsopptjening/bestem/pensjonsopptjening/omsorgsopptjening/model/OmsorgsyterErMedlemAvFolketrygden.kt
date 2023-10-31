@@ -1,8 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 
-import java.time.YearMonth
-
 object OmsorgsyterErMedlemAvFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemAvFolketrygden.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return Vurdering(
@@ -71,7 +69,7 @@ object OmsorgsyterErMedlemAvFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemAv
         abstract val omsorgsytersMedlemskapsmåneder: Medlemskapsmåneder
 
         fun erOppfylltFor(påkrevetAntallMåneder: Int): Boolean {
-            return omsorgsytersMedlemskapsmåneder.count() >= påkrevetAntallMåneder
+            return omsorgsytersMedlemskapsmåneder.alleMåneder().count() >= påkrevetAntallMåneder
         }
 
         data class OmsorgsmottakerFødtUtenforOmsorgsår(
@@ -87,8 +85,3 @@ object OmsorgsyterErMedlemAvFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemAv
         ) : Grunnlag()
     }
 }
-
-data class Medlemskapsmåneder(
-    val måneder: Set<YearMonth>
-) : Set<YearMonth> by måneder
-

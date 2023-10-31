@@ -72,7 +72,7 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
         abstract val omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder
 
         fun erOppfylltFor(påkrevetAntallMåneder: Int): Boolean {
-            return omsorgsytersUtbetalingsmåneder.gyldige.count() >= påkrevetAntallMåneder
+            return omsorgsytersUtbetalingsmåneder.alleMåneder().count() >= påkrevetAntallMåneder
         }
 
         data class OmsorgsmottakerFødtUtenforOmsorgsår(
@@ -89,28 +89,4 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
     }
 }
 
-data class Utbetalingsmåneder(
-    val måneder: Set<Utbetalingsmåned>,
-    val gyldige: Set<YearMonth> = måneder.filter { it.erOppfylt() }.map { it.måned }.toSet()
-) : Set<YearMonth> by gyldige //TODO
-
-data class Utbetalingsmåned(
-    val måned: YearMonth,
-    val utbetalt: Int,
-    val landstilknytning: Landstilknytning
-){
-    fun erOppfylt(): Boolean {
-        return when(landstilknytning){
-            Landstilknytning.Eøs.UkjentPrimærOgSekundærLand -> {
-                utbetalt > 0
-            }
-            Landstilknytning.Eøs.NorgeSekundærland -> {
-                utbetalt >= 0
-            }
-            Landstilknytning.Norge -> {
-                utbetalt > 0
-            }
-        }
-    }
-}
 

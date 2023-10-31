@@ -1,7 +1,15 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskap
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapmåned
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåned
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåned.Companion.merge
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.merge
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
@@ -25,6 +33,8 @@ data class BeriketDatagrunnlag(
     val omsorgsytersOmsorgsmottakere = omsorgsytersPersongrunnlag.omsorgsmottakere()
     val omsorgsytersOmsorgsår = omsorgsytersPersongrunnlag.omsorgsår()
     val alleMåneder: Set<YearMonth> = persongrunnlag.flatMap { it.måneder() }.distinct().toSet()
+    val omsorgsytersMedlemskapsmåneder = omsorgsytersPersongrunnlag.medlemskapsmåneder()
+    val omsorgsytersUtbetalingsmåneder = omsorgsytersPersongrunnlag.utbetalingsmåneder()
 }
 
 data class Persongrunnlag(
@@ -47,6 +57,14 @@ data class Persongrunnlag(
     fun perioder(): Set<Periode> {
         return omsorgsperioder.map { it.periode }.distinct().toSet()
     }
+
+    fun medlemskapsmåneder(): Medlemskapsmåneder {
+        return omsorgsperioder.map { it.medlemskapsmåneder() }.merge()
+    }
+
+    fun utbetalingsmåneder(): Utbetalingsmåneder {
+        return omsorgsperioder.map { it.utbetalingsmåneder() }.merge()
+    }
 }
 
 data class Omsorgsperiode(
@@ -64,7 +82,39 @@ data class Omsorgsperiode(
     fun alleMåneder(): Set<YearMonth> {
         return periode.alleMåneder().distinct().toSet()
     }
+
+    fun medlemskapsmåneder(): Medlemskapsmåneder {
+        return Medlemskapsmåneder(periode.alleMåneder()
+                                      .map { it to medlemskap }
+                                      .mapNotNull { (mnd, medl) -> Medlemskapmåned.of(mnd, medl) }
+                                      .toSet()
+        )
+    }
+
+    fun utbetalingsmåneder(): Utbetalingsmåneder {
+        return Utbetalingsmåneder(periode.alleMåneder()
+                                      .map { Triple(it, utbetalt, landstilknytning) }
+                                      .mapNotNull { (mnd, utb, land) -> Utbetalingsmåned.of(mnd, utb, land) }
+                                      .toSet()
+        )
+    }
+
+    fun omsorgsmåneder(): Omsorgsmåneder.Barnetrygd {
+        return Omsorgsmåneder.Barnetrygd(alleMåneder())
+    }
+
+    companion object {
+        fun List<Omsorgsperiode>.alleMåneder(): Set<YearMonth> {
+            return flatMap { it.alleMåneder() }.distinct().toSet()
+        }
+
+        fun List<Omsorgsperiode>.omsorgsmåneder(): Omsorgsmåneder.Barnetrygd {
+            return map { it.omsorgsmåneder() }.reduceOrNull { acc, o -> acc.merge(o) }
+                ?: Omsorgsmåneder.Barnetrygd.none()
+        }
+    }
 }
+
 
 data class Hjelpestønadperiode(
     val fom: YearMonth,
@@ -78,26 +128,28 @@ data class Hjelpestønadperiode(
     fun alleMåneder(): Set<YearMonth> {
         return periode.alleMåneder().distinct().toSet()
     }
+
+    /**
+     * Tell alle måneder hvor barnetrygd og hjelpestønad overlapper
+     */
+    fun omsorgsmåneder(omsorgsmåneder: Omsorgsmåneder.Barnetrygd): Omsorgsmåneder.Hjelpestønad {
+        return Omsorgsmåneder.Hjelpestønad(alleMåneder().intersect(omsorgsmåneder.alleMåneder()))
+    }
+
+    companion object {
+        @JvmName("alleMndHjelp")
+        fun List<Hjelpestønadperiode>.alleMåneder(): Set<YearMonth> {
+            return flatMap { it.alleMåneder() }.distinct().toSet()
+        }
+
+        fun List<Hjelpestønadperiode>.omsorgsmåneder(omsorgsmåneder: Omsorgsmåneder.Barnetrygd): Omsorgsmåneder.Hjelpestønad {
+            return map { it.omsorgsmåneder(omsorgsmåneder) }.reduceOrNull { acc, o -> acc.merge(o) }
+                ?: Omsorgsmåneder.Hjelpestønad.none()
+        }
+    }
 }
 
-fun List<Omsorgsperiode>.alleMåneder(): Set<YearMonth> {
-    return flatMap { it.alleMåneder() }.distinct().toSet()
-}
 
-@JvmName("alleMndHjelp")
-fun List<Hjelpestønadperiode>.alleMåneder(): Set<YearMonth> {
-    return flatMap { it.alleMåneder() }.distinct().toSet()
-}
-sealed class Omsorgsmåneder(
-    måneder: Set<YearMonth>
-) : Set<YearMonth> by måneder {
-    data class Barnetrygd(
-        val måneder: Set<YearMonth>
-    ) : Omsorgsmåneder(måneder)
 
-    data class Hjelpestønad(
-        val måneder: Set<YearMonth>,
-        val barnetrygd: Set<YearMonth>,
-        val hjelpestønad: Set<YearMonth>
-    ) : Omsorgsmåneder(måneder)
-}
+
+

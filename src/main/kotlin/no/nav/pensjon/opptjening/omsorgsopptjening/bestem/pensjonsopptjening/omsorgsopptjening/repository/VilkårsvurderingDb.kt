@@ -3,8 +3,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerVurdering
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.GyldigeOmsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.JuridiskHenvisning
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapmåned
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForBarnetrygd
@@ -409,19 +409,19 @@ internal fun GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.toDomain(): Omsorgs
     return when (this) {
         is GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtDesemberOmsorgsår -> {
             OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder)
+                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder.map { Medlemskapmåned(it) }.toSet())
             )
         }
 
         is GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtOmsorgsår -> {
             OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder)
+                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder.map { Medlemskapmåned(it) }.toSet())
             )
         }
 
         is GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtUtenforOmsorgsår -> {
             OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder)
+                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder.map { Medlemskapmåned(it) }.toSet())
             )
         }
     }
@@ -431,17 +431,17 @@ internal fun OmsorgsyterErMedlemAvFolketrygden.Grunnlag.toDb(): GrunnlagVilkårs
     return when(this){
         is OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> {
             GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtDesemberOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder.map { it.måned }.toSet()
             )
         }
         is OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> {
             GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder.map { it.måned }.toSet()
             )
         }
         is OmsorgsyterErMedlemAvFolketrygden.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> {
             GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.MedlemskapBarnFødtUtenforOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder.map { it.måned }.toSet()
             )
         }
     }
@@ -493,28 +493,25 @@ internal fun GrunnlagVilkårsvurderingDb.GyldigOmsorgsarbeid.toDomain(): Omsorgs
     return when (this) {
         is GrunnlagVilkårsvurderingDb.GyldigOmsorgsarbeid.GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår -> {
             OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder),
+                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder.map { Medlemskapmåned(it) }.toSet()),
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(omsorgsytersUtbetalingsmåneder.map { it.toDomain() }.toSet()),
                 omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),
-                gyldigeOmsorgsmåneder = GyldigeOmsorgsmåneder(gyldigeOmsorgsmåneder),
             )
         }
 
         is GrunnlagVilkårsvurderingDb.GyldigOmsorgsarbeid.GyldigOmsorgsarbeidBarnFødtOmsorgsår -> {
             OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder),
+                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder.map { Medlemskapmåned(it) }.toSet()),
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(omsorgsytersUtbetalingsmåneder.map { it.toDomain() }.toSet()),
                 omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),
-                gyldigeOmsorgsmåneder = GyldigeOmsorgsmåneder(gyldigeOmsorgsmåneder),
             )
         }
 
         is GrunnlagVilkårsvurderingDb.GyldigOmsorgsarbeid.GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår -> {
             OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder),
+                omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder.map { Medlemskapmåned(it) }.toSet()),
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(omsorgsytersUtbetalingsmåneder.map { it.toDomain() }.toSet()),
                 omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),
-                gyldigeOmsorgsmåneder = GyldigeOmsorgsmåneder(gyldigeOmsorgsmåneder),
             )
         }
     }
@@ -524,26 +521,23 @@ internal fun OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.toDb(): GrunnlagVilkårs
     return when(this){
         is OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> {
             GrunnlagVilkårsvurderingDb.GyldigOmsorgsarbeid.GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder,
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder.map { it.måned }.toSet(),
                 omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder.måneder.map { it.toDb() }.toSet(),
                 omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDb(),
-                gyldigeOmsorgsmåneder = gyldigeOmsorgsmåneder.måneder,
             )
         }
         is OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> {
             GrunnlagVilkårsvurderingDb.GyldigOmsorgsarbeid.GyldigOmsorgsarbeidBarnFødtOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder,
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder.map { it.måned }.toSet(),
                 omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder.måneder.map { it.toDb() }.toSet(),
                 omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDb(),
-                gyldigeOmsorgsmåneder = gyldigeOmsorgsmåneder.måneder,
             )
         }
         is OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> {
             GrunnlagVilkårsvurderingDb.GyldigOmsorgsarbeid.GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår(
-                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder,
+                omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder.map { it.måned }.toSet(),
                 omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder.måneder.map { it.toDb() }.toSet(),
                 omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDb(),
-                gyldigeOmsorgsmåneder = gyldigeOmsorgsmåneder.måneder,
             )
         }
     }

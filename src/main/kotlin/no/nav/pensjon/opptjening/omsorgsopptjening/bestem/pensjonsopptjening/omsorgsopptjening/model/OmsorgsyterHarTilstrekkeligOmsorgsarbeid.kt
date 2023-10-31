@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsmåneder
 
 /**
  * For barn fra 1 til og med 5 år må omsorgsyter minst ha 6 måneder med omsorgsarbeid for barnet
@@ -89,19 +88,14 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall,
         val påkrevetAntallMåneder: Int
-    ) : ParagrafVurdering<Grunnlag>() {
-        fun omsorgstype(): DomainOmsorgstype {
-            return grunnlag.omsorgstype()
-        }
-    }
+    ) : ParagrafVurdering<Grunnlag>()
 
 
     sealed class Grunnlag : ParagrafGrunnlag() {
-        abstract val aldersvurderingOmsorgsmottaker: AldersvurderingsGrunnlag
         abstract val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder
 
         fun erOppfylltFor(påkrevetAntallMåneder: Int): Boolean {
-            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.count() >= påkrevetAntallMåneder
+            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder().count() >= påkrevetAntallMåneder
         }
 
         fun omsorgstype(): DomainOmsorgstype {
@@ -112,31 +106,16 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         }
 
         data class OmsorgsmottakerFødtUtenforOmsorgsår(
-            override val aldersvurderingOmsorgsmottaker: AldersvurderingsGrunnlag,
             override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
-        ) : Grunnlag() {
-            init {
-                require(aldersvurderingOmsorgsmottaker.fødselsår() != aldersvurderingOmsorgsmottaker.omsorgsAr) { "Ugyldig data. Omsorgsmottaker: ${aldersvurderingOmsorgsmottaker.person} er født i omsorgsår: ${aldersvurderingOmsorgsmottaker.omsorgsAr}" }
-            }
-        }
+        ) : Grunnlag()
 
         data class OmsorgsmottakerFødtIOmsorgsår(
-            override val aldersvurderingOmsorgsmottaker: AldersvurderingsGrunnlag,
             override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
-        ) : Grunnlag() {
-            init {
-                require(aldersvurderingOmsorgsmottaker.fødselsår() == aldersvurderingOmsorgsmottaker.omsorgsAr) { "Ugyldig data. Omsorgsmottaker: ${aldersvurderingOmsorgsmottaker.person} er ikke født i omsorgsår: ${aldersvurderingOmsorgsmottaker.omsorgsAr}" }
-            }
-        }
+        ) : Grunnlag()
 
         data class OmsorgsmottakerFødtIDesemberOmsorgsår(
-            override val aldersvurderingOmsorgsmottaker: AldersvurderingsGrunnlag,
             override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
-        ) : Grunnlag() {
-            init {
-                require(aldersvurderingOmsorgsmottaker.fødselsår() == aldersvurderingOmsorgsmottaker.omsorgsAr) { "Ugyldig data. Omsorgsmottaker: ${aldersvurderingOmsorgsmottaker.person} er ikke født desember i omsorgsår: ${aldersvurderingOmsorgsmottaker.omsorgsAr}" }
-            }
-        }
+        ) : Grunnlag()
     }
 }
 

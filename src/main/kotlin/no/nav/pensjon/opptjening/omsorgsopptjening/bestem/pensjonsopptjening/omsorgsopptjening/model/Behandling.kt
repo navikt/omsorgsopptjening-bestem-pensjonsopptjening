@@ -16,7 +16,7 @@ data class Behandling(
     fun omsorgsår() = grunnlag.omsorgsAr
     fun omsorgsmottaker() = grunnlag.omsorgsmottaker
     fun omsorgsyter() = grunnlag.omsorgsyter
-    fun omsorgstype() = vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid().omsorgstype()
+    fun omsorgstype() = grunnlag.omsorgstype
     fun grunnlag() = grunnlag
 
     fun meldingId() = meldingId
