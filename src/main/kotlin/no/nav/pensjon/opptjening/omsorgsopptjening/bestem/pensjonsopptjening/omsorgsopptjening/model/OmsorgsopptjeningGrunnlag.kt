@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.alleMåneder
@@ -54,30 +53,26 @@ sealed class OmsorgsopptjeningGrunnlag {
     private fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Omsorgsmåneder> {
         return grunnlag.persongrunnlag
             .associate { persongrunnlag ->
-                persongrunnlag.omsorgsyter to persongrunnlag.omsorgsperioder
-                    .filter { it.omsorgsmottaker == omsorgsmottaker }
-                    .let { vedtaksperioder ->
-                        val barnetrygd = vedtaksperioder
-                            .filter { it.omsorgstype == DomainOmsorgstype.BARNETRYGD }
-                            .alleMåneder()
+                Triple(persongrunnlag.omsorgsyter,
+                       persongrunnlag.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker },
+                       persongrunnlag.hjelpestønadperioder.filter { it.omsorgsmottaker == omsorgsmottaker }
+                ).let { (omsorgsyter, omsorgsperioder, hjelpestønadperioder) ->
+                    val barnetrygd = omsorgsperioder.alleMåneder()
+                    val hjelpestønad = hjelpestønadperioder.alleMåneder()
 
-                        val hjelpestønad = vedtaksperioder
-                            .filter { it.omsorgstype == DomainOmsorgstype.HJELPESTØNAD }
-                            .alleMåneder()
-
-                        if (forAldersvurderingOmsorgsmottaker().erOppfylltFor(
-                                OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.ALDERSINTERVALL_BARNETRYGD
-                            )
-                        ) {
-                            Omsorgsmåneder.Barnetrygd(barnetrygd)
-                        } else {
-                            Omsorgsmåneder.Hjelpestønad(
-                                måneder = barnetrygd.intersect(hjelpestønad),
-                                barnetrygd = barnetrygd,
-                                hjelpestønad = hjelpestønad
-                            )
-                        }
+                    if (forAldersvurderingOmsorgsmottaker().erOppfylltFor(
+                            OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.ALDERSINTERVALL_BARNETRYGD
+                        )
+                    ) {
+                        omsorgsyter to Omsorgsmåneder.Barnetrygd(barnetrygd)
+                    } else {
+                        omsorgsyter to Omsorgsmåneder.Hjelpestønad(
+                            måneder = barnetrygd.intersect(hjelpestønad),
+                            barnetrygd = barnetrygd,
+                            hjelpestønad = hjelpestønad
+                        )
                     }
+                }
             }
     }
 

@@ -5,7 +5,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.App
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.kafka.PersongrunnlagKafkaConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -33,6 +32,7 @@ import org.springframework.test.context.ActiveProfiles
 import java.io.Serializable
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 @DirtiesContext
 sealed class SpringContextTest {
@@ -130,6 +130,23 @@ sealed class SpringContextTest {
                     RecordHeader(
                         CorrelationId.identifier,
                         correlationId.toByteArray()
+                    )
+                )
+            )
+            producer.send(pr).get()
+        }
+
+        fun send(melding: String){
+            val pr = ProducerRecord(
+                Topics.Omsorgsopptjening.NAME,
+                null,
+                null,
+                Topics.Omsorgsopptjening.Key(ident = "").mapToJson(),
+                melding,
+                listOf(
+                    RecordHeader(
+                        CorrelationId.identifier,
+                        CorrelationId.generate().toString().toByteArray()
                     )
                 )
             )

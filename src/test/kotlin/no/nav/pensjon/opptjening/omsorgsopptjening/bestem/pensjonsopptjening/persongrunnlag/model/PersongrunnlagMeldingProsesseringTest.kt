@@ -128,7 +128,8 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -229,7 +230,8 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -314,7 +316,8 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),

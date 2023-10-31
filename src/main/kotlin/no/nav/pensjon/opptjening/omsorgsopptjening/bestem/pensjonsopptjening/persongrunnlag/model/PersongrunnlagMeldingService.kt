@@ -151,8 +151,16 @@ class PersongrunnlagMeldingService(
                             utbetalt = omsorgVedtakPeriode.utbetalt,
                             landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain()
                         )
+                    },
+                    hjelpestønadperioder = persongrunnlag.hjelpestønadsperioder.map { hjelpestønadperiode ->
+                        Hjelpestønadperiode(
+                            fom = hjelpestønadperiode.fom,
+                            tom = hjelpestønadperiode.tom,
+                            omsorgstype = hjelpestønadperiode.omsorgstype.toDomain(),
+                            omsorgsmottaker = persondata.finnPerson(hjelpestønadperiode.omsorgsmottaker),
+                            kilde = hjelpestønadperiode.kilde.toDomain()
+                        )
                     }
-
                 )
             },
             innlesingId = innlesingId,

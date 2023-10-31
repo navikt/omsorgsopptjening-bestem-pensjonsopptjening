@@ -145,14 +145,14 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 ),
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                            ),
+                            hjelpestønadsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Hjelpestønadperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),
@@ -244,14 +244,14 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 ),
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                            ),
+                            hjelpestønadsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Hjelpestønadperiode(
                                     fom = YearMonth.of(2018, Month.JANUARY),
                                     tom = YearMonth.of(2030, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
                                 )
                             )
                         ),

@@ -83,7 +83,8 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         utbetalt = 7234,
                                         landstilknytning = Landstilknytning.NORGE
                                     )
-                                )
+                                ),
+                                hjelpestønadsperioder = emptyList(),
                             ),
                         ),
                         rådata = RådataFraKilde(""),
@@ -135,9 +136,10 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgsmottaker = "07081812345",
                                         kilde = Kilde.BARNETRYGD,
                                         utbetalt = 7234,
-                                landstilknytning = Landstilknytning.NORGE
+                                        landstilknytning = Landstilknytning.NORGE
                                     )
-                                )
+                                ),
+                                hjelpestønadsperioder = emptyList(),
                             ),
                         ),
                         rådata = RådataFraKilde(""),
@@ -187,9 +189,10 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgsmottaker = "01122012345",
                                         kilde = Kilde.BARNETRYGD,
                                         utbetalt = 7234,
-                                landstilknytning = Landstilknytning.NORGE
+                                        landstilknytning = Landstilknytning.NORGE
                                     )
-                                )
+                                ),
+                                hjelpestønadsperioder = emptyList(),
                             ),
                             PersongrunnlagMeldingKafka.Persongrunnlag(
                                 omsorgsyter = "04010012797",
@@ -201,9 +204,10 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                                         omsorgsmottaker = "01122012345",
                                         kilde = Kilde.BARNETRYGD,
                                         utbetalt = 7234,
-                                landstilknytning = Landstilknytning.NORGE
+                                        landstilknytning = Landstilknytning.NORGE
                                     ),
-                                )
+                                ),
+                                hjelpestønadsperioder = emptyList(),
                             ),
                         ),
                         rådata = RådataFraKilde(""),

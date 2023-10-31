@@ -71,7 +71,8 @@ internal class InnvilgetBarn2ÅrKafkaIntegrationTest : SpringContextTest.WithKaf
                                 utbetalt = 7234,
                                 landstilknytning = Landstilknytning.NORGE
                             )
-                        )
+                        ),
+                        hjelpestønadsperioder = emptyList(),
                     )
                 ),
                 rådata = RådataFraKilde(""),

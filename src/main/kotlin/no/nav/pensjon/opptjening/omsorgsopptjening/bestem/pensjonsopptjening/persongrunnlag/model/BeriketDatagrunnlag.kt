@@ -29,7 +29,8 @@ data class BeriketDatagrunnlag(
 
 data class Persongrunnlag(
     val omsorgsyter: Person,
-    val omsorgsperioder: List<Omsorgsperiode>
+    val omsorgsperioder: List<Omsorgsperiode>,
+    val hjelpestønadperioder: List<Hjelpestønadperiode>,
 ) {
     fun omsorgsmottakere(): Set<Person> {
         return omsorgsperioder.map { it.omsorgsmottaker }.distinct().toSet()
@@ -65,10 +66,28 @@ data class Omsorgsperiode(
     }
 }
 
+data class Hjelpestønadperiode(
+    val fom: YearMonth,
+    val tom: YearMonth,
+    val omsorgstype: DomainOmsorgstype,
+    val omsorgsmottaker: Person,
+    val kilde: DomainKilde,
+) {
+    val periode = Periode(fom, tom)
+
+    fun alleMåneder(): Set<YearMonth> {
+        return periode.alleMåneder().distinct().toSet()
+    }
+}
+
 fun List<Omsorgsperiode>.alleMåneder(): Set<YearMonth> {
     return flatMap { it.alleMåneder() }.distinct().toSet()
 }
 
+@JvmName("alleMndHjelp")
+fun List<Hjelpestønadperiode>.alleMåneder(): Set<YearMonth> {
+    return flatMap { it.alleMåneder() }.distinct().toSet()
+}
 sealed class Omsorgsmåneder(
     måneder: Set<YearMonth>
 ) : Set<YearMonth> by måneder {

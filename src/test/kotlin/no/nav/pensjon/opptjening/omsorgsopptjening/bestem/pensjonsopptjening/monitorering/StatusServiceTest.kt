@@ -81,7 +81,8 @@ object StatusServiceTest {
                                 utbetalt = 7234,
                                 landstilknytning = Landstilknytning.NORGE
                             )
-                        )
+                        ),
+                        hjelpestønadsperioder = emptyList()
                     ),
                 ),
                 rådata = RådataFraKilde(""),

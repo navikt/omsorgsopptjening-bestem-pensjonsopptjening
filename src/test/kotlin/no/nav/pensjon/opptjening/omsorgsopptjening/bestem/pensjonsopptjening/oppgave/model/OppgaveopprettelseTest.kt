@@ -71,7 +71,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
@@ -85,7 +86,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -118,7 +120,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
@@ -132,7 +135,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -184,7 +188,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
@@ -207,7 +212,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -251,7 +257,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
@@ -274,7 +281,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "01018212345",
@@ -288,7 +296,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -342,7 +351,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
@@ -356,7 +366,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -395,7 +406,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
@@ -409,7 +421,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -458,7 +471,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
@@ -481,7 +495,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -548,7 +563,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                         PersongrunnlagMeldingKafka.Persongrunnlag(
                             omsorgsyter = "04010012797",
@@ -571,7 +587,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),

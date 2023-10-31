@@ -109,7 +109,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -192,7 +193,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
@@ -256,7 +258,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                                     utbetalt = 7234,
                                     landstilknytning = Landstilknytning.NORGE
                                 )
-                            )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
                         ),
                     ),
                     rådata = RådataFraKilde(""),
