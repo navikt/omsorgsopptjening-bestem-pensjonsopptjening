@@ -11,8 +11,9 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List
     private val omsorgsarbeidProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "omsorgsarbeidProsessert")
     private val innvilget = registry.counter("behandling", "antall", "innvilget")
     private val avslag = registry.counter("behandling", "antall", "avslag")
-    private val antall = registry.counter("behandling", "antall", "totalt")
-    private val antallBehandlingerPerson = registry.counter("behandling", "antall", "pr_person")
+    private val antallUnikeProsesseringer = registry.counter("behandling", "antall", "totalt")
+    private val antallBehandlingerPerProsessering = registry.counter("behandling", "antall", "pr_prosessering")
+    private val antallAvslåttBehandlingPerProsessering = registry.counter("behandling", "antall", "avslag_pr_prosessering")
 
     private val omsorgsyterHarMestOmsorgAvAlleOmsorgsytere =
         registry.counter("avslag", "antall", "omsorgsyterHarMestOmsorgAvAlleOmsorgsytere")
@@ -35,24 +36,29 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List
     private val omsorgsyterHarGyldigOmsorgsarbeid =
         registry.counter("avslag", "antall", "OmsorgsyterHarGyldigOmsorgsarbeid")
 
+
     override fun oppdater(lambda: () -> List<FullførtBehandling>?): List<FullførtBehandling>? {
         return omsorgsarbeidProsessertTidsbruk.recordCallable(lambda)?.also { fullførte ->
-            antall.increment()
+            antallUnikeProsesseringer.increment()
+            fullførte.tellAntallBehandlinger()
             if (fullførte.any { it.erInnvilget() }) {
                 innvilget.increment()
             } else {
                 fullførte.tellAvslagsårsaker()
+                fullførte.tellAntallAvslag()
                 avslag.increment()
             }
         }
     }
 
-    private fun List<FullførtBehandling>.tellAntall(){
-        return forEach { _ -> antallBehandlingerPerson.increment() }
+    private fun List<FullførtBehandling>.tellAntallBehandlinger(){
+        return forEach { _ -> antallBehandlingerPerProsessering.increment() }
+    }
+    private fun List<FullførtBehandling>.tellAntallAvslag(){
+        return filter { !it.erInnvilget() }.forEach { _ -> antallAvslåttBehandlingPerProsessering.increment() }
     }
 
     private fun List<FullførtBehandling>.tellAvslagsårsaker() {
-        antallBehandlingerPerson.
         flatMap { it.avslagsArsaker() }.associateBy { it.javaClass }.values.map {
             when (it) {
                 is EllerVurdering -> {}
