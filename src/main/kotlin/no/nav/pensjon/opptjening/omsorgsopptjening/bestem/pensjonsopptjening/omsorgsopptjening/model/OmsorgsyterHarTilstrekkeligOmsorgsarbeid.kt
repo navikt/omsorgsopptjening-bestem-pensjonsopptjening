@@ -18,26 +18,17 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         return Vurdering(
             grunnlag = grunnlag,
             utfall = bestemUtfall(grunnlag),
-            påkrevetAntallMåneder = grunnlag.påkrevetAntallMåneder(),
         )
     }
 
-    fun Grunnlag.påkrevetAntallMåneder(): Int {
-        return when (this) {
-            is Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> 1
-            is Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> 1
-            is Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> 6
-        }
-    }
-
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
-        return when (grunnlag) {
-            is Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> {
+        return when (grunnlag.antallMånederRegel) {
+            AntallMånederRegel.FødtIOmsorgsår -> {
                 setOf(
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
-                    if (grunnlag.erOppfylltFor(grunnlag.påkrevetAntallMåneder())) {
+                    if (grunnlag.erOppfylltFor(grunnlag.antallMånederRegel.antall)) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -45,7 +36,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                 }
             }
 
-            is Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> {
+            AntallMånederRegel.FødtUtenforOmsorgsår -> {
                 when (grunnlag.omsorgstype()) {
                     DomainOmsorgstype.BARNETRYGD -> {
                         setOf(
@@ -61,20 +52,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                         )
                     }
                 }.let {
-                    if (grunnlag.erOppfylltFor(grunnlag.påkrevetAntallMåneder())) {
-                        VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
-                    } else {
-                        VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
-                    }
-                }
-            }
-
-            is Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> {
-                setOf(
-                    Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
-                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
-                ).let {
-                    if (grunnlag.erOppfylltFor(grunnlag.påkrevetAntallMåneder())) {
+                    if (grunnlag.erOppfylltFor(grunnlag.antallMånederRegel.antall)) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -86,13 +64,14 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
     data class Vurdering(
         override val grunnlag: Grunnlag,
-        override val utfall: VilkårsvurderingUtfall,
-        val påkrevetAntallMåneder: Int
+        override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>()
 
 
-    sealed class Grunnlag : ParagrafGrunnlag() {
-        abstract val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder
+    data class Grunnlag(
+        val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
+        val antallMånederRegel: AntallMånederRegel
+    ) : ParagrafGrunnlag() {
 
         fun erOppfylltFor(påkrevetAntallMåneder: Int): Boolean {
             return omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder().count() >= påkrevetAntallMåneder
@@ -104,18 +83,6 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                 is Omsorgsmåneder.Hjelpestønad -> DomainOmsorgstype.HJELPESTØNAD
             }
         }
-
-        data class OmsorgsmottakerFødtUtenforOmsorgsår(
-            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
-        ) : Grunnlag()
-
-        data class OmsorgsmottakerFødtIOmsorgsår(
-            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
-        ) : Grunnlag()
-
-        data class OmsorgsmottakerFødtIDesemberOmsorgsår(
-            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
-        ) : Grunnlag()
     }
 }
 

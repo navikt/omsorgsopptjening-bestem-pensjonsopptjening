@@ -9,6 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AntallMånederRegel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskap
@@ -123,12 +124,16 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>()
                 .also { vurdering ->
                     assertInstanceOf(
-                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår::class.java,
+                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag::class.java,
                         vurdering.grunnlag
                     ).also {
                         assertEquals(
                             Periode(2021).alleMåneder(),
-                            it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder()
+                            it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder(),
+                        )
+                        assertEquals(
+                            AntallMånederRegel.FødtIOmsorgsår,
+                            it.antallMånederRegel,
                         )
                     }
                 }
@@ -207,7 +212,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>()
                 .also { vurdering ->
                     assertInstanceOf(
-                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår::class.java,
+                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag::class.java,
                         vurdering.grunnlag
                     ).also {
                         assertEquals(
@@ -216,6 +221,10 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                 YearMonth.of(2020, Month.DECEMBER)
                             ).alleMåneder(),
                             it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder()
+                        )
+                        assertEquals(
+                            AntallMånederRegel.FødtIOmsorgsår,
+                            it.antallMånederRegel,
                         )
                     }
                 }
@@ -262,7 +271,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>()
                 .also { vurdering ->
                     assertInstanceOf(
-                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår::class.java,
+                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag::class.java,
                         vurdering.grunnlag
                     ).also {
                         assertEquals(
@@ -271,6 +280,10 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                 YearMonth.of(2020, Month.DECEMBER)
                             ).alleMåneder(),
                             it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder()
+                        )
+                        assertEquals(
+                            AntallMånederRegel.FødtIOmsorgsår,
+                            it.antallMånederRegel,
                         )
                     }
                 }
@@ -316,12 +329,16 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>()
                 .also { vurdering ->
                     assertInstanceOf(
-                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår::class.java,
+                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag::class.java,
                         vurdering.grunnlag
                     ).also {
                         assertEquals(
                             Periode(2020).alleMåneder(),
                             it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder()
+                        )
+                        assertEquals(
+                            AntallMånederRegel.FødtUtenforOmsorgsår,
+                            it.antallMånederRegel,
                         )
                     }
                 }
@@ -367,12 +384,16 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>()
                 .also { vurdering ->
                     assertInstanceOf(
-                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår::class.java,
+                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag::class.java,
                         vurdering.grunnlag
                     ).also {
                         assertEquals(
                             Periode(YearMonth.of(2020, Month.JANUARY), YearMonth.of(2020, Month.MAY)).alleMåneder(),
                             it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder()
+                        )
+                        assertEquals(
+                            AntallMånederRegel.FødtUtenforOmsorgsår,
+                            it.antallMånederRegel,
                         )
                     }
                 }
@@ -426,12 +447,16 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>()
                 .also { vurdering ->
                     assertInstanceOf(
-                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår::class.java,
+                        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag::class.java,
                         vurdering.grunnlag
                     ).also {
                         assertEquals(
                             Periode(YearMonth.of(2020, Month.JANUARY), YearMonth.of(2020, Month.MAY)).alleMåneder(),
                             it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder()
+                        )
+                        assertEquals(
+                            AntallMånederRegel.FødtUtenforOmsorgsår,
+                            it.antallMånederRegel,
                         )
                     }
                 }
@@ -1649,7 +1674,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 ), behandling.vilkårsvurdering.finnAlleAvslatte()
             )
             behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>().also { vurdering ->
-                assertEquals(6, vurdering.påkrevetAntallMåneder)
+                assertEquals(6, vurdering.grunnlag.antallMånederRegel.antall)
                 assertEquals(år(2020).alleMåneder(), vurdering.grunnlag.omsorgsytersOmsorgsmåneder.alleMåneder())
                 assertEquals(år(2020).alleMåneder(), vurdering.grunnlag.omsorgsytersMedlemskapsmåneder.alleMåneder())
                 assertEquals(

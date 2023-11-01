@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AldersvurderingsGrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AntallMånederRegel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
@@ -19,24 +20,11 @@ import java.util.UUID
     property = "type",
 )
 internal sealed class GrunnlagVilkårsvurderingDb {
-    internal sealed class OmsorgBarnUnder6 : GrunnlagVilkårsvurderingDb() {
-        abstract val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb
-
-        @JsonTypeName("OmsorgBarnFødtOmsorgsår")
-        data class OmsorgBarnFødtOmsorgsår(
-            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb,
-        ) : OmsorgBarnUnder6()
-
-        @JsonTypeName("OmsorgBarnFødtDesemberOmsorgsår")
-        data class OmsorgBarnFødtDesemberOmsorgsår(
-            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb,
-        ) : OmsorgBarnUnder6()
-
-        @JsonTypeName("OmsorgBarnFødtUtenforOmsorgsår")
-        data class OmsorgBarnFødtUtenforOmsorgsår(
-            override val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb,
-        ) : OmsorgBarnUnder6()
-    }
+    @JsonTypeName("OmsorgBarnUnder6")
+    data class OmsorgBarnUnder6(
+        val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb,
+        val antallMånederRegel: AntallMånederRegelDb
+    ) : GrunnlagVilkårsvurderingDb()
 
     @JsonTypeName("AldersvurderingGrunnlag")
     data class AldersvurderingGrunnlag(
@@ -72,69 +60,55 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         val omsorgsmottakersFamilierelasjoner: Map<String, String>,
     ) : GrunnlagVilkårsvurderingDb()
 
-    internal sealed class MedlemIFolketrygden : GrunnlagVilkårsvurderingDb() {
-        abstract val omsorgsytersMedlemskapsmåneder: Set<YearMonth>
+    @JsonTypeName("MedlemIFolketrygden")
+    data class MedlemIFolketrygden(
+        val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
+        val antallMånederRegel: AntallMånederRegelDb,
+    ) : GrunnlagVilkårsvurderingDb()
 
-        @JsonTypeName("MedlemskapBarnFødtOmsorgsår")
-        data class MedlemskapBarnFødtOmsorgsår(
-            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-        ) : MedlemIFolketrygden()
+    @JsonTypeName("MottarBarnetrygd")
+    data class MottarBarnetrygd(
+        val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
+        val antallMånederRegel: AntallMånederRegelDb,
+    ) : GrunnlagVilkårsvurderingDb()
 
-        @JsonTypeName("MedlemskapBarnFødtDesemberOmsorgsår")
-        data class MedlemskapBarnFødtDesemberOmsorgsår(
-            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-        ) : MedlemIFolketrygden()
+    @JsonTypeName("GyldigOmsorgsarbeid")
+    data class GyldigOmsorgsarbeid(
+        val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
+        val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
+        val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb,
+        val antallMånederRegel: AntallMånederRegelDb,
+    ) : GrunnlagVilkårsvurderingDb()
+}
 
-        @JsonTypeName("MedlemskapBarnFødtUtenforOmsorgsår")
-        data class MedlemskapBarnFødtUtenforOmsorgsår(
-            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-        ) : MedlemIFolketrygden()
+data class AntallMånederRegelDb(
+    val enum: AntallMånederRegelEnum,
+    val antallMåneder: Int,
+)
+
+enum class AntallMånederRegelEnum {
+    FødtIOmsorgsår,
+    FødtUtenforOmsorgsår
+}
+
+internal fun AntallMånederRegel.toDb(): AntallMånederRegelDb {
+    return when (this) {
+        AntallMånederRegel.FødtIOmsorgsår -> AntallMånederRegelDb(
+            AntallMånederRegelEnum.FødtIOmsorgsår,
+            AntallMånederRegel.FødtIOmsorgsår.antall
+        )
+
+        AntallMånederRegel.FødtUtenforOmsorgsår -> AntallMånederRegelDb(
+            AntallMånederRegelEnum.FødtUtenforOmsorgsår,
+            AntallMånederRegel.FødtUtenforOmsorgsår.antall
+        )
     }
+}
 
-    internal sealed class MottarBarnetrygd : GrunnlagVilkårsvurderingDb() {
-        abstract val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>
-
-        @JsonTypeName("MottarBarnetrygdBarnFødtOmsorgsår")
-        data class MottarBarnetrygdBarnFødtOmsorgsår(
-            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
-        ) : MottarBarnetrygd()
-
-        @JsonTypeName("MottarBarnetrygdBarnFødtDesemberOmsorgsår")
-        data class MottarBarnetrygdBarnFødtDesemberOmsorgsår(
-            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
-        ) : MottarBarnetrygd()
-
-        @JsonTypeName("MottarBarnetrygdBarnFødtUtenforOmsorgsår")
-        data class MottarBarnetrygdBarnFødtUtenforOmsorgsår(
-            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
-        ) : MottarBarnetrygd()
-    }
-
-    internal sealed class GyldigOmsorgsarbeid : GrunnlagVilkårsvurderingDb() {
-        abstract val omsorgsytersMedlemskapsmåneder: Set<YearMonth>
-        abstract val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>
-        abstract val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb
-
-        @JsonTypeName("GyldigOmsorgsarbeidBarnFødtOmsorgsår")
-        data class GyldigOmsorgsarbeidBarnFødtOmsorgsår(
-            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
-            override val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb,
-        ) : GyldigOmsorgsarbeid()
-
-        @JsonTypeName("GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår")
-        data class GyldigOmsorgsarbeidBarnFødtDesemberOmsorgsår(
-            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
-            override val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb,
-        ) : GyldigOmsorgsarbeid()
-
-        @JsonTypeName("GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår")
-        data class GyldigOmsorgsarbeidBarnFødtUtenforOmsorgsår(
-            override val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-            override val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
-            override val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb,
-        ) : GyldigOmsorgsarbeid()
+internal fun AntallMånederRegelDb.toDomain(): AntallMånederRegel {
+    return when (this.enum) {
+        AntallMånederRegelEnum.FødtIOmsorgsår -> AntallMånederRegel.FødtIOmsorgsår
+        AntallMånederRegelEnum.FødtUtenforOmsorgsår -> AntallMånederRegel.FødtUtenforOmsorgsår
     }
 }
 
@@ -313,48 +287,17 @@ internal fun FullførteBehandlingForOmsorgsyterDb.toDomain(): OmsorgsopptjeningK
 }
 
 internal fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6 {
-    return when (this) {
-        is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår -> {
-            GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtOmsorgsår(
-                omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDb(),
-            )
-        }
-
-        is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår -> {
-            GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtUtenforOmsorgsår(
-                omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDb()
-            )
-        }
-
-        is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår -> {
-            GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtDesemberOmsorgsår(
-                omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDb()
-            )
-        }
-    }
+    return GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6(
+        omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDb(),
+        antallMånederRegel = antallMånederRegel.toDb()
+    )
 }
 
 internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.toDomain(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
-    return when (this) {
-        is GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtOmsorgsår -> {
-            OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIOmsorgsår(
-                omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain()
-            )
-        }
-
-        is GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtUtenforOmsorgsår -> {
-            OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtUtenforOmsorgsår(
-                omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain()
-
-            )
-        }
-
-        is GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.OmsorgBarnFødtDesemberOmsorgsår -> {
-            OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.OmsorgsmottakerFødtIDesemberOmsorgsår(
-                omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain(),
-            )
-        }
-    }
+    return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+        omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain(),
+        antallMånederRegel = antallMånederRegel.toDomain(),
+    )
 }
 
 internal fun GrunnlagVilkårsvurderingDb.AldersvurderingGrunnlag.toDomain(): AldersvurderingsGrunnlag {
