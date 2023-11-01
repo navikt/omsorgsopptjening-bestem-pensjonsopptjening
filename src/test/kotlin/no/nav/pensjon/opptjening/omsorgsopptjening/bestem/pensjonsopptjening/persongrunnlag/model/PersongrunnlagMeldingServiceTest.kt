@@ -472,7 +472,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    fun `gitt at flere omsorgytere har ytt omsorg for samme barn, innvilges opptjening til omsorgsyter med flest måneder omsorg i opptjeningsåret - innvilget for omsorgsyter under behandling`() {
+    fun `gitt at flere omsorgytere har ytt omsorg for samme barn, innvilges opptjening til omsorgsyter med flest gyldige måneder omsorg i opptjeningsåret - innvilget for omsorgsyter under behandling`() {
         repo.persist(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
@@ -562,6 +562,79 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                         "12345678910" to 8,
                         "04010012797" to 7,
                         "01019212345" to 2,
+                    ),
+                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `gitt at flere omsorgytere har ytt omsorg for samme barn, innvilges opptjening til omsorgsyter med flest gyldige måneder, selv om andre har flere måneder med ugyldig barnetrygd`() {
+        repo.persist(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.JUNE),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "04010012797",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.MAY),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                ),
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JUNE),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 0,
+                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                    ),
+                    rådata = RådataFraKilde(""),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        handler.process().single().also { behandling ->
+            behandling.assertInnvilget(
+                omsorgsyter = "12345678910",
+                omsorgsmottaker = "07081812345"
+            )
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
+                assertTrue(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                assertFalse(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
+                assertEquals(
+                    mapOf(
+                        "12345678910" to 6,
+                        "04010012797" to 5,
                     ),
                     it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
@@ -1689,7 +1762,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                         YearMonth.of(2020, Month.JUNE),
                         YearMonth.of(2020, Month.JULY),
                         YearMonth.of(2020, Month.AUGUST),
-                    ), vurdering.grunnlag.gyldigeOmsorgsmåneder
+                    ), vurdering.grunnlag.gyldigeOmsorgsmåneder.alleMåneder()
                 )
             }
         }

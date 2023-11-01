@@ -13,8 +13,8 @@ interface VurderVilkår {
     fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering
     fun OmsorgsyterErForelderTilMottakerAvHjelpestønad(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering
     fun OmsorgsyterErMedlemAvFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Vurdering
-    fun OmsorgsyterMottarBarnetrgyd() : OmsorgsyterMottarBarnetrgyd.Vurdering
-    fun OmsorgsyterHarGyldigOmsorgsarbeid() : OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering
+    fun OmsorgsyterMottarBarnetrgyd(): OmsorgsyterMottarBarnetrgyd.Vurdering
+    fun OmsorgsyterHarGyldigOmsorgsarbeid(): OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering
 }
 
 internal class VilkårsvurderingFactory(
@@ -24,9 +24,11 @@ internal class VilkårsvurderingFactory(
     override fun OmsorgsyterOppfyllerAlderskrav(): OmsorgsyterOppfyllerAlderskrav.Vurdering {
         return OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(grunnlag.forAldersvurderingOmsorgsyter())
     }
+
     override fun OmsorgsmottakerOppfyllerAlderskravForBarnetryg(): OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering {
         return OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.vilkarsVurder(grunnlag.forAldersvurderingOmsorgsmottaker())
     }
+
     override fun OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(): OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering {
         return OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.vilkarsVurder(grunnlag.forAldersvurderingOmsorgsmottaker())
     }
@@ -55,9 +57,7 @@ internal class VilkårsvurderingFactory(
     }
 
     override fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering {
-        return OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.vilkarsVurder(
-            grunnlag.forSummertOmsorgPerOmsorgsyter()
-        )
+        return OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.vilkarsVurder(grunnlag.forGyldigOmsorgsarbeidPerOmsorgsyter())
     }
 
     override fun OmsorgsyterErForelderTilMottakerAvHjelpestønad(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering {
@@ -73,7 +73,7 @@ internal class VilkårsvurderingFactory(
     }
 
     override fun OmsorgsyterHarGyldigOmsorgsarbeid(): OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering {
-        return OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(grunnlag.forGyldigOmsorgsarbeid())
+        return OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(grunnlag.forGyldigOmsorgsarbeid(grunnlag.omsorgsyter))
     }
 
     override fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AldersvurderingsGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AntallMånederRegel
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.GyldigeOmsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
@@ -137,7 +138,7 @@ internal fun GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere.toDomain(): Omso
             OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
                 omsorgsyter = it.omsorgsyter,
                 omsorgsmottaker = it.omsorgsmottaker,
-                omsorgsmåneder = it.omsorgsmåneder.toDomain(),
+                omsorgsmåneder = GyldigeOmsorgsmåneder(it.omsorgsmåneder),
                 omsorgsår = it.omsorgsår
             )
         }
@@ -153,7 +154,7 @@ internal fun GrunnlagVilkårsvurderingDb.MestAvAlleOmsorgsytere.toDomain(): Omso
 internal data class OmsorgsyterMottakerAntallMånederDb(
     val omsorgsyter: String,
     val omsorgsmottaker: String,
-    val omsorgsmåneder: OmsorgsmånederDb,
+    val omsorgsmåneder: Set<YearMonth>,
     val omsorgsår: Int,
 )
 
@@ -164,7 +165,7 @@ internal fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag.toDb(): Grunnla
             OmsorgsyterMottakerAntallMånederDb(
                 omsorgsyter = it.omsorgsyter,
                 omsorgsmottaker = it.omsorgsmottaker,
-                omsorgsmåneder = it.omsorgsmåneder.toDb(),
+                omsorgsmåneder = it.omsorgsmåneder.alleMåneder(),
                 omsorgsår = it.omsorgsår
             )
         }

@@ -59,7 +59,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     data class OmsorgsmånederForMottakerOgÅr(
         val omsorgsyter: String,
         val omsorgsmottaker: String,
-        val omsorgsmåneder: Omsorgsmåneder,
+        val omsorgsmåneder: GyldigeOmsorgsmåneder,
         val omsorgsår: Int
     ) {
         fun antall(): Int {

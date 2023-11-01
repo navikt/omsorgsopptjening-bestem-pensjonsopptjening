@@ -28,7 +28,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
                     Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
-                    if (grunnlag.erOppfylltFor(grunnlag.antallMånederRegel.antall)) {
+                    if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -52,7 +52,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                         )
                     }
                 }.let {
-                    if (grunnlag.erOppfylltFor(grunnlag.antallMånederRegel.antall)) {
+                    if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -73,8 +73,8 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         val antallMånederRegel: AntallMånederRegel
     ) : ParagrafGrunnlag() {
 
-        fun erOppfylltFor(påkrevetAntallMåneder: Int): Boolean {
-            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder().count() >= påkrevetAntallMåneder
+        fun erOppfyllt(): Boolean {
+            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder().count() >= antallMånederRegel.antall
         }
 
         fun omsorgstype(): DomainOmsorgstype {

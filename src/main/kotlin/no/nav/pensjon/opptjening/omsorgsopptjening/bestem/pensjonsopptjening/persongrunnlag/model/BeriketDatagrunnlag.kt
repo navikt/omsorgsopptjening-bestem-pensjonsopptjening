@@ -10,6 +10,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåned.Companion.merge
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.merge
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Hjelpestønadperiode.Companion.omsorgsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.medlemskapsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.omsorgsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.utbetalingsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
@@ -33,8 +37,30 @@ data class BeriketDatagrunnlag(
     val omsorgsytersOmsorgsmottakere = omsorgsytersPersongrunnlag.omsorgsmottakere()
     val omsorgsytersOmsorgsår = omsorgsytersPersongrunnlag.omsorgsår()
     val alleMåneder: Set<YearMonth> = persongrunnlag.flatMap { it.måneder() }.distinct().toSet()
-    val omsorgsytersMedlemskapsmåneder = omsorgsytersPersongrunnlag.medlemskapsmåneder()
-    val omsorgsytersUtbetalingsmåneder = omsorgsytersPersongrunnlag.utbetalingsmåneder()
+    fun omsorgsmånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, Omsorgsmåneder.Barnetrygd> {
+        return persongrunnlag.associate { pg ->
+            pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }.omsorgsmåneder()
+        }
+    }
+
+    fun hjelpestønadMånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, Omsorgsmåneder.Hjelpestønad> {
+        return persongrunnlag.associate { pg ->
+            pg.omsorgsyter to pg.hjelpestønadperioder.filter { it.omsorgsmottaker == omsorgsmottaker }
+                .omsorgsmåneder(omsorgsmånederPerOmsorgsyter(omsorgsmottaker)[pg.omsorgsyter]!!)
+        }
+    }
+
+    fun medlemskapsmånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, Medlemskapsmåneder> {
+        return persongrunnlag.associate { pg ->
+            pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }.medlemskapsmåneder()
+        }
+    }
+
+    fun utbetalingsmånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, Utbetalingsmåneder> {
+        return persongrunnlag.associate { pg ->
+            pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }.utbetalingsmåneder()
+        }
+    }
 }
 
 data class Persongrunnlag(
@@ -111,6 +137,16 @@ data class Omsorgsperiode(
         fun List<Omsorgsperiode>.omsorgsmåneder(): Omsorgsmåneder.Barnetrygd {
             return map { it.omsorgsmåneder() }.reduceOrNull { acc, o -> acc.merge(o) }
                 ?: Omsorgsmåneder.Barnetrygd.none()
+        }
+
+        fun List<Omsorgsperiode>.medlemskapsmåneder(): Medlemskapsmåneder {
+            return map { it.medlemskapsmåneder() }.reduceOrNull { acc, o -> acc.merge(o) }
+                ?: Medlemskapsmåneder.none()
+        }
+
+        fun List<Omsorgsperiode>.utbetalingsmåneder(): Utbetalingsmåneder {
+            return map { it.utbetalingsmåneder() }.reduceOrNull { acc, o -> acc.merge(o) }
+                ?: Utbetalingsmåneder.none()
         }
     }
 }

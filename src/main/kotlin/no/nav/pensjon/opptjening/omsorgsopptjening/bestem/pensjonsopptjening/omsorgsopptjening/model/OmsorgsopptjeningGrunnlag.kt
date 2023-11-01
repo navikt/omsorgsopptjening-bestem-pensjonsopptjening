@@ -3,9 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Hjelpestønadperiode.Companion.omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
@@ -35,55 +33,33 @@ sealed class OmsorgsopptjeningGrunnlag {
         }
     }
 
-    protected fun omsorgsytersOmsorgsmånederForOmsorgsmottaker(): Omsorgsmåneder {
-        return omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!
-    }
-
-    protected fun omsorgsytersMedlemskapsmåneder(): Medlemskapsmåneder {
-        return grunnlag.omsorgsytersMedlemskapsmåneder
-    }
-
-    protected fun omsorgsytersUtbetalingsmåneder(): Utbetalingsmåneder {
-        return grunnlag.omsorgsytersUtbetalingsmåneder
-    }
-
     private fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Omsorgsmåneder> {
-        return grunnlag.persongrunnlag
-            .associate { persongrunnlag ->
-                Triple(persongrunnlag.omsorgsyter,
-                       persongrunnlag.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker },
-                       persongrunnlag.hjelpestønadperioder.filter { it.omsorgsmottaker == omsorgsmottaker }
-                ).let { (omsorgsyter, omsorgsperioder, hjelpestønadperioder) ->
-                    val barnetrygd = omsorgsperioder.omsorgsmåneder()
-                    val hjelpestønad = hjelpestønadperioder.omsorgsmåneder(barnetrygd)
-
+        return (grunnlag.omsorgsmånederPerOmsorgsyter(omsorgsmottaker) to grunnlag.hjelpestønadMånederPerOmsorgsyter(
+            omsorgsmottaker
+        )).let { (bt, hs) ->
+            //disse skal i utgangspunktet være 1-1
+            (bt.keys + hs.keys).distinct().associate { p ->
+                Triple(p, bt[p]!!, hs[p]!!).let { (person, barnetrygd, hjelpestønad) ->
                     when (omsorgstype) {
                         DomainOmsorgstype.BARNETRYGD -> {
-                            omsorgsyter to barnetrygd
+                            person to barnetrygd
                         }
 
                         DomainOmsorgstype.HJELPESTØNAD -> {
-                            omsorgsyter to hjelpestønad
+                            person to hjelpestønad
                         }
                     }
                 }
             }
+        }
     }
 
-    fun forSummertOmsorgPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
-        return omsorgsmånederForOmsorgsmottakerPerOmsorgsyter().let {
-            OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
-                omsorgsyter = omsorgsyter.fnr,
-                data = it.map { (yter, antallMnd) ->
-                    OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
-                        omsorgsyter = yter.fnr,
-                        omsorgsmottaker = omsorgsmottaker.fnr,
-                        omsorgsmåneder = antallMnd,
-                        omsorgsår = omsorgsAr
-                    )
-                }
-            )
-        }
+    private fun medlemskapsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Medlemskapsmåneder> {
+        return grunnlag.medlemskapsmånederPerOmsorgsyter(omsorgsmottaker)
+    }
+
+    private fun utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Utbetalingsmåneder> {
+        return grunnlag.utbetalingsmånederPerOmsorgsyter(omsorgsmottaker)
     }
 
     fun forAldersvurderingOmsorgsyter(): AldersvurderingsGrunnlag {
@@ -111,32 +87,52 @@ sealed class OmsorgsopptjeningGrunnlag {
 
     fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
         return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
-            omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker(),
+            omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel()
         )
     }
 
     fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Grunnlag {
         return OmsorgsyterErMedlemAvFolketrygden.Grunnlag(
-            omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder(),
+            omsorgsytersMedlemskapsmåneder = medlemskapsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel()
         )
     }
 
     fun forMottarBarnetrygd(): OmsorgsyterMottarBarnetrgyd.Grunnlag {
         return OmsorgsyterMottarBarnetrgyd.Grunnlag(
-            omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder(),
+            omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel(),
         )
     }
 
-    fun forGyldigOmsorgsarbeid(): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
+    fun forGyldigOmsorgsarbeid(omsorgsyter: Person): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
         return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
-            omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder(),
-            omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder(),
-            omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker(),
+            omsorgsytersMedlemskapsmåneder = medlemskapsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            omsorgsytersOmsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel()
         )
+    }
+
+    fun forGyldigOmsorgsarbeidPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
+        return grunnlag.persongrunnlag.associate {
+            it.omsorgsyter to forGyldigOmsorgsarbeid(it.omsorgsyter)
+        }.map {
+            it.key.fnr to it.value.gyldigeOmsorgsmåneder
+        }.let {
+            OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
+                omsorgsyter = omsorgsyter.fnr,
+                data = it.map { (yter, antallMnd) ->
+                    OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
+                        omsorgsyter = yter,
+                        omsorgsmottaker = omsorgsmottaker.fnr,
+                        omsorgsmåneder = antallMnd,
+                        omsorgsår = omsorgsAr
+                    )
+                }
+            )
+        }
     }
 
     abstract fun antallMånederRegel(): AntallMånederRegel

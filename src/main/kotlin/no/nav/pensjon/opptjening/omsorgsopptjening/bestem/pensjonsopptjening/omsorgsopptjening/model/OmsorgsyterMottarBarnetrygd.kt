@@ -15,7 +15,7 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
                 setOf(
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
                 ).let {
-                    if (grunnlag.erOppfylltFor(grunnlag.antallMånederRegel.antall)) {
+                    if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -27,7 +27,7 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
                 setOf(
                     Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
                 ).let {
-                    if (grunnlag.erOppfylltFor(grunnlag.antallMånederRegel.antall)) {
+                    if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -46,8 +46,8 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
         val omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder,
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
-        fun erOppfylltFor(påkrevetAntallMåneder: Int): Boolean {
-            return omsorgsytersUtbetalingsmåneder.alleMåneder().count() >= påkrevetAntallMåneder
+        fun erOppfyllt(): Boolean {
+            return omsorgsytersUtbetalingsmåneder.alleMåneder().count() >= antallMånederRegel.antall
         }
     }
 }

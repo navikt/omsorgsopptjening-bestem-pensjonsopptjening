@@ -16,7 +16,7 @@ data class Utbetalingsmåneder(
     }
 
     companion object {
-        val NONE = Utbetalingsmåneder(emptySet())
+        fun none() = Utbetalingsmåneder(emptySet())
     }
 }
 

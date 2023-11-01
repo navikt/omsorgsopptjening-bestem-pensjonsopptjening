@@ -15,18 +15,19 @@ object OmsorgsyterErMedlemAvFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemAv
                 setOf(
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
                 ).let {
-                    if (grunnlag.erOppfylltFor(grunnlag.antallMånederRegel.antall)) {
+                    if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
                     }
                 }
             }
+
             AntallMånederRegel.FødtUtenforOmsorgsår -> {
                 setOf(
                     Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
                 ).let {
-                    if (grunnlag.erOppfylltFor(grunnlag.antallMånederRegel.antall)) {
+                    if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
                         VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
@@ -47,8 +48,8 @@ object OmsorgsyterErMedlemAvFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemAv
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
 
-        fun erOppfylltFor(påkrevetAntallMåneder: Int): Boolean {
-            return omsorgsytersMedlemskapsmåneder.alleMåneder().count() >= påkrevetAntallMåneder
+        fun erOppfyllt(): Boolean {
+            return omsorgsytersMedlemskapsmåneder.alleMåneder().count() >= antallMånederRegel.antall
         }
     }
 }
