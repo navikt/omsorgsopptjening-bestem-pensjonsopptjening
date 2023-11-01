@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.monitorering
 
+import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
@@ -255,10 +256,9 @@ object StatusServiceTest {
         printDatabaseContent()
 
         val status = statusService.checkStatus()
-        assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet"))
+        // assertThat(status).isEqualTo(ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet"))
+        assertThat(status).isEqualTo(ApplicationStatus.OK) // Ingen rapportering tilbake, så oppgaver blir liggende permanent uferdig
     }
-
-
 
     @Test
     @Order(7)

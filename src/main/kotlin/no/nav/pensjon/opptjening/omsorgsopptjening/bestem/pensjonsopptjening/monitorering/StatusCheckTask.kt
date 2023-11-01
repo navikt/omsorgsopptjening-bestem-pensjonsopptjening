@@ -13,6 +13,10 @@ class StatusCheckTask(private val statusRapporteringsService: StatusRapportering
     @Scheduled(fixedDelay = 120000, initialDelay = 20000)
     fun check() {
         log.info("Sjekker og oppdaterer status for overvåking")
-        val status = statusRapporteringsService.oppdaterRapporterbarStatus()
+        try {
+            val status = statusRapporteringsService.oppdaterRapporterbarStatus()
+        } catch(t:RuntimeException) {
+            log.error("StatusCheckTask.check() failed",t)
+        }
     }
 }

@@ -43,7 +43,8 @@ class StatusService(
                 return ApplicationStatus.Feil("Det finnes gamle meldinger som ikke er ferdig behandlet")
             }
             if (gamleOppgaverSomIkkeErFerdig()) {
-                return ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet")
+//                return ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet")
+                return ApplicationStatus.OK // Ingen synkronisering/sjekk, så oppgaver blir aldri ferdig
             }
             if (ubehandledGodskrivOpptjening()) {
                 return ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet")
@@ -54,7 +55,7 @@ class StatusService(
 
     fun meldingErForGammel(persongrunnlagMelding: PersongrunnlagMelding) : Boolean {
         val opprettet: Instant = persongrunnlagMelding.opprettet
-        return opprettet < 400.daysAgo
+        return opprettet < 400.daysAgo // etter januar, ikke kjørt etter 1 oktober
     }
 
     fun feiledeMeldinger() : Boolean {
@@ -67,7 +68,7 @@ class StatusService(
 
     fun gamleOppgaverSomIkkeErFerdig() : Boolean {
         var oppgave = oppgaveRepo.finnEldsteUbehandledeOppgave()
-        return oppgave != null && oppgave.opprettet < 60.daysAgo
+        return oppgave != null && oppgave.opprettet < 60.daysAgo // disable - ikke mulighet til å sjekke
     }
 
     fun ubehandledGodskrivOpptjening() : Boolean {
