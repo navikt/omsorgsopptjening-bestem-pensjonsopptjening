@@ -31,6 +31,7 @@ class MicrometerStatusMalere(private val registry: MeterRegistry) {
     }
 
     fun oppdater(status: ApplicationStatus) {
+        log.info("Oppdaterer applikasjonsstatus til: $status")
         this.status = status
     }
 
@@ -43,7 +44,7 @@ class MicrometerStatusMalere(private val registry: MeterRegistry) {
     }
 
     fun antallMangler() : Int {
-        println("antallMangler status=$status")
+        if (status == null) log.warn("applikasjonsstatus har ikke blitt satt")
         val mangler = (status == null || status is ApplicationStatus.IkkeKjort)
         return if (mangler) 1 else 0
     }
