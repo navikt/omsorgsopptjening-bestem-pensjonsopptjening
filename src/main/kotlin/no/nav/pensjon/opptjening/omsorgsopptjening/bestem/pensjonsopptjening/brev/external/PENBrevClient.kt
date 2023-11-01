@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.PENBrevMetricsMåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.PENBrevMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClientException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Journalpost
@@ -24,9 +24,9 @@ import pensjon.opptjening.azure.ad.client.TokenProvider
 private class PENBrevClient(
     @Value("\${PEN_BASE_URL}") private val baseUrl: String,
     @Qualifier("PENTokenProvider") private val tokenProvider: TokenProvider,
-    private val penBrevMetricsMåling: PENBrevMetricsMåling,
+    private val penBrevMetricsMåling: PENBrevMetrikker,
 
-) : BrevClient {
+    ) : BrevClient {
     private val restTemplate = RestTemplateBuilder().build()
 
     override fun sendBrev(
@@ -36,7 +36,7 @@ private class PENBrevClient(
     ): Journalpost {
         val url = "$baseUrl/api/bestillbrev/todo"
         return try {
-            penBrevMetricsMåling.mål {
+            penBrevMetricsMåling.oppdater {
                 val response = restTemplate.exchange(
                     url,
                     HttpMethod.POST,

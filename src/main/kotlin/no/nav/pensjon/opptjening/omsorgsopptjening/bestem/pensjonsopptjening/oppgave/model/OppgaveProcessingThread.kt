@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetricsFeilmåling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetricsMåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 class OppgaveProcessingThread(
     private val service: OppgaveService,
     private val unleash: Unleash,
-    private val oppgaveProcessingMetricsMåling: OppgaveProcessingMetricsMåling,
+    private val oppgaveProcessingMetricsMåling: OppgaveProcessingMetrikker,
     private val oppgaveProcessingMetricsFeilmåling: OppgaveProcessingMetricsFeilmåling
 
 ) : Runnable {
@@ -33,13 +33,13 @@ class OppgaveProcessingThread(
     override fun run() {
         while (true) {
             try {
-                if(unleash.isEnabled(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName)){
-                    oppgaveProcessingMetricsMåling.mål {
+                if (unleash.isEnabled(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName)) {
+                    oppgaveProcessingMetricsMåling.oppdater {
                         service.process()
                     }
                 }
             } catch (exception: Throwable) {
-                oppgaveProcessingMetricsFeilmåling.målfeil {
+                oppgaveProcessingMetricsFeilmåling.oppdater {
                     log.warn("Exception caught while processing, exception:$exception")
                     Thread.sleep(1000)
                 }

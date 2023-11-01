@@ -1,13 +1,13 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.metrics
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MetricsMåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.Metrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding
 import org.springframework.stereotype.Component
 
 @Component
-class OmsorgsarbeidListenerMetricsMåling(registry: MeterRegistry): MetricsMåling<PersongrunnlagMelding> {
+class OmsorgsarbeidListenerMetrikker(registry: MeterRegistry) : Metrikker<PersongrunnlagMelding> {
 
     private val antallLesteMeldinger = registry.counter("meldinger", "antall", "lest")
     val antallVedtaksperioderFullBarnetrygd = registry.counter("barnetrygd", "antall", "full")
@@ -16,12 +16,15 @@ class OmsorgsarbeidListenerMetricsMåling(registry: MeterRegistry): MetricsMåli
     val antallVedtaksperioderHjelpestonadSats3 = registry.counter("barnetrygd", "antall", "hjelpestonadSats3")
     val antallVedtaksperioderHjelpestonadSats4 = registry.counter("barnetrygd", "antall", "hjelpestonadSats4")
 
-    override fun mål(lambda: () -> PersongrunnlagMelding): PersongrunnlagMelding {
-        antallLesteMeldinger.increment()
-        return tellOmsorgstyper(lambda.invoke())
+    override fun oppdater(lambda: () -> PersongrunnlagMelding): PersongrunnlagMelding {
+        return lambda().also {
+            antallLesteMeldinger.increment()
+            it.tellOmsorgstyper()
+        }
     }
-    private fun tellOmsorgstyper(persongrunnlagMelding: PersongrunnlagMelding): PersongrunnlagMelding {
-        persongrunnlagMelding.persongrunnlag.forEach { persongrunnlag ->
+
+    private fun PersongrunnlagMelding.tellOmsorgstyper() {
+        persongrunnlag.forEach { persongrunnlag ->
             persongrunnlag.omsorgsperioder.forEach { omsorgsperiode ->
                 when (omsorgsperiode.omsorgstype) {
                     Omsorgstype.DELT_BARNETRYGD -> antallVedtaksperioderDeltBarnetrygd.increment()
@@ -32,6 +35,5 @@ class OmsorgsarbeidListenerMetricsMåling(registry: MeterRegistry): MetricsMåli
                 }
             }
         }
-        return persongrunnlagMelding
     }
 }

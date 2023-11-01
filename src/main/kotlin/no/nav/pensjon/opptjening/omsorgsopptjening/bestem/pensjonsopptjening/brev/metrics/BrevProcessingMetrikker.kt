@@ -2,15 +2,17 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MetricsMåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.Metrikker
 import org.springframework.stereotype.Component
 
 @Component
-class BrevProcessingMetricsMåling(registry: MeterRegistry): MetricsMåling<Brev?> {
+class BrevProcessingMetrikker(registry: MeterRegistry): Metrikker<Brev?> {
 
     private val brevProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "brevProsessert")
 
-    override fun mål(lambda: () -> Brev?): Brev? {
-        return brevProsessertTidsbruk.recordCallable(lambda)
+    override fun oppdater(lambda: () -> Brev?): Brev? {
+        return brevProsessertTidsbruk.recordCallable(lambda)?.also {
+            //TODO
+        }
     }
 }

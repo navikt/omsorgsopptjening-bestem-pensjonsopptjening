@@ -97,7 +97,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process().single().also { behandling ->
+        handler.process()!!.single().also { behandling ->
             assertFalse(behandling.erInnvilget())
             assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForMelding(behandling.meldingId))
             assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
@@ -146,7 +146,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process().single().also { behandling ->
+        handler.process()!!.single().also { behandling ->
             assertFalse(behandling.erInnvilget())
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                 assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
@@ -223,7 +223,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process().single().also { behandling ->
+        handler.process()!!.single().also { behandling ->
             assertFalse(behandling.erInnvilget())
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                 assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
@@ -307,7 +307,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process().also { behandlinger ->
+        handler.process()!!.also { behandlinger ->
             assertEquals(2, behandlinger.count())
             oppgaveRepo.findForMelding(behandlinger[0].meldingId).single().also { oppgave ->
                 assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandlinger[0].id))
@@ -377,7 +377,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process().single().also { behandling ->
+        handler.process()!!.single().also { behandling ->
             assertFalse(behandling.erInnvilget())
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                 assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
@@ -431,7 +431,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 )
             ),
         )
-        handler.process().single().also { behandling ->
+        handler.process()!!.single().also { behandling ->
             assertFalse(behandling.erInnvilget())
             assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForMelding(behandling.meldingId))
             assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
@@ -506,7 +506,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process().let { result ->
+        handler.process()!!.let { result ->
             assertEquals(2, result.count())
             result.first().also { behandling ->
                 assertFalse(behandling.erInnvilget())
@@ -598,7 +598,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process().let { result ->
+        handler.process()!!.let { result ->
             assertEquals(4, result.count())
             result[0].also { behandling ->
                 assertFalse(behandling.erInnvilget())

@@ -120,7 +120,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process().single().also { behandling ->
+        handler.process()!!.single().also { behandling ->
             godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
                 assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                 assertEquals(behandling.id, it.behandlingId)
@@ -205,7 +205,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         )
 
 
-        handler.process().single().also {
+        handler.process()!!.single().also {
             assertThrows<PoppClientExecption> {
                 godskrivOpptjeningService.process()
             }
@@ -270,7 +270,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         )
 
 
-        handler.process().single().also { behandling ->
+        handler.process()!!.single().also { behandling ->
             godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
                 assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                 assertEquals(behandling.id, it.behandlingId)

@@ -166,7 +166,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         assertEquals(emptyList<FullførtBehandling>(), behandlingRepo.finnForOmsorgsyter("12345678910"))
 
 
-        handler.process().also { result ->
+        handler.process()!!.also { result ->
             result.single().also {
                 assertEquals(2020, it.omsorgsAr)
                 assertEquals("12345678910", it.omsorgsyter)
@@ -250,17 +250,19 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             assertEquals(1, it.antallForsøk)
         }
 
-        assertEquals(emptyList<FullførtBehandling>(), handler.process())
+        assertEquals(null, handler.process())
+
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding.id).status).also {
             assertEquals(1, it.antallForsøk)
         }
 
-        assertEquals(emptyList<FullførtBehandling>(), handler.process())
+        assertEquals(null, handler.process())
+
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding.id).status).also {
             assertEquals(1, it.antallForsøk)
         }
 
-        assertEquals(1, handler.process().count())
+        assertEquals(1, handler.process()!!.count())
 
         assertInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java, repo.find(melding.id).status)
     }
@@ -342,7 +344,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             handler.process()
         }
 
-        assertEquals(emptyList<FullførtBehandling>(), handler.process())
+        assertEquals(null, handler.process())
 
         repo.find(melding.id).also { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, m.statushistorikk[0])

@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.kafka
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.metrics.OmsorgsarbeidListenerMetricsMåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.metrics.OmsorgsarbeidListenerMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
 class PersongrunnlagKafkaListener(
     private val persongrunnlagRepo: PersongrunnlagRepo,
-    private val omsorgsarbeidListenerMetricsMåling: OmsorgsarbeidListenerMetricsMåling
+    private val omsorgsarbeidListenerMetricsMåling: OmsorgsarbeidListenerMetrikker
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
@@ -43,7 +43,7 @@ class PersongrunnlagKafkaListener(
                 }
             }
             acknowledgment.acknowledge()
-            omsorgsarbeidListenerMetricsMåling.mål { persongrunnlagMelding }
+            omsorgsarbeidListenerMetricsMåling.oppdater { persongrunnlagMelding }
         }
     }
 }

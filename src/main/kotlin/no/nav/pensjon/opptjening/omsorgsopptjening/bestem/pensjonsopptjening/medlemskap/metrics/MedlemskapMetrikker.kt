@@ -1,12 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.metrics
 
 import io.micrometer.core.instrument.MeterRegistry
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MetricsMåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.Metrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskap
 import org.springframework.stereotype.Component
 
 @Component
-class MedlemskapMetrikker(registry: MeterRegistry) : MetricsMåling<Medlemskap?> {
+class MedlemskapMetrikker(registry: MeterRegistry) : Metrikker<Medlemskap?> {
 
     private val oppslag = registry.counter("medlemskap", "antall", "oppslag")
     private val ikkeFunnet = registry.counter("medlemskap", "antall", "ikke_funnet")
@@ -14,7 +14,7 @@ class MedlemskapMetrikker(registry: MeterRegistry) : MetricsMåling<Medlemskap?>
     private val ikkeMedlem = registry.counter("medlemskap", "antall", "nei")
     private val ukjent = registry.counter("medlemskap", "antall", "ukjent")
 
-    override fun mål(lambda: () -> Medlemskap?): Medlemskap? {
+    override fun oppdater(lambda: () -> Medlemskap?): Medlemskap? {
         oppslag.increment()
         return lambda().also {
             when (it) {

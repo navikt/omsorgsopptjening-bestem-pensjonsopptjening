@@ -163,7 +163,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                 )
             ),
         ).let {
-            persongrunnlagMeldingService.process().single().let { behandling ->
+            persongrunnlagMeldingService.process()!!.single().let { behandling ->
                 Assertions.assertTrue(behandling.erInnvilget())
                 behandling to brevRepository.findForBehandling(behandling.id).singleOrNull()!!
             }
@@ -262,7 +262,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
                 )
             ),
         ).let {
-            persongrunnlagMeldingService.process().single().let { behandling ->
+            persongrunnlagMeldingService.process()!!.single().let { behandling ->
                 Assertions.assertTrue(behandling.erInnvilget())
                 behandling to brevRepository.findForBehandling(behandling.id).singleOrNull()!!
             }

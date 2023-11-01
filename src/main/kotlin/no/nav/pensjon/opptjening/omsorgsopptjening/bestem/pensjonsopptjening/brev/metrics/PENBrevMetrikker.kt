@@ -2,14 +2,15 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Journalpost
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.MetricsMåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.Metrikker
 import org.springframework.stereotype.Component
 
 @Component
-class PENBrevMetricsMåling(registry: MeterRegistry): MetricsMåling<Journalpost> {
+class PENBrevMetrikker(registry: MeterRegistry) : Metrikker<Journalpost> {
     private val antallSendteBrev = registry.counter("brev", "antall", "opprettet")
-    override fun mål(lambda: () -> Journalpost): Journalpost {
-        antallSendteBrev.increment()
-        return lambda.invoke()
+    override fun oppdater(lambda: () -> Journalpost): Journalpost {
+        return lambda().also {
+            antallSendteBrev.increment()
+        }
     }
 }

@@ -176,7 +176,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()
+        handler.process()!!
 
         oppgaveRepo.findForMelding(melding.id).single().also {
             assertInstanceOf(Oppgave.Status.Klar::class.java, it.status)
@@ -315,7 +315,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()
+        handler.process()!!
 
         assertInstanceOf(Oppgave.Status.Klar::class.java, oppgaveRepo.findForMelding(melding.id).single().status)
 
@@ -416,7 +416,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()
+        handler.process()!!
 
         oppgaveRepo.findForMelding(melding.id).single().also {
             assertInstanceOf(Oppgave.Status.Klar::class.java, it.status)

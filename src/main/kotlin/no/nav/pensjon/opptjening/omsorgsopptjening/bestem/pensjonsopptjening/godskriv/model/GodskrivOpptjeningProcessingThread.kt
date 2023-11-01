@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetricsFeilmåling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetricsMåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component
 class GodskrivOpptjeningProcessingThread(
     private val service: GodskrivOpptjeningService,
     private val unleash: Unleash,
-    private val godskrivProcessingMetricsMåling: GodskrivProcessingMetricsMåling,
+    private val godskrivProcessingMetricsMåling: GodskrivProcessingMetrikker,
     private val godskrivProcessingMetricsFeilmåling: GodskrivProcessingMetricsFeilmåling,
-    ) : Runnable {
+) : Runnable {
 
     companion object {
         val log = LoggerFactory.getLogger(this::class.java)!!
@@ -32,13 +32,15 @@ class GodskrivOpptjeningProcessingThread(
     override fun run() {
         while (true) {
             try {
-                if(unleash.isEnabled(NavUnleashConfig.Feature.GODSKRIV.toggleName)) {
-                    godskrivProcessingMetricsMåling.mål { service.process() }
+                if (unleash.isEnabled(NavUnleashConfig.Feature.GODSKRIV.toggleName)) {
+                    godskrivProcessingMetricsMåling.oppdater {
+                        service.process()
+                    }
                 }
             } catch (exception: Throwable) {
-                godskrivProcessingMetricsFeilmåling.målfeil {
-                        log.warn("Exception caught while processing, exception:$exception")
-                        Thread.sleep(1000)
+                godskrivProcessingMetricsFeilmåling.oppdater {
+                    log.warn("Exception caught while processing, exception:$exception")
+                    Thread.sleep(1000)
                 }
             }
         }

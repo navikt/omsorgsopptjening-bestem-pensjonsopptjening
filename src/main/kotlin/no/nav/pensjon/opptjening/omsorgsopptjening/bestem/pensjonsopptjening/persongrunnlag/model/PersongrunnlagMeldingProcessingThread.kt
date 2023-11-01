@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.metrics.OmsorgsarbeidProcessingMetricsFeilmåling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.metrics.OmsorgsarbeidProcessingMetricsMåling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.metrics.OmsorgsarbeidProcessingMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 class PersongrunnlagMeldingProcessingThread(
     private val handler: PersongrunnlagMeldingService,
     private val unleash: Unleash,
-    private val omsorgsarbeidMetricsMåling: OmsorgsarbeidProcessingMetricsMåling,
+    private val omsorgsarbeidMetricsMåling: OmsorgsarbeidProcessingMetrikker,
     private val omsorgsarbeidMetricsFeilmåling: OmsorgsarbeidProcessingMetricsFeilmåling,
 
     ) : Runnable {
@@ -34,12 +34,12 @@ class PersongrunnlagMeldingProcessingThread(
         while (true) {
             try {
                 if (unleash.isEnabled(NavUnleashConfig.Feature.BEHANDLING.toggleName)) {
-                    omsorgsarbeidMetricsMåling.mål {
+                    omsorgsarbeidMetricsMåling.oppdater {
                         handler.process()
                     }
                 }
             } catch (exception: Throwable) {
-                omsorgsarbeidMetricsFeilmåling.målfeil {
+                omsorgsarbeidMetricsFeilmåling.oppdater {
                     log.warn("Exception caught while processing, exception:$exception")
                     Thread.sleep(1000)
                 }

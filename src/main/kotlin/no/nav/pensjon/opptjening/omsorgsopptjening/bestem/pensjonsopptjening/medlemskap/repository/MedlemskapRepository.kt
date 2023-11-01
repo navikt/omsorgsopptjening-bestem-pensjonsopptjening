@@ -15,7 +15,7 @@ internal class MedlemskapRepository(
     private val medlemskapMetrikker: MedlemskapMetrikker,
 ) : MedlemskapOppslag {
     override fun hentMedlemskap(fnr: String): Medlemskap {
-        return medlemskapMetrikker.mål {
+        return medlemskapMetrikker.oppdater {
             jdbcTemplate.query(
                 """select pensjonstrygdet from medlemskap where fnr = :fnr""",
                 mapOf<String, Any>(

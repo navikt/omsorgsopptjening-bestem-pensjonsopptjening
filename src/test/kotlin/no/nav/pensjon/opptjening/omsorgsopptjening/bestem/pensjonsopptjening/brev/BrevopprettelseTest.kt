@@ -117,7 +117,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process().single().also { behandling ->
+        persongrunnlagMeldingService.process()!!.single().also { behandling ->
             assertTrue(behandling.erInnvilget())
 
             assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull())
@@ -201,7 +201,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process().single().also { behandling ->
+        persongrunnlagMeldingService.process()!!.single().also { behandling ->
             assertTrue(behandling.erInnvilget())
 
             assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull())
@@ -291,7 +291,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process().single().also { behandling ->
+        persongrunnlagMeldingService.process()!!.single().also { behandling ->
             assertTrue(behandling.erInnvilget())
 
             assertTrue(brevRepository.findForBehandling(behandling.id).isEmpty())
