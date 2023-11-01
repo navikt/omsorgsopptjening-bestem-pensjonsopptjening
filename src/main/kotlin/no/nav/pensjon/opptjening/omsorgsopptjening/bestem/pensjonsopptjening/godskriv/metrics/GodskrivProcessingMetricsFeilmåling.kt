@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 @Component
 class GodskrivProcessingMetricsFeilmåling(registry: MeterRegistry): MetricsFeilmåling<Unit>  {
 
-    private val godskrivFeiletTidsbruk = registry.timer("prosesseringTidsbruk","tidsbruk", "godskrivFeilet")
+    private val godskrivFeiletTidsbruk = registry.timer("prosessering","tidsbruk", "godskrivFeilet")
     private val antallFeiledeGodskriving = registry.counter("prosesseringsenhetFeilede","antall", "godskriving")
     override fun målfeil(lambda: () -> Unit) {
         antallFeiledeGodskriving.increment()

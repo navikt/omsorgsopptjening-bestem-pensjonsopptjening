@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class OppgaveProcessingMetricsMåling(registry: MeterRegistry): MetricsMåling<Oppgave?> {
 
-    private val oppgaverProsessertTidsbruk = registry.timer("prosesseringTidsbruk","tidsbruk", "oppgaverProsessert")
+    private val oppgaverProsessertTidsbruk = registry.timer("prosessering","tidsbruk", "oppgaverProsessert")
     private val antallOpprettedeOppgaver = registry.counter("oppgaver", "antall", "opprettet")
 
     override fun mål(lambda: () -> Oppgave?): Oppgave? {

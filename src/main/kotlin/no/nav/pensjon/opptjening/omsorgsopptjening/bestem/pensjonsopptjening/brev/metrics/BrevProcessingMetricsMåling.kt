@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class BrevProcessingMetricsMåling(registry: MeterRegistry): MetricsMåling<Brev?> {
 
-    private val brevProsessertTidsbruk = registry.timer("prosesseringTidsbruk", "tidsbruk", "brevProsessert")
+    private val brevProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "brevProsessert")
 
     override fun mål(lambda: () -> Brev?): Brev? {
         return brevProsessertTidsbruk.recordCallable(lambda)

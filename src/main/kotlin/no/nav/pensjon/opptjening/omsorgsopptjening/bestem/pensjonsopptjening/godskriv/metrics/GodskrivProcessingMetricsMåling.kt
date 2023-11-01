@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class GodskrivProcessingMetricsMåling(registry: MeterRegistry):
     MetricsMåling<GodskrivOpptjening.Persistent?> {
 
-    private val godskrivProsessertTidsbruk = registry.timer("prosesseringTidsbruk","tidsbruk", "godskrivProsessert")
+    private val godskrivProsessertTidsbruk = registry.timer("prosessering","tidsbruk", "godskrivProsessert")
 
     override fun mål(lambda: () -> GodskrivOpptjening.Persistent?): GodskrivOpptjening.Persistent? {
         return godskrivProsessertTidsbruk.recordCallable(lambda)
