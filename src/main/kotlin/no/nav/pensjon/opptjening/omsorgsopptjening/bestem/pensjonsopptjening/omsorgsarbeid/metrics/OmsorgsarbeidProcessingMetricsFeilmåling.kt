@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 @Component
 class OmsorgsarbeidProcessingMetricsFeilmåling(registry: MeterRegistry): MetricsFeilmåling<Unit> {
 
-    private val omsorgsarbeidFeiletTidsbruk = registry.timer("prosesseringTidsbruk","omsorgsarbeidFeilet", "tidsbruk")
+    private val omsorgsarbeidFeiletTidsbruk = registry.timer("prosesseringTidsbruk","tidsbruk", "omsorgsarbeidFeilet")
     private val antallFeiledeOmsorgsarbeid = registry.counter("prosesseringsenhetFeilede","antall", "omsorgsarbeid")
 
 

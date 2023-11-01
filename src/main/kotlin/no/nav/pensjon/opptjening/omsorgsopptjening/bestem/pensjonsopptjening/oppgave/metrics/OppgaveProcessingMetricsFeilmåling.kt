@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 class OppgaveProcessingMetricsFeilmåling(registry: MeterRegistry): MetricsFeilmåling<Unit> {
 
     private val antallFeiledeOppgaver = registry.counter("prosesseringsenhetFeilede", "antall", "oppgaver")
-    private val oppgaverFeiletTidsbruk = registry.timer("prosesseringTidsbruk","oppgaverFeilet", "tidsbruk")
+    private val oppgaverFeiletTidsbruk = registry.timer("prosesseringTidsbruk","tidsbruk", "oppgaverFeilet")
     override fun målfeil(lambda: () -> Unit) {
         oppgaverFeiletTidsbruk.recordCallable(lambda)
         antallFeiledeOppgaver.increment()

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class OmsorgsarbeidProcessingMetricsMåling(registry: MeterRegistry):
     MetricsMåling<List<FullførtBehandling>> {
 
-    private val omsorgsarbeidProsessertTidsbruk = registry.timer("prosesseringTidsbruk","omsorgsarbeidProsessert", "tidsbruk")
+    private val omsorgsarbeidProsessertTidsbruk = registry.timer("prosesseringTidsbruk", "tidsbruk", "omsorgsarbeidProsessert")
     private val innvilget = registry.counter("behandling", "antall", "innvilget" )
     private val avslag = registry.counter("behandling", "antall", "avslag" )
     private val omsorgsyterHarMestOmsorgAvAlleOmsorgsytere = registry.counter("avslag", "antall", "omsorgsyterHarMestOmsorgAvAlleOmsorgsytere")

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 @Component
 class BrevProcessingMetricsFeilmåling(val registry: MeterRegistry): MetricsFeilmåling<Unit> {
 
-    private val brevFeiletTidsbruk = registry.timer("prosesseringTidsbruk","brevFeilet", "tidsbruk")
+    private val brevFeiletTidsbruk = registry.timer("prosesseringTidsbruk", "tidsbruk", "brevFeilet")
     private val antallFeiledeBrev = registry.counter("prosesseringsenhetFeilede","antall", "brev")
 
     override fun målfeil(lambda: () -> Unit) {
