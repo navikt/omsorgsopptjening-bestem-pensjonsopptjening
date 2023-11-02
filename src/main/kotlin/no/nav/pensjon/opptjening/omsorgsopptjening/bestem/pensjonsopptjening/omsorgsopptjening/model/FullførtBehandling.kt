@@ -9,7 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import java.time.Instant
 import java.util.UUID
 
-data class FullførtBehandling(
+class FullførtBehandling(
     val id: UUID,
     val opprettet: Instant,
     val omsorgsAr: Int,
@@ -34,89 +34,9 @@ data class FullførtBehandling(
         return GodskrivOpptjening.Transient(behandlingId = id)
     }
 
-    fun opprettOppgave(
-        oppgaveEksistererForOmsorgsyter: (omsorgsyter: String, år: Int) -> Boolean,
-        oppgaveEksistererForOmsorgsmottaker: (omsorgsmottaker: String, år: Int) -> Boolean,
-    ): Oppgave.Transient? {
-        require(!erInnvilget()) { "Kan kun opprette oppgave for avslått behandling!" }
-        return avslagSkyldesFlereOmsorgsytereMedLikeMangeOmsorgsmåneder()?.let { vurdering ->
-            VelgOppgaveForPersonOgInnhold(grunnlag = vurdering.grunnlag).let { oppgaveOgInnhold ->
-                val oppgaveGjelderOmsorgsyter = oppgaveOgInnhold.oppgaveForPerson() == omsorgsyter
-                val omsorgsyterHarOppgaveForÅr = oppgaveEksistererForOmsorgsyter(omsorgsyter, omsorgsAr)
-                val omsorgsMottakerHarOppgaveForÅr = oppgaveEksistererForOmsorgsmottaker(omsorgsmottaker, omsorgsAr)
 
-                if (oppgaveGjelderOmsorgsyter && !omsorgsyterHarOppgaveForÅr && !omsorgsMottakerHarOppgaveForÅr) {
-                    lagOppgave(mottakere = oppgaveOgInnhold)
-                } else {
-                    null
-                }
-            }
-        }
-    }
 
-    private fun lagOppgave(mottakere: VelgOppgaveForPersonOgInnhold): Oppgave.Transient {
-        return when (grunnlag) {
-            is OmsorgsopptjeningGrunnlag.FødtIOmsorgsår -> {
-                OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår(
-                    omsorgsyter = omsorgsyter,
-                    omsorgsmottaker = omsorgsmottaker,
-                )
-            }
 
-            is OmsorgsopptjeningGrunnlag.IkkeFødtIOmsorgsår -> {
-                OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg(
-                    omsorgsyter = omsorgsyter,
-                    omsorgsmottaker = omsorgsmottaker,
-                    annenOmsorgsyter = mottakere.annenPersonForInnhold(),
-                )
-            }
-        }.let {
-            Oppgave.Transient(
-                detaljer = it,
-                behandlingId = id,
-                meldingId = meldingId,
-            )
-        }
-    }
-
-    /**
-     * Det er bare aktuelt å lage oppgave i tilfeller hvor det ikke kan godskrives oppgjening som følge av at flere
-     * omsorgsyter har like mange omsorgsmåneder for det samme barnet i løpet av omsorgsåret.
-     */
-    private fun avslagSkyldesFlereOmsorgsytereMedLikeMangeOmsorgsmåneder(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering? {
-        return vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-            if (vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>() && it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder()) {
-                it
-            } else {
-                null
-            }
-        }
-    }
-
-    /**
-     * Prioriterer oppgavemottakere etter kriteriene:
-     * 1. Flest omsorgsmåneder
-     * 2. Hadde omsorg i desember måned
-     * 3. Er personen [grunnlag] gjelder for
-     *    Dette sørger for at vi alltid prioriterer å sende oppgave for omsorgsyteren behandlingen gjelder.
-     */
-    private data class VelgOppgaveForPersonOgInnhold(
-        private val grunnlag: OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag,
-    ) {
-        private val prioritert: List<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr> =
-            grunnlag
-                .omsorgsytereMedFlestOmsorgsmåneder()
-                .sortedWith(compareBy<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr> { it.haddeOmsorgIDesember() }.thenBy { it.omsorgsyter == grunnlag.omsorgsyter })
-                .reversed()
-
-        fun oppgaveForPerson(): String {
-            return prioritert.first().omsorgsyter
-        }
-
-        fun annenPersonForInnhold(): String {
-            return prioritert.first { it.omsorgsyter != grunnlag.omsorgsyter }.omsorgsyter
-        }
-    }
 
     fun sendBrev(
         hentPensjonspoengForOmsorgsopptjening: (fnr: String, år: Int, type: DomainOmsorgstype) -> Pensjonspoeng,

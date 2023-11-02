@@ -3,13 +3,10 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjoner
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.tilOmsorgsopptjeningsgrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
@@ -19,6 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
+import java.lang.RuntimeException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 @Service
@@ -46,26 +44,34 @@ class PersongrunnlagMeldingService(
                         try {
                             transactionTemplate.execute {
                                 log.info("Prosesserer melding")
-                                behandle(melding).also { resultat ->
+                                behandle(melding).let { resultat ->
                                     persongrunnlagRepo.updateStatus(melding.ferdig())
-                                    resultat.forEach {
-                                        when (it.erInnvilget()) {
-                                            true -> {
-                                                håndterInnvilgelse(it)
-                                            }
-
-                                            false -> {
-                                                håndterAvslag(it)
+                                    resultat.forEach { (fullførtbehandling,oppgave) ->
+                                        when (fullførtbehandling.utfall) {
+                                            is BehandlingUtfall.Avslag -> {}
+                                            is BehandlingUtfall.Innvilget -> håndterInnvilgelse(fullførtbehandling)
+                                            is BehandlingUtfall.Manuell -> {
+                                                if (oppgave != null) {
+                                                    val oppgaveEksistererForOmsorgsyter = oppgaveService.oppgaveEksistererForOmsorgsyterOgÅr(omsorgsyter = fullførtbehandling.omsorgsyter,år = fullførtbehandling.omsorgsAr)
+                                                    val oppgaveEksistererForOmsorgsmottaker = oppgaveService.oppgaveEksistererForOmsorgsmottakerOgÅr(omsorgsmottaker = fullførtbehandling.omsorgsmottaker,år = fullførtbehandling.omsorgsAr)
+                                                    if (!oppgaveEksistererForOmsorgsmottaker && !oppgaveEksistererForOmsorgsyter) {
+                                                            val oppgave = oppgave.copy(behandlingId = fullførtbehandling.id)
+                                                            oppgaveService.opprett(oppgave)
+                                                    }
+                                                } else {
+                                                    throw RuntimeException("Status manuell, men oppgave er null")
+                                                }
                                             }
                                         }
                                         log.info("Melding prosessert")
                                     }
+                                    resultat.map { it.first }
                                 }
                             }
                         } catch (ex: Throwable) {
                             transactionTemplate.execute {
                                 melding.retry(ex.stackTraceToString()).let { melding ->
-                                    melding.opprettOppgave()?.let {
+                                    melding.opprettOppgaveHvisFeilet()?.let {
                                         log.error("Gir opp videre prosessering av melding")
                                         oppgaveService.opprett(it)
                                     }
@@ -80,7 +86,7 @@ class PersongrunnlagMeldingService(
         }
     }
 
-    private fun behandle(melding: PersongrunnlagMelding.Mottatt): List<FullførtBehandling> {
+    private fun behandle(melding: PersongrunnlagMelding.Mottatt): List<Pair<FullførtBehandling, Oppgave.Transient?>> {
         return melding.innhold
             .berikDatagrunnlag()
             .tilOmsorgsopptjeningsgrunnlag()
@@ -91,16 +97,18 @@ class PersongrunnlagMeldingService(
             }
             .map {
                 log.info("Utfører vilkårsvurdering")
-                behandlingRepo.persist(
-                    Behandling(
+                val behandling = Behandling(
+                    grunnlag = it,
+                    vurderVilkår = VilkårsvurderingFactory(
                         grunnlag = it,
-                        vurderVilkår = VilkårsvurderingFactory(
-                            grunnlag = it,
-                            behandlingRepo = behandlingRepo
-                        ),
-                        meldingId = melding.id
-                    )
+                        behandlingRepo = behandlingRepo
+                    ),
+                    meldingId = melding.id
                 )
+                val oppgave = behandling.oppgave()
+                behandlingRepo.persist(
+                    behandling
+                ) to oppgave
             }
     }
 
@@ -112,14 +120,6 @@ class PersongrunnlagMeldingService(
             hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgstype,
             hentPensjonspoengForInntekt = hentPensjonspoeng::hentPensjonspoengForInntekt,
         )?.also { brevService.opprett(it) }
-    }
-
-    private fun håndterAvslag(behandling: FullførtBehandling) {
-        log.info("Håndterer avslag")
-        behandling.opprettOppgave(
-            oppgaveEksistererForOmsorgsyter = oppgaveService::oppgaveEksistererForOmsorgsyterOgÅr,
-            oppgaveEksistererForOmsorgsmottaker = oppgaveService::oppgaveEksistererForOmsorgsmottakerOgÅr
-        )?.also { oppgaveService.opprett(it) }
     }
 
     private fun PersongrunnlagMeldingKafka.berikDatagrunnlag(): BeriketDatagrunnlag {

@@ -42,7 +42,7 @@ sealed class PersongrunnlagMelding {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 
-        fun opprettOppgave(): Oppgave.Transient? {
+        fun opprettOppgaveHvisFeilet(): Oppgave.Transient? {
             return if (status is Status.Feilet) {
                 Oppgave.Transient(
                     detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(

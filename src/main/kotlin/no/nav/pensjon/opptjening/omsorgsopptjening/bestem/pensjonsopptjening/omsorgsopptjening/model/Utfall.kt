@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
+
 sealed class VilkårsvurderingUtfall {
 
     sealed class Innvilget : VilkårsvurderingUtfall() {
@@ -35,13 +37,15 @@ sealed class VilkårsvurderingUtfall {
 }
 
 sealed class BehandlingUtfall {
-    object Innvilget : BehandlingUtfall()
-    object Avslag : BehandlingUtfall()
+    data object Innvilget : BehandlingUtfall()
+    data object Avslag : BehandlingUtfall()
+    data class Manuell (val oppgave:Oppgave.Transient?) : BehandlingUtfall()
 
     fun erInnvilget(): Boolean {
         return when (this) {
             is Avslag -> false
             is Innvilget -> true
+            is Manuell -> false
         }
     }
 }

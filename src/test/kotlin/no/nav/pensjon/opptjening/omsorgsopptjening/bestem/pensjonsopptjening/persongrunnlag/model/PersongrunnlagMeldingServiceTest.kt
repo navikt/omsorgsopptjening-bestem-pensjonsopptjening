@@ -29,6 +29,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.år
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -38,6 +39,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertNull
@@ -60,6 +62,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     @Autowired
     private lateinit var repo: PersongrunnlagRepo
+
+    @Autowired
+    private lateinit var oppgaveRepo: OppgaveRepo
 
     @Autowired
     private lateinit var handler: PersongrunnlagMeldingService
@@ -1092,12 +1097,9 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                     it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
             }
-            assertNull(//forventer ikke oppgave siden omsorgstyer ikke mottok i desember
-                behandling.opprettOppgave(
-                    oppgaveEksistererForOmsorgsyter = { _: String, _: Int -> false },
-                    oppgaveEksistererForOmsorgsmottaker = { _: String, _: Int -> false }
-                )
-            )
+            //forventer ikke oppgave siden omsorgstyer ikke mottok i desember
+            assertThat(oppgaveRepo.findForBehandling(behandling.id)).isEmpty()
+            assertThat(oppgaveRepo.findForMelding(behandling.meldingId)).isEmpty()
         }
     }
 
@@ -1147,7 +1149,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.single().let { behandling ->
-            behandling.assertAvslag(
+            behandling.assertManuell(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01122012345"
             )
@@ -1163,13 +1165,9 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                     it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
             }
-            assertInstanceOf(//forventer oppgave siden omsorgsyter mokkok i desember
-                Oppgave::class.java, behandling.opprettOppgave(
-                    oppgaveEksistererForOmsorgsyter = { _: String, _: Int -> false },
-                    oppgaveEksistererForOmsorgsmottaker = { _: String, _: Int -> false }
-                )).also {
-                assertInstanceOf(OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår::class.java, it.detaljer)
-            }
+            //forventer oppgave siden omsorgsyter mokkok i desember
+            val oppgave = oppgaveRepo.findForBehandling(behandling.id).single()
+            assertInstanceOf(OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår::class.java, oppgave.detaljer)
         }
     }
 
@@ -1768,6 +1766,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         }
     }
 
+    // TODO: slå sammen de under
     private fun FullførtBehandling.assertInnvilget(
         omsorgsyter: String,
         omsorgsmottaker: String,
@@ -1794,4 +1793,18 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         assertInstanceOf(BehandlingUtfall.Avslag::class.java, this.utfall)
         return this
     }
+
+    private fun FullførtBehandling.assertManuell(
+        omsorgsyter: String,
+        omsorgsmottaker: String,
+        omsorgstype: DomainOmsorgstype = DomainOmsorgstype.BARNETRYGD,
+    ): FullførtBehandling {
+        assertEquals(OPPTJENINGSÅR, this.omsorgsAr)
+        assertEquals(omsorgsyter, this.omsorgsyter)
+        assertEquals(omsorgsmottaker, this.omsorgsmottaker)
+        assertEquals(omsorgstype, this.omsorgstype)
+        assertInstanceOf(BehandlingUtfall.Manuell::class.java, this.utfall)
+        return this
+    }
+
 }
