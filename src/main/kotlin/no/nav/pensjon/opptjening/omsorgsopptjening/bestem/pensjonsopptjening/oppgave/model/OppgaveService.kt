@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysning
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -41,9 +41,10 @@ class OppgaveService(
 
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
     fun opprettOppgaveHvisNødvendig(behandling: FullførtBehandling) {
-        behandling.hentOppgaveopplysninger().let { oppgaveopplysning ->
+        behandling.hentOppgaveopplysninger().map { oppgaveopplysning ->
+            //TODO legg alle oppgavetekster for den samme behandlingen i en og samme oppgave
             when (oppgaveopplysning) {
-                is Oppgaveopplysning.ToOmsorgsytereMedLikeMangeMånederOmsorg -> {
+                is Oppgaveopplysninger.ToOmsorgsytereMedLikeMangeMånederOmsorg -> {
                     if (behandling.omsorgsmottakerFødtIOmsorgsår()) {
                         OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår(
                             omsorgsyter = oppgaveopplysning.oppgaveMottaker,
@@ -79,7 +80,7 @@ class OppgaveService(
                     }
                 }
 
-                Oppgaveopplysning.Ingen -> {
+                Oppgaveopplysninger.Ingen -> {
                     //noop
                 }
             }

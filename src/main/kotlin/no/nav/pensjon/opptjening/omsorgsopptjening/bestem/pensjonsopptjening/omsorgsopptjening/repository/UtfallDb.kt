@@ -34,6 +34,8 @@ internal sealed class VilkårsvurderingUtfallDb {
     @JsonTypeName("VilkårInnvilget")
     data class VilkårInnvilget(val henvisning: Set<JuridiskHenvisningDb>) : VilkårsvurderingUtfallDb()
 
+    @JsonTypeName("Manuell")
+    data class Manuell(val henvisning: Set<JuridiskHenvisningDb>) : VilkårsvurderingUtfallDb()
 }
 
 @JsonTypeInfo(
@@ -112,6 +114,10 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
         is VilkårsvurderingUtfall.Avslag.Vilkår -> {
             VilkårsvurderingUtfallDb.VilkårAvslag(henvisning = henvisninger.toDb())
         }
+
+        is VilkårsvurderingUtfall.Ubestemt -> {
+            VilkårsvurderingUtfallDb.Manuell(henvisning = henvisninger.toDb())
+        }
     }
 }
 
@@ -139,6 +145,10 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
 
         is VilkårsvurderingUtfallDb.VilkårInnvilget -> {
             VilkårsvurderingUtfall.Innvilget.Vilkår(henvisninger = henvisning.toDomain())
+        }
+
+        is VilkårsvurderingUtfallDb.Manuell -> {
+            VilkårsvurderingUtfall.Ubestemt(henvisninger = henvisning.toDomain())
         }
     }
 }

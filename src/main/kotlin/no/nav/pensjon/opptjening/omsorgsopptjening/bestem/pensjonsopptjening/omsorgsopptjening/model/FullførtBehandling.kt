@@ -101,8 +101,8 @@ data class FullførtBehandling(
         }
     }
 
-    fun hentOppgaveopplysninger(): Oppgaveopplysning {
+    fun hentOppgaveopplysninger(): List<Oppgaveopplysninger> {
         require(utfall is BehandlingUtfall.Manuell) { "Kan kun opprette oppgave for manuell behandling" }
-        return vilkårsvurdering.hentVilkårSomMåbehandlesManuelt()?.hentOppgaveopplysninger() ?: throw RuntimeException("Behandlingsutfall er manuell, men fant ingen vilkår som krever manuell behandling")
+        return vilkårsvurdering.finnAlleUbestemteVilkår().map { it.hentOppgaveopplysninger() }
     }
 }

@@ -25,20 +25,23 @@ sealed class VilkårsvurderingUtfall {
         }
     }
 
+    data class Ubestemt(val henvisninger: Set<JuridiskHenvisning>) : VilkårsvurderingUtfall()
+
+
     fun erInnvilget(): Boolean {
         return when (this) {
             is Avslag -> false
             is Innvilget -> true
+            is Ubestemt -> false
         }
     }
 
 }
 
 sealed class BehandlingUtfall {
-    object Innvilget : BehandlingUtfall()
-    object Avslag : BehandlingUtfall()
-
-    data object Manuell: BehandlingUtfall()
+    data object Innvilget : BehandlingUtfall()
+    data object Avslag : BehandlingUtfall()
+    data object Manuell : BehandlingUtfall()
 
     fun erInnvilget(): Boolean {
         return when (this) {

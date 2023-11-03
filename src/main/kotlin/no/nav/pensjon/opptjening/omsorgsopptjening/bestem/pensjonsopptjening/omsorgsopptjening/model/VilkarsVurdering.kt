@@ -7,6 +7,8 @@ sealed class VilkarsVurdering<Grunnlag : Any> {
     fun accept(vilkarsVurderingVisitor: VilkarsVurderingVisitor) {
         vilkarsVurderingVisitor.visit(this)
     }
+
+    open fun hentOppgaveopplysninger(): Oppgaveopplysninger = Oppgaveopplysninger.Ingen
 }
 
 sealed class ParagrafVurdering<T : ParagrafGrunnlag> : VilkarsVurdering<T>()
@@ -19,7 +21,7 @@ inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erInnvilget():
     return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { it.utfall.erInnvilget() }.single()
 }
 
-inline fun VilkarsVurdering<*>.finnAlleAvslatte(): List<VilkarsVurdering<*>> {
+fun VilkarsVurdering<*>.finnAlleAvslatte(): List<VilkarsVurdering<*>> {
     return UnwrapOgEllerVisitor.unwrap(this).filter { !it.utfall.erInnvilget() }
 }
 
@@ -32,34 +34,9 @@ inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.finnVurdering(
 }
 
 fun VilkarsVurdering<*>.behovForManuellBehandling(): Boolean {
-    return hentVilkårSomMåbehandlesManuelt() != null
+    return finnAlleUbestemteVilkår().isNotEmpty()
 }
 
-fun VilkarsVurdering<*>.hentVilkårSomMåbehandlesManuelt(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering? {
-    return avslagSkyldesFlereOmsorgsytereMedLikeMangeOmsorgsmåneder()
-}
-
-/**
- * Det er bare aktuelt å lage oppgave i tilfeller hvor det ikke kan godskrives oppgjening som følge av at flere
- * omsorgsyter har like mange omsorgsmåneder for det samme barnet i løpet av omsorgsåret.
- */
-private fun VilkarsVurdering<*>.avslagSkyldesFlereOmsorgsytereMedLikeMangeOmsorgsmåneder(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering? {
-    return finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-        if (erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>() && it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder()) {
-            it
-        } else {
-            null
-        }
-    }
-}
-
-sealed class Oppgaveopplysning {
-    data class ToOmsorgsytereMedLikeMangeMånederOmsorg(
-        val oppgaveMottaker: String,
-        val annenOmsorgsyter: String,
-        val omsorgsmottaker: String,
-        val omsorgsår: Int,
-    ) : Oppgaveopplysning()
-
-    data object Ingen : Oppgaveopplysning()
+fun VilkarsVurdering<*>.finnAlleUbestemteVilkår(): List<VilkarsVurdering<*>> {
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Ubestemt }
 }

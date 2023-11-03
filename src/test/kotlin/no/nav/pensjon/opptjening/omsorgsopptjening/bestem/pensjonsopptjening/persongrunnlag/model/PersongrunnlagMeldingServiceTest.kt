@@ -22,7 +22,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysning
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erEnesteAvslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnAlleAvslatte
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
@@ -43,6 +43,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.given
 import org.mockito.kotlin.any
+import org.mockito.kotlin.inOrder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
@@ -1087,10 +1088,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                     it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
             }
-            assertInstanceOf(
-                Oppgaveopplysning.Ingen::class.java, //forventer ikke oppgave siden omsorgstyer ikke mottok i desember
-                behandling.hentOppgaveopplysninger()
-            )
+            assertEquals(emptyList<Oppgaveopplysninger>(), behandling.hentOppgaveopplysninger())
         }
     }
 
@@ -1157,9 +1155,9 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 )
             }
             assertInstanceOf(
-                Oppgaveopplysning.ToOmsorgsytereMedLikeMangeMånederOmsorg::class.java//forventer oppgave siden omsorgsyter mokkok i desember
+                Oppgaveopplysninger.ToOmsorgsytereMedLikeMangeMånederOmsorg::class.java//forventer oppgave siden omsorgsyter mokkok i desember
                 , behandling.hentOppgaveopplysninger()
-            )
+            )//TODO
         }
     }
 

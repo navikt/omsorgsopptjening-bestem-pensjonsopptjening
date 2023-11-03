@@ -18,6 +18,8 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         ).let {
             if (grunnlag.omsorgsyterHarFlestOmsorgsmåneder()) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+            } else if (grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder()) {
+                VilkårsvurderingUtfall.Ubestemt(it.map { it.henvisning }.toSet())
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
             }
@@ -28,17 +30,18 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>() {
-        fun hentOppgaveopplysninger(): Oppgaveopplysning {
+
+        override fun hentOppgaveopplysninger(): Oppgaveopplysninger {
             return VelgOppgaveForPersonOgInnhold(grunnlag).let {
                 if (it.oppgaveForPerson() == grunnlag.omsorgsyter) {
-                    Oppgaveopplysning.ToOmsorgsytereMedLikeMangeMånederOmsorg(
+                    Oppgaveopplysninger.ToOmsorgsytereMedLikeMangeMånederOmsorg(
                         oppgaveMottaker = it.oppgaveForPerson(),
                         annenOmsorgsyter = it.annenPersonForInnhold(),
                         omsorgsmottaker = it.omsorgsmottaker(),
                         omsorgsår = it.omsorgsår(),
                     )
                 } else {
-                    Oppgaveopplysning.Ingen
+                    Oppgaveopplysninger.Ingen
                 }
             }
         }
