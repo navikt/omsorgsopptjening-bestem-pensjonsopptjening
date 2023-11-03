@@ -44,10 +44,13 @@ internal sealed class VilkårsvurderingUtfallDb {
 internal sealed class BehandlingsutfallDb {
 
     @JsonTypeName("Avslag")
-    object Avslag : BehandlingsutfallDb()
+    data object Avslag : BehandlingsutfallDb()
 
     @JsonTypeName("Innvilget")
-    object Innvilget : BehandlingsutfallDb()
+    data object Innvilget : BehandlingsutfallDb()
+
+    @JsonTypeName("Manuell")
+    data object Manuell : BehandlingsutfallDb()
 }
 
 internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
@@ -59,8 +62,30 @@ internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
         BehandlingUtfall.Innvilget -> {
             BehandlingsutfallDb.Innvilget
         }
+
+        BehandlingUtfall.Manuell -> {
+            BehandlingsutfallDb.Manuell
+        }
     }
 }
+
+
+internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
+    return when (this) {
+        is BehandlingsutfallDb.Innvilget -> {
+            BehandlingUtfall.Innvilget
+        }
+
+        is BehandlingsutfallDb.Avslag -> {
+            BehandlingUtfall.Avslag
+        }
+
+        is BehandlingsutfallDb.Manuell -> {
+            BehandlingUtfall.Manuell
+        }
+    }
+}
+
 
 internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
     return when (this) {
@@ -114,18 +139,6 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
 
         is VilkårsvurderingUtfallDb.VilkårInnvilget -> {
             VilkårsvurderingUtfall.Innvilget.Vilkår(henvisninger = henvisning.toDomain())
-        }
-    }
-}
-
-internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
-    return when (this) {
-        is BehandlingsutfallDb.Innvilget -> {
-            BehandlingUtfall.Innvilget
-        }
-
-        is BehandlingsutfallDb.Avslag -> {
-            BehandlingUtfall.Avslag
         }
     }
 }

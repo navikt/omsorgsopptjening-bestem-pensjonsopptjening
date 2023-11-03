@@ -4,7 +4,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.bre
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjoner
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
@@ -14,7 +14,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -46,16 +45,20 @@ class PersongrunnlagMeldingService(
                         try {
                             transactionTemplate.execute {
                                 log.info("Prosesserer melding")
-                                behandle(melding).also { resultat ->
+                                behandle(melding).also { behandlinger ->
                                     persongrunnlagRepo.updateStatus(melding.ferdig())
-                                    resultat.forEach {
-                                        when (it.erInnvilget()) {
-                                            true -> {
-                                                håndterInnvilgelse(it)
+                                    behandlinger.forEach { behandling ->
+                                        when (behandling.utfall) {
+                                            BehandlingUtfall.Avslag -> {
+                                                //noop
                                             }
 
-                                            false -> {
-                                                håndterAvslag(it)
+                                            BehandlingUtfall.Innvilget -> {
+                                                håndterInnvilgelse(behandling)
+                                            }
+
+                                            BehandlingUtfall.Manuell -> {
+                                                oppgaveService.opprettOppgaveHvisNødvendig(behandling)
                                             }
                                         }
                                         log.info("Melding prosessert")
@@ -112,14 +115,6 @@ class PersongrunnlagMeldingService(
             hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgstype,
             hentPensjonspoengForInntekt = hentPensjonspoeng::hentPensjonspoengForInntekt,
         )?.also { brevService.opprett(it) }
-    }
-
-    private fun håndterAvslag(behandling: FullførtBehandling) {
-        log.info("Håndterer avslag")
-        behandling.opprettOppgave(
-            oppgaveEksistererForOmsorgsyter = oppgaveService::oppgaveEksistererForOmsorgsyterOgÅr,
-            oppgaveEksistererForOmsorgsmottaker = oppgaveService::oppgaveEksistererForOmsorgsmottakerOgÅr
-        )?.also { oppgaveService.opprett(it) }
     }
 
     private fun PersongrunnlagMeldingKafka.berikDatagrunnlag(): BeriketDatagrunnlag {

@@ -27,7 +27,55 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     data class Vurdering(
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall
-    ) : ParagrafVurdering<Grunnlag>()
+    ) : ParagrafVurdering<Grunnlag>() {
+        fun hentOppgaveopplysninger(): Oppgaveopplysning {
+            return VelgOppgaveForPersonOgInnhold(grunnlag).let {
+                if (it.oppgaveForPerson() == grunnlag.omsorgsyter) {
+                    Oppgaveopplysning.ToOmsorgsytereMedLikeMangeMånederOmsorg(
+                        oppgaveMottaker = it.oppgaveForPerson(),
+                        annenOmsorgsyter = it.annenPersonForInnhold(),
+                        omsorgsmottaker = it.omsorgsmottaker(),
+                        omsorgsår = it.omsorgsår(),
+                    )
+                } else {
+                    Oppgaveopplysning.Ingen
+                }
+            }
+        }
+
+        /**
+         * Prioriterer oppgavemottakere etter kriteriene:
+         * 1. Flest omsorgsmåneder
+         * 2. Hadde omsorg i desember måned
+         * 3. Er personen [grunnlag] gjelder for
+         *    Dette sørger for at vi alltid prioriterer å sende oppgave for omsorgsyteren behandlingen gjelder.
+         */
+        private data class VelgOppgaveForPersonOgInnhold(
+            private val grunnlag: Grunnlag,
+        ) {
+            private val prioritert: List<OmsorgsmånederForMottakerOgÅr> =
+                grunnlag
+                    .omsorgsytereMedFlestOmsorgsmåneder()
+                    .sortedWith(compareBy<OmsorgsmånederForMottakerOgÅr> { it.haddeOmsorgIDesember() }.thenBy { it.omsorgsyter == grunnlag.omsorgsyter })
+                    .reversed()
+
+            fun oppgaveForPerson(): String {
+                return prioritert.first().omsorgsyter
+            }
+
+            fun annenPersonForInnhold(): String {
+                return prioritert.first { it.omsorgsyter != grunnlag.omsorgsyter }.omsorgsyter
+            }
+
+            fun omsorgsmottaker(): String {
+                return prioritert.first().omsorgsmottaker
+            }
+
+            fun omsorgsår(): Int {
+                return prioritert.first().omsorgsår
+            }
+        }
+    }
 
     data class Grunnlag(
         val omsorgsyter: String,

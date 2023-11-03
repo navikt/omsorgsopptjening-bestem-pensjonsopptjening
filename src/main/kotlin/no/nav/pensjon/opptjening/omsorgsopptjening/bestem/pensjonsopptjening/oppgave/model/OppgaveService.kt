@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -35,6 +37,54 @@ class OppgaveService(
 
     fun oppgaveEksistererForOmsorgsmottakerOgÅr(omsorgsmottaker: String, år: Int): Boolean {
         return oppgaveRepo.existsForOmsorgsmottakerOgÅr(omsorgsmottaker, år)
+    }
+
+    @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
+    fun opprettOppgaveHvisNødvendig(behandling: FullførtBehandling) {
+        behandling.hentOppgaveopplysninger().let { oppgaveopplysning ->
+            when (oppgaveopplysning) {
+                is Oppgaveopplysning.ToOmsorgsytereMedLikeMangeMånederOmsorg -> {
+                    if (behandling.omsorgsmottakerFødtIOmsorgsår()) {
+                        OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår(
+                            omsorgsyter = oppgaveopplysning.oppgaveMottaker,
+                            omsorgsmottaker = oppgaveopplysning.omsorgsmottaker,
+                        )
+                    } else {
+                        OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg(
+                            omsorgsyter = oppgaveopplysning.oppgaveMottaker,
+                            omsorgsmottaker = oppgaveopplysning.omsorgsmottaker,
+                            annenOmsorgsyter = oppgaveopplysning.annenOmsorgsyter,
+                        )
+                    }.let {
+                        val omsorgsyterHarOppgaveForÅr =
+                            oppgaveEksistererForOmsorgsyterOgÅr(
+                                oppgaveopplysning.oppgaveMottaker,
+                                oppgaveopplysning.omsorgsår
+                            )
+                        val omsorgsMottakerHarOppgaveForÅr =
+                            oppgaveEksistererForOmsorgsmottakerOgÅr(
+                                oppgaveopplysning.omsorgsmottaker,
+                                oppgaveopplysning.omsorgsår
+                            )
+
+                        if (!omsorgsyterHarOppgaveForÅr && !omsorgsMottakerHarOppgaveForÅr) {
+                            opprett(
+                                Oppgave.Transient(
+                                    detaljer = it,
+                                    behandlingId = behandling.id,
+                                    meldingId = behandling.meldingId,
+                                )
+                            )
+                        }
+                    }
+                }
+
+                Oppgaveopplysning.Ingen -> {
+                    //noop
+                }
+            }
+
+        }
     }
 
     fun process(): Oppgave? {

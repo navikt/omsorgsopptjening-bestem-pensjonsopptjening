@@ -38,10 +38,13 @@ sealed class BehandlingUtfall {
     object Innvilget : BehandlingUtfall()
     object Avslag : BehandlingUtfall()
 
+    data object Manuell: BehandlingUtfall()
+
     fun erInnvilget(): Boolean {
         return when (this) {
             is Avslag -> false
             is Innvilget -> true
+            is Manuell -> false
         }
     }
 }
