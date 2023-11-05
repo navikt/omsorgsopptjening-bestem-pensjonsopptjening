@@ -1088,7 +1088,12 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                     it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
             }
-            assertEquals(emptyList<Oppgaveopplysninger>(), behandling.hentOppgaveopplysninger())
+            assertEquals(
+                listOf(
+                    Oppgaveopplysninger.Ingen
+                ),
+                behandling.hentOppgaveopplysninger()
+            )
         }
     }
 
@@ -1154,10 +1159,18 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                     it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                 )
             }
-            assertInstanceOf(
-                Oppgaveopplysninger.ToOmsorgsytereMedLikeMangeMånederOmsorg::class.java//forventer oppgave siden omsorgsyter mokkok i desember
-                , behandling.hentOppgaveopplysninger()
-            )//TODO
+            assertEquals(
+                listOf(
+                    Oppgaveopplysninger.ToOmsorgsytereMedLikeMangeMånederOmsorg(
+                        oppgaveMottaker = "12345678910",
+                        annenOmsorgsyter = "04010012797",
+                        omsorgsmottaker = "01122012345",
+                        omsorgsår = 2020
+
+                    )
+                ),
+                behandling.hentOppgaveopplysninger()
+            )
         }
     }
 
