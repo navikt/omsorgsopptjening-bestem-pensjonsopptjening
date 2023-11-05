@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @Configuration
 @EnableScheduling
 // @Profile("dev-gcp", "prod-gcp")
-class StatusConfig {
+class ScheduledTasksConfig {
 
     @Autowired
     private lateinit var statusRapporteringsService: StatusRapporteringCachingAdapter

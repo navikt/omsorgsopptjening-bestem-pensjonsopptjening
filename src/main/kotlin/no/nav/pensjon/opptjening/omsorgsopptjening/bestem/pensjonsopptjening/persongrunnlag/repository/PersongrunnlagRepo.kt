@@ -123,7 +123,6 @@ class PersongrunnlagRepo(
 
     fun antallMedStatus(kclass: KClass<*>) : Long {
         val name = kclass.simpleName!!
-        println("XXXX: $name")
         return jdbcTemplate.queryForObject(
             """select count(*) from melding_status where (status->>'type' = :type)""",
             mapOf(

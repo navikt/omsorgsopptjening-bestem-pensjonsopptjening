@@ -153,9 +153,6 @@ class OppgaveRepo(
     internal class OppgaveMapper : RowMapper<Oppgave.Persistent> {
 
         override fun mapRow(rs: ResultSet, rowNum: Int): Oppgave.Persistent {
-
-            println("*** Deserialize oppgave: ${rs.getString("statushistorikk")}")
-
             return Oppgave.Persistent(
                 id = UUID.fromString(rs.getString("id")),
                 opprettet = rs.getTimestamp("opprettet").toInstant(),
