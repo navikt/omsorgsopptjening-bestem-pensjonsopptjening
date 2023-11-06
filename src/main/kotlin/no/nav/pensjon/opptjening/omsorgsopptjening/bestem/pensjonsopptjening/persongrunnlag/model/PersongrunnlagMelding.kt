@@ -45,8 +45,9 @@ sealed class PersongrunnlagMelding {
         fun opprettOppgave(): Oppgave.Transient? {
             return if (status is Status.Feilet) {
                 Oppgave.Transient(
-                    detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
-                        omsorgsyter = innhold.omsorgsyter,
+                    detaljer = OppgaveDetaljer.MottakerOgTekst(
+                        oppgavemottaker = innhold.omsorgsyter,
+                        oppgavetekst = """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
                     ),
                     behandlingId = null,
                     meldingId = id,

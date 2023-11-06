@@ -44,39 +44,29 @@ class OppgaveService(
         behandling.hentOppgaveopplysninger().map { oppgaveopplysning ->
             //TODO legg alle oppgavetekster for den samme behandlingen i en og samme oppgave
             when (oppgaveopplysning) {
-                is Oppgaveopplysninger.ToOmsorgsytereMedLikeMangeMånederOmsorg -> {
-                    if (behandling.omsorgsmottakerFødtIOmsorgsår()) {
-                        OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår(
-                            omsorgsyter = oppgaveopplysning.oppgaveMottaker,
-                            omsorgsmottaker = oppgaveopplysning.omsorgsmottaker,
+                is Oppgaveopplysninger.Generell -> {
+                    val oppgavemottakerHarOppgaveForÅr =
+                        oppgaveEksistererForOmsorgsyterOgÅr(
+                            oppgaveopplysning.oppgavemottaker,
+                            behandling.omsorgsAr
                         )
-                    } else {
-                        OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg(
-                            omsorgsyter = oppgaveopplysning.oppgaveMottaker,
-                            omsorgsmottaker = oppgaveopplysning.omsorgsmottaker,
-                            annenOmsorgsyter = oppgaveopplysning.annenOmsorgsyter,
+                    val omsorgsMottakerHarOppgaveForÅr =
+                        oppgaveEksistererForOmsorgsmottakerOgÅr(
+                            behandling.omsorgsmottaker,
+                            behandling.omsorgsAr
                         )
-                    }.let {
-                        val omsorgsyterHarOppgaveForÅr =
-                            oppgaveEksistererForOmsorgsyterOgÅr(
-                                oppgaveopplysning.oppgaveMottaker,
-                                oppgaveopplysning.omsorgsår
-                            )
-                        val omsorgsMottakerHarOppgaveForÅr =
-                            oppgaveEksistererForOmsorgsmottakerOgÅr(
-                                oppgaveopplysning.omsorgsmottaker,
-                                oppgaveopplysning.omsorgsår
-                            )
 
-                        if (!omsorgsyterHarOppgaveForÅr && !omsorgsMottakerHarOppgaveForÅr) {
-                            opprett(
-                                Oppgave.Transient(
-                                    detaljer = it,
-                                    behandlingId = behandling.id,
-                                    meldingId = behandling.meldingId,
+                    if (!oppgavemottakerHarOppgaveForÅr && !omsorgsMottakerHarOppgaveForÅr) {
+                        opprett(
+                            Oppgave.Transient(
+                                behandlingId = behandling.id,
+                                meldingId = behandling.meldingId,
+                                detaljer = OppgaveDetaljer.MottakerOgTekst(
+                                    oppgavemottaker = oppgaveopplysning.oppgavemottaker,
+                                    oppgavetekst = oppgaveopplysning.oppgaveTekst
                                 )
                             )
-                        }
+                        )
                     }
                 }
 
@@ -84,7 +74,6 @@ class OppgaveService(
                     //noop
                 }
             }
-
         }
     }
 

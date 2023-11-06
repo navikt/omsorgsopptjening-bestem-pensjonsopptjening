@@ -43,7 +43,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.given
 import org.mockito.kotlin.any
-import org.mockito.kotlin.inOrder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
@@ -1161,12 +1160,9 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             }
             assertEquals(
                 listOf(
-                    Oppgaveopplysninger.ToOmsorgsytereMedLikeMangeMånederOmsorg(
-                        oppgaveMottaker = "12345678910",
-                        annenOmsorgsyter = "04010012797",
-                        omsorgsmottaker = "01122012345",
-                        omsorgsår = 2020
-
+                    Oppgaveopplysninger.Generell(
+                        oppgavemottaker = "12345678910",
+                        oppgaveTekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01122012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
                     )
                 ),
                 behandling.hentOppgaveopplysninger()

@@ -16,7 +16,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.willAnswer
@@ -150,16 +149,12 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             assertFalse(behandling.erInnvilget())
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                 assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                assertInstanceOf(OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg::class.java, oppgave.detaljer).also {
-                    assertEquals(it.omsorgsyter, "04010012797")
-                    assertEquals(it.omsorgsmottaker, "07081812345")
-                    assertEquals(it.annenOmsorgsyter, "12345678910")
-                    assertEquals(
-                        """
-                    Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 12345678910 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.
-                """.trimIndent(), it.oppgaveTekst
+                assertEquals(
+                    oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                        oppgavemottaker = "04010012797",
+                        oppgavetekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 12345678910 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
                     )
-                }
+                )
             }
         }
     }
@@ -227,16 +222,12 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             assertFalse(behandling.erInnvilget())
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                 assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                assertInstanceOf(OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg::class.java, oppgave.detaljer).also {
-                    assertEquals(it.omsorgsyter, "12345678910")
-                    assertEquals(it.omsorgsmottaker, "07081812345")
-                    assertEquals(it.annenOmsorgsyter, "04010012797")
-                    assertEquals(
-                        """
-                    Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.
-                """.trimIndent(), it.oppgaveTekst
+                assertEquals(
+                    oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                        oppgavemottaker = "12345678910",
+                        oppgavetekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
                     )
-                }
+                )
             }
         }
 
@@ -312,17 +303,12 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             oppgaveRepo.findForMelding(behandlinger[0].meldingId).single().also { oppgave ->
                 assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandlinger[0].id))
                 assertEquals(oppgave, oppgaveRepo.findForBehandling(behandlinger[1].id).single())
-                assertInstanceOf(
-                    OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorgIFødselsår::class.java,
-                    oppgave.detaljer
-                ).also {
-                    assertEquals(it.omsorgsyter, "04010012797")
-                    assertEquals(it.omsorgsmottaker, "01052012345")
-                    assertEquals(
-                        it.oppgaveTekst,
-                        """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01052012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene.""".trimIndent()
+                assertEquals(
+                    oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                        oppgavemottaker = "04010012797",
+                        oppgavetekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01052012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
                     )
-                }
+                )
             }
         }
     }
@@ -381,11 +367,12 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             assertFalse(behandling.erInnvilget())
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                 assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                assertInstanceOf(OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg::class.java, oppgave.detaljer).also {
-                    assertEquals(it.omsorgsyter, "12345678910")
-                    assertEquals(it.omsorgsmottaker, "07081812345")
-                    assertEquals(it.annenOmsorgsyter, "04010012797")
-                }
+                assertEquals(
+                    oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                        oppgavemottaker = "12345678910",
+                        oppgavetekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+                    )
+                )
             }
         }
 
@@ -512,14 +499,12 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 assertFalse(behandling.erInnvilget())
                 oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                     assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                    assertInstanceOf(
-                        OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg::class.java,
-                        oppgave.detaljer
-                    ).also {
-                        assertEquals(it.omsorgsyter, "12345678910")
-                        assertEquals(it.omsorgsmottaker, "07081812345")
-                        assertEquals(it.annenOmsorgsyter, "04010012797")
-                    }
+                    assertEquals(
+                        oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                            oppgavemottaker = "12345678910",
+                            oppgavetekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+                        )
+                    )
                 }
             }
             result.last().also { behandling ->
@@ -606,14 +591,12 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 assertEquals("07081812345", behandling.omsorgsmottaker)
                 oppgaveRepo.findForMelding(behandling.meldingId)[0].also { oppgave ->
                     assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                    assertInstanceOf(
-                        OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg::class.java,
-                        oppgave.detaljer
-                    ).also {
-                        assertEquals(it.omsorgsyter, "12345678910")
-                        assertEquals(it.omsorgsmottaker, "07081812345")
-                        assertEquals(it.annenOmsorgsyter, "04010012797")
-                    }
+                    assertEquals(
+                        oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                            oppgavemottaker = "12345678910",
+                            oppgavetekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+                        )
+                    )
                 }
             }
             result[1].also { behandling ->
@@ -622,14 +605,12 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 assertEquals("07081812345", behandling.omsorgsmottaker)
                 oppgaveRepo.findForMelding(behandling.meldingId)[1].also { oppgave ->
                     assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                    assertInstanceOf(
-                        OppgaveDetaljer.FlereOmsorgytereMedLikeMyeOmsorg::class.java,
-                        oppgave.detaljer
-                    ).also {
-                        assertEquals(it.omsorgsyter, "12345678910")
-                        assertEquals(it.omsorgsmottaker, "07081812345")
-                        assertEquals(it.annenOmsorgsyter, "04010012797")
-                    }
+                    assertEquals(
+                        oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                            oppgavemottaker = "12345678910",
+                            oppgavetekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+                        )
+                    )
                 }
             }
             result[2].also { behandling ->

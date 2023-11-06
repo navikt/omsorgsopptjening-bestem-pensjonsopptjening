@@ -51,8 +51,9 @@ sealed class GodskrivOpptjening {
         fun opprettOppgave(): Oppgave.Transient? {
             return if (status is Status.Feilet) {
                 Oppgave.Transient(
-                    detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
-                        omsorgsyter = omsorgsyter,
+                    detaljer = OppgaveDetaljer.MottakerOgTekst(
+                        oppgavemottaker = omsorgsyter,
+                        oppgavetekst = """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
                     ),
                     behandlingId = behandlingId,
                     meldingId = meldingId,

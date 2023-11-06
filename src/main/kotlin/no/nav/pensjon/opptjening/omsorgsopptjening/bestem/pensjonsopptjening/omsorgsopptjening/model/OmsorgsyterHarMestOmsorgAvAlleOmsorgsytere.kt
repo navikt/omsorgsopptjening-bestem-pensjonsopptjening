@@ -31,15 +31,26 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>() {
 
-        override fun hentOppgaveopplysninger(): Oppgaveopplysninger {
-            return VelgOppgaveForPersonOgInnhold(grunnlag).let {
-                if (it.oppgaveForPerson() == grunnlag.omsorgsyter) {
-                    Oppgaveopplysninger.ToOmsorgsytereMedLikeMangeMånederOmsorg(
-                        oppgaveMottaker = it.oppgaveForPerson(),
-                        annenOmsorgsyter = it.annenPersonForInnhold(),
-                        omsorgsmottaker = it.omsorgsmottaker(),
-                        omsorgsår = it.omsorgsår(),
-                    )
+        override fun hentOppgaveopplysninger(omsorgsmottakerFødtOmsorgsår: Boolean): Oppgaveopplysninger {
+            return InnholdsvalgForOppgavetekstHvisFlereOmsorgsytereMedLikeMyeOmsorg(grunnlag).let {
+                val oppgavemottaker = it.oppgaveGjelderFnr()
+                if (oppgavemottaker == grunnlag.omsorgsyter) {
+                    when (omsorgsmottakerFødtOmsorgsår) {
+                        true -> {
+                            Oppgaveopplysninger.Generell(
+                                oppgavemottaker = oppgavemottaker,
+                                oppgaveTekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr ${it.omsorgsmottaker()} i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
+                            )
+                        }
+
+                        false -> {
+                            Oppgaveopplysninger.Generell(
+                                oppgavemottaker = oppgavemottaker,
+                                oppgaveTekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr ${it.omsorgsmottaker()}. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr ${it.annenOmsorgsyterFnr()} mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+
+                            )
+                        }
+                    }
                 } else {
                     Oppgaveopplysninger.Ingen
                 }
@@ -53,7 +64,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
          * 3. Er personen [grunnlag] gjelder for
          *    Dette sørger for at vi alltid prioriterer å sende oppgave for omsorgsyteren behandlingen gjelder.
          */
-        private data class VelgOppgaveForPersonOgInnhold(
+        private data class InnholdsvalgForOppgavetekstHvisFlereOmsorgsytereMedLikeMyeOmsorg(
             private val grunnlag: Grunnlag,
         ) {
             private val prioritert: List<OmsorgsmånederForMottakerOgÅr> =
@@ -62,20 +73,16 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
                     .sortedWith(compareBy<OmsorgsmånederForMottakerOgÅr> { it.haddeOmsorgIDesember() }.thenBy { it.omsorgsyter == grunnlag.omsorgsyter })
                     .reversed()
 
-            fun oppgaveForPerson(): String {
+            fun oppgaveGjelderFnr(): String {
                 return prioritert.first().omsorgsyter
             }
 
-            fun annenPersonForInnhold(): String {
+            fun annenOmsorgsyterFnr(): String {
                 return prioritert.first { it.omsorgsyter != grunnlag.omsorgsyter }.omsorgsyter
             }
 
             fun omsorgsmottaker(): String {
                 return prioritert.first().omsorgsmottaker
-            }
-
-            fun omsorgsår(): Int {
-                return prioritert.first().omsorgsår
             }
         }
     }

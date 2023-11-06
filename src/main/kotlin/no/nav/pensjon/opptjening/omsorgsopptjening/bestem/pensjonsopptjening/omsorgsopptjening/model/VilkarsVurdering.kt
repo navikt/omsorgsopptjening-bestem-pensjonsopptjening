@@ -8,7 +8,7 @@ sealed class VilkarsVurdering<Grunnlag : Any> {
         vilkarsVurderingVisitor.visit(this)
     }
 
-    open fun hentOppgaveopplysninger(): Oppgaveopplysninger = Oppgaveopplysninger.Ingen
+    open fun hentOppgaveopplysninger(omsorgsmottakerFødtOmsorgsår: Boolean): Oppgaveopplysninger = Oppgaveopplysninger.Ingen
 }
 
 sealed class ParagrafVurdering<T : ParagrafGrunnlag> : VilkarsVurdering<T>()

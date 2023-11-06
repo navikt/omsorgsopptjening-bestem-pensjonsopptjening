@@ -36,7 +36,7 @@ data class FullførtBehandling(
         return GodskrivOpptjening.Transient(behandlingId = id)
     }
 
-    fun omsorgsmottakerFødtIOmsorgsår(): Boolean {
+    private fun omsorgsmottakerFødtIOmsorgsår(): Boolean {
         return when(this.grunnlag){
             is OmsorgsopptjeningGrunnlag.FødtIOmsorgsår.FødtDesember -> true
             is OmsorgsopptjeningGrunnlag.FødtIOmsorgsår.IkkeFødtDesember -> true
@@ -107,6 +107,6 @@ data class FullførtBehandling(
 
     fun hentOppgaveopplysninger(): List<Oppgaveopplysninger> {
         require(utfall is BehandlingUtfall.Manuell) { "Kan kun opprette oppgave for manuell behandling" }
-        return vilkårsvurdering.finnAlleUbestemte().map { it.hentOppgaveopplysninger() }
+        return vilkårsvurdering.finnAlleUbestemte().map { it.hentOppgaveopplysninger(omsorgsmottakerFødtIOmsorgsår()) }
     }
 }
