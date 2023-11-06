@@ -23,25 +23,8 @@ data class Behandling(
     fun meldingId() = meldingId
 
     fun utfall(): BehandlingUtfall {
-        return vilkarsVurdering.let { vilkårsvurdering ->
-            when (vilkårsvurdering.utfall.erInnvilget()) {
-                true -> BehandlingUtfall.Innvilget
-                false -> {
-                    if (behovForManuellBehandling()) {
-                        BehandlingUtfall.Manuell
-                    } else {
-                        BehandlingUtfall.Avslag
-                    }
-                }
-            }
-        }
+        return AvgjørBehandlingUtfall(vilkarsVurdering).utfall()
     }
-
-    fun behovForManuellBehandling(): Boolean {
-        //TODO utvide med andre feilsituasjoner som må sjekkes manuelt?
-        return vilkarsVurdering.behovForManuellBehandling()
-    }
-
 
     fun vilkårsvurdering(): VilkarsVurdering<*> {
         return og(

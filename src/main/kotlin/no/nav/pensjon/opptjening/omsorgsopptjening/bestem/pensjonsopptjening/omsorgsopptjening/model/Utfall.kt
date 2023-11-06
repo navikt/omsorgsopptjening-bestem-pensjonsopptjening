@@ -50,4 +50,12 @@ sealed class BehandlingUtfall {
             is Manuell -> false
         }
     }
+
+    fun erManuell(): Boolean {
+        return when(this){
+            Avslag -> false
+            Innvilget -> false
+            Manuell -> true
+        }
+    }
 }

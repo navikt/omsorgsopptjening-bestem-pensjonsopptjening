@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.med
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.tilOmsorgsopptjeningsgrunnlag
@@ -45,24 +46,27 @@ class PersongrunnlagMeldingService(
                         try {
                             transactionTemplate.execute {
                                 log.info("Prosesserer melding")
-                                behandle(melding).also { behandlinger ->
+                                behandle(melding).let { fullførte ->
                                     persongrunnlagRepo.updateStatus(melding.ferdig())
-                                    behandlinger.forEach { behandling ->
-                                        when (behandling.utfall) {
+                                    fullførte.perÅr().forEach { (år, behandlingerForÅr, utfall) ->
+                                        when (utfall) {
                                             BehandlingUtfall.Avslag -> {
                                                 //noop
                                             }
 
                                             BehandlingUtfall.Innvilget -> {
-                                                håndterInnvilgelse(behandling)
+                                                behandlingerForÅr.filter { it.erInnvilget() }
+                                                    .forEach { håndterInnvilgelse(it) }
                                             }
 
                                             BehandlingUtfall.Manuell -> {
-                                                oppgaveService.opprettOppgaveHvisNødvendig(behandling)
+                                                behandlingerForÅr.filter { it.erManuell() }
+                                                    .forEach { oppgaveService.opprettOppgaveHvisNødvendig(it) }
                                             }
                                         }
-                                        log.info("Melding prosessert")
                                     }
+                                    log.info("Melding prosessert")
+                                    fullførte.forAlleÅr()
                                 }
                             }
                         } catch (ex: Throwable) {
@@ -83,28 +87,30 @@ class PersongrunnlagMeldingService(
         }
     }
 
-    private fun behandle(melding: PersongrunnlagMelding.Mottatt): List<FullførtBehandling> {
-        return melding.innhold
-            .berikDatagrunnlag()
-            .tilOmsorgsopptjeningsgrunnlag()
-            .filter { grunnlag ->
-                gyldigOpptjeningsår.get().contains(grunnlag.omsorgsAr).also {
-                    if (!it) log.info("Filtrerer vekk grunnlag for ugyldig opptjeningsår: ${grunnlag.omsorgsAr}")
+    private fun behandle(melding: PersongrunnlagMelding.Mottatt): FullførteBehandlinger {
+        return FullførteBehandlinger(
+            behandlinger = melding.innhold
+                .berikDatagrunnlag()
+                .tilOmsorgsopptjeningsgrunnlag()
+                .filter { grunnlag ->
+                    gyldigOpptjeningsår.get().contains(grunnlag.omsorgsAr).also {
+                        if (!it) log.info("Filtrerer vekk grunnlag for ugyldig opptjeningsår: ${grunnlag.omsorgsAr}")
+                    }
                 }
-            }
-            .map {
-                log.info("Utfører vilkårsvurdering")
-                behandlingRepo.persist(
-                    Behandling(
-                        grunnlag = it,
-                        vurderVilkår = VilkårsvurderingFactory(
+                .map {
+                    log.info("Utfører vilkårsvurdering")
+                    behandlingRepo.persist(
+                        Behandling(
                             grunnlag = it,
-                            behandlingRepo = behandlingRepo
-                        ),
-                        meldingId = melding.id
+                            vurderVilkår = VilkårsvurderingFactory(
+                                grunnlag = it,
+                                behandlingRepo = behandlingRepo
+                            ),
+                            meldingId = melding.id
+                        )
                     )
-                )
-            }
+                }
+        )
     }
 
 

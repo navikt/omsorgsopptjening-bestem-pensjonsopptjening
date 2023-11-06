@@ -21,8 +21,16 @@ inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erInnvilget():
     return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { it.utfall.erInnvilget() }.single()
 }
 
+fun VilkarsVurdering<*>.finnAlleInnvilget(): List<VilkarsVurdering<*>> {
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Innvilget }
+}
+
 fun VilkarsVurdering<*>.finnAlleAvslatte(): List<VilkarsVurdering<*>> {
-    return UnwrapOgEllerVisitor.unwrap(this).filter { !it.utfall.erInnvilget() }
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Avslag }
+}
+
+fun VilkarsVurdering<*>.finnAlleUbestemte(): List<VilkarsVurdering<*>> {
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Ubestemt }
 }
 
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erEnesteAvslag(): Boolean {
@@ -31,12 +39,4 @@ inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erEnesteAvslag
 
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.finnVurdering(): T {
     return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().single()
-}
-
-fun VilkarsVurdering<*>.behovForManuellBehandling(): Boolean {
-    return finnAlleUbestemteVilkår().isNotEmpty()
-}
-
-fun VilkarsVurdering<*>.finnAlleUbestemteVilkår(): List<VilkarsVurdering<*>> {
-    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Ubestemt }
 }

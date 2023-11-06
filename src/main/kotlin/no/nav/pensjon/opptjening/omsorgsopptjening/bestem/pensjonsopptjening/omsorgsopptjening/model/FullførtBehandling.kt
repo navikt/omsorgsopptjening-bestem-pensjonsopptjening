@@ -23,6 +23,10 @@ data class FullførtBehandling(
         return utfall.erInnvilget()
     }
 
+    fun erManuell(): Boolean {
+        return utfall.erManuell()
+    }
+
     fun avslagsArsaker(): List<VilkarsVurdering<*>> {
         return vilkårsvurdering.finnAlleAvslatte()
     }
@@ -103,6 +107,6 @@ data class FullførtBehandling(
 
     fun hentOppgaveopplysninger(): List<Oppgaveopplysninger> {
         require(utfall is BehandlingUtfall.Manuell) { "Kan kun opprette oppgave for manuell behandling" }
-        return vilkårsvurdering.finnAlleUbestemteVilkår().map { it.hentOppgaveopplysninger() }
+        return vilkårsvurdering.finnAlleUbestemte().map { it.hentOppgaveopplysninger() }
     }
 }
