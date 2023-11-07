@@ -13,6 +13,7 @@ data class Behandling(
     private val vurderVilkår: VurderVilkår,
     private val meldingId: UUID
 ) {
+    val vilkarsVurdering = vilkårsvurdering()
     fun omsorgsår() = grunnlag.omsorgsAr
     fun omsorgsmottaker() = grunnlag.omsorgsmottaker
     fun omsorgsyter() = grunnlag.omsorgsyter
@@ -22,14 +23,8 @@ data class Behandling(
     fun meldingId() = meldingId
 
     fun utfall(): BehandlingUtfall {
-        return vilkårsvurdering().let { vilkårsvurdering ->
-            when (vilkårsvurdering.utfall.erInnvilget()) {
-                true -> BehandlingUtfall.Innvilget
-                false -> BehandlingUtfall.Avslag
-            }
-        }
+        return AvgjørBehandlingUtfall(vilkarsVurdering).utfall()
     }
-
 
     fun vilkårsvurdering(): VilkarsVurdering<*> {
         return og(
@@ -53,7 +48,11 @@ data class Behandling(
     private fun vilkårsurderHjelpestønad(): VilkarsVurdering<*> {
         return og(
             vurderVilkår.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(),
-            //vurderVilkår.OmsorgsyterErForelderTilMottakerAvHjelpestønad(), dette var ikke et kriterium i batch
+            /**
+             * @see FullførtBehandling.sendBrev
+             * Ikke et kriterium i bpen030
+             */
+            //vurderVilkår.OmsorgsyterErForelderTilMottakerAvHjelpestønad()
         )
     }
 

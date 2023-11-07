@@ -308,13 +308,13 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                     Oppgave::class.java,
                     oppgaveRepo.findForBehandling(behandling.id).single()
                 ).also { oppgave ->
-                    assertInstanceOf(OppgaveDetaljer.UspesifisertFeilsituasjon::class.java, oppgave.detaljer).also {
-                        assertEquals(behandling.omsorgsyter, it.omsorgsyter)
-                        assertEquals(
-                            """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch.""",
-                            it.oppgaveTekst
-                        )
-                    }
+                    assertEquals(
+                        OppgaveDetaljer.MottakerOgTekst(
+                            oppgavemottaker = behandling.omsorgsyter,
+                            oppgavetekst = """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
+                        ),
+                        oppgave.detaljer
+                    )
                 }
             }
         }

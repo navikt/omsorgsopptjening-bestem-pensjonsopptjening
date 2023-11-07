@@ -7,6 +7,8 @@ sealed class VilkarsVurdering<Grunnlag : Any> {
     fun accept(vilkarsVurderingVisitor: VilkarsVurderingVisitor) {
         vilkarsVurderingVisitor.visit(this)
     }
+
+    open fun hentOppgaveopplysninger(omsorgsmottakerFødtOmsorgsår: Boolean): Oppgaveopplysninger = Oppgaveopplysninger.Ingen
 }
 
 sealed class ParagrafVurdering<T : ParagrafGrunnlag> : VilkarsVurdering<T>()
@@ -19,8 +21,16 @@ inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erInnvilget():
     return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { it.utfall.erInnvilget() }.single()
 }
 
-inline fun VilkarsVurdering<*>.finnAlleAvslatte(): List<VilkarsVurdering<*>> {
-    return UnwrapOgEllerVisitor.unwrap(this).filter { !it.utfall.erInnvilget() }
+fun VilkarsVurdering<*>.finnAlleInnvilget(): List<VilkarsVurdering<*>> {
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Innvilget }
+}
+
+fun VilkarsVurdering<*>.finnAlleAvslatte(): List<VilkarsVurdering<*>> {
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Avslag }
+}
+
+fun VilkarsVurdering<*>.finnAlleUbestemte(): List<VilkarsVurdering<*>> {
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Ubestemt }
 }
 
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erEnesteAvslag(): Boolean {

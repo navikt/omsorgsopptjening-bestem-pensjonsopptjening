@@ -18,6 +18,17 @@ sealed class Oppgave {
     val mottaker get() = detaljer.mottaker()
     val oppgavetekst get() = detaljer.oppgavetekst()
 
+    companion object Oppgavetekster {
+        fun flereOmsorgsytereMedLikeMyeOmsorgFødselsår(omsorgsmottaker: String): String =
+            """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr $omsorgsmottaker i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
+
+        fun flereOmsorgsytereMedLikeMyeOmsorg(omsorgsmottaker: String, annenOmsorgsyter: String): String =
+            """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr $omsorgsmottaker. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr $annenOmsorgsyter mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+
+        fun kunneIkkeBehandlesAutomatisk(): String =
+            """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
+    }
+
     /**
      * Knytter oppgaven og [detaljer] til aktuell [behandlingId] og/eller [meldingId].
      */

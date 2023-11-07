@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -35,6 +37,44 @@ class OppgaveService(
 
     fun oppgaveEksistererForOmsorgsmottakerOgÅr(omsorgsmottaker: String, år: Int): Boolean {
         return oppgaveRepo.existsForOmsorgsmottakerOgÅr(omsorgsmottaker, år)
+    }
+
+    @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
+    fun opprettOppgaveHvisNødvendig(behandling: FullførtBehandling) {
+        behandling.hentOppgaveopplysninger().map { oppgaveopplysning ->
+            //TODO legg alle oppgavetekster for den samme behandlingen i en og samme oppgave
+            when (oppgaveopplysning) {
+                is Oppgaveopplysninger.Generell -> {
+                    val oppgavemottakerHarOppgaveForÅr =
+                        oppgaveEksistererForOmsorgsyterOgÅr(
+                            oppgaveopplysning.oppgavemottaker,
+                            behandling.omsorgsAr
+                        )
+                    val omsorgsMottakerHarOppgaveForÅr =
+                        oppgaveEksistererForOmsorgsmottakerOgÅr(
+                            behandling.omsorgsmottaker,
+                            behandling.omsorgsAr
+                        )
+
+                    if (!oppgavemottakerHarOppgaveForÅr && !omsorgsMottakerHarOppgaveForÅr) {
+                        opprett(
+                            Oppgave.Transient(
+                                behandlingId = behandling.id,
+                                meldingId = behandling.meldingId,
+                                detaljer = OppgaveDetaljer.MottakerOgTekst(
+                                    oppgavemottaker = oppgaveopplysning.oppgavemottaker,
+                                    oppgavetekst = oppgaveopplysning.oppgaveTekst
+                                )
+                            )
+                        )
+                    }
+                }
+
+                Oppgaveopplysninger.Ingen -> {
+                    //noop
+                }
+            }
+        }
     }
 
     fun process(): Oppgave? {

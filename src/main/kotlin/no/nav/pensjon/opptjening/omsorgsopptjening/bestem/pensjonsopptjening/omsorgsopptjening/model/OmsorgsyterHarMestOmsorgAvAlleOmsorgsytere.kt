@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import java.time.Month
 import java.time.YearMonth
 
@@ -18,6 +19,8 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         ).let {
             if (grunnlag.omsorgsyterHarFlestOmsorgsmåneder()) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+            } else if (grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder()) {
+                VilkårsvurderingUtfall.Ubestemt(it.map { it.henvisning }.toSet())
             } else {
                 VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
             }
@@ -27,7 +30,66 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     data class Vurdering(
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall
-    ) : ParagrafVurdering<Grunnlag>()
+    ) : ParagrafVurdering<Grunnlag>() {
+
+        override fun hentOppgaveopplysninger(omsorgsmottakerFødtOmsorgsår: Boolean): Oppgaveopplysninger {
+            return InnholdsvalgForOppgavetekstHvisFlereOmsorgsytereMedLikeMyeOmsorg(grunnlag).let {
+                val oppgavemottaker = it.oppgaveGjelderFnr()
+                if (oppgavemottaker == grunnlag.omsorgsyter) {
+                    when (omsorgsmottakerFødtOmsorgsår) {
+                        true -> {
+                            Oppgaveopplysninger.Generell(
+                                oppgavemottaker = oppgavemottaker,
+                                oppgaveTekst = Oppgave.flereOmsorgsytereMedLikeMyeOmsorgFødselsår(omsorgsmottaker = it.omsorgsmottaker())
+                            )
+                        }
+
+                        false -> {
+                            Oppgaveopplysninger.Generell(
+                                oppgavemottaker = oppgavemottaker,
+                                oppgaveTekst = Oppgave.flereOmsorgsytereMedLikeMyeOmsorg(
+                                    omsorgsmottaker = it.omsorgsmottaker(),
+                                    annenOmsorgsyter = it.annenOmsorgsyterFnr()
+                                )
+
+                            )
+                        }
+                    }
+                } else {
+                    Oppgaveopplysninger.Ingen
+                }
+            }
+        }
+
+        /**
+         * Prioriterer oppgavemottakere etter kriteriene:
+         * 1. Flest omsorgsmåneder
+         * 2. Hadde omsorg i desember måned
+         * 3. Er personen [grunnlag] gjelder for
+         *    Dette sørger for at vi alltid prioriterer å sende oppgave for omsorgsyteren behandlingen gjelder.
+         */
+        private data class InnholdsvalgForOppgavetekstHvisFlereOmsorgsytereMedLikeMyeOmsorg(
+            private val grunnlag: Grunnlag,
+        ) {
+            private val prioritert: List<OmsorgsmånederForMottakerOgÅr> =
+                grunnlag
+                    .omsorgsytereMedFlestOmsorgsmåneder()
+                    .sortedWith(compareBy<OmsorgsmånederForMottakerOgÅr> { it.haddeOmsorgIDesember() }.thenBy { it.omsorgsyter == grunnlag.omsorgsyter })
+                    .reversed()
+
+            fun oppgaveGjelderFnr(): String {
+                return prioritert.first().omsorgsyter
+            }
+
+            fun annenOmsorgsyterFnr(): String {
+                return prioritert.first { it.omsorgsyter != grunnlag.omsorgsyter }.omsorgsyter
+            }
+
+            fun omsorgsmottaker(): String {
+                return prioritert.first().omsorgsmottaker
+            }
+        }
+    }
 
     data class Grunnlag(
         val omsorgsyter: String,

@@ -34,6 +34,8 @@ internal sealed class VilkårsvurderingUtfallDb {
     @JsonTypeName("VilkårInnvilget")
     data class VilkårInnvilget(val henvisning: Set<JuridiskHenvisningDb>) : VilkårsvurderingUtfallDb()
 
+    @JsonTypeName("Manuell")
+    data class Manuell(val henvisning: Set<JuridiskHenvisningDb>) : VilkårsvurderingUtfallDb()
 }
 
 @JsonTypeInfo(
@@ -44,10 +46,13 @@ internal sealed class VilkårsvurderingUtfallDb {
 internal sealed class BehandlingsutfallDb {
 
     @JsonTypeName("Avslag")
-    object Avslag : BehandlingsutfallDb()
+    data object Avslag : BehandlingsutfallDb()
 
     @JsonTypeName("Innvilget")
-    object Innvilget : BehandlingsutfallDb()
+    data object Innvilget : BehandlingsutfallDb()
+
+    @JsonTypeName("Manuell")
+    data object Manuell : BehandlingsutfallDb()
 }
 
 internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
@@ -59,8 +64,30 @@ internal fun BehandlingUtfall.toDb(): BehandlingsutfallDb {
         BehandlingUtfall.Innvilget -> {
             BehandlingsutfallDb.Innvilget
         }
+
+        BehandlingUtfall.Manuell -> {
+            BehandlingsutfallDb.Manuell
+        }
     }
 }
+
+
+internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
+    return when (this) {
+        is BehandlingsutfallDb.Innvilget -> {
+            BehandlingUtfall.Innvilget
+        }
+
+        is BehandlingsutfallDb.Avslag -> {
+            BehandlingUtfall.Avslag
+        }
+
+        is BehandlingsutfallDb.Manuell -> {
+            BehandlingUtfall.Manuell
+        }
+    }
+}
+
 
 internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
     return when (this) {
@@ -86,6 +113,10 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
 
         is VilkårsvurderingUtfall.Avslag.Vilkår -> {
             VilkårsvurderingUtfallDb.VilkårAvslag(henvisning = henvisninger.toDb())
+        }
+
+        is VilkårsvurderingUtfall.Ubestemt -> {
+            VilkårsvurderingUtfallDb.Manuell(henvisning = henvisninger.toDb())
         }
     }
 }
@@ -115,17 +146,9 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         is VilkårsvurderingUtfallDb.VilkårInnvilget -> {
             VilkårsvurderingUtfall.Innvilget.Vilkår(henvisninger = henvisning.toDomain())
         }
-    }
-}
 
-internal fun BehandlingsutfallDb.toDomain(): BehandlingUtfall {
-    return when (this) {
-        is BehandlingsutfallDb.Innvilget -> {
-            BehandlingUtfall.Innvilget
-        }
-
-        is BehandlingsutfallDb.Avslag -> {
-            BehandlingUtfall.Avslag
+        is VilkårsvurderingUtfallDb.Manuell -> {
+            VilkårsvurderingUtfall.Ubestemt(henvisninger = henvisning.toDomain())
         }
     }
 }

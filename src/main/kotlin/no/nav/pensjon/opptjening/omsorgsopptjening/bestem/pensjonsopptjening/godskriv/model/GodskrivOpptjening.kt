@@ -51,8 +51,9 @@ sealed class GodskrivOpptjening {
         fun opprettOppgave(): Oppgave.Transient? {
             return if (status is Status.Feilet) {
                 Oppgave.Transient(
-                    detaljer = OppgaveDetaljer.UspesifisertFeilsituasjon(
-                        omsorgsyter = omsorgsyter,
+                    detaljer = OppgaveDetaljer.MottakerOgTekst(
+                        oppgavemottaker = omsorgsyter,
+                        oppgavetekst = Oppgave.kunneIkkeBehandlesAutomatisk()
                     ),
                     behandlingId = behandlingId,
                     meldingId = meldingId,

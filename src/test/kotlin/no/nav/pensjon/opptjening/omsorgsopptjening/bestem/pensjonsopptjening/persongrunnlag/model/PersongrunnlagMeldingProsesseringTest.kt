@@ -381,9 +381,13 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         assertEquals(0, behandlingRepo.finnForOmsorgsyter("12345678910").count())
 
         oppgaveRepo.findForMelding(melding.id).single().also { oppgave ->
-            assertInstanceOf(OppgaveDetaljer.UspesifisertFeilsituasjon::class.java, oppgave.detaljer).also {
-                assertEquals("12345678910", it.omsorgsyter)
-            }
+            assertEquals(
+                OppgaveDetaljer.MottakerOgTekst(
+                    oppgavemottaker = "12345678910",
+                    oppgavetekst = """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
+                ),
+                oppgave.detaljer
+            )
             assertEquals(null, oppgave.behandlingId)
             assertEquals(melding.id, oppgave.meldingId)
             assertEquals(melding.correlationId, oppgave.correlationId)
