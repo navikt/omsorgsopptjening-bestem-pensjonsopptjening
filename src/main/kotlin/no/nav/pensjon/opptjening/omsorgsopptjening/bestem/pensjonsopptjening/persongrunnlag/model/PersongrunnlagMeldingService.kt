@@ -4,7 +4,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.bre
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
@@ -48,25 +47,15 @@ class PersongrunnlagMeldingService(
                                 log.info("Prosesserer melding")
                                 behandle(melding).let { fullførte ->
                                     persongrunnlagRepo.updateStatus(melding.ferdig())
-                                    fullførte.perÅr().forEach { (år, behandlingerForÅr, utfall) ->
-                                        when (utfall) {
-                                            BehandlingUtfall.Avslag -> {
-                                                //noop
-                                            }
 
-                                            BehandlingUtfall.Innvilget -> {
-                                                behandlingerForÅr.filter { it.erInnvilget() }
-                                                    .forEach { håndterInnvilgelse(it) }
-                                            }
+                                    fullførte.håndterUtfall(
+                                        innvilget = ::håndterInnvilgelse,
+                                        manuell = oppgaveService::opprettOppgaveHvisNødvendig,
+                                        avslag = {} //noop
+                                    )
 
-                                            BehandlingUtfall.Manuell -> {
-                                                behandlingerForÅr.filter { it.erManuell() }
-                                                    .forEach { oppgaveService.opprettOppgaveHvisNødvendig(it) }
-                                            }
-                                        }
-                                    }
                                     log.info("Melding prosessert")
-                                    fullførte.forAlleÅr()
+                                    fullførte.alle()
                                 }
                             }
                         } catch (ex: Throwable) {
