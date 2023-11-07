@@ -299,10 +299,10 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.also { behandlinger ->
-            assertEquals(2, behandlinger.count())
-            oppgaveRepo.findForMelding(behandlinger[0].meldingId).single().also { oppgave ->
-                assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandlinger[0].id))
-                assertEquals(oppgave, oppgaveRepo.findForBehandling(behandlinger[1].id).single())
+            assertEquals(2, behandlinger.antallBehandlinger(2020))
+            oppgaveRepo.findForMelding(behandlinger.finnÅr(2020)!!.behandlinger[0].meldingId).single().also { oppgave ->
+                assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId(2020)[0]))
+                assertEquals(oppgave, oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId(2020)[1]).single())
                 assertEquals(
                     oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "04010012797",
@@ -494,8 +494,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.let { result ->
-            assertEquals(2, result.count())
-            result.first().also { behandling ->
+            assertEquals(2, result.antallBehandlinger(2020))
+            result.finnÅr(2020)!!.behandlinger.first().also { behandling ->
                 assertFalse(behandling.erInnvilget())
                 oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                     assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
@@ -507,7 +507,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     )
                 }
             }
-            result.last().also { behandling ->
+            result.finnÅr(2020)!!.behandlinger.last().also { behandling ->
                 assertFalse(behandling.erInnvilget())
                 assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
                 assertEquals(1, oppgaveRepo.findForMelding(behandling.meldingId).count())
@@ -584,8 +584,9 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.let { result ->
-            assertEquals(4, result.count())
-            result[0].also { behandling ->
+            assertEquals(2, result.antallBehandlinger(2020))
+            assertEquals(2, result.antallBehandlinger(2021))
+            result.finnÅr(2020)!!.behandlinger[0].also { behandling ->
                 assertFalse(behandling.erInnvilget())
                 assertEquals(2020, behandling.omsorgsAr)
                 assertEquals("07081812345", behandling.omsorgsmottaker)
@@ -599,7 +600,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     )
                 }
             }
-            result[1].also { behandling ->
+            result.finnÅr(2021)!!.behandlinger[0].also { behandling ->
                 assertFalse(behandling.erInnvilget())
                 assertEquals(2021, behandling.omsorgsAr)
                 assertEquals("07081812345", behandling.omsorgsmottaker)
@@ -613,14 +614,14 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     )
                 }
             }
-            result[2].also { behandling ->
+            result.finnÅr(2020)!!.behandlinger[1].also { behandling ->
                 assertFalse(behandling.erInnvilget())
                 assertEquals(2020, behandling.omsorgsAr)
                 assertEquals("01122012345", behandling.omsorgsmottaker)
                 assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
                 assertEquals(2, oppgaveRepo.findForMelding(behandling.meldingId).count())
             }
-            result[3].also { behandling ->
+            result.finnÅr(2021)!!.behandlinger[1].also { behandling ->
                 assertFalse(behandling.erInnvilget())
                 assertEquals(2021, behandling.omsorgsAr)
                 assertEquals("01122012345", behandling.omsorgsmottaker)

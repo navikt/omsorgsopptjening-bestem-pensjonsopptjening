@@ -262,7 +262,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             assertEquals(1, it.antallForsøk)
         }
 
-        assertEquals(1, handler.process()!!.count())
+        assertEquals(1, handler.process()!!.antallBehandlinger(2020))
 
         assertInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java, repo.find(melding.id).status)
     }

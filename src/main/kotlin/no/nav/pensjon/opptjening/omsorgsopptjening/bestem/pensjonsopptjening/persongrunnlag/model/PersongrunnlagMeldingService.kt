@@ -37,7 +37,7 @@ class PersongrunnlagMeldingService(
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
-    fun process(): List<FullførtBehandling>? {
+    fun process(): FullførteBehandlinger? {
         return transactionTemplate.execute {
             persongrunnlagRepo.finnNesteUprosesserte()?.let { melding ->
                 Mdc.scopedMdc(melding.correlationId) {
@@ -47,15 +47,14 @@ class PersongrunnlagMeldingService(
                                 log.info("Prosesserer melding")
                                 behandle(melding).let { fullførte ->
                                     persongrunnlagRepo.updateStatus(melding.ferdig())
-
-                                    fullførte.håndterUtfall(
-                                        innvilget = ::håndterInnvilgelse,
-                                        manuell = oppgaveService::opprettOppgaveHvisNødvendig,
-                                        avslag = {} //noop
-                                    )
-
-                                    log.info("Melding prosessert")
-                                    fullførte.alle()
+                                    fullførte.also {
+                                        it.håndterUtfall(
+                                            innvilget = ::håndterInnvilgelse,
+                                            manuell = oppgaveService::opprettOppgaveHvisNødvendig,
+                                            avslag = {} //noop
+                                        )
+                                        log.info("Melding prosessert")
+                                    }
                                 }
                             }
                         } catch (ex: Throwable) {

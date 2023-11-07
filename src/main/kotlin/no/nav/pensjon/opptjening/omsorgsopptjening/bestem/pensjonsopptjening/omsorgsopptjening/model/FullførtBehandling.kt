@@ -27,7 +27,11 @@ data class FullførtBehandling(
         return utfall.erManuell()
     }
 
-    fun avslagsArsaker(): List<VilkarsVurdering<*>> {
+    fun erAvslag(): Boolean {
+        return utfall.erAvslag()
+    }
+
+    fun avslåtteVilkår(): List<VilkarsVurdering<*>> {
         return vilkårsvurdering.finnAlleAvslatte()
     }
 

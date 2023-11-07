@@ -58,4 +58,12 @@ sealed class BehandlingUtfall {
             Manuell -> true
         }
     }
+
+    fun erAvslag(): Boolean {
+        return when(this){
+            Avslag -> true
+            Innvilget -> false
+            Manuell -> false
+        }
+    }
 }

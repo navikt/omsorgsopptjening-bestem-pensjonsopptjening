@@ -6,14 +6,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import org.springframework.stereotype.Component
 
 @Component
-class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List<FullførtBehandling>?> {
+class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<FullførteBehandlinger?> {
 
     private val omsorgsarbeidProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "omsorgsarbeidProsessert")
     private val innvilget = registry.counter("behandling", "antall", "innvilget")
     private val avslag = registry.counter("behandling", "antall", "avslag")
-    private val antallUnikeProsesseringer = registry.counter("behandling", "antall", "totalt")
-    private val antallBehandlingerPerProsessering = registry.counter("behandling", "antall", "pr_prosessering")
-    private val antallAvslåttBehandlingPerProsessering = registry.counter("behandling", "antall", "avslag_pr_prosessering")
+    private val manuell = registry.counter("behandling", "antall", "manuell")
+    private val totalt = registry.counter("behandling", "antall", "totalt")
 
     private val omsorgsyterHarMestOmsorgAvAlleOmsorgsytere =
         registry.counter("avslag", "antall", "omsorgsyterHarMestOmsorgAvAlleOmsorgsytere")
@@ -37,43 +36,30 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List
         registry.counter("avslag", "antall", "OmsorgsyterHarGyldigOmsorgsarbeid")
 
 
-    override fun oppdater(lambda: () -> List<FullførtBehandling>?): List<FullførtBehandling>? {
+    override fun oppdater(lambda: () -> FullførteBehandlinger?): FullførteBehandlinger? {
         return omsorgsarbeidProsessertTidsbruk.recordCallable(lambda)?.also { fullførte ->
-            antallUnikeProsesseringer.increment()
-            fullførte.tellAntallBehandlinger()
-            if (fullførte.any { it.erInnvilget() }) {
-                innvilget.increment()
-            } else {
-                fullførte.tellAvslagsårsaker()
-                fullførte.tellAntallAvslag()
-                avslag.increment()
-            }
-        }
-    }
-
-    private fun List<FullførtBehandling>.tellAntallBehandlinger(){
-        return forEach { _ -> antallBehandlingerPerProsessering.increment() }
-    }
-    private fun List<FullførtBehandling>.tellAntallAvslag(){
-        return filter { !it.erInnvilget() }.forEach { _ -> antallAvslåttBehandlingPerProsessering.increment() }
-    }
-
-    private fun List<FullførtBehandling>.tellAvslagsårsaker() {
-        flatMap { it.avslagsArsaker() }.associateBy { it.javaClass }.values.map {
-            when (it) {
-                is EllerVurdering -> {}
-                is OgVurdering -> {}
-                is OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering -> omsorgsyterHarMestOmsorgAvAlleOmsorgsytere.increment()
-                is OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering -> omsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.increment()
-                is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering -> omsorgsyterHarTilstrekkeligOmsorgsarbeid.increment()
-                is OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering -> omsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.increment()
-                is OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering -> omsorgsyterErForelderTilMottakerAvHjelpestønad.increment()
-                is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> omsorgsmottakerOppfyllerAlderskravForHjelpestønad.increment()
-                is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> omsorgsmottakerOppfyllerAlderskravForBarnetrygd.increment()
-                is OmsorgsyterOppfyllerAlderskrav.Vurdering -> omsorgsyterOppfyllerAlderskrav.increment()
-                is OmsorgsyterErMedlemAvFolketrygden.Vurdering -> omsorgsyterErMedlemAvFolketrygden.increment()
-                is OmsorgsyterMottarBarnetrgyd.Vurdering -> omsorgsyterMottarBarnetrygd.increment()
-                is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> omsorgsyterHarGyldigOmsorgsarbeid.increment()
+            fullførte.statistikk().let { statistikk ->
+                totalt.increment()
+                innvilget.increment(statistikk.innvilgetOpptjening.toDouble())
+                avslag.increment(statistikk.avslåttOpptjening.toDouble())
+                manuell.increment(statistikk.manuellBehandling.toDouble())
+                statistikk.summertAvslagPerVilkår.map {
+                    when (it.key) {
+                        is EllerVurdering -> {}
+                        is OgVurdering -> {}
+                        is OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering -> omsorgsyterHarMestOmsorgAvAlleOmsorgsytere.increment()
+                        is OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering -> omsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.increment()
+                        is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering -> omsorgsyterHarTilstrekkeligOmsorgsarbeid.increment()
+                        is OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering -> omsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.increment()
+                        is OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering -> omsorgsyterErForelderTilMottakerAvHjelpestønad.increment()
+                        is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> omsorgsmottakerOppfyllerAlderskravForHjelpestønad.increment()
+                        is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> omsorgsmottakerOppfyllerAlderskravForBarnetrygd.increment()
+                        is OmsorgsyterOppfyllerAlderskrav.Vurdering -> omsorgsyterOppfyllerAlderskrav.increment()
+                        is OmsorgsyterErMedlemAvFolketrygden.Vurdering -> omsorgsyterErMedlemAvFolketrygden.increment()
+                        is OmsorgsyterMottarBarnetrgyd.Vurdering -> omsorgsyterMottarBarnetrygd.increment()
+                        is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> omsorgsyterHarGyldigOmsorgsarbeid.increment()
+                    }
+                }
             }
         }
     }

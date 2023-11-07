@@ -164,7 +164,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 )
             ),
         )
-        assertTrue(handler.process()!!.isEmpty())
+        assertEquals(0, handler.process()!!.antallBehandlinger(OPPTJENINGSÅR))
     }
 
     @Test
@@ -785,21 +785,21 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.also { behandlinger ->
-            assertEquals(3, behandlinger.count())
-            behandlinger[0].also {
+            assertEquals(3, behandlinger.antallBehandlinger(OPPTJENINGSÅR))
+            behandlinger.finnÅr(2020)!!.behandlinger[0].also {
                 it.assertInnvilget(
                     omsorgsyter = "12345678910",
                     omsorgsmottaker = "07081812345"
                 )
             }
-            behandlinger[1].also {
+            behandlinger.finnÅr(OPPTJENINGSÅR)!!.behandlinger[1].also {
                 it.assertAvslag(
                     omsorgsyter = "12345678910",
                     omsorgsmottaker = "01052012345"
                 )
                 assertTrue(it.vilkårsvurdering.erEnesteAvslag<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>())
             }
-            behandlinger[2].also {
+            behandlinger.finnÅr(OPPTJENINGSÅR)!!.behandlinger[2].also {
                 it.assertAvslag(
                     omsorgsyter = "12345678910",
                     omsorgsmottaker = "01122012345"
@@ -996,16 +996,16 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
 
 
         handler.process()!!.also { behandlinger ->
-            assertEquals(2, behandlinger.count())
-            behandlinger.first().assertInnvilget(
+            assertEquals(2, behandlinger.antallBehandlinger(OPPTJENINGSÅR))
+            behandlinger.finnÅr(OPPTJENINGSÅR)!!.behandlinger.first().assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
             )
-            behandlinger.last().assertAvslag(
+            behandlinger.finnÅr(OPPTJENINGSÅR)!!.behandlinger.last().assertAvslag(
                 "12345678910",
                 "01052012345"
             )
-            assertTrue(behandlinger.last().vilkårsvurdering.erEnesteAvslag<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>())
+            assertTrue(behandlinger.finnÅr(OPPTJENINGSÅR)!!.behandlinger.last().vilkårsvurdering.erEnesteAvslag<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>())
         }
     }
 
