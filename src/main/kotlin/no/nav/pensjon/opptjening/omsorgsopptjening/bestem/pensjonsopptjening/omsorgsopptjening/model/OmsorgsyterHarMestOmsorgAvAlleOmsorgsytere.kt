@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import java.time.Month
 import java.time.YearMonth
 
@@ -39,14 +40,17 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
                         true -> {
                             Oppgaveopplysninger.Generell(
                                 oppgavemottaker = oppgavemottaker,
-                                oppgaveTekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr ${it.omsorgsmottaker()} i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
+                                oppgaveTekst = Oppgave.flereOmsorgsytereMedLikeMyeOmsorgFødselsår(omsorgsmottaker = it.omsorgsmottaker())
                             )
                         }
 
                         false -> {
                             Oppgaveopplysninger.Generell(
                                 oppgavemottaker = oppgavemottaker,
-                                oppgaveTekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr ${it.omsorgsmottaker()}. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr ${it.annenOmsorgsyterFnr()} mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+                                oppgaveTekst = Oppgave.flereOmsorgsytereMedLikeMyeOmsorg(
+                                    omsorgsmottaker = it.omsorgsmottaker(),
+                                    annenOmsorgsyter = it.annenOmsorgsyterFnr()
+                                )
 
                             )
                         }

@@ -53,7 +53,7 @@ sealed class GodskrivOpptjening {
                 Oppgave.Transient(
                     detaljer = OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = omsorgsyter,
-                        oppgavetekst = """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
+                        oppgavetekst = Oppgave.kunneIkkeBehandlesAutomatisk()
                     ),
                     behandlingId = behandlingId,
                     meldingId = meldingId,

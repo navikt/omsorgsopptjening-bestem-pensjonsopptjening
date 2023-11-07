@@ -47,7 +47,7 @@ sealed class PersongrunnlagMelding {
                 Oppgave.Transient(
                     detaljer = OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = innhold.omsorgsyter,
-                        oppgavetekst = """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
+                        oppgavetekst = Oppgave.kunneIkkeBehandlesAutomatisk()
                     ),
                     behandlingId = null,
                     meldingId = id,
