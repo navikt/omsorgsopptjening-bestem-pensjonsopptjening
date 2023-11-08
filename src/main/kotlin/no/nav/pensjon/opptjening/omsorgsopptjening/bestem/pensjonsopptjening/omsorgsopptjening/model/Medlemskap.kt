@@ -20,10 +20,11 @@ sealed class Medlemskap {
     ) : Medlemskap()
 
     /**
-     * Tidligere har man godtatt at verdien av "pensjonstrygdet" i Infotrygd var enten fraværende eller ja.
+     * Ikke helt avklart hvordan vi skal håndtere dette enda, ser ut som feltet "pensjonstrygdet" aldri har blitt brukt
+     * som en mekanisme for filtrering. Inntil videre godtar vi alt"
      */
     fun erMedlem(): Boolean {
-        return this is Ja || this is Ukjent
+        return true
     }
 }
 
