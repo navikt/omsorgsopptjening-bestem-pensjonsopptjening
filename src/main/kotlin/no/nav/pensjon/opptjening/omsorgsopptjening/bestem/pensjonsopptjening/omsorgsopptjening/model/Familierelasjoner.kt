@@ -4,7 +4,12 @@ data class Familierelasjoner(
     val relasjoner: List<Familierelasjon>
 ) {
     fun erForelder(fnr: String): Boolean {
-        return finnForeldre().let { it.farEllerMedmor == fnr || it.mor == fnr }
+        return finnForeldre().let {
+            when (it) {
+                is Foreldre.Identifisert -> it.farEllerMedmor == fnr || it.mor == fnr
+                is Foreldre.Ukjent -> false
+            }
+        }
     }
 
     fun erBarn(fnr: String): Boolean {
@@ -18,20 +23,22 @@ data class Familierelasjoner(
 
         return when {
             far != null -> {
-                Foreldre(
+                Foreldre.Identifisert(
                     farEllerMedmor = far.ident,
                     mor = mor!!.ident,
                 )
             }
 
             medmor != null -> {
-                Foreldre(
+                Foreldre.Identifisert(
                     farEllerMedmor = medmor.ident,
                     mor = mor!!.ident
                 )
             }
 
-            else -> throw RuntimeException("Klarte ikke å identifisere foreldre")
+            else -> {
+                Foreldre.Ukjent
+            }
         }
     }
 }
@@ -52,9 +59,11 @@ data class Familierelasjon(
     }
 }
 
-data class Foreldre(
-    val farEllerMedmor: String,
-    val mor: String,
-) {
+sealed class Foreldre {
+    data class Identifisert(
+        val farEllerMedmor: String,
+        val mor: String,
+    ) : Foreldre()
 
+    data object Ukjent : Foreldre()
 }

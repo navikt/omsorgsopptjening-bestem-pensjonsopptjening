@@ -30,7 +30,6 @@ class PersongrunnlagMeldingService(
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
     private val transactionTemplate: TransactionTemplate,
     private val brevService: BrevService,
-    private val hentPensjonspoeng: HentPensjonspoengClient,
     private val medlemskapOppslag: MedlemskapOppslag,
 ) {
     companion object {
@@ -105,10 +104,7 @@ class PersongrunnlagMeldingService(
     private fun håndterInnvilgelse(behandling: FullførtBehandling) {
         log.info("Håndterer innvilgelse")
         godskrivOpptjeningService.opprett(behandling.godskrivOpptjening())
-        behandling.sendBrev(
-            hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgstype,
-            hentPensjonspoengForInntekt = hentPensjonspoeng::hentPensjonspoengForInntekt,
-        )?.also { brevService.opprett(it) }
+        brevService.opprettHvisNødvendig(behandling)
     }
 
     private fun PersongrunnlagMeldingKafka.berikDatagrunnlag(): BeriketDatagrunnlag {

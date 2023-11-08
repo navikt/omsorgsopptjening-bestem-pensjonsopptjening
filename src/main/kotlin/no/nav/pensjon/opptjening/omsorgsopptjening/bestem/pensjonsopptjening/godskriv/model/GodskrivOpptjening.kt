@@ -14,10 +14,6 @@ sealed class GodskrivOpptjening {
     abstract val behandlingId: UUID
     abstract val statushistorikk: List<Status>
 
-    companion object {
-        const val OMSORGSPOENG_GODSKRIVES = 3.5
-    }
-
     val status get() = statushistorikk.last()
 
     /**

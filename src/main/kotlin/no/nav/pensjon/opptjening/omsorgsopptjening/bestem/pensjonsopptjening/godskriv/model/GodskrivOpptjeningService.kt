@@ -5,6 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -12,7 +13,7 @@ import org.springframework.transaction.support.TransactionTemplate
 
 @Component
 class GodskrivOpptjeningService(
-    private val godskrivClient: GodskrivOpptjeningClient,
+    @Qualifier("godskrivOpptjening") private val godskrivClient: GodskrivOpptjeningClient,
     private val godskrivOpptjeningRepo: GodskrivOpptjeningRepo,
     private val behandlingRepo: BehandlingRepo,
     private val oppgaveService: OppgaveService,

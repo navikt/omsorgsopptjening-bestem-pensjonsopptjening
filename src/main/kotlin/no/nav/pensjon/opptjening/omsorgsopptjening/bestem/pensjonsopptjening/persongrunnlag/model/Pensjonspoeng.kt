@@ -3,6 +3,11 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 sealed class Pensjonspoeng : Comparable<Pensjonspoeng> {
     abstract val år: Int
     abstract val poeng: Double
+
+    companion object {
+        fun opptjenesForOmsorg(): Double = 3.5
+    }
+
     override fun compareTo(other: Pensjonspoeng): Int {
         return poeng.compareTo(other.poeng)
     }
