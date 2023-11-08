@@ -47,7 +47,7 @@ sealed class PersongrunnlagMelding {
                 Oppgave.Transient(
                     detaljer = OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = innhold.omsorgsyter,
-                        oppgavetekst = Oppgave.kunneIkkeBehandlesAutomatisk()
+                        oppgavetekst = setOf(Oppgave.kunneIkkeBehandlesAutomatisk())
                     ),
                     behandlingId = null,
                     meldingId = id,

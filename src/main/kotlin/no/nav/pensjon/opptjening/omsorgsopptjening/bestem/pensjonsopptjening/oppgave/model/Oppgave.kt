@@ -16,7 +16,7 @@ sealed class Oppgave {
 
     val status get() = statushistorikk.last()
     val mottaker get() = detaljer.mottaker()
-    val oppgavetekst get() = detaljer.oppgavetekst()
+    val oppgavetekst : Set<String> get() = detaljer.oppgavetekst().toSet()
 
     companion object Oppgavetekster {
         fun flereOmsorgsytereMedLikeMyeOmsorgFødselsår(omsorgsmottaker: String): String =

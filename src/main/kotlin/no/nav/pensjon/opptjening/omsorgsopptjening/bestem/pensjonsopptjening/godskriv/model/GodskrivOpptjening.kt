@@ -49,7 +49,7 @@ sealed class GodskrivOpptjening {
                 Oppgave.Transient(
                     detaljer = OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = omsorgsyter,
-                        oppgavetekst = Oppgave.kunneIkkeBehandlesAutomatisk()
+                        oppgavetekst = setOf(Oppgave.kunneIkkeBehandlesAutomatisk())
                     ),
                     behandlingId = behandlingId,
                     meldingId = meldingId,
