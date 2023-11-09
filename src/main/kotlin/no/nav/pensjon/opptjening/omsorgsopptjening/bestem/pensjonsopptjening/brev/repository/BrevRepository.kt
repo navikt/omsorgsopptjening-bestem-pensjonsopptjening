@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
@@ -25,10 +26,11 @@ class BrevRepository(
     fun persist(brev: Brev.Transient): Brev.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into brev (behandlingId) values (:behandlingId)""",
+            """insert into brev (behandlingId, årsak) values (:behandlingId, :arsak)""",
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to brev.behandlingId,
+                    "arsak" to brev.årsak.toDb()
                 ),
             ),
             keyHolder
@@ -104,6 +106,22 @@ class BrevRepository(
         ).singleOrNull()
     }
 
+    private fun BrevÅrsak.toDb(): String {
+        return when (this) {
+            BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR -> BrevÅrsakDb.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR
+            BrevÅrsak.OMSORGSYTER_IKKE_FORELDER_AV_OMSORGSMOTTAKER -> BrevÅrsakDb.OMSORGSYTER_IKKE_FORELDER_AV_OMSORGSMOTTAKER
+            BrevÅrsak.ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG -> BrevÅrsakDb.ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG
+            BrevÅrsak.FORELDRE_ER_UKJENT -> BrevÅrsakDb.FORELDRE_ER_UKJENT
+        }.toString()
+    }
+
+    private enum class BrevÅrsakDb {
+        OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR,
+        OMSORGSYTER_IKKE_FORELDER_AV_OMSORGSMOTTAKER,
+        ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG,
+        FORELDRE_ER_UKJENT
+    }
+
 
     internal class BrevMapper : RowMapper<Brev.Persistent> {
         override fun mapRow(rs: ResultSet, rowNum: Int): Brev.Persistent {
@@ -116,8 +134,18 @@ class BrevRepository(
                 correlationId = CorrelationId.fromString(rs.getString("correlation_id")),
                 statushistorikk = rs.getString("statushistorikk").deserializeList(),
                 innlesingId = InnlesingId.fromString(rs.getString("innlesing_id")),
-                omsorgsår = rs.getInt("omsorgs_ar")
+                omsorgsår = rs.getInt("omsorgs_ar"),
+                årsak = rs.getString("årsak").let { BrevÅrsakDb.valueOf(it).toDomain() }
             )
+        }
+
+        private fun BrevÅrsakDb.toDomain(): BrevÅrsak {
+            return when (this) {
+                BrevÅrsakDb.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR -> BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR
+                BrevÅrsakDb.OMSORGSYTER_IKKE_FORELDER_AV_OMSORGSMOTTAKER -> BrevÅrsak.OMSORGSYTER_IKKE_FORELDER_AV_OMSORGSMOTTAKER
+                BrevÅrsakDb.ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG -> BrevÅrsak.ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG
+                BrevÅrsakDb.FORELDRE_ER_UKJENT -> BrevÅrsak.FORELDRE_ER_UKJENT
+            }
         }
     }
 }

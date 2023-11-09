@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.Instant
@@ -10,15 +11,13 @@ import java.util.UUID
 
 sealed class Brev {
     abstract val behandlingId: UUID
+    abstract val årsak: BrevÅrsak
     abstract val statushistorikk: List<Status>
     val status: Status get() = statushistorikk.last()
 
-    /**
-     * Inneholder kun informasjon nok til å knytte brevet til en behandling.
-     * Alle brev som opprettes er av den samme typen, og vi trenger derfor ikke noe mer enn dette.
-     */
     data class Transient(
         override val behandlingId: UUID,
+        override val årsak: BrevÅrsak,
     ) : Brev() {
         override val statushistorikk: List<Status> = listOf(Status.Klar())
     }
@@ -35,6 +34,7 @@ sealed class Brev {
         val omsorgsår: Int,
         val meldingId: UUID,
         override val behandlingId: UUID,
+        override val årsak: BrevÅrsak,
         override val statushistorikk: List<Status>,
     ) : Brev() {
 

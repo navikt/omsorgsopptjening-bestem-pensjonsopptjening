@@ -1,0 +1,1 @@
+alter table brev add column årsak varchar not null;

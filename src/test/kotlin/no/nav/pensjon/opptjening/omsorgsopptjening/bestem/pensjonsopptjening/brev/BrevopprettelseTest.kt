@@ -7,6 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
@@ -17,6 +18,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -120,7 +122,9 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         persongrunnlagMeldingService.process()!!.single().also { behandling ->
             assertTrue(behandling.erInnvilget())
 
-            assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull())
+            assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull()).also {
+                assertThat(it.årsak).isEqualTo(BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR)
+            }
         }
     }
 
@@ -204,7 +208,9 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         persongrunnlagMeldingService.process()!!.single().also { behandling ->
             assertTrue(behandling.erInnvilget())
 
-            assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull())
+            assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull()).also {
+                assertThat(it.årsak).isEqualTo(BrevÅrsak.ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG)
+            }
         }
     }
 
@@ -293,7 +299,6 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
 
         persongrunnlagMeldingService.process()!!.single().also { behandling ->
             assertTrue(behandling.erInnvilget())
-
             assertTrue(brevRepository.findForBehandling(behandling.id).isEmpty())
         }
     }

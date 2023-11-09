@@ -34,12 +34,14 @@ class BrevService(
 
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
     fun opprettHvisNødvendig(behandling: FullførtBehandling) {
-        when (behandling.hentBrevopplysninger(
+        val brevopplysninger = behandling.hentBrevopplysninger(
             hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgstype,
             hentPensjonspoengForInntekt = hentPensjonspoeng::hentPensjonspoengForInntekt
-        )) {
+        )
+
+        when (brevopplysninger) {
             is Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker -> {
-                opprett(Brev.Transient(behandling.id))
+                opprett(Brev.Transient(behandling.id, brevopplysninger.årsak))
             }
 
             Brevopplysninger.Ingen -> {
