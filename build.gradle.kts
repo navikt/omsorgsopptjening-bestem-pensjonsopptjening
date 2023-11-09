@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val domeneVersion = "1.0.63"
+val domeneVersion = "1.0.64"
 val azureAdClient = "0.0.7"
 val jacksonVersion = "2.15.3"
 val logbackEncoderVersion = "7.4"

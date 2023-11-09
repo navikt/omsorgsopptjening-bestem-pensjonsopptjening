@@ -13,7 +13,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.RådataFraKilde
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
@@ -169,7 +169,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                             hjelpestønadsperioder = emptyList(),
                         ),
                     ),
-                    rådata = RådataFraKilde(""),
+                    rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
                 )
@@ -308,7 +308,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                             hjelpestønadsperioder = emptyList(),
                         ),
                     ),
-                    rådata = RådataFraKilde(""),
+                    rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
                 )
@@ -409,7 +409,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                             hjelpestønadsperioder = emptyList(),
                         ),
                     ),
-                    rådata = RådataFraKilde(""),
+                    rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
                 )
