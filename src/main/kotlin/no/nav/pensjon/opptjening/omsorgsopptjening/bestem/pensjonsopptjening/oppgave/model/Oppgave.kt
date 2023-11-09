@@ -14,9 +14,9 @@ sealed class Oppgave {
     abstract val meldingId: UUID
     abstract val statushistorikk: List<Status>
 
-    val status get() = statushistorikk.last()
-    val mottaker get() = detaljer.mottaker()
-    val oppgavetekst : Set<String> get() = detaljer.oppgavetekst().toSet()
+    val status: Status get() = statushistorikk.last()
+    val mottaker: String get() = detaljer.mottaker()
+    val oppgavetekst: Set<String> get() = detaljer.oppgavetekst()
 
     companion object Oppgavetekster {
         fun flereOmsorgsytereMedLikeMyeOmsorgFødselsår(omsorgsmottaker: String): String =

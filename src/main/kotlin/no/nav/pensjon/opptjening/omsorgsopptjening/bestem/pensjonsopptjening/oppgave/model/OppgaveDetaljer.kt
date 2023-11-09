@@ -2,8 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -24,9 +22,6 @@ sealed class OppgaveDetaljer {
             return oppgavemottaker
         }
 
-        // TODO: Fikse serialiseringen
-        @JsonDeserialize(`as` = Set::class)
-        @JsonSerialize(`as` = Set::class)
         override fun oppgavetekst(): Set<String> {
             return oppgavetekst
         }

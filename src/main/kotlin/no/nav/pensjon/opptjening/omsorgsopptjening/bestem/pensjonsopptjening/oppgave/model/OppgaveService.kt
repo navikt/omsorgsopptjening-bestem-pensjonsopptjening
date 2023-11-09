@@ -56,9 +56,9 @@ class OppgaveService(
         if (!omsorgsMottakerHarOppgaveForÅr) {
             behandling.hentOppgaveopplysninger()
                 .filterIsInstance<Oppgaveopplysninger.Generell>()
-                .filter { oppgaveopplysning -> oppgavemottakerHarOppgaveForÅr(oppgaveopplysning) }
+                .filterNot { oppgaveopplysning -> oppgavemottakerHarOppgaveForÅr(oppgaveopplysning) }
                 .groupBy { it.oppgavemottaker }
-                .mapValues { it.value.map { it.oppgaveTekst }.toSet() }
+                .mapValues { o -> o.value.map { it.oppgaveTekst }.toSet() }
                 .forEach { (oppgavemottaker, oppgaveTekster) ->
                     //TODO legg alle oppgavetekster for den samme behandlingen i en og samme oppgave
                     opprett(
@@ -82,7 +82,6 @@ class OppgaveService(
                 Mdc.scopedMdc(oppgave.correlationId) {
                     Mdc.scopedMdc(oppgave.innlesingId) {
                         try {
-                            val oppgaveTekst : Set<String> = oppgave.oppgavetekst
                             transactionTemplate.execute {
                                 log.info("Oppretter oppgave")
                                 personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
@@ -93,7 +92,7 @@ class OppgaveService(
                                             aktoerId = aktørId,
                                             sakId = omsorgssak.sakId,
                                             // TODO: Skal ikke kunne være tom
-                                            beskrivelse = oppgaveTekst.first(),
+                                            beskrivelse = FlereOppgaveteksterFormatter.format(oppgave.oppgavetekst),
                                             tildeltEnhetsnr = omsorgssak.enhet
                                         ).let { oppgaveId ->
                                             oppgave.ferdig(oppgaveId).also {

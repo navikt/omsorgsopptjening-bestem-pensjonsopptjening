@@ -118,7 +118,7 @@ object StatusServiceTest {
                     "behandlingId" to id,
                     "opprettet" to opprettet.toString(),
                     "meldingId" to mottatt.id,
-                    "detaljer" to """{"type":"MottakerOgTekst", "oppgavemottaker":"12345123451", "oppgavetekst":"blah blah"}"""
+                    "detaljer" to """{"type":"MottakerOgTekst", "oppgavemottaker":"12345123451", "oppgavetekst":["blah blah", "blah"]}"""
                 ),
             ),
         )
