@@ -86,7 +86,6 @@ class KanKunGodskrivesEnOmsorgsyterTest {
                 kotlin.test.assertEquals(
                     setOf(
                         JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum,
-                        JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Andre_Punktum
                     ),
                     it.henvisninger
                 )

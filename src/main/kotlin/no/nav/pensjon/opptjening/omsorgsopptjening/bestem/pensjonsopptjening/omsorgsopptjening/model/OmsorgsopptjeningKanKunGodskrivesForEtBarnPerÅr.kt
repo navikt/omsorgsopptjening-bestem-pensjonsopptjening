@@ -15,7 +15,7 @@ object OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr :
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OpptjeningKanKunGodskrivesForEtBarnPerÅr
+            Referanse.`OpptjeningKanGodskrivesMed18,1ProsentAv4,5GHvertKalenderår`
         ).let { referanser ->
             if (grunnlag.behandlinger.none { it.erInnvilget && grunnlag.omsorgsår == it.omsorgsÅr }) {
                 VilkårsvurderingUtfall.Innvilget.Vilkår.from(referanser)

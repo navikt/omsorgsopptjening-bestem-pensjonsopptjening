@@ -14,16 +14,14 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
-        return setOf(
-            Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder //TODO rett opp henvinsinger/presiser hvorfor det er slik? tolkning/forskrift/lov whatever
-        ).let {
-            if (grunnlag.omsorgsyterHarFlestOmsorgsmåneder()) {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
-            } else if (grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder()) {
-                VilkårsvurderingUtfall.Ubestemt(it.map { it.henvisning }.toSet())
-            } else {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
-            }
+        return if (grunnlag.omsorgsyterHarFlestOmsorgsmåneder()) {
+            VilkårsvurderingUtfall.Innvilget.Vilkår.from(emptySet()) //TODO har egentlig ikke noe godt å hekte dette på
+        } else if (grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder()) {
+            VilkårsvurderingUtfall.Ubestemt(
+                setOf(Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder).map { it.henvisning }.toSet()
+            )
+        } else {
+            VilkårsvurderingUtfall.Avslag.Vilkår.from(emptySet()) //TODO har egentlig ikke noe godt å hekte dette på
         }
     }
 

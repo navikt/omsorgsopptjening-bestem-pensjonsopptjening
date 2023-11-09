@@ -80,7 +80,7 @@ class OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅrTest {
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                 kotlin.test.assertEquals(
                     setOf(
-                        JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
+                        JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Innledning
                     ),
                     it.henvisninger
                 )
@@ -115,7 +115,7 @@ class OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅrTest {
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                 kotlin.test.assertEquals(
                     setOf(
-                        JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
+                        JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Innledning
                     ),
                     it.henvisninger
                 )

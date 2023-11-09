@@ -114,7 +114,6 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                     assertEquals(
                         setOf(
                             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum,
-                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum
                         ),
                         it.henvisninger
                     )
@@ -162,7 +161,6 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                 assertEquals(
                     setOf(
                         JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum,
-                        JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum
                     ),
                     it.henvisninger
                 )

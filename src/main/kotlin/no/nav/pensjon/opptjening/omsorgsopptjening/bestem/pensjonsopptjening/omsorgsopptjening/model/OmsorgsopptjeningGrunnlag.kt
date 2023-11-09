@@ -95,7 +95,8 @@ sealed class OmsorgsopptjeningGrunnlag {
     fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Grunnlag {
         return OmsorgsyterErMedlemAvFolketrygden.Grunnlag(
             omsorgsytersMedlemskapsmåneder = medlemskapsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            antallMånederRegel = antallMånederRegel()
+            antallMånederRegel = antallMånederRegel(),
+            omsorgstype = omsorgstype,
         )
     }
 
@@ -103,6 +104,7 @@ sealed class OmsorgsopptjeningGrunnlag {
         return OmsorgsyterMottarBarnetrgyd.Grunnlag(
             omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel(),
+            omsorgstype = omsorgstype,
         )
     }
 

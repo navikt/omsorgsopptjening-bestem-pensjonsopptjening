@@ -396,7 +396,8 @@ internal fun GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.toDomain(): Omsorgs
     return OmsorgsyterErMedlemAvFolketrygden.Grunnlag(
         omsorgsytersMedlemskapsmåneder = Medlemskapsmåneder(omsorgsytersMedlemskapsmåneder.map { Medlemskapmåned(it) }
                                                                 .toSet()),
-        antallMånederRegel = antallMånederRegel.toDomain()
+        antallMånederRegel = antallMånederRegel.toDomain(),
+        omsorgstype = omsorgstype.toDomain(),
     )
 }
 
@@ -404,6 +405,7 @@ internal fun OmsorgsyterErMedlemAvFolketrygden.Grunnlag.toDb(): GrunnlagVilkårs
     return GrunnlagVilkårsvurderingDb.MedlemIFolketrygden(
         omsorgsytersMedlemskapsmåneder = omsorgsytersMedlemskapsmåneder.måneder.map { it.måned }.toSet(),
         antallMånederRegel = antallMånederRegel.toDb(),
+        omsorgstype = omsorgstype.toDb()
     )
 }
 
@@ -412,6 +414,7 @@ internal fun GrunnlagVilkårsvurderingDb.MottarBarnetrygd.toDomain(): Omsorgsyte
         omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(omsorgsytersUtbetalingsmåneder.map { it.toDomain() }
                                                                 .toSet()),
         antallMånederRegel = antallMånederRegel.toDomain(),
+        omsorgstype = omsorgstype.toDomain(),
     )
 }
 
@@ -419,6 +422,7 @@ internal fun OmsorgsyterMottarBarnetrgyd.Grunnlag.toDb(): GrunnlagVilkårsvurder
     return GrunnlagVilkårsvurderingDb.MottarBarnetrygd(
         omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder.måneder.map { it.toDb() }.toSet(),
         antallMånederRegel = antallMånederRegel.toDb(),
+        omsorgstype = omsorgstype.toDb(),
     )
 }
 

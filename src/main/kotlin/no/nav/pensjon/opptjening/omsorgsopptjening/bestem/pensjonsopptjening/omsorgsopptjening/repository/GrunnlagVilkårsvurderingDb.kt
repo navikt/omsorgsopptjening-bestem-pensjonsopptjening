@@ -65,12 +65,14 @@ internal sealed class GrunnlagVilkårsvurderingDb {
     data class MedlemIFolketrygden(
         val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
         val antallMånederRegel: AntallMånederRegelDb,
+        val omsorgstype: OmsorgstypeDb,
     ) : GrunnlagVilkårsvurderingDb()
 
     @JsonTypeName("MottarBarnetrygd")
     data class MottarBarnetrygd(
         val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
         val antallMånederRegel: AntallMånederRegelDb,
+        val omsorgstype: OmsorgstypeDb,
     ) : GrunnlagVilkårsvurderingDb()
 
     @JsonTypeName("GyldigOmsorgsarbeid")

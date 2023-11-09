@@ -3,16 +3,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 
-/**
- * For barn fra 1 til og med 5 år må omsorgsyter minst ha 6 måneder med omsorgsarbeid for barnet
- *
- * For barn som ikke har fylt ett år kreves ikke 6 måneder for å oppnå omsorgsopptjening
- *
- * Barn som ikke har fylt ett år og er født i desember vil ikke ha utbetalt barnetrygd og har ikke omsorgsarbeid for året.
- * De har alikevel rett til full omsorgsopptjening det første året.
- * Det betyr at vi må sjekke om omsorgsyter har fått barnetrygd i året etter for å vite om omsorgsyter har rett til omsorgsopptjening
- *
- */
 object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
         return Vurdering(
@@ -26,7 +16,6 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
             AntallMånederRegel.FødtIOmsorgsår -> {
                 setOf(
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
-                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                 ).let {
                     if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
@@ -41,14 +30,12 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     DomainOmsorgstype.BARNETRYGD -> {
                         setOf(
                             Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
-                            Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                         )
                     }
 
                     DomainOmsorgstype.HJELPESTØNAD -> {
                         setOf(
                             Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
-                            Referanse.OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad
                         )
                     }
                 }.let {
@@ -70,7 +57,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
     data class Grunnlag(
         val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
-        val antallMånederRegel: AntallMånederRegel
+        val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
 
         fun erOppfyllt(): Boolean {
@@ -78,10 +65,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         }
 
         fun omsorgstype(): DomainOmsorgstype {
-            return when (omsorgsytersOmsorgsmånederForOmsorgsmottaker) {
-                is Omsorgsmåneder.Barnetrygd -> DomainOmsorgstype.BARNETRYGD
-                is Omsorgsmåneder.Hjelpestønad -> DomainOmsorgstype.HJELPESTØNAD
-            }
+            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.omsorgstype()
         }
     }
 }

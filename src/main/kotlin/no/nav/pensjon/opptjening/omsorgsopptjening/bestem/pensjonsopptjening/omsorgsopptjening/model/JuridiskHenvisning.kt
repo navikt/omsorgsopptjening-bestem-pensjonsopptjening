@@ -13,9 +13,9 @@ sealed class Referanse {
             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_b_Første_Punktum
     }
 
-    object OpptjeningKanKunGodskrivesForEtBarnPerÅr : Referanse() {
+    object `OpptjeningKanGodskrivesMed18,1ProsentAv4,5GHvertKalenderår` : Referanse() {
         override val henvisning: JuridiskHenvisning =
-            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
+            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Innledning
     }
 
     object OmsorgsmottakerErIkkeFylt6FørUtgangAvOpptjeningsår : Referanse() {
@@ -27,7 +27,7 @@ sealed class Referanse {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Folketrygdloven_Kap_6_Paragraf_5_Første_Ledd_Første_Punktum
     }
-    
+
     object OmsorgsopptjeningGisTilOgMedKalenderårHjelpestønadFallerBort : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Tredje_Ledd_Første_Punktum
@@ -53,22 +53,13 @@ sealed class Referanse {
             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum
     }
 
-    object OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller17 : Referanse() {
-        override val henvisning: JuridiskHenvisning = JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Andre_Ledd
-    }
-
-    object OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller69 : Referanse() {
+    object OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller17TilOgMedÅretManFyller69 : Referanse() {
         override val henvisning: JuridiskHenvisning = JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Andre_Ledd
     }
 
     object OmsorgsopptjeningGisKunEnOmsorgsyterPerKalenderÅr : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum
-    }
-
-    object OmsorgsopptjeningKanTidligstGisPåfølgendeKalenderårHvisAlleredeInnvilgetAnnenOmsorgsyter : Referanse() {
-        override val henvisning: JuridiskHenvisning =
-            JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Andre_Punktum
     }
 
     object OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder : Referanse() {
@@ -114,10 +105,24 @@ sealed class JuridiskHenvisning(
         kapittel = 20,
         paragraf = 8,
         ledd = 1,
-        bokstav = "a",
-        punktum = 1,
+        bokstav = null,
+        punktum = null,
         tekst = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn som ikke har fylt seks år innen årets utgang."
     )
+
+    object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Innledning : JuridiskHenvisning(
+        kortTittel = "Folketrygdloven – ftrl",
+        dato = "LOV-1997-02-28-19",
+        kapittel = 20,
+        paragraf = 8,
+        ledd = 1,
+        bokstav = "a",
+        punktum = 1,
+        tekst = """
+                Et medlem som har utført omsorgsarbeid, får hvert kalenderår en pensjonsopptjening tilsvarende 18,1 prosent av et beløp på 4,5 ganger grunnbeløpet i følgende tilfeller
+        """.trimIndent()
+    )
+
 
     object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Andre_Punktum : JuridiskHenvisning(
         kortTittel = "Folketrygdloven – ftrl",
@@ -179,16 +184,6 @@ sealed class JuridiskHenvisning(
         ledd = 1,
         punktum = 1,
         tekst = "Omsorgsopptjening på grunnlag av omsorgen for ett barn eller for flere barn som bor sammen, gis bare én omsorgsyter for det enkelte kalenderår."
-    )
-
-    object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Andre_Punktum : JuridiskHenvisning(
-        kortTittel = "Forskrift om alderspensjon i folketrygden",
-        dato = "FOR-2009-12-22-1810",
-        kapittel = 3,
-        paragraf = 4,
-        ledd = 1,
-        punktum = 2,
-        tekst = "Når en omsorgsyter gis omsorgsopptjening i et kalenderår, kan en annen omsorgsyter først gis opptjening for det påfølgende kalenderåret."
     )
 
     object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd : JuridiskHenvisning(

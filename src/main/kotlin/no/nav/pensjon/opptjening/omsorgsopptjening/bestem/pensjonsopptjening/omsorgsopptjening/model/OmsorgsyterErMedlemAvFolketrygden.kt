@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+
 
 object OmsorgsyterErMedlemAvFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemAvFolketrygden.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
@@ -24,9 +26,19 @@ object OmsorgsyterErMedlemAvFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemAv
             }
 
             AntallMånederRegel.FødtUtenforOmsorgsår -> {
-                setOf(
-                    Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
-                ).let {
+                when (grunnlag.omsorgstype) {
+                    DomainOmsorgstype.BARNETRYGD -> {
+                        setOf(
+                            Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
+                        )
+                    }
+
+                    DomainOmsorgstype.HJELPESTØNAD -> {
+                        setOf(
+                            Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
+                        )
+                    }
+                }.let {
                     if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
@@ -46,6 +58,7 @@ object OmsorgsyterErMedlemAvFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemAv
     data class Grunnlag(
         val omsorgsytersMedlemskapsmåneder: Medlemskapsmåneder,
         val antallMånederRegel: AntallMånederRegel,
+        val omsorgstype: DomainOmsorgstype,
     ) : ParagrafGrunnlag() {
 
         fun erOppfyllt(): Boolean {

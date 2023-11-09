@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import java.time.YearMonth
 
 sealed class Omsorgsmåneder {
@@ -8,6 +9,13 @@ sealed class Omsorgsmåneder {
 
     fun alleMåneder(): Set<YearMonth>{
         return sortert
+    }
+
+    fun omsorgstype(): DomainOmsorgstype {
+        return when(this){
+            is Barnetrygd -> DomainOmsorgstype.BARNETRYGD
+            is Hjelpestønad -> DomainOmsorgstype.HJELPESTØNAD
+        }
     }
 
     data class Barnetrygd(

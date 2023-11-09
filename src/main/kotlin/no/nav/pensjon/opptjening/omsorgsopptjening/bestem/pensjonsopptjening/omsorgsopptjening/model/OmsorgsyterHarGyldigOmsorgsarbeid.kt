@@ -1,5 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+
 
 object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
@@ -14,6 +16,7 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
             AntallMånederRegel.FødtIOmsorgsår -> {
                 setOf(
                     Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
+                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd,
                 ).let {
                     if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
@@ -24,9 +27,21 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
             }
 
             AntallMånederRegel.FødtUtenforOmsorgsår -> {
-                setOf(
-                    Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
-                ).let {
+                when (grunnlag.omsorgstype()) {
+                    DomainOmsorgstype.BARNETRYGD -> {
+                        setOf(
+                            Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
+                            Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
+                        )
+                    }
+
+                    DomainOmsorgstype.HJELPESTØNAD -> {
+                        setOf(
+                            Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
+                            Referanse.OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad
+                        )
+                    }
+                }.let {
                     if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
@@ -57,6 +72,10 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
 
         fun erOppfyllt(): Boolean {
             return gyldigeOmsorgsmåneder.alleMåneder().count() >= antallMånederRegel.antall
+        }
+
+        fun omsorgstype(): DomainOmsorgstype {
+            return omsorgsytersOmsorgsmåneder.omsorgstype()
         }
     }
 }
