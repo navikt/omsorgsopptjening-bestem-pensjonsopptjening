@@ -37,7 +37,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
-    @Autowire
+    @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
 
     companion object {
