@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetricsFeilmåling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
@@ -16,6 +17,7 @@ class GodskrivOpptjeningProcessingThread(
     private val unleash: Unleash,
     private val godskrivProcessingMetricsMåling: GodskrivProcessingMetrikker,
     private val godskrivProcessingMetricsFeilmåling: GodskrivProcessingMetricsFeilmåling,
+    private val datasourceReadinessCheck: DatasourceReadinessCheck,
 ) : Runnable {
 
     companion object {
@@ -32,7 +34,7 @@ class GodskrivOpptjeningProcessingThread(
     override fun run() {
         while (true) {
             try {
-                if (unleash.isEnabled(NavUnleashConfig.Feature.GODSKRIV.toggleName)) {
+                if (unleash.isEnabled(NavUnleashConfig.Feature.GODSKRIV.toggleName) && datasourceReadinessCheck.isReady()) {
                     godskrivProcessingMetricsMåling.oppdater {
                         service.process()
                     }

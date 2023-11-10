@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.metrics.OmsorgsarbeidProcessingMetricsFeilmåling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.metrics.OmsorgsarbeidProcessingMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
@@ -16,7 +17,7 @@ class PersongrunnlagMeldingProcessingThread(
     private val unleash: Unleash,
     private val omsorgsarbeidMetricsMåling: OmsorgsarbeidProcessingMetrikker,
     private val omsorgsarbeidMetricsFeilmåling: OmsorgsarbeidProcessingMetricsFeilmåling,
-
+    private val datasourceReadinessCheck: DatasourceReadinessCheck,
     ) : Runnable {
 
     companion object {
@@ -33,7 +34,7 @@ class PersongrunnlagMeldingProcessingThread(
     override fun run() {
         while (true) {
             try {
-                if (unleash.isEnabled(NavUnleashConfig.Feature.BEHANDLING.toggleName)) {
+                if (unleash.isEnabled(NavUnleashConfig.Feature.BEHANDLING.toggleName) && datasourceReadinessCheck.isReady()) {
                     omsorgsarbeidMetricsMåling.oppdater {
                         handler.process()
                     }

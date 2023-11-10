@@ -4,6 +4,7 @@ import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.BrevProcessingMetricsFeilmåling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.BrevProcessingMetrikker
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -16,6 +17,7 @@ class BrevProcessingThread(
     private val unleash: Unleash,
     private val brevProcessingMetricsMåling: BrevProcessingMetrikker,
     private val brevProcessingMetricsFeilmåling: BrevProcessingMetricsFeilmåling,
+    private val datasourceReadinessCheck: DatasourceReadinessCheck,
 ) : Runnable {
 
     companion object {
@@ -32,7 +34,7 @@ class BrevProcessingThread(
     override fun run() {
         while (true) {
             try {
-                if (unleash.isEnabled(NavUnleashConfig.Feature.BREV.toggleName)) {
+                if (unleash.isEnabled(NavUnleashConfig.Feature.BREV.toggleName) && datasourceReadinessCheck.isReady()) {
                     brevProcessingMetricsMåling.oppdater { service.process() }
                 }
             } catch (exception: Throwable) {

@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 
 import io.getunleash.Unleash
 import jakarta.annotation.PostConstruct
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetricsFeilmåling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
@@ -15,9 +16,9 @@ class OppgaveProcessingThread(
     private val service: OppgaveService,
     private val unleash: Unleash,
     private val oppgaveProcessingMetricsMåling: OppgaveProcessingMetrikker,
-    private val oppgaveProcessingMetricsFeilmåling: OppgaveProcessingMetricsFeilmåling
-
-) : Runnable {
+    private val oppgaveProcessingMetricsFeilmåling: OppgaveProcessingMetricsFeilmåling,
+    private val datasourceReadinessCheck: DatasourceReadinessCheck,
+    ) : Runnable {
 
     companion object {
         val log = LoggerFactory.getLogger(this::class.java)!!
@@ -33,7 +34,7 @@ class OppgaveProcessingThread(
     override fun run() {
         while (true) {
             try {
-                if (unleash.isEnabled(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName)) {
+                if (unleash.isEnabled(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName) && datasourceReadinessCheck.isReady()) {
                     oppgaveProcessingMetricsMåling.oppdater {
                         service.process()
                     }
