@@ -41,41 +41,40 @@ class OppgaveService(
 
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
     fun opprettOppgaveHvisNødvendig(behandling: FullførtBehandling) {
-        behandling.hentOppgaveopplysninger().map { oppgaveopplysning ->
-            //TODO legg alle oppgavetekster for den samme behandlingen i en og samme oppgave
-            when (oppgaveopplysning) {
-                is Oppgaveopplysninger.Generell -> {
-                    val oppgavemottakerHarOppgaveForÅr =
-                        oppgaveEksistererForOmsorgsyterOgÅr(
-                            oppgaveopplysning.oppgavemottaker,
-                            behandling.omsorgsAr
-                        )
-                    val omsorgsMottakerHarOppgaveForÅr =
-                        oppgaveEksistererForOmsorgsmottakerOgÅr(
-                            behandling.omsorgsmottaker,
-                            behandling.omsorgsAr
-                        )
+        val omsorgsMottakerHarOppgaveForÅr =
+            oppgaveEksistererForOmsorgsmottakerOgÅr(
+                behandling.omsorgsmottaker,
+                behandling.omsorgsAr
+            )
 
-                    if (!oppgavemottakerHarOppgaveForÅr && !omsorgsMottakerHarOppgaveForÅr) {
-                        opprett(
-                            Oppgave.Transient(
-                                behandlingId = behandling.id,
-                                meldingId = behandling.meldingId,
-                                detaljer = OppgaveDetaljer.MottakerOgTekst(
-                                    oppgavemottaker = oppgaveopplysning.oppgavemottaker,
-                                    oppgavetekst = oppgaveopplysning.oppgaveTekst
-                                )
+        fun oppgavemottakerHarOppgaveForÅr(oppgaveopplysning: Oppgaveopplysninger.Generell): Boolean {
+            return oppgaveEksistererForOmsorgsyterOgÅr(
+                oppgaveopplysning.oppgavemottaker,
+                behandling.omsorgsAr
+            )
+        }
+        if (!omsorgsMottakerHarOppgaveForÅr) {
+            behandling.hentOppgaveopplysninger()
+                .filterIsInstance<Oppgaveopplysninger.Generell>()
+                .filterNot { oppgaveopplysning -> oppgavemottakerHarOppgaveForÅr(oppgaveopplysning) }
+                .groupBy { it.oppgavemottaker }
+                .mapValues { o -> o.value.map { it.oppgaveTekst }.toSet() }
+                .forEach { (oppgavemottaker, oppgaveTekster) ->
+                    //TODO legg alle oppgavetekster for den samme behandlingen i en og samme oppgave
+                    opprett(
+                        Oppgave.Transient(
+                            behandlingId = behandling.id,
+                            meldingId = behandling.meldingId,
+                            detaljer = OppgaveDetaljer.MottakerOgTekst(
+                                oppgavemottaker = oppgavemottaker,
+                                oppgavetekst = oppgaveTekster
                             )
                         )
-                    }
+                    )
                 }
-
-                Oppgaveopplysninger.Ingen -> {
-                    //noop
-                }
-            }
         }
     }
+
 
     fun process(): Oppgave? {
         return transactionTemplate.execute {
@@ -92,7 +91,8 @@ class OppgaveService(
                                         oppgaveKlient.opprettOppgave(
                                             aktoerId = aktørId,
                                             sakId = omsorgssak.sakId,
-                                            beskrivelse = oppgave.oppgavetekst,
+                                            // TODO: Skal ikke kunne være tom
+                                            beskrivelse = FlereOppgaveteksterFormatter.format(oppgave.oppgavetekst),
                                             tildeltEnhetsnr = omsorgssak.enhet
                                         ).let { oppgaveId ->
                                             oppgave.ferdig(oppgaveId).also {

@@ -11,18 +11,18 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 sealed class OppgaveDetaljer {
 
     abstract fun mottaker(): String
-    abstract fun oppgavetekst(): String
+    abstract fun oppgavetekst(): Set<String>
 
     @JsonTypeName("MottakerOgTekst")
     data class MottakerOgTekst(
         val oppgavemottaker: String,
-        val oppgavetekst: String,
+        val oppgavetekst: Set<String>,
     ) : OppgaveDetaljer() {
         override fun mottaker(): String {
             return oppgavemottaker
         }
 
-        override fun oppgavetekst(): String {
+        override fun oppgavetekst(): Set<String> {
             return oppgavetekst
         }
     }
