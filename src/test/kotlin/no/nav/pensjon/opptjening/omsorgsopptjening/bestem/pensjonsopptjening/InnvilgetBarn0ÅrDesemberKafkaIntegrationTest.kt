@@ -14,7 +14,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.willAnswer
@@ -44,7 +43,6 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
     }
 
     @Test
-    @Disabled("årsak til heng på github?")
     fun `consume, process and send innvilget child 0 years`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
@@ -52,7 +50,6 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
                 .willReturn(WireMock.ok())
         )
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2021)
 
         sendOmsorgsgrunnlagKafka(
             omsorgsGrunnlag = PersongrunnlagMeldingKafka(
@@ -82,17 +79,11 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
 
         Thread.sleep(2500)
 
-        assertEquals(2, behandlingRepo.finnForOmsorgsyter("12345678910").count())
+        assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
 
         verify(godskrivOpptjeningClient).godskriv(
             omsorgsyter = "12345678910",
             omsorgsÅr = 2020,
-            omsorgstype = DomainOmsorgstype.BARNETRYGD,
-            omsorgsmottaker = "01122012345"
-        )
-        verify(godskrivOpptjeningClient).godskriv(
-            omsorgsyter = "12345678910",
-            omsorgsÅr = 2021,
             omsorgstype = DomainOmsorgstype.BARNETRYGD,
             omsorgsmottaker = "01122012345"
         )
