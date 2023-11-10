@@ -37,7 +37,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
-    @Autowired
+    @Autowire
     private lateinit var oppgaveRepo: OppgaveRepo
 
     companion object {
@@ -295,10 +295,10 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.also { behandlinger ->
-            assertEquals(2, behandlinger.antallBehandlinger(2020))
-            oppgaveRepo.findForMelding(behandlinger.finnÅr(2020)!!.behandlinger[0].meldingId).single().also { oppgave ->
-                assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId(2020)[0]))
-                assertEquals(oppgave, oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId(2020)[1]).single())
+            assertEquals(2, behandlinger.antallBehandlinger())
+            oppgaveRepo.findForMelding(behandlinger.alle()[0].meldingId).single().also { oppgave ->
+                assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId()[0]))
+                assertEquals(oppgave, oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId()[1]).single())
                 assertEquals(
                     oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "04010012797",
@@ -486,8 +486,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.let { result ->
-            assertEquals(2, result.antallBehandlinger(2020))
-            result.finnÅr(2020)!!.behandlinger.first().also { behandling ->
+            assertEquals(2, result.antallBehandlinger())
+            result.alle().first().also { behandling ->
                 assertFalse(behandling.erInnvilget())
                 oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                     assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
@@ -499,126 +499,10 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     )
                 }
             }
-            result.finnÅr(2020)!!.behandlinger.last().also { behandling ->
+            result.alle().last().also { behandling ->
                 assertFalse(behandling.erInnvilget())
                 assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
                 assertEquals(1, oppgaveRepo.findForMelding(behandling.meldingId).count())
-            }
-        }
-    }
-
-    @Test
-    fun `gitt at to omsorgsytere har like mange omsorgsmåneder for flere barn i forskjellige omsorgsår opprettes det oppgave for det eldste barnet i hvert omsorgsår`() {
-        wiremock.stubForPdlTransformer()
-
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2021)
-
-        repo.persist(
-            PersongrunnlagMelding.Lest(
-                innhold = PersongrunnlagMeldingKafka(
-                    omsorgsyter = "12345678910",
-                    persongrunnlag = listOf(
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "12345678910",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2021, Month.JULY),
-                                    tom = YearMonth.of(2021, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
-                                ),
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2021, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "04010012797",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2021, Month.JANUARY),
-                                    tom = YearMonth.of(2021, Month.JUNE),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01122012345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
-                                ),
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2021, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                    ),
-                    rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
-                )
-            ),
-        )
-
-        handler.process()!!.let { result ->
-            assertEquals(2, result.antallBehandlinger(2020))
-            assertEquals(2, result.antallBehandlinger(2021))
-            result.finnÅr(2020)!!.behandlinger[0].also { behandling ->
-                assertFalse(behandling.erInnvilget())
-                assertEquals(2020, behandling.omsorgsAr)
-                assertEquals("07081812345", behandling.omsorgsmottaker)
-                oppgaveRepo.findForMelding(behandling.meldingId)[0].also { oppgave ->
-                    assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                    assertEquals(
-                        oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
-                            oppgavemottaker = "12345678910",
-                            oppgavetekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
-                        )
-                    )
-                }
-            }
-            result.finnÅr(2021)!!.behandlinger[0].also { behandling ->
-                assertFalse(behandling.erInnvilget())
-                assertEquals(2021, behandling.omsorgsAr)
-                assertEquals("07081812345", behandling.omsorgsmottaker)
-                oppgaveRepo.findForMelding(behandling.meldingId)[1].also { oppgave ->
-                    assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                    assertEquals(
-                        oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
-                            oppgavemottaker = "12345678910",
-                            oppgavetekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
-                        )
-                    )
-                }
-            }
-            result.finnÅr(2020)!!.behandlinger[1].also { behandling ->
-                assertFalse(behandling.erInnvilget())
-                assertEquals(2020, behandling.omsorgsAr)
-                assertEquals("01122012345", behandling.omsorgsmottaker)
-                assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
-                assertEquals(2, oppgaveRepo.findForMelding(behandling.meldingId).count())
-            }
-            result.finnÅr(2021)!!.behandlinger[1].also { behandling ->
-                assertFalse(behandling.erInnvilget())
-                assertEquals(2021, behandling.omsorgsAr)
-                assertEquals("01122012345", behandling.omsorgsmottaker)
-                assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
-                assertEquals(2, oppgaveRepo.findForMelding(behandling.meldingId).count())
             }
         }
     }

@@ -6,42 +6,23 @@ import java.util.UUID
 data class FullførteBehandlinger(
     private val behandlinger: List<FullførtBehandling>
 ) {
-    private val behandlingerPerOmsorgsår = behandlinger
-        .alleOmsorgsår()
-        .associateWith { år -> behandlinger.filter { år == it.omsorgsAr } }
-        .map { (år, behandlinger) ->
-            AggregertResultatForÅr(
-                år = år,
-                behandlinger = behandlinger,
-                aggregertUtfall = AggregerBehandlingsutfallPerOmsorgsår(behandlinger).utfall()
-            )
-        }
+    private val aggregertUtfall = AggregertBehandlingsutfall(behandlinger.map { it.utfall }).utfall()
 
     init {
-        require(behandlingerPerOmsorgsår.flatMap { it.behandlinger }.map { it.utfall }
-                    .count { it.erInnvilget() } <= 1) { "Det kan kun eksistere 0..1 innvilget behandling per omsorgsyter per år." }
+        require(
+            behandlinger.isEmpty() || behandlinger.alleOmsorgsår().count() == 1
+        ) { "Forventet bare behandlinger for ett omsorgsår" }
+        require(
+            behandlinger.isEmpty() || behandlinger.alleOmsorgsytere().count() == 1
+        ) { "Forventet bare behandlinger for en omsorgsyter" }
     }
 
-    data class AggregertResultatForÅr(
-        val år: Int,
-        val behandlinger: List<FullførtBehandling>,
-        val aggregertUtfall: BehandlingUtfall,
-    ) {
-        fun erInnvilget(): Boolean {
-            return aggregertUtfall.erInnvilget()
-        }
-
-        fun antall(): Int {
-            return behandlinger.count()
-        }
+    private fun innvilget(): FullførtBehandling? {
+        return behandlinger.singleOrNull { it.erInnvilget() }
     }
 
-    private fun innvilget(år: Int): FullførtBehandling? {
-        return finnÅr(år)?.behandlinger?.singleOrNull { it.erInnvilget() }
-    }
-
-    private fun manuell(år: Int): List<FullførtBehandling> {
-        return finnÅr(år)?.behandlinger?.filter { it.erManuell() } ?: emptyList()
+    private fun manuell(): List<FullførtBehandling> {
+        return behandlinger.filter { it.erManuell() }
     }
 
     fun håndterUtfall(
@@ -49,18 +30,18 @@ data class FullførteBehandlinger(
         manuell: (behandling: FullførtBehandling) -> Unit,
         avslag: () -> Unit,
     ) {
-        behandlingerPerOmsorgsår.forEach { (år, _, utfall) ->
-            when (utfall) {
+        behandlinger.forEach {
+            when (aggregertUtfall) {
                 BehandlingUtfall.Avslag -> {
                     avslag()
                 }
 
                 BehandlingUtfall.Innvilget -> {
-                    innvilget(innvilget(år)!!)
+                    innvilget(innvilget()!!)
                 }
 
                 BehandlingUtfall.Manuell -> {
-                    manuell(år).forEach { manuell(it) }
+                    manuell().forEach { manuell(it) }
                 }
             }
         }
@@ -72,31 +53,34 @@ data class FullførteBehandlinger(
         return behandlinger.single()
     }
 
-    fun finnÅr(år: Int): AggregertResultatForÅr? {
-        return behandlingerPerOmsorgsår.singleOrNull { it.år == år }
+    fun alle(): List<FullførtBehandling> {
+        return behandlinger
     }
 
-    fun antallBehandlinger(år: Int): Int {
-        return finnÅr(år)?.antall() ?: 0
+    fun antallBehandlinger(): Int {
+        return behandlinger.count()
     }
 
-    fun finnBehandlingsId(år: Int): List<UUID> {
-        return finnÅr(år)?.behandlinger?.map { it.id } ?: emptyList()
+    fun finnBehandlingsId(): List<UUID> {
+        return behandlinger.map { it.id }
     }
 
     private fun List<FullførtBehandling>.alleOmsorgsår(): Set<Int> {
-        return this.map { it.omsorgsAr }.toSet()
+        return map { it.omsorgsAr }.distinct().toSet()
+    }
+
+    private fun List<FullførtBehandling>.alleOmsorgsytere(): Set<String> {
+        return map { it.omsorgsyter }.distinct().toSet()
     }
 
     fun statistikk(): FullførteBehandlingerStatistikk {
         return FullførteBehandlingerStatistikk(
-            innvilgetOpptjening = behandlingerPerOmsorgsår.count { it.aggregertUtfall.erInnvilget() },
-            avslåttOpptjening = behandlingerPerOmsorgsår.count { it.aggregertUtfall.erAvslag() },
-            manuellBehandling = behandlingerPerOmsorgsår.count { it.aggregertUtfall.erManuell() },
+            innvilgetOpptjening = behandlinger.count { aggregertUtfall.erInnvilget() },
+            avslåttOpptjening = behandlinger.count { aggregertUtfall.erAvslag() },
+            manuellBehandling = behandlinger.count { aggregertUtfall.erManuell() },
             //summerer bare avslagsårsaker for tilfeller hvor aggregert utfall er avslag
-            summertAvslagPerVilkår = behandlingerPerOmsorgsår
-                .filter { it.aggregertUtfall.erAvslag() }
-                .flatMap { it.behandlinger }
+            summertAvslagPerVilkår = behandlinger
+                .filter { aggregertUtfall.erAvslag() }
                 .flatMap { it.avslåtteVilkår() }
                 .fold(mutableMapOf()) { acc, vilkarsVurdering ->
                     acc.merge(vilkarsVurdering, 1) { gammel, value -> gammel + value }

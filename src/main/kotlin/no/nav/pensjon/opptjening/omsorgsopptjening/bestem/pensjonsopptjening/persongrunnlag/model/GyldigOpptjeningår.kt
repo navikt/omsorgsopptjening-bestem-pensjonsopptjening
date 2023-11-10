@@ -8,10 +8,10 @@ interface GyldigOpptjeningår {
 }
 
 data class GyldigOpptjeningsårImpl(
-    private val år: List<Int>
+    private val år: Int
 ) : GyldigOpptjeningår {
     override fun erGyldig(år: Int): Boolean {
-        return this.år.contains(år)
+        return this.år == (år)
     }
 }
 
@@ -19,6 +19,6 @@ data class GyldigOpptjeningsårImpl(
 class GyldigOpptjeningsårConfig {
     @Bean
     fun gyldigOpptjeningsår(): GyldigOpptjeningår {
-        return GyldigOpptjeningsårImpl(listOf(2022))
+        return GyldigOpptjeningsårImpl(2022)
     }
 }
