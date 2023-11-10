@@ -83,9 +83,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                 .willReturn(WireMock.ok())
         )
 
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         /**
          * Stiller klokka litt fram i tid for å unngå at [GodskrivOpptjening.Status.Retry.karanteneTil] fører til at vi hopper over raden.
@@ -172,9 +170,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             Clock.systemUTC().instant().plus(6, ChronoUnit.HOURS), //karantenetid utløpt
         )
 
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(
@@ -232,9 +228,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(WireMock.serverError())
         )
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         /**
          * Stiller klokka litt fram i tid for å unngå at [GodskrivOpptjening.Status.Retry.karanteneTil] fører til at vi hopper over raden.

@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Clock
@@ -126,7 +127,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
          * Stiller klokka litt fram i tid for å unngå at [Brev.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
-        given(gyldigOpptjeningår.get()).willReturn(listOf(2020))
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val (behandling, brev) = persongrunnlagRepo.persist(
             PersongrunnlagMelding.Lest(
@@ -225,7 +226,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
          * Stiller klokka litt fram i tid for å unngå at [Brev.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
-        given(gyldigOpptjeningår.get()).willReturn(listOf(2020))
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val (behandling, brev) = persongrunnlagRepo.persist(
             PersongrunnlagMelding.Lest(

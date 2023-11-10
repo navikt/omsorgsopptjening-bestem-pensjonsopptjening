@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito
+import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
@@ -55,7 +56,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     override fun beforeEach() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
-        BDDMockito.given(gyldigOpptjeningår.get()).willReturn(listOf(OPPTJENINGSÅR))
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
     }
 
     @Test

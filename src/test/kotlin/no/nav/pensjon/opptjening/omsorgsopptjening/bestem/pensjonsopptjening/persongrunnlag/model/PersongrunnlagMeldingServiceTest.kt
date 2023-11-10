@@ -41,7 +41,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.BDDMockito
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.willAnswer
 import org.mockito.kotlin.any
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -76,7 +78,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     override fun beforeEach() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
-        given(gyldigOpptjeningår.get()).willReturn(listOf(OPPTJENINGSÅR))
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
         given(medlemskapOppslag.hentMedlemskap(any())).willReturn(Medlemskap.Ukjent(DomainKilde.INFOTRYGD_UTTREKK_PENSJONSTRYGDET))
     }
 
@@ -1172,7 +1174,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `gitt en omsorgsmottaker som har blitt innvilget for en omsorgsyter i et år, kan innvilges for en annen omsorgsyter et annet år`() {
-        given(gyldigOpptjeningår.get()).willReturn(listOf(2020, 2021))
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2021)
 
         repo.persist(
             PersongrunnlagMelding.Lest(

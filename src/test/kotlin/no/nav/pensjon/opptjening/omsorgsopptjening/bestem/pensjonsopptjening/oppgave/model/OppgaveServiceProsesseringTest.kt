@@ -129,9 +129,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                 )
         )
 
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(
@@ -268,9 +266,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                 )
         )
 
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(
@@ -369,9 +365,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                 )
         )
 
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(

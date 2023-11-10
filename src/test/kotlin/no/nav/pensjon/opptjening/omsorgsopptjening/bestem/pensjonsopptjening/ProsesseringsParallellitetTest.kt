@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.transaction.support.TransactionTemplate
@@ -59,7 +60,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
     override fun beforeEach() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
-        given(gyldigOpptjeningår.get()).willReturn(listOf(2020))
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
     }
 
     @Nested

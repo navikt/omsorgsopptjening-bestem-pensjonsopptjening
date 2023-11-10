@@ -51,9 +51,7 @@ internal class InnvilgetBarn2ÅrKafkaIntegrationTest : SpringContextTest.WithKaf
             WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .willReturn(WireMock.ok())
         )
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         sendOmsorgsgrunnlagKafka(
             omsorgsGrunnlag = PersongrunnlagMeldingKafka(

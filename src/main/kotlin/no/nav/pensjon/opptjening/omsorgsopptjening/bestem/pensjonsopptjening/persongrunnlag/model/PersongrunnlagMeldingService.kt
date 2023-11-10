@@ -79,11 +79,7 @@ class PersongrunnlagMeldingService(
             behandlinger = melding.innhold
                 .berikDatagrunnlag()
                 .tilOmsorgsopptjeningsgrunnlag()
-                .filter { grunnlag ->
-                    gyldigOpptjeningsår.get().contains(grunnlag.omsorgsAr).also {
-                        if (!it) log.info("Filtrerer vekk grunnlag for ugyldig opptjeningsår: ${grunnlag.omsorgsAr}")
-                    }
-                }
+                .filter { grunnlag -> gyldigOpptjeningsår.erGyldig(grunnlag.omsorgsAr) }
                 .map {
                     log.info("Utfører vilkårsvurdering")
                     behandlingRepo.persist(

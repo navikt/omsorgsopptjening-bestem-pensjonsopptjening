@@ -4,14 +4,14 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 interface GyldigOpptjeningår {
-    fun get(): List<Int>
+    fun erGyldig(år: Int): Boolean
 }
 
 data class GyldigOpptjeningsårImpl(
     private val år: List<Int>
 ) : GyldigOpptjeningår {
-    override fun get(): List<Int> {
-        return år
+    override fun erGyldig(år: Int): Boolean {
+        return this.år.contains(år)
     }
 }
 

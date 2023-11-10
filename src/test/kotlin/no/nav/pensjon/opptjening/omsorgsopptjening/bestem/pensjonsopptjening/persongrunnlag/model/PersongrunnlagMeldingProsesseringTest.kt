@@ -107,9 +107,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
          * Stiller klokka litt fram i tid for å unngå at [PersongrunnlagMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(
@@ -209,9 +207,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(6, ChronoUnit.HOURS), //karantenetid utløpt
         )
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(
@@ -297,9 +293,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
          * Stiller klokka litt fram i tid for å unngå at [PersongrunnlagMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
-        willAnswer {
-            listOf(2020)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val melding = repo.persist(
             PersongrunnlagMelding.Lest(

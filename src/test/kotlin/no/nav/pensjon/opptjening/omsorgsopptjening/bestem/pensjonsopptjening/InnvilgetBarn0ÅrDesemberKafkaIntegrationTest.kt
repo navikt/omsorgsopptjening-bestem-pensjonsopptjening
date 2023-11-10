@@ -51,9 +51,8 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
             WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .willReturn(WireMock.ok())
         )
-        willAnswer {
-            listOf(2020, 2021)
-        }.given(gyldigOpptjeningår).get()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2021)
 
         sendOmsorgsgrunnlagKafka(
             omsorgsGrunnlag = PersongrunnlagMeldingKafka(
