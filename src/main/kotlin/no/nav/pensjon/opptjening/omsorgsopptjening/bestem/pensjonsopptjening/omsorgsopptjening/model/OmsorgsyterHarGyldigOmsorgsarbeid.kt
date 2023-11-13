@@ -58,7 +58,6 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
     ) : ParagrafVurdering<Grunnlag>()
 
     data class Grunnlag(
-        val omsorgsytersMedlemskapsmåneder: Medlemskapsmåneder,
         val omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder,
         val omsorgsytersOmsorgsmåneder: Omsorgsmåneder,
         val antallMånederRegel: AntallMånederRegel,
@@ -66,7 +65,6 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
         val gyldigeOmsorgsmåneder: GyldigeOmsorgsmåneder
             get() = GyldigeOmsorgsmåneder.of(
                 omsorgsmåneder = omsorgsytersOmsorgsmåneder,
-                medlemskapsmåneder = omsorgsytersMedlemskapsmåneder,
                 utbetalingsmåneder = omsorgsytersUtbetalingsmåneder
             )
 

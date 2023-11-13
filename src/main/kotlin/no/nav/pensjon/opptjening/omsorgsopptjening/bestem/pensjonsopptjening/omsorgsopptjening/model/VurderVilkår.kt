@@ -12,7 +12,6 @@ interface VurderVilkår {
     fun OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr(): OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering
     fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering
     fun OmsorgsyterErForelderTilMottakerAvHjelpestønad(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering
-    fun OmsorgsyterErMedlemAvFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Vurdering
     fun OmsorgsyterMottarBarnetrgyd(): OmsorgsyterMottarBarnetrgyd.Vurdering
     fun OmsorgsyterHarGyldigOmsorgsarbeid(): OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering
 }
@@ -62,10 +61,6 @@ internal class VilkårsvurderingFactory(
 
     override fun OmsorgsyterErForelderTilMottakerAvHjelpestønad(): OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering {
         return OmsorgsyterErForelderTilMottakerAvHjelpestønad.vilkarsVurder(grunnlag.forFamilierelasjon())
-    }
-
-    override fun OmsorgsyterErMedlemAvFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Vurdering {
-        return OmsorgsyterErMedlemAvFolketrygden.vilkarsVurder(grunnlag.forMedlemskapIFolketrygden())
     }
 
     override fun OmsorgsyterMottarBarnetrgyd(): OmsorgsyterMottarBarnetrgyd.Vurdering {

@@ -8,16 +8,13 @@ import com.github.tomakehurst.wiremock.client.WireMock.get
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AntallMånederRegel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemAvFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarGyldigOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
@@ -63,9 +60,6 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
-    @MockBean
-    private lateinit var medlemskapOppslag: MedlemskapOppslag
-
     companion object {
         @JvmField
         @RegisterExtension
@@ -78,7 +72,6 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
-        given(medlemskapOppslag.hentMedlemskap(any())).willReturn(Medlemskap.Ukjent(DomainKilde.INFOTRYGD_UTTREKK_PENSJONSTRYGDET))
     }
 
     @Test
@@ -395,7 +388,6 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 }
             assertEquals(
                 listOf(
-                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemAvFolketrygden.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
@@ -458,7 +450,6 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 }
             assertEquals(
                 listOf(
-                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemAvFolketrygden.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
@@ -1547,52 +1538,6 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    fun `en omsorgsyter som ikke er medlem i folketrygden skal avslås`() {
-        given(medlemskapOppslag.hentMedlemskap(any())).willReturn(Medlemskap.Nei(DomainKilde.INFOTRYGD_UTTREKK_PENSJONSTRYGDET))
-        repo.persist(
-            PersongrunnlagMelding.Lest(
-                innhold = PersongrunnlagMeldingKafka(
-                    omsorgsyter = "12345678910",
-                    persongrunnlag = listOf(
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "12345678910",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2018, Month.JANUARY),
-                                    tom = YearMonth.of(2030, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "01052012345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                    ),
-                    rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
-                )
-            ),
-        )
-
-        handler.process()!!.single().also { behandling ->
-            behandling.assertAvslag(
-                omsorgsyter = "12345678910",
-                omsorgsmottaker = "01052012345",
-                omsorgstype = DomainOmsorgstype.BARNETRYGD,
-            )
-            assertEquals(
-                listOf(
-                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemAvFolketrygden.Vurdering>(),
-                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
-                ), behandling.vilkårsvurdering.finnAlleAvslatte()
-            )
-        }
-    }
-
-    @Test
     fun `en omsorgsyter som ikke får utbetalt barnetryd skal avslås`() {
         repo.persist(
             PersongrunnlagMelding.Lest(
@@ -1677,7 +1622,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    fun `en omsorgsyter ikke tilstrekkelig overlapp mellom utbetaling, medlemskap og omsorg (ikke gyldig) skal avslås`() {
+    fun `en omsorgsyter ikke tilstrekkelig overlapp mellom utbetaling og omsorg (ikke gyldig) skal avslås`() {
         repo.persist(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
@@ -1748,7 +1693,6 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>().also { vurdering ->
                 assertEquals(6, vurdering.grunnlag.antallMånederRegel.antall)
                 assertEquals(år(2020).alleMåneder(), vurdering.grunnlag.omsorgsytersOmsorgsmåneder.alleMåneder())
-                assertEquals(år(2020).alleMåneder(), vurdering.grunnlag.omsorgsytersMedlemskapsmåneder.alleMåneder())
                 assertEquals(
                     setOf(
                         YearMonth.of(2020, Month.JUNE),

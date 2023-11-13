@@ -61,13 +61,6 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         val omsorgsmottakersFamilierelasjoner: Map<String, String>,
     ) : GrunnlagVilkårsvurderingDb()
 
-    @JsonTypeName("MedlemIFolketrygden")
-    data class MedlemIFolketrygden(
-        val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
-        val antallMånederRegel: AntallMånederRegelDb,
-        val omsorgstype: OmsorgstypeDb,
-    ) : GrunnlagVilkårsvurderingDb()
-
     @JsonTypeName("MottarBarnetrygd")
     data class MottarBarnetrygd(
         val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
@@ -77,7 +70,6 @@ internal sealed class GrunnlagVilkårsvurderingDb {
 
     @JsonTypeName("GyldigOmsorgsarbeid")
     data class GyldigOmsorgsarbeid(
-        val omsorgsytersMedlemskapsmåneder: Set<YearMonth>,
         val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
         val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb,
         val antallMånederRegel: AntallMånederRegelDb,

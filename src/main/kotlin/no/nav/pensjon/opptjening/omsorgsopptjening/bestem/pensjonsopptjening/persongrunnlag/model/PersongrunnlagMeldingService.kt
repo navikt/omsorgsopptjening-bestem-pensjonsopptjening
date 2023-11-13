@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
@@ -30,7 +29,6 @@ class PersongrunnlagMeldingService(
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
     private val transactionTemplate: TransactionTemplate,
     private val brevService: BrevService,
-    private val medlemskapOppslag: MedlemskapOppslag,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -120,7 +118,6 @@ class PersongrunnlagMeldingService(
             omsorgsyter = persondata.finnPerson(omsorgsyter),
             persongrunnlag = persongrunnlag.map { persongrunnlag ->
                 val omsorgsyter = persondata.finnPerson(persongrunnlag.omsorgsyter)
-                val medlemskap = medlemskapOppslag.hentMedlemskap(omsorgsyter.fnr)
                 Persongrunnlag(
                     omsorgsyter = omsorgsyter,
                     omsorgsperioder = persongrunnlag.omsorgsperioder.map { omsorgVedtakPeriode ->
@@ -130,7 +127,6 @@ class PersongrunnlagMeldingService(
                             omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain(),
                             omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
                             kilde = omsorgVedtakPeriode.kilde.toDomain(),
-                            medlemskap = medlemskap,
                             utbetalt = omsorgVedtakPeriode.utbetalt,
                             landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain()
                         )

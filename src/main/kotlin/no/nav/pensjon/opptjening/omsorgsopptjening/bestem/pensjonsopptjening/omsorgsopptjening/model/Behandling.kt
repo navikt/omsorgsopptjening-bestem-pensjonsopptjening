@@ -59,7 +59,6 @@ data class Behandling(
     private fun vilkårsvurderOmsorgsyter(): VilkarsVurdering<*> {
         return og(
             vurderVilkår.OmsorgsyterOppfyllerAlderskrav(),
-            vurderVilkår.OmsorgsyterErMedlemAvFolketrygden(),
             vurderVilkår.OmsorgsyterMottarBarnetrgyd(),
             vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
             vurderVilkår.OmsorgsyterHarGyldigOmsorgsarbeid(),

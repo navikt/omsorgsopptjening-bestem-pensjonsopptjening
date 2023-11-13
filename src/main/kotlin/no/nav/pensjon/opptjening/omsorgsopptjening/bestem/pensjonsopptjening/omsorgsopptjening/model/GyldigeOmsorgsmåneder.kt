@@ -4,7 +4,7 @@ import java.time.YearMonth
 
 /**
  * Alle måneder vurdert som gyldig.
- * En gyldig måned er en måned hvor det er overlapp mellom utbetaling, medlemskap og omsorg.
+ * En gyldig måned er en måned hvor det er overlapp mellom utbetaling og omsorg.
  */
 data class GyldigeOmsorgsmåneder(
     val måneder: Set<YearMonth>
@@ -18,11 +18,10 @@ data class GyldigeOmsorgsmåneder(
         }
         fun of(
             omsorgsmåneder: Omsorgsmåneder,
-            medlemskapsmåneder: Medlemskapsmåneder,
             utbetalingsmåneder: Utbetalingsmåneder,
         ): GyldigeOmsorgsmåneder {
             return GyldigeOmsorgsmåneder(
-                omsorgsmåneder.alleMåneder().intersect(medlemskapsmåneder.alleMåneder()).intersect(utbetalingsmåneder.alleMåneder())
+                omsorgsmåneder.alleMåneder().intersect(utbetalingsmåneder.alleMåneder())
             )
         }
     }

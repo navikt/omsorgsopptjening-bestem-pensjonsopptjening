@@ -1,17 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskap
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapmåned
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåned
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåned.Companion.merge
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåneder
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.merge
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Hjelpestønadperiode.Companion.omsorgsmåneder
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.medlemskapsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.utbetalingsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -50,12 +45,6 @@ data class BeriketDatagrunnlag(
         }
     }
 
-    fun medlemskapsmånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, Medlemskapsmåneder> {
-        return persongrunnlag.associate { pg ->
-            pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }.medlemskapsmåneder()
-        }
-    }
-
     fun utbetalingsmånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, Utbetalingsmåneder> {
         return persongrunnlag.associate { pg ->
             pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }.utbetalingsmåneder()
@@ -84,10 +73,6 @@ data class Persongrunnlag(
         return omsorgsperioder.map { it.periode }.distinct().toSet()
     }
 
-    fun medlemskapsmåneder(): Medlemskapsmåneder {
-        return omsorgsperioder.map { it.medlemskapsmåneder() }.merge()
-    }
-
     fun utbetalingsmåneder(): Utbetalingsmåneder {
         return omsorgsperioder.map { it.utbetalingsmåneder() }.merge()
     }
@@ -99,7 +84,6 @@ data class Omsorgsperiode(
     val omsorgstype: DomainOmsorgstype,
     val omsorgsmottaker: Person,
     val kilde: DomainKilde,
-    val medlemskap: Medlemskap,
     val utbetalt: Int,
     val landstilknytning: Landstilknytning
 ) {
@@ -107,14 +91,6 @@ data class Omsorgsperiode(
 
     fun alleMåneder(): Set<YearMonth> {
         return periode.alleMåneder().distinct().toSet()
-    }
-
-    fun medlemskapsmåneder(): Medlemskapsmåneder {
-        return Medlemskapsmåneder(periode.alleMåneder()
-                                      .map { it to medlemskap }
-                                      .mapNotNull { (mnd, medl) -> Medlemskapmåned.of(mnd, medl) }
-                                      .toSet()
-        )
     }
 
     fun utbetalingsmåneder(): Utbetalingsmåneder {
@@ -137,11 +113,6 @@ data class Omsorgsperiode(
         fun List<Omsorgsperiode>.omsorgsmåneder(): Omsorgsmåneder.Barnetrygd {
             return map { it.omsorgsmåneder() }.reduceOrNull { acc, o -> acc.merge(o) }
                 ?: Omsorgsmåneder.Barnetrygd.none()
-        }
-
-        fun List<Omsorgsperiode>.medlemskapsmåneder(): Medlemskapsmåneder {
-            return map { it.medlemskapsmåneder() }.reduceOrNull { acc, o -> acc.merge(o) }
-                ?: Medlemskapsmåneder.none()
         }
 
         fun List<Omsorgsperiode>.utbetalingsmåneder(): Utbetalingsmåneder {

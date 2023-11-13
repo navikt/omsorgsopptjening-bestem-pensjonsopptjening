@@ -54,10 +54,6 @@ sealed class OmsorgsopptjeningGrunnlag {
         }
     }
 
-    private fun medlemskapsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Medlemskapsmåneder> {
-        return grunnlag.medlemskapsmånederPerOmsorgsyter(omsorgsmottaker)
-    }
-
     private fun utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Utbetalingsmåneder> {
         return grunnlag.utbetalingsmånederPerOmsorgsyter(omsorgsmottaker)
     }
@@ -92,14 +88,6 @@ sealed class OmsorgsopptjeningGrunnlag {
         )
     }
 
-    fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemAvFolketrygden.Grunnlag {
-        return OmsorgsyterErMedlemAvFolketrygden.Grunnlag(
-            omsorgsytersMedlemskapsmåneder = medlemskapsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            antallMånederRegel = antallMånederRegel(),
-            omsorgstype = omsorgstype,
-        )
-    }
-
     fun forMottarBarnetrygd(): OmsorgsyterMottarBarnetrgyd.Grunnlag {
         return OmsorgsyterMottarBarnetrgyd.Grunnlag(
             omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
@@ -110,7 +98,6 @@ sealed class OmsorgsopptjeningGrunnlag {
 
     fun forGyldigOmsorgsarbeid(omsorgsyter: Person): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
         return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
-            omsorgsytersMedlemskapsmåneder = medlemskapsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             omsorgsytersOmsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel()
@@ -303,7 +290,6 @@ private fun BeriketDatagrunnlag.`avgrens for omsorgsår`(): Map<Int, BeriketData
                                         omsorgstype = barnetrygdPeriode.omsorgstype,
                                         omsorgsmottaker = barnetrygdPeriode.omsorgsmottaker,
                                         kilde = barnetrygdPeriode.kilde,
-                                        medlemskap = barnetrygdPeriode.medlemskap,
                                         utbetalt = barnetrygdPeriode.utbetalt,
                                         landstilknytning = barnetrygdPeriode.landstilknytning,
                                     )

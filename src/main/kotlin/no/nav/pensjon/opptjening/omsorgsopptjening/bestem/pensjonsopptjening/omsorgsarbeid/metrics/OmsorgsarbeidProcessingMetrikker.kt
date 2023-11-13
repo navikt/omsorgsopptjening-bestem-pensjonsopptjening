@@ -29,8 +29,6 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<Full
     private val omsorgsmottakerOppfyllerAlderskravForBarnetrygd =
         registry.counter("avslag", "antall", "OmsorgsmottakerOppfyllerAlderskravForBarnetrygd")
     private val omsorgsyterOppfyllerAlderskrav = registry.counter("avslag", "antall", "OmsorgsyterOppfyllerAlderskrav")
-    private val omsorgsyterErMedlemAvFolketrygden =
-        registry.counter("avslag", "antall", "OmsorgsyterErMedlemAvFolketrygden")
     private val omsorgsyterMottarBarnetrygd = registry.counter("avslag", "antall", "OmsorgsyterMottarBarnetrgyd")
     private val omsorgsyterHarGyldigOmsorgsarbeid =
         registry.counter("avslag", "antall", "OmsorgsyterHarGyldigOmsorgsarbeid")
@@ -55,7 +53,6 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<Full
                         is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> omsorgsmottakerOppfyllerAlderskravForHjelpestønad.increment()
                         is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> omsorgsmottakerOppfyllerAlderskravForBarnetrygd.increment()
                         is OmsorgsyterOppfyllerAlderskrav.Vurdering -> omsorgsyterOppfyllerAlderskrav.increment()
-                        is OmsorgsyterErMedlemAvFolketrygden.Vurdering -> omsorgsyterErMedlemAvFolketrygden.increment()
                         is OmsorgsyterMottarBarnetrgyd.Vurdering -> omsorgsyterMottarBarnetrygd.increment()
                         is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> omsorgsyterHarGyldigOmsorgsarbeid.increment()
                     }
