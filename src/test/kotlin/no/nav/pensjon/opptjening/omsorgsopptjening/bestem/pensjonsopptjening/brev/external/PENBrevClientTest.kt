@@ -44,7 +44,7 @@ class PENBrevClientTest(
         val json = serialize(request)
         val mapper = ObjectMapper()
         val jsonTree = mapper.readTree(json)
-        val expectedTree = mapper.readTree("""{"brevdata":{"aarInvilgetOmsorgspoeng":2010},"eksternReferanseId":"42"}""")
+        val expectedTree = mapper.readTree("""{"brevdata":{"aarInnvilgetOmsorgspoeng":2010},"eksternReferanseId":"42"}""")
         assertThat(jsonTree).isEqualTo(expectedTree)
     }
 
@@ -87,14 +87,14 @@ class PENBrevClientTest(
                         .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
                         .withRequestBody(
                             equalToJson(
-                                """{"brevdata":{"aarInvilgetOmsorgspoeng":2020},
+                                """{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
                                     "eksternReferanseId":"${'$'}{json-unit.any-string}"
                                    }""".trimMargin()
                             )
                         )
                         .willReturn(
                             ok()
-                                .withBody("""{"journalpostId":"123"}""")
+                                .withBody("""{"journalpostId":"123", "error":null}""")
                                 .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                         )
                 )
@@ -121,7 +121,7 @@ class PENBrevClientTest(
                         .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
                         .withRequestBody(
                             equalToJson(
-                                """{"brevdata":{"aarInvilgetOmsorgspoeng":2020},
+                                """{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
                                     "eksternReferanseId":"${'$'}{json-unit.any-string}"
                                    }""".trimMargin()
                             )
@@ -157,7 +157,7 @@ class PENBrevClientTest(
                         .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
                         .withRequestBody(
                             equalToJson(
-                                """{"brevdata":{"aarInvilgetOmsorgspoeng":2020},
+                                """{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
                                     "eksternReferanseId":"${'$'}{json-unit.any-string}"
                                    }""".trimMargin()
                             )

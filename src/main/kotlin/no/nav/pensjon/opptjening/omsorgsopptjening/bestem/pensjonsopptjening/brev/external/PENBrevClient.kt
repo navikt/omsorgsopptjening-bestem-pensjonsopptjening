@@ -79,12 +79,17 @@ class PENBrevClient(
                     String::class.java
                 )
                 when (response.statusCode.value()) {
-                    200 -> Journalpost(
+                    200 -> {
                         mapper.readValue(
                             response.body,
                             SendBrevResponse.JournalPostId::class.java
-                        ).journalpostId
-                    )
+                        ).let { response ->
+                            if (response.error != null) {
+                                throw BrevClientException("Brevtjenesten svarte ok, med journalId:${response.journalpostId} og feil, teknisk grunn:${response.error.tekniskgrunn} og beskrivelse: ${response.error.beskrivelse}")
+                            }
+                            Journalpost(response.journalpostId)
+                        }
+                    }
 
                     404 -> throw BrevClientException("Vedtak eksisterer ikke (400 Not Found)")
                     400 -> {
@@ -125,7 +130,7 @@ class PENBrevClient(
         }
     }
 
-    data class BrevData(val aarInvilgetOmsorgspoeng: Int)
+    data class BrevData(val aarInnvilgetOmsorgspoeng: Int)
     data class Overstyr(val spraak: BrevSpraak)
 
     data class SendBrevRequest(
@@ -140,7 +145,7 @@ class PENBrevClient(
     }
 
     private sealed class SendBrevResponse {
-        data class JournalPostId(val journalpostId: String) : SendBrevResponse()
+        data class JournalPostId(val journalpostId: String, val error: Error?) : SendBrevResponse()
         data object IkkeFunnet
         data class Feil(val error: Error)
         data class Error(val tekniskgrunn: String, val beskrivelse: String?)
