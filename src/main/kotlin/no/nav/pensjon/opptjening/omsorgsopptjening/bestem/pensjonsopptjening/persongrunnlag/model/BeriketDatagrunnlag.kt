@@ -58,7 +58,7 @@ data class Persongrunnlag(
     val hjelpestønadperioder: List<Hjelpestønadperiode>,
 ) {
     fun omsorgsmottakere(): Set<Person> {
-        return omsorgsperioder.map { it.omsorgsmottaker }.distinct().toSet()
+        return (omsorgsperioder.map { it.omsorgsmottaker } + hjelpestønadperioder.map { it.omsorgsmottaker }).distinct().toSet()
     }
 
     fun omsorgsår(): Set<Int> {
@@ -70,11 +70,7 @@ data class Persongrunnlag(
     }
 
     fun perioder(): Set<Periode> {
-        return omsorgsperioder.map { it.periode }.distinct().toSet()
-    }
-
-    fun utbetalingsmåneder(): Utbetalingsmåneder {
-        return omsorgsperioder.map { it.utbetalingsmåneder() }.merge()
+        return (omsorgsperioder.map { it.periode } + hjelpestønadperioder.map { it.periode }).distinct().toSet()
     }
 }
 

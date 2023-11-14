@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Hjelpestønadperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -153,6 +154,7 @@ sealed class OmsorgsopptjeningGrunnlag {
                 require(
                     !omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER)
                 ) { "Forventer ikke grunnlag for fødselsåret dersom barn er født i desember" }
+                grunnlag.valider()
             }
 
             override fun antallMånederRegel(): AntallMånederRegel {
@@ -176,6 +178,7 @@ sealed class OmsorgsopptjeningGrunnlag {
                 require(
                     omsorgsmottaker.erFødt(omsorgsAr, Month.DECEMBER)
                 ) { "$omsorgsmottaker er ikke født i ${Month.DECEMBER} i $omsorgsAr" }
+                grunnlag.valider()
             }
 
             override fun antallMånederRegel(): AntallMånederRegel {
@@ -196,11 +199,18 @@ sealed class OmsorgsopptjeningGrunnlag {
             require(
                 !omsorgsmottaker.erFødt(omsorgsAr)
             ) { "$omsorgsmottaker er født i $omsorgsAr" }
+            grunnlag.valider()
         }
 
         override fun antallMånederRegel(): AntallMånederRegel {
             return AntallMånederRegel.FødtUtenforOmsorgsår
         }
+    }
+
+    protected fun BeriketDatagrunnlag.valider() {
+        require(
+            this.omsorgsytersOmsorgsmottakere.distinct().single() == omsorgsmottaker
+        ) { "Grunnlagsdata inneholder flere omsorgsmottakere!" }
     }
 }
 
@@ -269,7 +279,12 @@ private fun BeriketDatagrunnlag.`avgrens grunnlagsdata per omsorgsmottaker`(): M
         .sortedBy { it.fødselsdato } //eldste barn først
         .associateWith { omsorgsmottaker ->
             copy(persongrunnlag = persongrunnlag
-                .map { persongrunnlag -> persongrunnlag.copy(omsorgsperioder = persongrunnlag.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }) }
+                .map { persongrunnlag ->
+                    persongrunnlag.copy(
+                        omsorgsperioder = persongrunnlag.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker },
+                        hjelpestønadperioder = persongrunnlag.hjelpestønadperioder.filter { it.omsorgsmottaker == omsorgsmottaker }
+                    )
+                }
             )
         }
 }
@@ -279,22 +294,38 @@ private fun BeriketDatagrunnlag.`avgrens for omsorgsår`(): Map<Int, BeriketData
         .associateWith { år ->
             copy(persongrunnlag = persongrunnlag
                 .map { persongrunnlag ->
-                    persongrunnlag.copy(omsorgsperioder = persongrunnlag.omsorgsperioder
-                        .filter { it.periode.overlapper(år) }
-                        .map { barnetrygdPeriode ->
-                            barnetrygdPeriode.periode.overlappendeMåneder(år)
-                                .let {
-                                    Omsorgsperiode(
-                                        fom = it.min(),
-                                        tom = it.max(),
-                                        omsorgstype = barnetrygdPeriode.omsorgstype,
-                                        omsorgsmottaker = barnetrygdPeriode.omsorgsmottaker,
-                                        kilde = barnetrygdPeriode.kilde,
-                                        utbetalt = barnetrygdPeriode.utbetalt,
-                                        landstilknytning = barnetrygdPeriode.landstilknytning,
-                                    )
-                                }
-                        })
+                    persongrunnlag.copy(
+                        omsorgsperioder = persongrunnlag.omsorgsperioder
+                            .filter { it.periode.overlapper(år) }
+                            .map { barnetrygdPeriode ->
+                                barnetrygdPeriode.periode.overlappendeMåneder(år)
+                                    .let {
+                                        Omsorgsperiode(
+                                            fom = it.min(), //TODO det er vel ingen garanti for at dette blir korrekt
+                                            tom = it.max(),
+                                            omsorgstype = barnetrygdPeriode.omsorgstype,
+                                            omsorgsmottaker = barnetrygdPeriode.omsorgsmottaker,
+                                            kilde = barnetrygdPeriode.kilde,
+                                            utbetalt = barnetrygdPeriode.utbetalt,
+                                            landstilknytning = barnetrygdPeriode.landstilknytning,
+                                        )
+                                    }
+                            },
+                        hjelpestønadperioder = persongrunnlag.hjelpestønadperioder
+                            .filter { it.periode.overlapper(år) }
+                            .map { hjelpestønadperiode ->
+                                hjelpestønadperiode.periode.overlappendeMåneder(år)
+                                    .let {
+                                        Hjelpestønadperiode(
+                                            fom = it.min(),
+                                            tom = it.max(),
+                                            omsorgstype = hjelpestønadperiode.omsorgstype,
+                                            omsorgsmottaker = hjelpestønadperiode.omsorgsmottaker,
+                                            kilde = hjelpestønadperiode.kilde
+                                        )
+                                    }
+                            }
+                    )
                 })
         }
 }
