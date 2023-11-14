@@ -25,6 +25,8 @@ spec:
       value: https://pensjon-popp-q2.dev-fss-pub.nais.io/popp/api
     - name: POPP_API_ID
       value: dev-fss.pensjonopptjening.pensjon-popp-q2
+    - name: OMSORGSOPPTJENING_TOPIC
+      value: pensjonopptjening.omsorgsopptjening
   envFrom:
     - secret: unleash-api-token
   kafka:

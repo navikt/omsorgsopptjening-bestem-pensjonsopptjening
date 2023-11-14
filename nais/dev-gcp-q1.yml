@@ -1,46 +1,46 @@
 kind: Application
 apiVersion: nais.io/v1alpha1
 metadata:
-  name: omsorgsopptjening-bestem-pensjonsopptjening
+  name: omsorgsopptjening-bestem-pensjonsopptjening-q1
   namespace: pensjonopptjening
   labels:
     team: pensjonopptjening
 spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
-      value: prod-gcp
+      value: dev-gcp
     - name: PDL_URL
-      value: https://pdl-api.prod-fss-pub.nais.io/graphql
+      value: https://pdl-api-q1.dev-fss-pub.nais.io/graphql
     - name: PDL_API_ID
-      value: prod-fss.pdl.pdl-api
+      value: dev-fss.pdl.pdl-api-q1
     - name: PEN_BASE_URL
-      value: https://pensjon-pen.prod-fss-pub.nais.io/pen
+      value: https://disabled.com
     - name: PEN_API_ID
-      value: prod-fss.teampensjon.pensjon-pen
+      value: tbd
     - name: OPPGAVE_URL
-      value: https://oppgave.prod-fss-pub.nais.io/api/v1/oppgaver
+      value: https://disabled.com
     - name: OPPGAVE_API_ID
-      value: prod-fss.oppgavehandtering.oppgave
+      value: tbd
     - name: POPP_URL
-      value: https://pensjon-popp.prod-fss-pub.nais.io/popp/api
+      value: https://disabled.com
     - name: POPP_API_ID
-      value: prod-fss.pensjonopptjening.pensjon-popp
+      value: tbd
     - name: OMSORGSOPPTJENING_TOPIC
-      value: pensjonopptjening.omsorgsopptjening
+      value: pensjonopptjening.omsorgsopptjening-q1
   envFrom:
     - secret: unleash-api-token
   kafka:
-    pool: nav-prod
+    pool: nav-dev
   gcp:
     sqlInstances:
       - type: POSTGRES_14
         cascadingDelete: true
         diskAutoresize: true
         pointInTimeRecovery: true
-        name: omsorgsopptjening-bestem-pensjonsopptjening-db
+        name: omsorgsopptjening-bestem-pensjonsopptjening-db-q1
         tier: db-custom-4-15360
         databases:
-          - name: omsorgsopptjening-bestem-pensjonsopptjening-db
+          - name: omsorgsopptjening-bestem-pensjonsopptjening-db-q1
             envVarPrefix: DATABASE
   azure:
     application:
@@ -50,12 +50,10 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: pdl-api.prod-fss-pub.nais.io
-        - host: pensjon-pen.prod-fss-pub.nais.io
-        - host: oppgave.prod-fss-pub.nais.io
-        - host: pensjon-popp.prod-fss-pub.nais.io
-        - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
+        - host: pdl-api-q1.dev-fss-pub.nais.io
   image: {{ image }}
+  ingresses:
+    - https://omsorgsopptjening-bestem-pensjonsopptjening-q1.intern.dev.nav.no
   liveness:
     path: /actuator/health/liveness
     port: 8080

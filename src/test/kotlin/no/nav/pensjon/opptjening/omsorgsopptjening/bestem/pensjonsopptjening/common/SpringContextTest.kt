@@ -80,7 +80,7 @@ sealed class SpringContextTest {
     }
 
 
-    @EmbeddedKafka(partitions = 1, topics = [Topics.Omsorgsopptjening.NAME])
+    @EmbeddedKafka(partitions = 1, topics = ["\${OMSORGSOPPTJENING_TOPIC}"])
     @SpringBootTest(classes = [Application::class])
     @ActiveProfiles("kafkaIntegrationTest")
     class WithKafka : SpringContextTest() {
