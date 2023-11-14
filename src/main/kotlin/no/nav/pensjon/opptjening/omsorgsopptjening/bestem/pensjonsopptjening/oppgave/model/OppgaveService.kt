@@ -83,7 +83,6 @@ class OppgaveService(
                     Mdc.scopedMdc(oppgave.innlesingId) {
                         try {
                             transactionTemplate.execute {
-                                log.info("Oppretter oppgave")
                                 personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
                                     sakKlient.bestemSak(
                                         aktørId = aktørId

@@ -38,7 +38,6 @@ class BestemSakKlient(
     fun bestemSak(aktørId: String): Omsorgssak {
         val url = "$bestemSakUrl/api/bestemsak/v1"
         return try {
-            logger.info("Kaller bestemSak i PESYS")
             val response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,

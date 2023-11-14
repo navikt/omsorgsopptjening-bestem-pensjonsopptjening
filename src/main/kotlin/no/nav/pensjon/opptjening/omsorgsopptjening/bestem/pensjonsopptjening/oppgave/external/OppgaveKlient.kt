@@ -56,7 +56,6 @@ class OppgaveKlient(
         )
         return try {
             val response = restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OppgaveResponse::class.java)
-            logger.info("Opprettet kravoppgave for sakId: $sakId")
             response.body!!.id.toString()
         } catch (ex: Exception) {
             """Feil ved kall til $oppgaveUrl, feil: $ex""".let {

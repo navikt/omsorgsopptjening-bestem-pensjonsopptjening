@@ -41,7 +41,6 @@ class PersongrunnlagMeldingService(
                     Mdc.scopedMdc(melding.innlesingId) {
                         try {
                             transactionTemplate.execute {
-                                log.info("Prosesserer melding")
                                 behandle(melding).let { fullførte ->
                                     persongrunnlagRepo.updateStatus(melding.ferdig())
                                     fullførte.also {
@@ -79,7 +78,6 @@ class PersongrunnlagMeldingService(
                 .tilOmsorgsopptjeningsgrunnlag()
                 .filter { grunnlag -> gyldigOpptjeningsår.erGyldig(grunnlag.omsorgsAr) }
                 .map {
-                    log.info("Utfører vilkårsvurdering")
                     behandlingRepo.persist(
                         Behandling(
                             grunnlag = it,
@@ -96,7 +94,6 @@ class PersongrunnlagMeldingService(
 
 
     private fun håndterInnvilgelse(behandling: FullførtBehandling) {
-        log.info("Håndterer innvilgelse")
         godskrivOpptjeningService.opprett(behandling.godskrivOpptjening())
         brevService.opprettHvisNødvendig(behandling)
     }
