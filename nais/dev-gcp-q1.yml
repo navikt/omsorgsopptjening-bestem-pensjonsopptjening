@@ -22,9 +22,9 @@ spec:
     - name: OPPGAVE_API_ID
       value: tbd
     - name: POPP_URL
-      value: https://disabled.com
+      value: https://pensjon-popp-q1.dev-fss-pub.nais.io/popp/api
     - name: POPP_API_ID
-      value: tbd
+      value: dev-fss.pensjonopptjening.pensjon-popp-q1
     - name: OMSORGSOPPTJENING_TOPIC
       value: pensjonopptjening.omsorgsopptjening-q1
   envFrom:
@@ -51,6 +51,7 @@ spec:
     outbound:
       external:
         - host: pdl-api-q1.dev-fss-pub.nais.io
+        - host: pensjon-popp.dev-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
   image: {{ image }}
   ingresses:
