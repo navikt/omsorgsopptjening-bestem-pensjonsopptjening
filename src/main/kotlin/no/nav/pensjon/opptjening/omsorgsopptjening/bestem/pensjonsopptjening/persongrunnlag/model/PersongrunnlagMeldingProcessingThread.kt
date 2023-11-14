@@ -42,7 +42,6 @@ class PersongrunnlagMeldingProcessingThread(
             } catch (exception: Throwable) {
                 omsorgsarbeidMetricsFeilmåling.oppdater {
                     log.warn("Exception caught while processing, exception:$exception")
-                    Thread.sleep(1000)
                 }
             }
         }

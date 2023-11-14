@@ -42,7 +42,6 @@ class GodskrivOpptjeningProcessingThread(
             } catch (exception: Throwable) {
                 godskrivProcessingMetricsFeilmåling.oppdater {
                     log.warn("Exception caught while processing, exception:$exception")
-                    Thread.sleep(1000)
                 }
             }
         }
