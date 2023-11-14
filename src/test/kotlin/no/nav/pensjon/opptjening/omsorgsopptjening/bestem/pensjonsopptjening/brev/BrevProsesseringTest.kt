@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external.PENBrevClient.Companion.sendBrevPath
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external.PENBrevClient.Companion.sendBrevUrl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClientException
@@ -25,6 +25,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -34,7 +35,9 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.mock.mockito.MockBean
+import java.net.URL
 import java.time.Clock
 import java.time.Instant
 import java.time.Month
@@ -44,7 +47,10 @@ import kotlin.test.assertContains
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 
-class BrevProsesseringTest : SpringContextTest.NoKafka() {
+class BrevProsesseringTest(
+    @Value("\${PEN_BASE_URL}")
+    private val baseUrl: String,
+) : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var persongrunnlagRepo: PersongrunnlagRepo
@@ -87,8 +93,10 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
         wiremock.ingenPensjonspoeng("04010012797") //far
         wiremock.bestemSakOk()
 
+        val sendBrevPath = URL(sendBrevUrl(baseUrl, "12345")).path
+
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath("42")))
+            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath))
                 .inScenario("retry")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(
@@ -98,7 +106,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath("42")))
+            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath))
                 .inScenario("retry")
                 .whenScenarioStateIs("feil 2")
                 .willReturn(
@@ -108,7 +116,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath("42")))
+            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath))
                 .inScenario("retry")
                 .whenScenarioStateIs("ok")
                 .willReturn(
@@ -193,7 +201,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
             assertInstanceOf(Brev.Status.Retry::class.java, m.status).let {
                 assertEquals(2, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
-                assertContains(it.melding, "Not Found")
+                assertThat(it.melding).contains("Feil fra brevtjenesten: vedtak finnes ikke")
             }
         }
 
@@ -211,13 +219,15 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `gitt at en melding har blitt prosessert på nytt uten hell maks antall ganger skal det opprettes en oppgave`() {
+        val sendBrevPath = URL(sendBrevUrl(baseUrl, "42")).path
+
         wiremock.stubForPdlTransformer()
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.ingenPensjonspoeng("04010012797") //far
         wiremock.bestemSakOk()
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath("42")))
+            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath))
                 .willReturn(
                     WireMock.forbidden()
                 )

@@ -62,7 +62,7 @@ class BrevService(
                                     bestemSak.bestemSak(aktørId).let { sak ->
                                         brevClient.sendBrev(
                                             sakId = sak.sakId,
-                                            fnr = brev.omsorgsyter,
+                                            eksternReferanseId = EksternReferanseId(brev.behandlingId.toString()),
                                             omsorgsår = Year.of(brev.omsorgsår),
                                         ).let { journalpost ->
                                             brev.ferdig(journalpost).also {

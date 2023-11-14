@@ -2,9 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.PENBrevMetrikker
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClient
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClientException
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Journalpost
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient.Companion.logger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -19,46 +17,55 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpClientErrorException
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.time.Year
 import java.util.*
 
 @Component
 class PENBrevClient(
-@Value("\${PEN_BASE_URL}")
-private val baseUrl: String,
-@Qualifier("PENTokenProvider")
-private val tokenProvider: TokenProvider,
-private val penBrevMetricsMåling: PENBrevMetrikker,
+    @Value("\${PEN_BASE_URL}")
+    private val baseUrl: String,
+    @Qualifier("PENTokenProvider")
+    private val tokenProvider: TokenProvider,
+    private val penBrevMetricsMåling: PENBrevMetrikker,
 
-) : BrevClient {
+    ) : BrevClient {
     private val restTemplate = RestTemplateBuilder().build()
 
     companion object {
-        fun sendBrevPath(sakId: String) : String { return "/sak/$sakId/PE_OMSORG_HJELPESTOENAD_AUTO" }
+        fun sendBrevUrl(baseUrl: String, sakId: String): String {
+            return "$baseUrl/springapi/brev/sak/$sakId/PE_OMSORG_HJELPESTOENAD_AUTO"
+        }
     }
 
-
-    override fun sendBrev(sakId: String, fnr: String, omsorgsår: Year, språk: BrevSpraak?): Journalpost {
-        val url = baseUrl + sendBrevPath(sakId)
-        println("sendBrev: url=$url")
+    override fun sendBrev(
+        sakId: String,
+        eksternReferanseId: EksternReferanseId,
+        omsorgsår: Year,
+        språk: BrevSpraak?
+    ): Journalpost {
+        val url = sendBrevUrl(baseUrl, sakId)
         return try {
             penBrevMetricsMåling.oppdater {
-                val brevRequest = serialize(SendBrevRequest(
-                    omsorgsår,
-                    UUID.randomUUID().toString(), // TODO: Fiks
-                    språk
-                ))
-                println("brevRequest: $brevRequest")
+                val brevRequest = serialize(
+                    SendBrevRequest(
+                        omsorgsår = omsorgsår,
+                        eksternReferanseId = eksternReferanseId.value,
+                        spraak = språk,
+                    )
+                )
                 val response = restTemplate.exchange(
                     url,
                     HttpMethod.POST,
                     HttpEntity(
-                        serialize(SendBrevRequest(
+                        serialize(
+                            SendBrevRequest(
                                 omsorgsår,
-                                UUID.randomUUID().toString(), // TODO: Fiks
-                                språk
-                            )),
+                                eksternReferanseId.value,
+                                språk,
+                            )
+                        ),
                         HttpHeaders().apply {
                             add("Nav-Call-Id", Mdc.getCorrelationId())
                             add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
@@ -71,7 +78,44 @@ private val penBrevMetricsMåling: PENBrevMetrikker,
                     ),
                     String::class.java
                 )
-                Journalpost(mapper.readValue(response.body, SendBrevResponse::class.java).journalpostId)
+                when (response.statusCode.value()) {
+                    200 -> Journalpost(
+                        mapper.readValue(
+                            response.body,
+                            SendBrevResponse.JournalPostId::class.java
+                        ).journalpostId
+                    )
+
+                    404 -> throw BrevClientException("Vedtak eksisterer ikke (400 Not Found)")
+                    400 -> {
+                        val feil =
+                            mapper.readValue(
+                                response.body,
+                                SendBrevResponse.Feil::class.java
+                            )
+                        throw BrevClientException("${feil.error.tekniskgrunn} ${feil.error.beskrivelse ?: ""}}")
+                    }
+
+                    else -> throw BrevClientException("PEN Brev returnerte http ${response.statusCode.value()}")
+                }
+            }
+        } catch (ex: HttpClientErrorException) {
+            when (ex.statusCode.value()) {
+                400 -> {
+                    mapper.readValue(
+                        ex.responseBodyAsString,
+                        SendBrevResponse.Feil::class.java
+                    ).let { feil ->
+                        "Feil fra brevtjenesten: teknisk grunn: ${feil.error.tekniskgrunn}, beskrivelse: ${feil.error.beskrivelse}"
+                            .let { message ->
+                                throw BrevClientException(message, ex)
+                            }
+                    }
+                }
+                404 -> {
+                    throw BrevClientException ("Feil fra brevtjenesten: vedtak finnes ikke")
+                }
+                else -> throw BrevClientException("PEN Brev returnerte http ${ex.statusCode.value()}", ex)
             }
         } catch (ex: Throwable) {
             """Feil ved kall til $url, feil: $ex""".let {
@@ -81,7 +125,6 @@ private val penBrevMetricsMåling: PENBrevMetrikker,
         }
     }
 
-
     data class BrevData(val aarInvilgetOmsorgspoeng: Int)
     data class Overstyr(val spraak: BrevSpraak)
 
@@ -89,22 +132,17 @@ private val penBrevMetricsMåling: PENBrevMetrikker,
 //        val omsorgsår: Year,
         val brevdata: BrevData,
         val eksternReferanseId: String,
-        @JsonInclude(JsonInclude.Include. NON_NULL)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         val overstyr: Overstyr?
     ) {
-        constructor(omsorgsår: Year,eksternReferanseId: String,spraak: BrevSpraak? = null) :
-                this(BrevData(omsorgsår.value),eksternReferanseId,spraak?.let { språk -> Overstyr(språk) })
+        constructor(omsorgsår: Year, eksternReferanseId: String, spraak: BrevSpraak? = null) :
+                this(BrevData(omsorgsår.value), eksternReferanseId, spraak?.let { språk -> Overstyr(språk) })
     }
 
-
-    private data class SendBrevResponse(
-        val journalpostId: String
-    )
-
-    enum class BrevSpraak {
-        EN, NB, NN
+    private sealed class SendBrevResponse {
+        data class JournalPostId(val journalpostId: String) : SendBrevResponse()
+        data object IkkeFunnet
+        data class Feil(val error: Error)
+        data class Error(val tekniskgrunn: String, val beskrivelse: String?)
     }
-
-    class PENBrevKlientException(message: String, throwable: Throwable) : RuntimeException(message, throwable)
-
 }
