@@ -56,6 +56,7 @@ data class FullførtBehandling(
         hentPensjonspoengForOmsorgsopptjening: (fnr: String, år: Int, type: DomainOmsorgstype) -> Pensjonspoeng.Omsorg,
         hentPensjonspoengForInntekt: (fnr: String, år: Int) -> Pensjonspoeng.Inntekt,
     ): Brevopplysninger {
+        require(utfall is BehandlingUtfall.Innvilget) { " Kan kun opprette brev for innvilget behandling" }
         return HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
             hentPensjonspoengForOmsorgsopptjening,
             hentPensjonspoengForInntekt

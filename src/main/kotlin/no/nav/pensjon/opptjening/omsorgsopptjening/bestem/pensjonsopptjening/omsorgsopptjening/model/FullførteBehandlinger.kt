@@ -18,7 +18,7 @@ data class FullførteBehandlinger(
     }
 
     private fun innvilget(): FullførtBehandling? {
-        return behandlinger.singleOrNull { it.erInnvilget() }
+        return behandlinger.single { it.erInnvilget() }
     }
 
     private fun manuell(): List<FullførtBehandling> {
@@ -30,19 +30,17 @@ data class FullførteBehandlinger(
         manuell: (behandling: FullførtBehandling) -> Unit,
         avslag: () -> Unit,
     ) {
-        behandlinger.forEach {
-            when (aggregertUtfall) {
-                BehandlingUtfall.Avslag -> {
-                    avslag()
-                }
+        when (aggregertUtfall) {
+            BehandlingUtfall.Avslag -> {
+                avslag() //noop
+            }
 
-                BehandlingUtfall.Innvilget -> {
-                    innvilget(innvilget()!!)
-                }
+            BehandlingUtfall.Innvilget -> {
+                innvilget(innvilget()!!)
+            }
 
-                BehandlingUtfall.Manuell -> {
-                    manuell().forEach { manuell(it) }
-                }
+            BehandlingUtfall.Manuell -> {
+                manuell().forEach { manuell(it) }
             }
         }
     }

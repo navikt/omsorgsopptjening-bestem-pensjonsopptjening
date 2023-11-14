@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -301,6 +300,96 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         persongrunnlagMeldingService.process()!!.single().also { behandling ->
             assertTrue(behandling.erInnvilget())
             assertTrue(brevRepository.findForBehandling(behandling.id).isEmpty())
+        }
+    }
+
+    @Test
+    fun `innvilget omsorgsopptjening for barn over 6 år skal bare sende 1 brev`() {
+        wiremock.ingenPensjonspoeng("12345678910") //mor
+        wiremock.givenThat(
+            WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
+                .withHeader("fnr", WireMock.equalTo("04010012797")) //far
+                .willReturn(
+                    WireMock.aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            """
+                            {
+                                "pensjonspoeng": [
+                                    {
+                                        "ar":$OPPTJENINGSÅR,
+                                        "poeng":7.4,
+                                        "pensjonspoengType":"PPI"
+                                    }
+                                ]
+                            }
+                        """.trimIndent()
+                        )
+                )
+        )
+
+        persongrunnlagRepo.persist(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2018, Month.JANUARY),
+                                    tom = YearMonth.of(2030, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
+                                ),
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2021, Month.JANUARY),
+                                    tom = YearMonth.of(2030, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 3123,
+                                    landstilknytning = Landstilknytning.NORGE
+                                ),
+                            ),
+                            hjelpestønadsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Hjelpestønadperiode(
+                                    fom = YearMonth.of(2018, Month.JANUARY),
+                                    tom = YearMonth.of(2030, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.INFOTRYGD,
+                                )
+                            )
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        persongrunnlagMeldingService.process()!!.also { behandling ->
+            behandling.alle().let {
+                it[0].let {
+                    assertThat(it.erInnvilget()).isTrue()
+                    assertThat(it.omsorgsmottaker).isEqualTo("03041212345")
+                    assertThat(it.omsorgstype.toString()).isEqualTo("HJELPESTØNAD")
+                    assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(it.id).single()).also {
+                        assertThat(it.årsak).isEqualTo(BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR)
+                    }
+                }
+                it[1].let {
+                    assertThat(it.erAvslag()).isTrue()
+                    assertThat(it.omsorgsmottaker).isEqualTo("01122012345")
+                    assertThat(it.omsorgstype.toString()).isEqualTo("BARNETRYGD")
+                    assertThat(brevRepository.findForBehandling(it.id)).isEmpty()
+                }
+            }
         }
     }
 }
