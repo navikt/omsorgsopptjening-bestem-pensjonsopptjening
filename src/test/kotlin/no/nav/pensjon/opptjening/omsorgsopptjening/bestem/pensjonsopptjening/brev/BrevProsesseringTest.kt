@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external.PENBrevClient.Companion.sendBrevPath
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClientException
@@ -87,7 +88,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
         wiremock.bestemSakOk()
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(SEND_BREV_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath("42")))
                 .inScenario("retry")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(
@@ -97,7 +98,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(SEND_BREV_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath("42")))
                 .inScenario("retry")
                 .whenScenarioStateIs("feil 2")
                 .willReturn(
@@ -107,7 +108,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(SEND_BREV_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath("42")))
                 .inScenario("retry")
                 .whenScenarioStateIs("ok")
                 .willReturn(
@@ -216,7 +217,7 @@ class BrevProsesseringTest : SpringContextTest.NoKafka() {
         wiremock.bestemSakOk()
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo(SEND_BREV_PATH))
+            WireMock.post(WireMock.urlPathEqualTo(sendBrevPath("42")))
                 .willReturn(
                     WireMock.forbidden()
                 )

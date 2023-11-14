@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
+import java.time.Year
 
 @Component
 class BrevService(
@@ -62,7 +63,7 @@ class BrevService(
                                         brevClient.sendBrev(
                                             sakId = sak.sakId,
                                             fnr = brev.omsorgsyter,
-                                            omsorgsår = brev.omsorgsår,
+                                            omsorgsår = Year.of(brev.omsorgsår),
                                         ).let { journalpost ->
                                             brev.ferdig(journalpost).also {
                                                 brevRepository.updateStatus(it)

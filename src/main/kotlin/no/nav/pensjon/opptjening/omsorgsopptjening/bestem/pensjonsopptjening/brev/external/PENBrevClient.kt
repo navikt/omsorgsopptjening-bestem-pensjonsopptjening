@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.PENBrevMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClientException
@@ -19,35 +20,45 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import pensjon.opptjening.azure.ad.client.TokenProvider
+import java.time.Year
+import java.util.*
 
 @Component
-private class PENBrevClient(
-    @Value("\${PEN_BASE_URL}") private val baseUrl: String,
-    @Qualifier("PENTokenProvider") private val tokenProvider: TokenProvider,
-    private val penBrevMetricsMåling: PENBrevMetrikker,
+class PENBrevClient(
+@Value("\${PEN_BASE_URL}")
+private val baseUrl: String,
+@Qualifier("PENTokenProvider")
+private val tokenProvider: TokenProvider,
+private val penBrevMetricsMåling: PENBrevMetrikker,
 
-    ) : BrevClient {
+) : BrevClient {
     private val restTemplate = RestTemplateBuilder().build()
 
-    override fun sendBrev(
-        sakId: String,
-        fnr: String,
-        omsorgsår: Int
-    ): Journalpost {
-        val url = "$baseUrl/api/bestillbrev/todo"
+    companion object {
+        fun sendBrevPath(sakId: String) : String { return "/sak/$sakId/PE_OMSORG_HJELPESTOENAD_AUTO" }
+    }
+
+
+    override fun sendBrev(sakId: String, fnr: String, omsorgsår: Year, språk: BrevSpraak?): Journalpost {
+        val url = baseUrl + sendBrevPath(sakId)
+        println("sendBrev: url=$url")
         return try {
             penBrevMetricsMåling.oppdater {
+                val brevRequest = serialize(SendBrevRequest(
+                    omsorgsår,
+                    UUID.randomUUID().toString(), // TODO: Fiks
+                    språk
+                ))
+                println("brevRequest: $brevRequest")
                 val response = restTemplate.exchange(
                     url,
                     HttpMethod.POST,
                     HttpEntity(
-                        serialize(
-                            SendBrevRequest(
-                                sakId = sakId,
-                                fnr = fnr,
-                                omsorgsår = omsorgsår
-                            )
-                        ),
+                        serialize(SendBrevRequest(
+                                omsorgsår,
+                                UUID.randomUUID().toString(), // TODO: Fiks
+                                språk
+                            )),
                         HttpHeaders().apply {
                             add("Nav-Call-Id", Mdc.getCorrelationId())
                             add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
@@ -70,13 +81,30 @@ private class PENBrevClient(
         }
     }
 
-    private data class SendBrevRequest(
-        val sakId: String,
-        val fnr: String,
-        val omsorgsår: Int
-    )
+
+    data class BrevData(val aarInvilgetOmsorgspoeng: Int)
+    data class Overstyr(val spraak: BrevSpraak)
+
+    data class SendBrevRequest(
+//        val omsorgsår: Year,
+        val brevdata: BrevData,
+        val eksternReferanseId: String,
+        @JsonInclude(JsonInclude.Include. NON_NULL)
+        val overstyr: Overstyr?
+    ) {
+        constructor(omsorgsår: Year,eksternReferanseId: String,spraak: BrevSpraak? = null) :
+                this(BrevData(omsorgsår.value),eksternReferanseId,spraak?.let { språk -> Overstyr(språk) })
+    }
+
 
     private data class SendBrevResponse(
         val journalpostId: String
     )
+
+    enum class BrevSpraak {
+        EN, NB, NN
+    }
+
+    class PENBrevKlientException(message: String, throwable: Throwable) : RuntimeException(message, throwable)
+
 }
