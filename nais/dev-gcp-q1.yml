@@ -51,6 +51,7 @@ spec:
     outbound:
       external:
         - host: pdl-api-q1.dev-fss-pub.nais.io
+        - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
   image: {{ image }}
   ingresses:
     - https://omsorgsopptjening-bestem-pensjonsopptjening-q1.intern.dev.nav.no
