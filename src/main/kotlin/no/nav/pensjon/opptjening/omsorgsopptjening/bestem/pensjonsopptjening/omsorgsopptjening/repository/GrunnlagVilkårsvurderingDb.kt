@@ -32,6 +32,7 @@ internal sealed class GrunnlagVilkårsvurderingDb {
         val fnr: String,
         val fødselsdato: LocalDate,
         val omsorgsAr: Int,
+        val alder: Int,
     ) : GrunnlagVilkårsvurderingDb()
 
     @JsonTypeName("KanKunGodskrivesEnOmsorgsyter")
@@ -301,7 +302,8 @@ internal fun GrunnlagVilkårsvurderingDb.AldersvurderingGrunnlag.toDomain(): Ald
             fnr = fnr,
             fødselsdato = fødselsdato,
         ),
-        omsorgsAr = omsorgsAr
+        omsorgsAr = omsorgsAr,
+        alder = alder,
     )
 }
 
@@ -309,7 +311,8 @@ internal fun AldersvurderingsGrunnlag.toDb(): GrunnlagVilkårsvurderingDb.Alders
     return GrunnlagVilkårsvurderingDb.AldersvurderingGrunnlag(
         fnr = person.fnr,
         fødselsdato = person.fødselsdato,
-        omsorgsAr = omsorgsAr
+        omsorgsAr = omsorgsAr,
+        alder = alder,
     )
 }
 
