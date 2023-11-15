@@ -31,6 +31,8 @@ data class BeriketDatagrunnlag(
     val omsorgsytersOmsorgsmottakere = omsorgsytersPersongrunnlag.omsorgsmottakere()
     val omsorgsytersOmsorgsår = omsorgsytersPersongrunnlag.omsorgsår()
     val alleMåneder: Set<YearMonth> = persongrunnlag.flatMap { it.måneder() }.distinct().toSet()
+    val alleOmsorgsmottakere = persongrunnlag.flatMap { it.omsorgsmottakere() }.distinct()
+
     fun omsorgsmånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, Omsorgsmåneder.Barnetrygd> {
         return persongrunnlag.associate { pg ->
             pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }.omsorgsmåneder()

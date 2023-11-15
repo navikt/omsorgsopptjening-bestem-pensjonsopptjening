@@ -209,8 +209,14 @@ sealed class OmsorgsopptjeningGrunnlag {
 
     protected fun BeriketDatagrunnlag.valider() {
         require(
-            this.omsorgsytersOmsorgsmottakere.distinct().single() == omsorgsmottaker
+            this.alleOmsorgsmottakere.distinct().count() == 1
         ) { "Grunnlagsdata inneholder flere omsorgsmottakere!" }
+        require(
+            this.alleOmsorgsmottakere.distinct().single() == omsorgsmottaker
+        ) { "Grunnlagsdata inneholder ikke forventet omsorgsmottaker" }
+        require(
+            this.alleMåneder.distinctBy { it.year }.count() == 1
+        ) { "Grunnlagsdata inneholder grunnlag for flere omsorgsår" }
     }
 }
 
