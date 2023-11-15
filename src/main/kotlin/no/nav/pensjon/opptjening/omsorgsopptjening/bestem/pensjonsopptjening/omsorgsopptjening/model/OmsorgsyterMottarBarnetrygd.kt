@@ -26,17 +26,19 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
             }
 
             AntallMånederRegel.FødtUtenforOmsorgsår -> {
-                when(grunnlag.omsorgstype){
+                when (grunnlag.omsorgstype) {
                     DomainOmsorgstype.BARNETRYGD -> {
-                        Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
+                        setOf(
+                            Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
+                        )
                     }
+
                     DomainOmsorgstype.HJELPESTØNAD -> {
-                        Referanse.OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad
+                        setOf(
+                            Referanse.OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad
+                        )
                     }
-                }
-                setOf(
-                    Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
-                ).let {
+                }.let {
                     if (grunnlag.erOppfyllt()) {
                         VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
                     } else {
@@ -58,7 +60,7 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
         val omsorgstype: DomainOmsorgstype,
     ) : ParagrafGrunnlag() {
         fun erOppfyllt(): Boolean {
-            return omsorgsytersUtbetalingsmåneder.alleMåneder().count() >= antallMånederRegel.antall
+            return omsorgsytersUtbetalingsmåneder.antall() >= antallMånederRegel.antall
         }
     }
 }

@@ -321,11 +321,11 @@ internal data class OmsorgsmånederDb(
 internal fun Omsorgsmåneder.toDb(): OmsorgsmånederDb {
     return when (this) {
         is Omsorgsmåneder.Barnetrygd -> {
-            OmsorgsmånederDb(this.alleMåneder(), OmsorgstypeDb.BARNETRYGD)
+            OmsorgsmånederDb(this.alle(), OmsorgstypeDb.BARNETRYGD)
         }
 
         is Omsorgsmåneder.Hjelpestønad -> {
-            OmsorgsmånederDb(this.alleMåneder(), OmsorgstypeDb.HJELPESTØNAD)
+            OmsorgsmånederDb(this.alle(), OmsorgstypeDb.HJELPESTØNAD)
         }
     }
 }

@@ -7,8 +7,12 @@ sealed class Omsorgsmåneder {
     protected abstract val måneder: Set<YearMonth>
     protected val sortert get() = måneder.toSortedSet()
 
-    fun alleMåneder(): Set<YearMonth>{
+    fun alle(): Set<YearMonth>{
         return sortert
+    }
+
+    fun antall(): Int {
+        return alle().count()
     }
 
     fun omsorgstype(): DomainOmsorgstype {

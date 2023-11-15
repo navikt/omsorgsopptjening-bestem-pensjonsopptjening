@@ -61,7 +61,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
     ) : ParagrafGrunnlag() {
 
         fun erOppfyllt(): Boolean {
-            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.alleMåneder().count() >= antallMånederRegel.antall
+            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall() >= antallMånederRegel.antall
         }
 
         fun omsorgstype(): DomainOmsorgstype {

@@ -11,8 +11,12 @@ data class Utbetalingsmåneder(
         return Utbetalingsmåneder((måneder + other.måneder).toSet())
     }
 
-    fun alleMåneder(): Set<YearMonth> {
+    fun alle(): Set<YearMonth> {
         return måneder.map { it.måned }.toSet()
+    }
+
+    fun antall(): Int {
+        return alle().count()
     }
 
     companion object {

@@ -21,7 +21,7 @@ data class GyldigeOmsorgsmåneder(
             utbetalingsmåneder: Utbetalingsmåneder,
         ): GyldigeOmsorgsmåneder {
             return GyldigeOmsorgsmåneder(
-                omsorgsmåneder.alleMåneder().intersect(utbetalingsmåneder.alleMåneder())
+                omsorgsmåneder.alle().intersect(utbetalingsmåneder.alle())
             )
         }
     }
