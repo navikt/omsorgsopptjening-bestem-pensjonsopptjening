@@ -11,36 +11,59 @@ class AggregertBehandlingsutfallTest {
 
     @Test
     fun `en innvilget er innvilget`() {
-        assertThat(AggregertBehandlingsutfall(listOf(innvilget)).utfall()).isEqualTo(innvilget)
+        assertThat(AggregertBehandlingsutfall(listOf(innvilget)).utfall()).isEqualTo(AggregertBehandlingUtfall.Innvilget)
     }
 
     @Test
     fun `et avslag er avslag`() {
-        assertThat(AggregertBehandlingsutfall(listOf(avslag)).utfall()).isEqualTo(avslag)
+        assertThat(AggregertBehandlingsutfall(listOf(avslag)).utfall()).isEqualTo(AggregertBehandlingUtfall.Avslag)
     }
 
     @Test
     fun `et manuell er manuell`() {
-        assertThat(AggregertBehandlingsutfall(listOf(manuell)).utfall()).isEqualTo(manuell)
+        assertThat(AggregertBehandlingsutfall(listOf(manuell)).utfall()).isEqualTo(AggregertBehandlingUtfall.Manuell)
     }
 
     @Test
     fun `innvilget og avslag er innvilget`() {
-        assertThat(AggregertBehandlingsutfall(listOf(innvilget, avslag)).utfall()).isEqualTo(innvilget)
+        assertThat(
+            AggregertBehandlingsutfall(
+                listOf(
+                    innvilget,
+                    avslag
+                )
+            ).utfall()
+        ).isEqualTo(AggregertBehandlingUtfall.Innvilget)
     }
 
     @Test
     fun `innvilget og manuell er innvilget`() {
-        assertThat(AggregertBehandlingsutfall(listOf(innvilget, manuell)).utfall()).isEqualTo(innvilget)
+        assertThat(
+            AggregertBehandlingsutfall(
+                listOf(
+                    innvilget,
+                    manuell
+                )
+            ).utfall()
+        ).isEqualTo(AggregertBehandlingUtfall.Innvilget)
     }
 
     @Test
     fun `manuell og avslag er manuell`() {
-        assertThat(AggregertBehandlingsutfall(listOf(manuell, avslag)).utfall()).isEqualTo(manuell)
+        assertThat(
+            AggregertBehandlingsutfall(
+                listOf(
+                    manuell,
+                    avslag
+                )
+            ).utfall()
+        ).isEqualTo(AggregertBehandlingUtfall.Manuell)
     }
 
     @Test
     fun `innvilget, manuell og avslag er innvilget`() {
-        assertThat(AggregertBehandlingsutfall(listOf(innvilget, manuell, avslag)).utfall()).isEqualTo(innvilget)
+        assertThat(AggregertBehandlingsutfall(listOf(innvilget, manuell, avslag)).utfall()).isEqualTo(
+            AggregertBehandlingUtfall.Innvilget
+        )
     }
 }

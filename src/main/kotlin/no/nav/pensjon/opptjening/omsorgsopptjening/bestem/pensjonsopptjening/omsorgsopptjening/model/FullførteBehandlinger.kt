@@ -25,21 +25,25 @@ data class FullførteBehandlinger(
         return behandlinger.filter { it.erManuell() }
     }
 
+    private fun avslag(): List<FullførtBehandling> {
+        return behandlinger.filter { it.erAvslag() }
+    }
+
     fun håndterUtfall(
         innvilget: (behandling: FullførtBehandling) -> Unit,
         manuell: (behandling: FullførtBehandling) -> Unit,
         avslag: () -> Unit,
     ) {
         when (aggregertUtfall) {
-            BehandlingUtfall.Avslag -> {
+            AggregertBehandlingUtfall.Avslag -> {
                 avslag() //noop
             }
 
-            BehandlingUtfall.Innvilget -> {
+            AggregertBehandlingUtfall.Innvilget -> {
                 innvilget(innvilget()!!)
             }
 
-            BehandlingUtfall.Manuell -> {
+            AggregertBehandlingUtfall.Manuell -> {
                 manuell().forEach { manuell(it) }
             }
         }
@@ -73,17 +77,17 @@ data class FullførteBehandlinger(
 
     fun statistikk(): FullførteBehandlingerStatistikk {
         return FullførteBehandlingerStatistikk(
-            innvilgetOpptjening = behandlinger.count { aggregertUtfall.erInnvilget() },
-            avslåttOpptjening = behandlinger.count { aggregertUtfall.erAvslag() },
-            manuellBehandling = behandlinger.count { aggregertUtfall.erManuell() },
+            innvilgetOpptjening = if (aggregertUtfall.erInnvilget()) 1 else 0,
+            avslåttOpptjening = if (aggregertUtfall.erAvslag()) 1 else 0,
+            manuellBehandling = if (aggregertUtfall.erManuell()) 1 else 0,
             //summerer bare avslagsårsaker for tilfeller hvor aggregert utfall er avslag
-            summertAvslagPerVilkår = behandlinger
-                .filter { aggregertUtfall.erAvslag() }
-                .flatMap { it.avslåtteVilkår() }
-                .fold(mutableMapOf()) { acc, vilkarsVurdering ->
-                    acc.merge(vilkarsVurdering, 1) { gammel, value -> gammel + value }
-                    acc
-                }
+            summertAvslagPerVilkår = if (aggregertUtfall.erAvslag())
+                avslag()
+                    .flatMap { it.avslåtteVilkår() }
+                    .fold(mutableMapOf()) { acc, vilkarsVurdering ->
+                        acc.merge(vilkarsVurdering, 1) { gammel, value -> gammel + value }
+                        acc
+                    } else emptyMap()
         )
     }
 

@@ -52,7 +52,7 @@ sealed class BehandlingUtfall {
     }
 
     fun erManuell(): Boolean {
-        return when(this){
+        return when (this) {
             Avslag -> false
             Innvilget -> false
             Manuell -> true
@@ -60,7 +60,37 @@ sealed class BehandlingUtfall {
     }
 
     fun erAvslag(): Boolean {
-        return when(this){
+        return when (this) {
+            Avslag -> true
+            Innvilget -> false
+            Manuell -> false
+        }
+    }
+}
+
+sealed class AggregertBehandlingUtfall {
+    data object Innvilget : AggregertBehandlingUtfall()
+    data object Avslag : AggregertBehandlingUtfall()
+    data object Manuell : AggregertBehandlingUtfall()
+
+    fun erInnvilget(): Boolean {
+        return when (this) {
+            is Avslag -> false
+            is Innvilget -> true
+            is Manuell -> false
+        }
+    }
+
+    fun erManuell(): Boolean {
+        return when (this) {
+            Avslag -> false
+            Innvilget -> false
+            Manuell -> true
+        }
+    }
+
+    fun erAvslag(): Boolean {
+        return when (this) {
             Avslag -> true
             Innvilget -> false
             Manuell -> false

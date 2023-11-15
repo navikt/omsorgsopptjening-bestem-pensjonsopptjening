@@ -3,18 +3,18 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 data class AggregertBehandlingsutfall(
     private val alle: List<BehandlingUtfall>
 ) {
-    fun utfall(): BehandlingUtfall {
+    fun utfall(): AggregertBehandlingUtfall {
         return when {
             alle.any { it.erInnvilget() } -> {
-                BehandlingUtfall.Innvilget
+                AggregertBehandlingUtfall.Innvilget
             }
 
             alle.none { it.erInnvilget() } && alle.any { it.erManuell() } -> {
-                BehandlingUtfall.Manuell
+                AggregertBehandlingUtfall.Manuell
             }
 
             else -> {
-                BehandlingUtfall.Avslag
+                AggregertBehandlingUtfall.Avslag
             }
         }
     }
