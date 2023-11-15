@@ -28,7 +28,7 @@ import java.util.Queue
 sealed class VilkårsvurderingDb {
     @JsonTypeName("OmsorgsyterHarTilstrekkeligOmsorgsarbeid")
     internal data class OmsorgsyterHarTilstrekkeligOmsorgsarbeid(
-        val grunnlag: GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6,
+        val grunnlag: GrunnlagVilkårsvurderingDb.TilstrekkeligOmsorgsarbeid,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
 

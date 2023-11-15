@@ -21,8 +21,8 @@ import java.util.UUID
     property = "type",
 )
 internal sealed class GrunnlagVilkårsvurderingDb {
-    @JsonTypeName("OmsorgBarnUnder6")
-    data class OmsorgBarnUnder6(
+    @JsonTypeName("TilstrekkeligOmsorgsarbeid")
+    data class TilstrekkeligOmsorgsarbeid(
         val omsorgsytersOmsorgsmånederForOmsorgsmottaker: OmsorgsmånederDb,
         val antallMånederRegel: AntallMånederRegelDb
     ) : GrunnlagVilkårsvurderingDb()
@@ -281,14 +281,14 @@ internal fun FullførteBehandlingForOmsorgsyterDb.toDomain(): OmsorgsopptjeningK
     )
 }
 
-internal fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6 {
-    return GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6(
+internal fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.TilstrekkeligOmsorgsarbeid {
+    return GrunnlagVilkårsvurderingDb.TilstrekkeligOmsorgsarbeid(
         omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDb(),
         antallMånederRegel = antallMånederRegel.toDb()
     )
 }
 
-internal fun GrunnlagVilkårsvurderingDb.OmsorgBarnUnder6.toDomain(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
+internal fun GrunnlagVilkårsvurderingDb.TilstrekkeligOmsorgsarbeid.toDomain(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
     return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
         omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain(),
         antallMånederRegel = antallMånederRegel.toDomain(),
