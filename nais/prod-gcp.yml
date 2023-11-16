@@ -27,7 +27,7 @@ spec:
       value: prod-fss.pensjonopptjening.pensjon-popp
     - name: OMSORGSOPPTJENING_TOPIC
       value: pensjonopptjening.omsorgsopptjening
-    - name: GYLDIG_OPPTJENINGSÅR
+    - name: GYLDIG_OPPTJENINGSAR
       value: "2022"
   envFrom:
     - secret: unleash-api-token

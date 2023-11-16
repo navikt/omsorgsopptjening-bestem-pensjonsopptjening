@@ -20,7 +20,7 @@ data class GyldigOpptjeningsårImpl(
 class GyldigOpptjeningsårConfig {
     @Bean
     fun gyldigOpptjeningsår(
-        @Value("\${GYLDIG_OPPTJENINGSÅR}") gyldigOpptjeningsår: String,
+        @Value("\${GYLDIG_OPPTJENINGSAR}") gyldigOpptjeningsår: String,
     ): GyldigOpptjeningår {
         return GyldigOpptjeningsårImpl(gyldigOpptjeningsår.toInt())
     }
