@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -18,7 +19,9 @@ data class GyldigOpptjeningsårImpl(
 @Configuration
 class GyldigOpptjeningsårConfig {
     @Bean
-    fun gyldigOpptjeningsår(): GyldigOpptjeningår {
-        return GyldigOpptjeningsårImpl(2022)
+    fun gyldigOpptjeningsår(
+        @Value("\${GYLDIG_OPPTJENINGSÅR}") gyldigOpptjeningsår: Int,
+    ): GyldigOpptjeningår {
+        return GyldigOpptjeningsårImpl(gyldigOpptjeningsår)
     }
 }

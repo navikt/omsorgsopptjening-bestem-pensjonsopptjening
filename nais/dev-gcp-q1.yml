@@ -27,6 +27,8 @@ spec:
       value: dev-fss.pensjonopptjening.pensjon-popp-q1
     - name: OMSORGSOPPTJENING_TOPIC
       value: pensjonopptjening.omsorgsopptjening-q1
+    - name: GYLDIG_OPPTJENINGSÅR
+      value: 2021
   envFrom:
     - secret: unleash-api-token
   kafka:
