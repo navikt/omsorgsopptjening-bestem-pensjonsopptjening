@@ -27,6 +27,8 @@ spec:
       value: dev-fss.pensjonopptjening.pensjon-popp-q1
     - name: OMSORGSOPPTJENING_TOPIC
       value: pensjonopptjening.omsorgsopptjening-q1
+    - name: OMSORGSOPPTJENING_CONSUMER_GROUP
+      value: omsorgsopptjening-bestem-pensjonsopptjening-q1
     - name: GYLDIG_OPPTJENINGSAR
       value: "2021"
   envFrom:
