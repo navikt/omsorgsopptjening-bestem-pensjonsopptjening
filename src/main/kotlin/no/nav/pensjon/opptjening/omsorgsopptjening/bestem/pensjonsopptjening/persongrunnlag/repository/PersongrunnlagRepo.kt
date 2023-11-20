@@ -1,10 +1,15 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -21,11 +26,12 @@ class PersongrunnlagRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
     private val clock: Clock = Clock.systemUTC()
 ) {
+    private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun persist(melding: PersongrunnlagMelding.Lest): PersongrunnlagMelding.Mottatt {
         val keyHolder = GeneratedKeyHolder()
-        jdbcTemplate.update(
-            """insert into melding (melding, correlation_id, innlesing_id, opprettet) values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz)""",
+        val res = jdbcTemplate.update(
+            """insert into melding (melding, correlation_id, innlesing_id, opprettet) values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz) on conflict on constraint unique_correlation_innlesing do nothing""",
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "melding" to serialize(melding.innhold),
@@ -36,17 +42,31 @@ class PersongrunnlagRepo(
             ),
             keyHolder
         )
-        jdbcTemplate.update(
-            """insert into melding_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
-            MapSqlParameterSource(
-                mapOf<String, Any>(
-                    "id" to keyHolder.keys!!["id"] as UUID,
-                    "status" to serialize(melding.status),
-                    "statushistorikk" to melding.statushistorikk.serializeList(),
-                ),
-            ),
-        )
-        return find(keyHolder.keys!!["id"] as UUID)
+        return when (res) {
+            1 -> {
+                jdbcTemplate.update(
+                    """insert into melding_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
+                    MapSqlParameterSource(
+                        mapOf<String, Any>(
+                            "id" to keyHolder.keys!!["id"] as UUID,
+                            "status" to serialize(melding.status),
+                            "statushistorikk" to melding.statushistorikk.serializeList(),
+                        ),
+                    ),
+                )
+                find(keyHolder.keys!!["id"] as UUID)
+            }
+
+            0 -> {
+                log.info("Rad med correlation_id:${melding.correlationId} for innlesing_id:${melding.innlesingId} eksisterer i databasen - hopper over duplikat")
+                find(melding.correlationId, melding.innlesingId)
+            }
+
+            else -> {
+                throw RuntimeException("Uventet verdi: $res fra insert-statement")
+            }
+        }
+
     }
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
@@ -70,6 +90,21 @@ class PersongrunnlagRepo(
             ),
             PersongrunnlagMeldingMapper()
         ).single()
+    }
+
+    private fun find(correlationId: CorrelationId, innlesingId: InnlesingId): PersongrunnlagMelding.Mottatt {
+        return jdbcTemplate.query(
+            """select id from melding where correlation_id = :cid and innlesing_id = :iid""",
+            mapOf<String, Any>(
+                "cid" to correlationId.toString(),
+                "iid" to innlesingId.toString(),
+            ),
+            ResultSetExtractor { rs ->
+                if (rs.next()) find(UUID.fromString(rs.getString("id"))) else throw RuntimeException(
+                    "Could not extract resultset"
+                )
+            }
+        )!!
     }
 
     /**
@@ -105,7 +140,7 @@ class PersongrunnlagRepo(
         ).singleOrNull()
     }
 
-    fun finnSiste() : PersongrunnlagMelding? {
+    fun finnSiste(): PersongrunnlagMelding? {
         return jdbcTemplate.query(
 //            """select m.*, ms.statushistorikk from melding m, melding_status ms
 //                |where m.id = ms.id and order by m.opprettet desc limit 1""".trimMargin(),
@@ -117,7 +152,7 @@ class PersongrunnlagRepo(
         ).singleOrNull()
     }
 
-    fun finnEldsteMedStatus(kclass: KClass<*>) : PersongrunnlagMelding? {
+    fun finnEldsteMedStatus(kclass: KClass<*>): PersongrunnlagMelding? {
         val name = kclass.simpleName!!
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m, melding_status ms
@@ -130,7 +165,7 @@ class PersongrunnlagRepo(
         ).singleOrNull()
     }
 
-    fun finnEldsteSomIkkeErFerdig() : PersongrunnlagMelding? {
+    fun finnEldsteSomIkkeErFerdig(): PersongrunnlagMelding? {
         val name = PersongrunnlagMelding.Status.Ferdig::class.simpleName!!
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m, melding_status ms
@@ -143,7 +178,7 @@ class PersongrunnlagRepo(
         ).singleOrNull()
     }
 
-    fun antallMedStatus(kclass: KClass<*>) : Long {
+    fun antallMedStatus(kclass: KClass<*>): Long {
         val name = kclass.simpleName!!
         return jdbcTemplate.queryForObject(
             """select count(*) from melding_status where (status->>'type' = :type)""",
