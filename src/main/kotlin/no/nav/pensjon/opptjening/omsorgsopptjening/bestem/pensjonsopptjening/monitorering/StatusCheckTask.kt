@@ -10,7 +10,7 @@ class StatusCheckTask(private val statusRapporteringsService: StatusRapportering
         private val log = LoggerFactory.getLogger(this::class.java)
     }
 
-    @Scheduled(fixedDelay = 120000, initialDelay = 20000)
+    @Scheduled(fixedDelay = 600_000, initialDelay = 20_000)
     fun check() {
         try {
             val status = statusRapporteringsService.oppdaterRapporterbarStatus()

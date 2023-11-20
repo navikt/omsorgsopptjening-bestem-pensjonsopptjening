@@ -89,8 +89,12 @@ class PersongrunnlagRepo(
 
     fun finnSiste() : PersongrunnlagMelding? {
         return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk from melding m, melding_status ms
-                |where m.id = ms.id order by m.opprettet desc limit 1""".trimMargin(),
+//            """select m.*, ms.statushistorikk from melding m, melding_status ms
+//                |where m.id = ms.id and order by m.opprettet desc limit 1""".trimMargin(),
+              """select m.*, ms.statushistorikk from
+                  | (select * from melding m order by m.opprettet desc limit 1) m,
+                  | melding_status ms
+                  | where m.id = ms.id""".trimMargin(),
             PersongrunnlagMeldingMapper()
         ).singleOrNull()
     }
