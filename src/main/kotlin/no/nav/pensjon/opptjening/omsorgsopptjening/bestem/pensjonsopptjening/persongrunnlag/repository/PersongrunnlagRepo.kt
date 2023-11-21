@@ -80,6 +80,7 @@ class PersongrunnlagRepo(
     fun finnNesteUprosesserte(): PersongrunnlagMelding.Mottatt? {
         return jdbcTemplate.query(
 //            """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where (ms.status->>'type' = 'Klar') or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of m skip locked""",
+            /*
             """select m.*, ms.statushistorikk 
                | from melding m 
                | join (select * from melding_status
@@ -87,6 +88,16 @@ class PersongrunnlagRepo(
                | where (ms.status->>'type' = 'Klar') 
                | or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) 
                | fetch first row only for no key update of m skip locked""".trimMargin(),
+             */
+            """ SELECT mms.*, m.id as m_id2
+                  | FROM (SELECT *, ms.statushistorikk, ms.status as ms_status, (ms.status->>'karanteneTil') as karanteneTil, m.id as m_id1
+                  |        FROM melding m,
+                  |             (SELECT * FROM melding_status WHERE (status->>'type' = 'Klar') OR (status->>'type' = 'Retry')) ms
+                  |        WHERE ms.id = m.id) mms,
+                  |        melding m
+                  |  WHERE karanteneTil is null or (karanteneTil)::timestamptz < (:now)::timestamptz
+                  |    AND m.id = mms.m_id1
+                  | FETCH FIRST ROW ONLY FOR NO KEY UPDATE OF m SKIP LOCKED""".trimMargin(),
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),
