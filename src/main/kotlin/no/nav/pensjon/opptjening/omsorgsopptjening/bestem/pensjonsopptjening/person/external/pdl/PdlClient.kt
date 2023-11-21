@@ -23,7 +23,7 @@ import java.net.URI
 internal class PdlClient(
     @Value("\${PDL_URL}") private val pdlUrl: String,
     @Qualifier("pdlTokenProvider") private val tokenProvider: TokenProvider,
-    private val registry: MeterRegistry,
+    registry: MeterRegistry,
     private val graphqlQuery: GraphqlQuery,
 ) {
     private val antallPersonerHentet = registry.counter("personer", "antall", "hentet")

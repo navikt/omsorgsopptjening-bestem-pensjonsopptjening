@@ -17,7 +17,7 @@ object Mdc {
         return MDC.get(CorrelationId.identifier).toString()
     }
 
-    fun getInnlesingId(): String? {
+    fun getInnlesingId(): String {
         return MDC.get(InnlesingId.identifier).toString()
     }
 }

@@ -34,6 +34,6 @@ data class OgVurdering(
     override val utfall: VilkårsvurderingUtfall
 ) : VilkarsVurdering<List<VilkarsVurdering<*>>>()
 
-object OgInnvilget : VilkårsvurderingUtfall.Innvilget()
+data object OgInnvilget : VilkårsvurderingUtfall.Innvilget()
 
-object OgAvslått: VilkårsvurderingUtfall.Avslag()
+data object OgAvslått: VilkårsvurderingUtfall.Avslag()

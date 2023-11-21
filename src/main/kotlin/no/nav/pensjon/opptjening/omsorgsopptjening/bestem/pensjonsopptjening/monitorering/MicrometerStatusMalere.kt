@@ -4,7 +4,7 @@ import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory
 
-class MicrometerStatusMalere(private val registry: MeterRegistry) {
+class MicrometerStatusMalere(registry: MeterRegistry) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private var status : ApplicationStatus? = null

@@ -25,7 +25,7 @@ class NavUnleashConfig(
             .apiKey(unleash_api_key)
             .build(),
             DefaultStrategy()
-        );
+        )
     }
 
     enum class Feature(val toggleName: String) {

@@ -88,12 +88,12 @@ sealed class PersongrunnlagMelding {
 
         @JsonTypeName("Ferdig")
         data class Ferdig(
-            val tidspunkt: Instant = Instant.now(),
+            val tidspunkt: Instant = now(),
         ) : Status()
 
         @JsonTypeName("Retry")
         data class Retry(
-            val tidspunkt: Instant = Instant.now(),
+            val tidspunkt: Instant = now(),
             val antallForsøk: Int = 1,
             val maxAntallForsøk: Int = 3,
             val karanteneTil: Instant = tidspunkt.plus(5, ChronoUnit.HOURS),
@@ -107,7 +107,7 @@ sealed class PersongrunnlagMelding {
                 return when {
                     antallForsøk < maxAntallForsøk -> {
                         Retry(
-                            tidspunkt = Instant.now(),
+                            tidspunkt = now(),
                             antallForsøk = antallForsøk + 1,
                             melding = melding,
                         )
@@ -126,7 +126,7 @@ sealed class PersongrunnlagMelding {
 
         @JsonTypeName("Feilet")
         data class Feilet(
-            val tidspunkt: Instant = Instant.now(),
+            val tidspunkt: Instant = now(),
         ) : Status()
     }
 }

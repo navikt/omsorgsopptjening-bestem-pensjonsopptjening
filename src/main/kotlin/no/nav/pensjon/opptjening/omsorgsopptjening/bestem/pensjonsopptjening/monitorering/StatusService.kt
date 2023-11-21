@@ -67,7 +67,7 @@ class StatusService(
     }
 
     fun gamleOppgaverSomIkkeErFerdig() : Boolean {
-        var oppgave = oppgaveRepo.finnEldsteUbehandledeOppgave()
+        val oppgave = oppgaveRepo.finnEldsteUbehandledeOppgave()
         return oppgave != null && oppgave.opprettet < 60.daysAgo // disable - ikke mulighet til å sjekke
     }
 

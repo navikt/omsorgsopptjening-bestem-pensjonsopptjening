@@ -42,6 +42,6 @@ data class EllerVurdering(
     override val utfall: VilkårsvurderingUtfall
 ) : VilkarsVurdering<List<VilkarsVurdering<*>>>()
 
-object EllerInnvilget : VilkårsvurderingUtfall.Innvilget()
+data object EllerInnvilget : VilkårsvurderingUtfall.Innvilget()
 
-object EllerAvslått : VilkårsvurderingUtfall.Avslag()
+data object EllerAvslått : VilkårsvurderingUtfall.Avslag()

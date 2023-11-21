@@ -17,7 +17,7 @@ data class FullførteBehandlinger(
         ) { "Forventet bare behandlinger for en omsorgsyter" }
     }
 
-    private fun innvilget(): FullførtBehandling? {
+    private fun innvilget(): FullførtBehandling {
         return behandlinger.single { it.erInnvilget() }
     }
 

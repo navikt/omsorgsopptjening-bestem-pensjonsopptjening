@@ -69,7 +69,7 @@ class OmsorgsyterOppfyllerAlderskravTest {
                 omsorgsAr = fødselsår.plusYears(69).year
             )
         )
-        Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vilkarsVurdering.utfall)
+        assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vilkarsVurdering.utfall)
     }
 
     @Test

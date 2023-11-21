@@ -3,66 +3,66 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 sealed class Referanse {
     abstract val henvisning: JuridiskHenvisning
 
-    object MåHaMinstHalveÅretMedOmsorgForBarnUnder6 : Referanse() {
+    data object MåHaMinstHalveÅretMedOmsorgForBarnUnder6 : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
     }
 
-    object MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre : Referanse() {
+    data object MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_b_Første_Punktum
     }
 
-    object `OpptjeningKanGodskrivesMed18,1ProsentAv4,5GHvertKalenderår` : Referanse() {
+    data object `OpptjeningKanGodskrivesMed18,1ProsentAv4,5GHvertKalenderår` : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Innledning
     }
 
-    object OmsorgsmottakerErIkkeFylt6FørUtgangAvOpptjeningsår : Referanse() {
+    data object OmsorgsmottakerErIkkeFylt6FørUtgangAvOpptjeningsår : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
     }
 
-    object HjelpestønadYtesTilMedlemUnder18 : Referanse() {
+    data object HjelpestønadYtesTilMedlemUnder18 : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Folketrygdloven_Kap_6_Paragraf_5_Første_Ledd_Første_Punktum
     }
 
-    object OmsorgsopptjeningGisTilOgMedKalenderårHjelpestønadFallerBort : Referanse() {
+    data object OmsorgsopptjeningGisTilOgMedKalenderårHjelpestønadFallerBort : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Tredje_Ledd_Første_Punktum
     }
 
-    object OmsorgsopptjeningGisTilForelderAvBarnMedForhøyetHjelpestønad : Referanse() {
+    data object OmsorgsopptjeningGisTilForelderAvBarnMedForhøyetHjelpestønad : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Første_Ledd
     }
 
-    object OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad : Referanse() {
+    data object OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Andre_Ledd_Første_Punktum
     }
 
-    object UnntakFraMinstHalvtÅrMedOmsorgForFødselår : Referanse() {
+    data object UnntakFraMinstHalvtÅrMedOmsorgForFødselår : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Andre_Punktum
     }
 
-    object OmsorgsopptjeningGisTilMottakerAvBarnetrygd : Referanse() {
+    data object OmsorgsopptjeningGisTilMottakerAvBarnetrygd : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum
     }
 
-    object OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller17TilOgMedÅretManFyller69 : Referanse() {
+    data object OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller17TilOgMedÅretManFyller69 : Referanse() {
         override val henvisning: JuridiskHenvisning = JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Andre_Ledd
     }
 
-    object OmsorgsopptjeningGisKunEnOmsorgsyterPerKalenderÅr : Referanse() {
+    data object OmsorgsopptjeningGisKunEnOmsorgsyterPerKalenderÅr : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum
     }
 
-    object OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder : Referanse() {
+    data object OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder : Referanse() {
         override val henvisning: JuridiskHenvisning =
             JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd
     }
@@ -99,7 +99,7 @@ sealed class JuridiskHenvisning(
         tekst = tekst
     )
 
-    object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum : JuridiskHenvisning(
+    data object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum : JuridiskHenvisning(
         kortTittel = "Folketrygdloven – ftrl",
         dato = "LOV-1997-02-28-19",
         kapittel = 20,
@@ -110,7 +110,7 @@ sealed class JuridiskHenvisning(
         tekst = "Medlemmet har minst halve året hatt den daglige omsorgen for et barn som ikke har fylt seks år innen årets utgang."
     )
 
-    object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Innledning : JuridiskHenvisning(
+    data object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Innledning : JuridiskHenvisning(
         kortTittel = "Folketrygdloven – ftrl",
         dato = "LOV-1997-02-28-19",
         kapittel = 20,
@@ -124,7 +124,7 @@ sealed class JuridiskHenvisning(
     )
 
 
-    object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Andre_Punktum : JuridiskHenvisning(
+    data object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Andre_Punktum : JuridiskHenvisning(
         kortTittel = "Folketrygdloven – ftrl",
         dato = "LOV-1997-02-28-19",
         kapittel = 20,
@@ -135,7 +135,7 @@ sealed class JuridiskHenvisning(
         tekst = "For barnets fødselsår opptjenes det samme beløpet selv om omsorgen har vart mindre enn et halvt år."
     )
 
-    object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum : JuridiskHenvisning(
+    data object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum : JuridiskHenvisning(
         kortTittel = "Folketrygdloven – ftrl",
         dato = "LOV-1997-02-28-19",
         kapittel = 20,
@@ -157,7 +157,7 @@ sealed class JuridiskHenvisning(
         tekst = "Medlemmet har minst halve året utført omsorgsarbeid for en syk, en funksjonshemmet eller en eldre person som selv er medlem i eller mottar pensjon fra folketrygden"
     )
 
-    object Folketrygdloven_Kap_20_Paragraf_8_Andre_Ledd : JuridiskHenvisning(
+    data object Folketrygdloven_Kap_20_Paragraf_8_Andre_Ledd : JuridiskHenvisning(
         kortTittel = "Folketrygdloven – ftrl",
         dato = "LOV-1997-02-28-19",
         kapittel = 20,
@@ -166,7 +166,7 @@ sealed class JuridiskHenvisning(
         tekst = "Det kan gis pensjonsopptjening etter første ledd fra og med det året vedkommende fyller 17 år, til og med det året vedkommende fyller 69 år."
     )
 
-    object Folketrygdloven_Kap_6_Paragraf_5_Første_Ledd_Første_Punktum : JuridiskHenvisning(
+    data object Folketrygdloven_Kap_6_Paragraf_5_Første_Ledd_Første_Punktum : JuridiskHenvisning(
         kortTittel = "Folketrygdloven – ftrl",
         dato = "LOV-1997-02-28-19",
         kapittel = 6,
@@ -176,7 +176,7 @@ sealed class JuridiskHenvisning(
         tekst = "Forhøyet hjelpestønad ytes til et medlem under 18 år som har vesentlig større behov for tilsyn, pleie og annen hjelp enn det som hjelpestønad etter § 6-4 dekker"
     )
 
-    object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum : JuridiskHenvisning(
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum : JuridiskHenvisning(
         kortTittel = "Forskrift om alderspensjon i folketrygden",
         dato = "FOR-2009-12-22-1810",
         kapittel = 3,
@@ -186,7 +186,7 @@ sealed class JuridiskHenvisning(
         tekst = "Omsorgsopptjening på grunnlag av omsorgen for ett barn eller for flere barn som bor sammen, gis bare én omsorgsyter for det enkelte kalenderår."
     )
 
-    object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd : JuridiskHenvisning(
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd : JuridiskHenvisning(
         kortTittel = "Forskrift om alderspensjon i folketrygden",
         dato = "FOR-2009-12-22-1810",
         kapittel = 3,
@@ -197,7 +197,7 @@ sealed class JuridiskHenvisning(
         """.trimIndent()
     )
 
-    object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Første_Ledd : JuridiskHenvisning(
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Første_Ledd : JuridiskHenvisning(
         kortTittel = "Forskrift om alderspensjon i folketrygden",
         dato = "FOR-2009-12-22-1810",
         kapittel = 3,
@@ -208,7 +208,7 @@ sealed class JuridiskHenvisning(
         """.trimIndent()
     )
 
-    object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Andre_Ledd_Første_Punktum : JuridiskHenvisning(
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Andre_Ledd_Første_Punktum : JuridiskHenvisning(
         kortTittel = "Forskrift om alderspensjon i folketrygden",
         dato = "FOR-2009-12-22-1810",
         kapittel = 3,
@@ -220,7 +220,7 @@ sealed class JuridiskHenvisning(
         """.trimIndent()
     )
 
-    object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Tredje_Ledd_Første_Punktum : JuridiskHenvisning(
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Tredje_Ledd_Første_Punktum : JuridiskHenvisning(
         kortTittel = "Forskrift om alderspensjon i folketrygden",
         dato = "FOR-2009-12-22-1810",
         kapittel = 3,

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 @Service
 class StatusRapporteringCachingAdapter (
     private val statusService: StatusService,
-    private val registry: MeterRegistry,
+    registry: MeterRegistry,
 ) {
     companion object {
         private lateinit var statusMalere : MicrometerStatusMalere

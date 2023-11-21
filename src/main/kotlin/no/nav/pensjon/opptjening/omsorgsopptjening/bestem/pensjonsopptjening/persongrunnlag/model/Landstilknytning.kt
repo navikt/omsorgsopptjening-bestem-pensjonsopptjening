@@ -7,20 +7,20 @@ sealed class Landstilknytning {
         /**
          * Vi kjenner ikke, eller har ikke nok informasjon til å utlede primær/sekundærland.
          */
-        object UkjentPrimærOgSekundærLand : Eøs()
+        data object UkjentPrimærOgSekundærLand : Eøs()
 
         /**
          * Norge er medansvarlig for utbetaling av ytelse og utbetaler differansen mellom annet lands ytelse og
          * ytelse man har rett til i Norge dersom denne er større. Dersom annet lands ytelse er større enn eller lik
          * Norges ytelse utbetales det ingenting fra Norge.
          */
-        object NorgeSekundærland : Eøs()
+        data object NorgeSekundærland : Eøs()
     }
 
     /**
      * Norge er hovedansvarlig for utbetaling av yelse.
      */
-    object Norge : Landstilknytning()
+    data object Norge : Landstilknytning()
 }
 
 internal fun LandstilknytningKafka.toDomain(): Landstilknytning {

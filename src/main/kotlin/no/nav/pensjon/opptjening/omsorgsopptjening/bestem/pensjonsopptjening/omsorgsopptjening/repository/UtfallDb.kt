@@ -17,16 +17,16 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 )
 internal sealed class VilkårsvurderingUtfallDb {
     @JsonTypeName("EllerAvslått")
-    object EllerAvslått : VilkårsvurderingUtfallDb()
+    data object EllerAvslått : VilkårsvurderingUtfallDb()
 
     @JsonTypeName("EllerInnvilget")
-    object EllerInnvilget : VilkårsvurderingUtfallDb()
+    data object EllerInnvilget : VilkårsvurderingUtfallDb()
 
     @JsonTypeName("OgAvslått")
-    object OgAvslått : VilkårsvurderingUtfallDb()
+    data object OgAvslått : VilkårsvurderingUtfallDb()
 
     @JsonTypeName("OgInnvilget")
-    object OgInnvilget : VilkårsvurderingUtfallDb()
+    data object OgInnvilget : VilkårsvurderingUtfallDb()
 
     @JsonTypeName("VilkårAvslag")
     data class VilkårAvslag(val henvisning: Set<JuridiskHenvisningDb>) : VilkårsvurderingUtfallDb()

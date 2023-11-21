@@ -4,7 +4,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
