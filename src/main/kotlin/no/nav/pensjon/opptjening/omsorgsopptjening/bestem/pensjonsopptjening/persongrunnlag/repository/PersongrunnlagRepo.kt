@@ -79,7 +79,14 @@ class PersongrunnlagRepo(
      */
     fun finnNesteUprosesserte(): PersongrunnlagMelding.Mottatt? {
         return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where (ms.status->>'type' = 'Klar') or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of m skip locked""",
+//            """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where (ms.status->>'type' = 'Klar') or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of m skip locked""",
+            """select m.*, ms.statushistorikk 
+               | from melding m 
+               | join (select * from melding_status
+               |       where (status->>'type' = 'Klar') or (status->>'type' = 'Retry')) ms on m.id = ms.id 
+               | where (ms.status->>'type' = 'Klar') 
+               | or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) 
+               | fetch first row only for no key update of m skip locked""".trimMargin(),
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),

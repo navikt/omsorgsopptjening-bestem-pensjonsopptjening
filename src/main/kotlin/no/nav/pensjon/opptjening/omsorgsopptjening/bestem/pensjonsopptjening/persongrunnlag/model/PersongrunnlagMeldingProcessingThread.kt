@@ -36,7 +36,10 @@ class PersongrunnlagMeldingProcessingThread(
             try {
                 if (unleash.isEnabled(NavUnleashConfig.Feature.BEHANDLING.toggleName) && datasourceReadinessCheck.isReady()) {
                     omsorgsarbeidMetricsMåling.oppdater {
-                        handler.process()
+                        handler.process() ?: run {
+                            Thread.sleep(1000)
+                            null
+                        }
                     }
                 }
             } catch (exception: Throwable) {
