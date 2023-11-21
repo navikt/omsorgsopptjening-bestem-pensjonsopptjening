@@ -66,7 +66,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
     inner class GodskrivOpptjening {
         @Test
         fun `finnNesteUprosesserte låser raden slik at den ikke plukkes opp av andre connections`() {
-            persongrunnlagRepo.persist(
+            persongrunnlagRepo.lagre(
                 PersongrunnlagMelding.Lest(
                     innhold = PersongrunnlagMeldingKafka(
                         omsorgsyter = "12345678910",
@@ -121,7 +121,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
     inner class Omsorgsarbeid {
         @Test
         fun `finnNesteUprosesserte låser raden slik at den ikke plukkes opp av andre connections`() {
-            persongrunnlagRepo.persist(
+            persongrunnlagRepo.lagre(
                 PersongrunnlagMelding.Lest(
                     innhold = PersongrunnlagMeldingKafka(
                         omsorgsyter = "12345678910",
@@ -174,7 +174,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
     inner class Oppgave {
         @Test
         fun `finnNesteUprosesserte låser raden slik at den ikke plukkes opp av andre connections`() {
-            persongrunnlagRepo.persist(
+            persongrunnlagRepo.lagre(
                 PersongrunnlagMelding.Lest(
                     innhold = PersongrunnlagMeldingKafka(
                         omsorgsyter = "12345678910",

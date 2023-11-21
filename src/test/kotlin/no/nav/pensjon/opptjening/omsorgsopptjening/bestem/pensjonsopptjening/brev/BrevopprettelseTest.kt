@@ -83,7 +83,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                 )
         )
 
-        persongrunnlagRepo.persist(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -169,7 +169,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                 )
         )
 
-        persongrunnlagRepo.persist(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -261,7 +261,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                 )
         )
 
-        persongrunnlagRepo.persist(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -328,7 +328,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                 )
         )
 
-        persongrunnlagRepo.persist(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",

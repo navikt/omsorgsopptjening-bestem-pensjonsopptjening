@@ -35,7 +35,7 @@ class PersongrunnlagKafkaListener(
         deserialize<PersongrunnlagMeldingKafka>(consumerRecord.value()).also { persongrunnlagMelding ->
             Mdc.scopedMdc(persongrunnlagMelding.correlationId) { _ ->
                 Mdc.scopedMdc(persongrunnlagMelding.innlesingId) { _ ->
-                    persongrunnlagRepo.persist(
+                    persongrunnlagRepo.lagre(
                         PersongrunnlagMelding.Lest(innhold = persongrunnlagMelding)
                     )
                     log.info("Melding prosessert")

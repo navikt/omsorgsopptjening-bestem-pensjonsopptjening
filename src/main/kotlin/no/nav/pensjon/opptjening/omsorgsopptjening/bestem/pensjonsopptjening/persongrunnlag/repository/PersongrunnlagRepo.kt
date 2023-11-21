@@ -28,45 +28,35 @@ class PersongrunnlagRepo(
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun persist(melding: PersongrunnlagMelding.Lest): PersongrunnlagMelding.Mottatt {
+    /**
+     * @return Id til rad som ble lagret i databasen - null dersom raden eksisterte fra før (duplikat)
+     */
+    fun lagre(melding: PersongrunnlagMelding.Lest): UUID? {
         val keyHolder = GeneratedKeyHolder()
-        val res = jdbcTemplate.update(
-            """insert into melding (melding, correlation_id, innlesing_id, opprettet) values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz) on conflict on constraint unique_correlation_innlesing do nothing""",
+        jdbcTemplate.update(
+            //language=postgres-psql
+            """
+                |with pg as (insert into melding (melding, correlation_id, innlesing_id, opprettet) 
+                |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz) 
+                |on conflict on constraint unique_correlation_innlesing do nothing 
+                |returning id, to_jsonb(:status::jsonb) as status, to_jsonb(:statushistorikk::jsonb) as statushistorikk)
+                |insert into melding_status (id, status, statushistorikk)
+                |select id, status, statushistorikk from pg where id is not null
+            """
+                .trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any>(
                     "melding" to serialize(melding.innhold),
                     "correlation_id" to melding.correlationId.toString(),
                     "innlesing_id" to melding.innlesingId.toString(),
                     "opprettet" to melding.opprettet.toString(),
+                    "status" to serialize(melding.status),
+                    "statushistorikk" to melding.statushistorikk.serializeList(),
                 ),
             ),
             keyHolder
         )
-        return when (res) {
-            1 -> {
-                jdbcTemplate.update(
-                    """insert into melding_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
-                    MapSqlParameterSource(
-                        mapOf<String, Any>(
-                            "id" to keyHolder.keys!!["id"] as UUID,
-                            "status" to serialize(melding.status),
-                            "statushistorikk" to melding.statushistorikk.serializeList(),
-                        ),
-                    ),
-                )
-                find(keyHolder.keys!!["id"] as UUID)
-            }
-
-            0 -> {
-                log.info("Rad med correlation_id:${melding.correlationId} for innlesing_id:${melding.innlesingId} eksisterer i databasen - hopper over duplikat")
-                find(melding.correlationId, melding.innlesingId)
-            }
-
-            else -> {
-                throw RuntimeException("Uventet verdi: $res fra insert-statement")
-            }
-        }
-
+        return keyHolder.keys?.get("id")?.let { it as UUID }
     }
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
@@ -90,21 +80,6 @@ class PersongrunnlagRepo(
             ),
             PersongrunnlagMeldingMapper()
         ).single()
-    }
-
-    private fun find(correlationId: CorrelationId, innlesingId: InnlesingId): PersongrunnlagMelding.Mottatt {
-        return jdbcTemplate.query(
-            """select id from melding where correlation_id = :cid and innlesing_id = :iid""",
-            mapOf<String, Any>(
-                "cid" to correlationId.toString(),
-                "iid" to innlesingId.toString(),
-            ),
-            ResultSetExtractor { rs ->
-                if (rs.next()) find(UUID.fromString(rs.getString("id"))) else throw RuntimeException(
-                    "Could not extract resultset"
-                )
-            }
-        )!!
     }
 
     /**

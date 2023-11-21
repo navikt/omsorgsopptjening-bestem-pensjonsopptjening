@@ -51,7 +51,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        repo.persist(
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -100,7 +100,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
         }
 
-        repo.persist(
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "04010012797",
@@ -162,7 +162,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        repo.persist(
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -227,7 +227,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             }
         }
 
-        repo.persist(
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "04010012797",
@@ -314,7 +314,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        repo.persist(
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -370,7 +370,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             }
         }
 
-        repo.persist(
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "04010012797",
@@ -424,7 +424,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        repo.persist(
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",

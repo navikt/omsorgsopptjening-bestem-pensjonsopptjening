@@ -24,7 +24,7 @@ class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
         val innlesingId = InnlesingId.generate()
         val correlationId = CorrelationId.generate()
         val persongrunnlag = persongrunnlag(innlesingId, correlationId)
-        persongrunnlagRepo.persist(persongrunnlag)
+        persongrunnlagRepo.lagre(persongrunnlag)
     }
 
     @Test
@@ -32,9 +32,13 @@ class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
         val innlesingId = InnlesingId.generate()
         val correlationId = CorrelationId.generate()
         val persongrunnlag = persongrunnlag(innlesingId, correlationId)
-        val pg1 = persongrunnlagRepo.persist(persongrunnlag)
-        val pg2 = persongrunnlagRepo.persist(persongrunnlag)
-        assertThat(pg1.id).isEqualTo(pg2.id)
+        val pg1 = persongrunnlagRepo.lagre(persongrunnlag)
+        val pg2 = persongrunnlagRepo.lagre(persongrunnlag)
+        assertThat(pg1).isNotNull()
+        assertThat(pg2).isNull()
+        assertThat(
+            persongrunnlagRepo.antallMedStatus(no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding.Status.Klar::class)
+        ).isEqualTo(1)
     }
 
     private fun persongrunnlag(innlesingId: InnlesingId, correlationId: CorrelationId) =
