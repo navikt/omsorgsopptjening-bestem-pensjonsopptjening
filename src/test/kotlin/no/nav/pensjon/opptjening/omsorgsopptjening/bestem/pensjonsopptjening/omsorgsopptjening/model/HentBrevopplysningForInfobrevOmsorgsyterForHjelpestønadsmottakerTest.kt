@@ -132,11 +132,11 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
         familierelasjoner = Familierelasjoner(
             relasjoner = listOf(
                 Familierelasjon(
-                    ident = "far",
+                    ident = Ident.FolkeregisterIdent("far"),
                     relasjon = Familierelasjon.Relasjon.FAR
                 ),
                 Familierelasjon(
-                    ident = "mor",
+                    ident = Ident.FolkeregisterIdent("mor"),
                     relasjon = Familierelasjon.Relasjon.MOR
                 )
             )
@@ -160,7 +160,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
         familierelasjoner = Familierelasjoner(
             relasjoner = listOf(
                 Familierelasjon(
-                    ident = "barn",
+                    ident = Ident.FolkeregisterIdent("barn"),
                     relasjon = Familierelasjon.Relasjon.BARN
                 ),
             )
@@ -174,7 +174,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
         familierelasjoner = Familierelasjoner(
             relasjoner = listOf(
                 Familierelasjon(
-                    ident = "barn",
+                    ident = Ident.FolkeregisterIdent("barn"),
                     relasjon = Familierelasjon.Relasjon.BARN
                 ),
             )

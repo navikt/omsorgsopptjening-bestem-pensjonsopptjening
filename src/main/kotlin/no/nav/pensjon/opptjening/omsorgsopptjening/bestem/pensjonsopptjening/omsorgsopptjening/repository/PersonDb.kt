@@ -39,7 +39,7 @@ internal fun PersonDb.toDomain(): Person {
 }
 
 internal fun Familierelasjoner.toDb(): Map<String, String> {
-    return relasjoner.associate { it.ident to it.relasjon.toString() }
+    return relasjoner.associate { it.ident.ident to it.relasjon.toString() }
 }
 
 internal fun Map<String, String>.toDomain(): Familierelasjoner {

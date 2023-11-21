@@ -32,21 +32,21 @@ data class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
 
                 when (val foreldre = omsorgsmottaker.finnForeldre()) {
                     is Foreldre.Identifisert -> {
-                        val farEllerMedMorErOmsorgsyter = foreldre.farEllerMedmor == omsorgsyter.fnr
-                        val morErOmsorgsyter = foreldre.mor == omsorgsyter.fnr
+                        val farEllerMedMorErOmsorgsyter = foreldre.farEllerMedmor.ident == omsorgsyter.fnr
+                        val morErOmsorgsyter = foreldre.mor.ident == omsorgsyter.fnr
 
                         if (!(farEllerMedMorErOmsorgsyter || morErOmsorgsyter)) {
                             return Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker(BrevÅrsak.OMSORGSYTER_IKKE_FORELDER_AV_OMSORGSMOTTAKER)
                         } else {
                             if (farEllerMedMorErOmsorgsyter && Pensjonspoeng.opptjenesForOmsorg() > hentPensjonspoengForInntekt(
-                                    foreldre.mor,
+                                    foreldre.mor.ident,
                                     omsorgsAr,
                                 ).poeng
                             ) {
                                 return Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker(BrevÅrsak.ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG)
                             }
                             if (morErOmsorgsyter && Pensjonspoeng.opptjenesForOmsorg() > hentPensjonspoengForInntekt(
-                                    foreldre.farEllerMedmor,
+                                    foreldre.farEllerMedmor.ident,
                                     omsorgsAr,
                                 ).poeng
                             ) {

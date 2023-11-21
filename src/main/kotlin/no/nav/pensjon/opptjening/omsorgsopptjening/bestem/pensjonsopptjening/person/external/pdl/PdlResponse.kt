@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjoner
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Ident
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -55,10 +56,10 @@ internal data class HentPersonQueryResponse(
     }
 
     private fun familierelasjoner(): Familierelasjoner {
-        return forelderBarnRelasjon.map {
+        return forelderBarnRelasjon.map { relasjon ->
             Familierelasjon(
-                ident = it.relatertPersonsIdent,
-                relasjon = when (it.relatertPersonsRolle) {
+                ident = relasjon.relatertPersonsIdent?.let { Ident.FolkeregisterIdent(it) } ?: Ident.Ukjent,
+                relasjon = when (relasjon.relatertPersonsRolle) {
                     ForelderBarnRelasjon.Rolle.BARN -> Familierelasjon.Relasjon.BARN
                     ForelderBarnRelasjon.Rolle.FAR -> Familierelasjon.Relasjon.FAR
                     ForelderBarnRelasjon.Rolle.MOR -> Familierelasjon.Relasjon.MOR
@@ -102,11 +103,12 @@ internal data class Foedsel(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class ForelderBarnRelasjon(
-    val relatertPersonsIdent: String,
+    val relatertPersonsIdent: String?,
     val relatertPersonsRolle: Rolle,
     val minRolleForPerson: Rolle,
     val metadata: Metadata,
     val folkeregistermetadata: Folkeregistermetadata? = null,
+    val relatertPersonUtenFolkeregisteridentifikator: RelatertPersonUtenFolkeregisterident?
 ) {
     enum class Rolle {
         FAR,
@@ -137,4 +139,11 @@ internal data class Folkeregistermetadata(
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class Endring(
     val registrert: LocalDateTime
+)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class RelatertPersonUtenFolkeregisterident(
+    //tar bare i mot et av feltene da vi uansett konverterer opplysningene til "ukjent" til domenet
+    val foedselsdato: String?
+
 )
