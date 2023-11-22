@@ -22,7 +22,7 @@ spec:
     - name: OPPGAVE_API_ID
       value: tbd
     - name: POPP_URL
-      value: https://pensjon-popp-q1.dev-fss-pub.nais.io/popp/api
+      value: https://pensjon-popp.dev-fss-pub.nais.io/popp/api
     - name: POPP_API_ID
       value: dev-fss.pensjonopptjening.pensjon-popp-q1
     - name: OMSORGSOPPTJENING_TOPIC
