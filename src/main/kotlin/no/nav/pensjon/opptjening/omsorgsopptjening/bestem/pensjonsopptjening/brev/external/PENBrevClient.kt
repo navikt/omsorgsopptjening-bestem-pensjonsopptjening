@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.time.Year
-import java.util.*
 
 @Component
 class PENBrevClient(
@@ -48,13 +47,6 @@ class PENBrevClient(
         val url = sendBrevUrl(baseUrl, sakId)
         return try {
             penBrevMetricsMåling.oppdater {
-                val brevRequest = serialize(
-                    SendBrevRequest(
-                        omsorgsår = omsorgsår,
-                        eksternReferanseId = eksternReferanseId.value,
-                        spraak = språk,
-                    )
-                )
                 val response = restTemplate.exchange(
                     url,
                     HttpMethod.POST,
@@ -117,11 +109,15 @@ class PENBrevClient(
                             }
                     }
                 }
+
                 404 -> {
-                    throw BrevClientException ("Feil fra brevtjenesten: vedtak finnes ikke")
+                    throw BrevClientException("Feil fra brevtjenesten: vedtak finnes ikke")
                 }
+
                 else -> throw BrevClientException("PEN Brev returnerte http ${ex.statusCode.value()}", ex)
             }
+        } catch(ex: BrevClientException) {
+            throw ex
         } catch (ex: Throwable) {
             """Feil ved kall til $url, feil: $ex""".let {
                 logger.warn(it, ex)

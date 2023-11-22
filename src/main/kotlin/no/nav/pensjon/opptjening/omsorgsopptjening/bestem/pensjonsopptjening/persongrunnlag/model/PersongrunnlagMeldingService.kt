@@ -36,7 +36,7 @@ class PersongrunnlagMeldingService(
 
     fun process(): FullførteBehandlinger? {
         return transactionTemplate.execute {
-            persongrunnlagRepo.finnNesteUprosesserte()?.let { melding ->
+            finnNesteMeldingForBehandling()?.let { melding ->
                 Mdc.scopedMdc(melding.correlationId) {
                     Mdc.scopedMdc(melding.innlesingId) {
                         try {
@@ -69,6 +69,13 @@ class PersongrunnlagMeldingService(
                 }
             }
         }
+    }
+
+    private fun finnNesteMeldingForBehandling() : PersongrunnlagMelding.Mottatt? {
+        return persongrunnlagRepo.finnNesteKlarTilProsessering()
+            ?: run {
+                return persongrunnlagRepo.finnNesteKlarForRetry()
+            }
     }
 
     private fun behandle(melding: PersongrunnlagMelding.Mottatt): FullførteBehandlinger {

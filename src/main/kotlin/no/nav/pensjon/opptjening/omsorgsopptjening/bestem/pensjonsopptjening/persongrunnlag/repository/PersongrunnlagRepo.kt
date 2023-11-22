@@ -77,26 +77,65 @@ class PersongrunnlagRepo(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
-    fun finnNesteUprosesserte(): PersongrunnlagMelding.Mottatt? {
-        return jdbcTemplate.query(
-           """select m.*, ms.statushistorikk 
+    fun finnNesteKlarTilProsessering(): PersongrunnlagMelding.Mottatt? {
+
+        val result = jdbcTemplate.query(
+            """select m.*, ms.statushistorikk 
              |from melding m, melding_status ms 
              |where m.id = ms.id
-             |and ((ms.status->>'type' = 'Klar') 
-             |     or (ms.status->>'type' = 'Retry' and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz)) 
+             |and (ms.status->>'type') = 'Klar' 
              |fetch first row only for no key update of m skip locked""".trimMargin(),
             mapOf(
                 "now" to Instant.now(clock).toString()
             ),
             PersongrunnlagMeldingMapper()
         ).singleOrNull()
+        println("finnNesteKlarTilProsessering: $result")
+        return result;
     }
 
-    fun finnSiste() : PersongrunnlagMelding? {
+    fun finnNesteKlarForRetry(): PersongrunnlagMelding.Mottatt? {
+
+        val now = Instant.now(clock).toString()
+
+        println("KLOKKA: $now")
+
+        val resultPre = jdbcTemplate.query(
+            """select m.*, ms.statushistorikk 
+             |from melding m, melding_status ms 
+             |where m.id = ms.id
+             |and ms.status->>'type' = 'Retry' 
+             |and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz 
+             |fetch first row only for no key update of m skip locked""".trimMargin(),
+            mapOf(
+                "now" to now
+            ),
+            SimpleStringMapper()
+        ).singleOrNull()
+        println("resPre: $resultPre")
+        // resultPre.forEach { t -> println("VALUE: $t") }
+
+        val result = jdbcTemplate.query(
+            """select m.*, ms.statushistorikk 
+             |from melding m, melding_status ms 
+             |where m.id = ms.id
+             |and ms.status->>'type' = 'Retry' 
+             |and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz 
+             |fetch first row only for no key update of m skip locked""".trimMargin(),
+            mapOf(
+                "now" to now
+            ),
+            PersongrunnlagMeldingMapper()
+        ).singleOrNull()
+        println("finnNesteKlarForRetry: $result")
+        return result;
+    }
+
+    fun finnSiste(): PersongrunnlagMelding? {
         return jdbcTemplate.query(
 //            """select m.*, ms.statushistorikk from melding m, melding_status ms
 //                |where m.id = ms.id and order by m.opprettet desc limit 1""".trimMargin(),
-              """select m.*, ms.statushistorikk from
+            """select m.*, ms.statushistorikk from
                   | (select * from melding m order by m.opprettet desc limit 1) m,
                   | melding_status ms
                   | where m.id = ms.id""".trimMargin(),
@@ -104,7 +143,7 @@ class PersongrunnlagRepo(
         ).singleOrNull()
     }
 
-    fun finnEldsteMedStatus(kclass: KClass<*>) : PersongrunnlagMelding? {
+    fun finnEldsteMedStatus(kclass: KClass<*>): PersongrunnlagMelding? {
         val name = kclass.simpleName!!
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m, melding_status ms
@@ -117,7 +156,7 @@ class PersongrunnlagRepo(
         ).singleOrNull()
     }
 
-    fun finnEldsteSomIkkeErFerdig() : PersongrunnlagMelding? {
+    fun finnEldsteSomIkkeErFerdig(): PersongrunnlagMelding? {
         val name = PersongrunnlagMelding.Status.Ferdig::class.simpleName!!
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m, melding_status ms
@@ -130,7 +169,7 @@ class PersongrunnlagRepo(
         ).singleOrNull()
     }
 
-    fun antallMedStatus(kclass: KClass<*>) : Long {
+    fun antallMedStatus(kclass: KClass<*>): Long {
         val name = kclass.simpleName!!
         return jdbcTemplate.queryForObject(
             """select count(*) from melding_status where (status->>'type' = :type)""",
@@ -149,6 +188,13 @@ class PersongrunnlagRepo(
                 innhold = deserialize(rs.getString("melding")),
                 statushistorikk = rs.getString("statushistorikk").deserializeList(),
             )
+        }
+    }
+
+    internal class SimpleStringMapper : RowMapper<String>
+    {
+        override fun mapRow(rs: ResultSet, rowNum: Int): String {
+            return rs.toString()
         }
     }
 }

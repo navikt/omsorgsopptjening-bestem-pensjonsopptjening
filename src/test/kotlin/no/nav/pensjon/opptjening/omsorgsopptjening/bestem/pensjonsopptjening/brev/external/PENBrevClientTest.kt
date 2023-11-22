@@ -54,7 +54,6 @@ class PENBrevClientTest(
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
                 val path = URL(PENBrevClient.sendBrevUrl(baseUrl,"42")).path
-                println("Wiremock-path: ${path}")
                 wiremock.givenThat(
                     post(urlPathEqualTo(path))
                         .willReturn(serverError())
@@ -177,4 +176,39 @@ class PENBrevClientTest(
         }
     }
 
+    @Test
+    fun `returnerer feilårsak dersom opprettelse av brev lykkes men med feilmelding`() {
+        val sakId = "42"
+        val path = URL(PENBrevClient.sendBrevUrl(baseUrl, sakId)).path
+        Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
+            Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
+                wiremock.givenThat(
+                    post(urlPathEqualTo(path))
+                        .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer test.token.test"))
+                        .withHeader(HttpHeaders.ACCEPT, equalTo("application/json"))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
+                        .withHeader("x-correlation-id", equalTo(correlationId.toString()))
+                        .withHeader("X-Correlation-ID", equalTo(correlationId.toString()))
+                        .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
+                        .withRequestBody(
+                            equalToJson(
+                                """{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
+                                    "eksternReferanseId":"${'$'}{json-unit.any-string}"
+                                   }""".trimMargin()
+                            )
+                        )
+                        .willReturn(
+                            ok()
+                                .withBody("""{"journalpostId":"123", "error": { "tekniskgrunn": "noe mangler", "beskrivelse": "dette kan leses"}}""")
+                                .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                        )
+                )
+                assertThatThrownBy {
+                    (client.sendBrev("42", EksternReferanseId("referanse"), Year.of(2020)))
+                }
+                    .isInstanceOf(BrevClientException::class.java)
+                    .hasMessage("Brevtjenesten svarte ok, med journalId:123 og feil, teknisk grunn:noe mangler og beskrivelse: dette kan leses")
+            }
+        }
+    }
 }
