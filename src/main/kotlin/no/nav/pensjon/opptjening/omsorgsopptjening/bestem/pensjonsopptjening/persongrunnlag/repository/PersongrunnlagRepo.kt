@@ -42,6 +42,7 @@ class PersongrunnlagRepo(
                 |returning id, to_jsonb(:status::jsonb) as status, to_jsonb(:statushistorikk::jsonb) as statushistorikk)
                 |insert into melding_status (id, status, statushistorikk)
                 |select id, status, statushistorikk from pg where id is not null
+                |returning (select id from pg)
             """
                 .trimMargin(),
             MapSqlParameterSource(
@@ -56,7 +57,8 @@ class PersongrunnlagRepo(
             ),
             keyHolder
         )
-        return keyHolder.keys?.get("id")?.let { it as UUID }
+        return keyHolder.getKeyAs(UUID::class.java)
+            .also { if (it == null) log.info("Ingen primærnøkkel returnert fra insert, meldingen med correlationId:${melding.correlationId}, innlesingId:${melding.innlesingId} er et duplikat") }
     }
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
@@ -119,7 +121,7 @@ class PersongrunnlagRepo(
         return jdbcTemplate.query(
 //            """select m.*, ms.statushistorikk from melding m, melding_status ms
 //                |where m.id = ms.id and order by m.opprettet desc limit 1""".trimMargin(),
-              """select m.*, ms.statushistorikk from
+            """select m.*, ms.statushistorikk from
                   | (select * from melding m order by m.opprettet desc limit 1) m,
                   | melding_status ms
                   | where m.id = ms.id""".trimMargin(),
