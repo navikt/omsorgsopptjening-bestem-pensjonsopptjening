@@ -17,6 +17,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
+import java.lang.RuntimeException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 @Service
@@ -120,7 +121,7 @@ class PersongrunnlagMeldingService(
 
     private fun PersongrunnlagMeldingKafka.berikDatagrunnlag(persondata: Set<Person>): BeriketDatagrunnlag {
         fun Set<Person>.finnPerson(fnr: String): Person {
-            return single { it.fnr == fnr }
+            return singleOrNull { it.identifisertAv(fnr) } ?: throw PersonIkkeIdentifisertAvIdentException()
         }
 
         return BeriketDatagrunnlag(
@@ -155,5 +156,8 @@ class PersongrunnlagMeldingService(
             correlationId = correlationId
         )
     }
+
+    class PersonIkkeIdentifisertAvIdentException(msg: String = "Person kunne ikke identifiseres av oppgitt ident") :
+        RuntimeException(msg)
 }
 

@@ -53,7 +53,7 @@ data class Familierelasjon(
     ) : this(
         when (ident == Ident.IDENT_UKJENT) {
             true -> Ident.Ukjent
-            false -> Ident.FolkeregisterIdent(ident)
+            false -> Ident.FolkeregisterIdent.Gjeldende(ident)
         },
         relasjon
     )
@@ -83,9 +83,16 @@ sealed class Foreldre {
 sealed class Ident {
     abstract val ident: String
 
-    data class FolkeregisterIdent(
-        override val ident: String
-    ) : Ident()
+    sealed class FolkeregisterIdent : Ident() {
+
+        data class Gjeldende(
+            override val ident: String
+        ) : FolkeregisterIdent()
+
+        data class Historisk(
+            override val ident: String
+        ) : FolkeregisterIdent()
+    }
 
     data object Ukjent : Ident() {
         override val ident: String = IDENT_UKJENT

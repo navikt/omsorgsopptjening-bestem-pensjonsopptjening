@@ -1,8 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.Month
 
@@ -12,16 +14,16 @@ class PersonTest {
     private val nittenfemtiseks = LocalDate.of(1956, Month.JANUARY, 1)
 
     private val personAprilNittenÅttiFem = Person(
-        fnr = "01048512345",
         fødselsdato = aprilNittenÅttiFem,
         dødsdato = null,
-        familierelasjoner = Familierelasjoner(emptyList())
+        familierelasjoner = Familierelasjoner(emptyList()),
+        identhistorikk = IdentHistorikk(setOf(Ident.FolkeregisterIdent.Gjeldende("01048512345")))
     )
     private val personNittenFemtiSeks = Person(
-        fnr = "12345678910",
         fødselsdato = nittenfemtiseks,
         dødsdato = null,
-        familierelasjoner = Familierelasjoner(emptyList())
+        familierelasjoner = Familierelasjoner(emptyList()),
+        identhistorikk = IdentHistorikk(setOf(Ident.FolkeregisterIdent.Gjeldende("12345678910")))
     )
 
     @Test
@@ -58,7 +60,13 @@ class PersonTest {
     fun `Gitt en person med lik fnr så skal equals være true`() {
         assertEquals(
             personNittenFemtiSeks,
-            Person("12345678910", nittenfemtiseks, null, Familierelasjoner(emptyList()))
+            Person(
+                fødselsdato = nittenfemtiseks,
+                dødsdato = null,
+                familierelasjoner = Familierelasjoner(emptyList()),
+                identhistorikk = IdentHistorikk(setOf(Ident.FolkeregisterIdent.Gjeldende("12345678910")))
+
+            )
         )
     }
 
@@ -71,7 +79,12 @@ class PersonTest {
     fun `Gitt en person med samme fødsels nummer men annet fødelsdato enn person 2 så skal equals være true`() {
         assertEquals(
             personNittenFemtiSeks,
-            Person("12345678910", nittenfemtiseks.plusYears(1), null, Familierelasjoner(emptyList()))
+            Person(
+                fødselsdato = nittenfemtiseks.plusYears(1),
+                dødsdato = null,
+                familierelasjoner = Familierelasjoner(emptyList()),
+                identhistorikk = IdentHistorikk(setOf(Ident.FolkeregisterIdent.Gjeldende("12345678910")))
+            )
         )
     }
 
@@ -79,7 +92,12 @@ class PersonTest {
     fun `Gitt en person med annet fødsels nummer enn person 2 så skal equals være false`() {
         assertNotEquals(
             personNittenFemtiSeks,
-            Person("12345678911", nittenfemtiseks, null, Familierelasjoner(emptyList()))
+            Person(
+                fødselsdato = nittenfemtiseks,
+                dødsdato = null,
+                familierelasjoner = Familierelasjoner(emptyList()),
+                identhistorikk = IdentHistorikk(setOf(Ident.FolkeregisterIdent.Gjeldende("12345678911")))
+            )
         )
     }
 
@@ -94,5 +112,61 @@ class PersonTest {
             personNittenFemtiSeks.hashCode(),
             personNittenFemtiSeks.hashCode()
         )
+    }
+
+    @Test
+    fun `En person kan identifiseres av flere fødselsnummer`() {
+        val id1 = "12345678911"
+        val id2 = "12345678912"
+        val id3 = "bogus"
+
+        val person = Person(
+            fødselsdato = nittenfemtiseks,
+            dødsdato = null,
+            familierelasjoner = Familierelasjoner(emptyList()),
+            identhistorikk = IdentHistorikk(
+                setOf(
+                    Ident.FolkeregisterIdent.Gjeldende(id1),
+                    Ident.FolkeregisterIdent.Historisk(id2),
+                )
+            )
+        )
+
+        assertThat(person.identifisertAv(id1)).isTrue()
+        assertThat(person.identifisertAv(id2)).isTrue()
+        assertThat(person.identifisertAv(id3)).isFalse()
+    }
+
+    @Test
+    fun `Kaster exception dersom en person har 0 gjeldende identer`() {
+        assertThrows<IdentHistorikk.IdentHistorikkManglerGjeldendeException> {
+            Person(
+                fødselsdato = nittenfemtiseks,
+                dødsdato = null,
+                familierelasjoner = Familierelasjoner(emptyList()),
+                identhistorikk = IdentHistorikk(
+                    setOf(
+                        Ident.FolkeregisterIdent.Historisk("1"),
+                    )
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `Kaster exception dersom en person har mange gjeldende identer`() {
+        assertThrows<IdentHistorikk.IdentHistorikkManglerGjeldendeException> {
+            Person(
+                fødselsdato = nittenfemtiseks,
+                dødsdato = null,
+                familierelasjoner = Familierelasjoner(emptyList()),
+                identhistorikk = IdentHistorikk(
+                    setOf(
+                        Ident.FolkeregisterIdent.Gjeldende("1"),
+                        Ident.FolkeregisterIdent.Gjeldende("2"),
+                    )
+                )
+            )
+        }
     }
 }
