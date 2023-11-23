@@ -37,11 +37,21 @@ class PersongrunnlagRepo(
             keyHolder
         )
         jdbcTemplate.update(
-            """insert into melding_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
+            """insert into melding_status (id, status, statushistorikk, status_type, karantene_til) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb),:statusType, :karanteneTil)""",
             MapSqlParameterSource(
-                mapOf<String, Any>(
+                mapOf<String, Any?>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(melding.status),
+                    "statusType" to when(melding.status) {
+                        is PersongrunnlagMelding.Status.Feilet -> "Feilet"
+                        is PersongrunnlagMelding.Status.Ferdig -> "Ferdig"
+                        is PersongrunnlagMelding.Status.Klar -> "Klar"
+                        is PersongrunnlagMelding.Status.Retry -> "Retry"
+                    },
+                    "karanteneTil" to when (val m = melding.status) {
+                        is PersongrunnlagMelding.Status.Retry -> m.karanteneTil
+                        else -> null
+                     },
                     "statushistorikk" to melding.statushistorikk.serializeList(),
                 ),
             ),
@@ -51,11 +61,21 @@ class PersongrunnlagRepo(
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
         jdbcTemplate.update(
-            """update melding_status set status = to_jsonb(:status::jsonb), statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
+            """update melding_status set status = to_jsonb(:status::jsonb), status_type = :statusType, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
             MapSqlParameterSource(
-                mapOf<String, Any>(
+                mapOf<String, Any?>(
                     "id" to melding.id,
                     "status" to serialize(melding.status),
+                    "statusType" to when(melding.status) {
+                        is PersongrunnlagMelding.Status.Feilet -> "Feilet"
+                        is PersongrunnlagMelding.Status.Ferdig -> "Ferdig"
+                        is PersongrunnlagMelding.Status.Klar -> "Klar"
+                        is PersongrunnlagMelding.Status.Retry -> "Retry"
+                    },
+                    "karanteneTil" to when (val m = melding.status) {
+                        is PersongrunnlagMelding.Status.Retry -> m.karanteneTil.toString()
+                        else -> null
+                    },
                     "statushistorikk" to melding.statushistorikk.serializeList()
                 ),
             ),
@@ -83,7 +103,7 @@ class PersongrunnlagRepo(
             """select m.*, ms.statushistorikk 
              |from melding m, melding_status ms 
              |where m.id = ms.id
-             |and (ms.status->>'type') = 'Klar' 
+             |and ms.status_type = 'Klar' 
              |fetch first row only for no key update of m skip locked""".trimMargin(),
             mapOf(
                 "now" to Instant.now(clock).toString()
@@ -98,8 +118,8 @@ class PersongrunnlagRepo(
             """select m.*, ms.statushistorikk 
              |from melding m, melding_status ms 
              |where m.id = ms.id
-             |and ms.status->>'type' = 'Retry' 
-             |and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz 
+             |and status_type = 'Retry' 
+             |and karantene_til < (:now)::timestamptz
              |fetch first row only for no key update of m skip locked""".trimMargin(),
             mapOf(
                 "now" to now
