@@ -138,7 +138,7 @@ class BrevProsesseringTest(
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        val (behandling, brev) = persongrunnlagRepo.persist(
+        val (behandling, brev) = persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -239,7 +239,7 @@ class BrevProsesseringTest(
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        val (behandling, brev) = persongrunnlagRepo.persist(
+        val (behandling, brev) = persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",

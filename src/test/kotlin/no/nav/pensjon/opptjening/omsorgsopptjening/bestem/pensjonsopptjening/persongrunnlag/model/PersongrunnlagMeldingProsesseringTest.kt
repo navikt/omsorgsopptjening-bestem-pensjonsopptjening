@@ -110,7 +110,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        val melding = repo.persist(
+        val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -138,13 +138,13 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, repo.find(melding.id).status)
+        assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, repo.find(melding!!).status)
 
         assertThrows<PersonOppslagException> {
             handler.process()
         }
 
-        repo.find(melding.id).let { m ->
+        repo.find(melding).let { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, m.status).let {
                 assertEquals(1, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
@@ -156,7 +156,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             handler.process()
         }
 
-        repo.find(melding.id).let { m ->
+        repo.find(melding).let { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, m.status).let {
                 assertEquals(2, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
@@ -214,7 +214,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         )
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        val melding = repo.persist(
+        val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -242,31 +242,31 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        assertThat(repo.find(melding.id).status)
+        assertThat(repo.find(melding!!).status)
             .isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
 
         assertThrows<PersonOppslagException> {
             handler.process()
         }
-        assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding.id).status).also {
+        assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertEquals(1, it.antallForsøk)
         }
 
         assertThat( handler.process()).isNull()
 
-        assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding.id).status).also {
+        assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertThat(it.antallForsøk).isOne()
         }
 
         assertThat(handler.process()).isNull()
 
-        assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding.id).status).also {
+        assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertEquals(1, it.antallForsøk)
         }
 
         assertEquals(1, handler.process()!!.antallBehandlinger())
 
-        assertInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java, repo.find(melding.id).status)
+        assertInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java, repo.find(melding).status)
     }
 
     @Test
@@ -301,7 +301,10 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        val melding = repo.persist(
+        val innlesingId = InnlesingId.generate()
+        val correlationId = CorrelationId.generate()
+
+        val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -323,13 +326,13 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                         ),
                     ),
                     rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
+                    innlesingId = innlesingId,
+                    correlationId = correlationId,
                 )
             ),
         )
 
-        assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, repo.find(melding.id).status)
+        assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, repo.find(melding!!).status)
 
         assertThrows<PersonOppslagException> {
             handler.process()
@@ -346,7 +349,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertEquals(null, handler.process())
 
-        repo.find(melding.id).also { m ->
+        repo.find(melding).also { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, m.statushistorikk[0])
             assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, m.statushistorikk[1]).also {
                 assertEquals(1, it.antallForsøk)
@@ -380,7 +383,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertEquals(0, behandlingRepo.finnForOmsorgsyter("12345678910").count())
 
-        oppgaveRepo.findForMelding(melding.id).single().also { oppgave ->
+        oppgaveRepo.findForMelding(melding).single().also { oppgave ->
             assertEquals(
                 OppgaveDetaljer.MottakerOgTekst(
                     oppgavemottaker = "12345678910",
@@ -389,9 +392,9 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 oppgave.detaljer
             )
             assertEquals(null, oppgave.behandlingId)
-            assertEquals(melding.id, oppgave.meldingId)
-            assertEquals(melding.correlationId, oppgave.correlationId)
-            assertEquals(melding.innlesingId, oppgave.innlesingId)
+            assertEquals(melding, oppgave.meldingId)
+            assertEquals(correlationId, oppgave.correlationId)
+            assertEquals(innlesingId, oppgave.innlesingId)
             assertInstanceOf(Oppgave.Status.Klar::class.java, oppgave.status)
         }
     }

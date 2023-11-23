@@ -90,7 +90,10 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
 
-        val melding = repo.persist(
+        val innlesingId = InnlesingId.generate()
+        val correlationId = CorrelationId.generate()
+
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -112,8 +115,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                         ),
                     ),
                     rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
+                    innlesingId = innlesingId,
+                    correlationId = correlationId,
                 )
             ),
         )
@@ -122,8 +125,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
                 assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                 assertEquals(behandling.id, it.behandlingId)
-                assertEquals(melding.correlationId, it.correlationId)
-                assertEquals(melding.innlesingId, it.innlesingId)
+                assertEquals(correlationId, it.correlationId)
+                assertEquals(innlesingId, it.innlesingId)
                 assertEquals(behandling.omsorgsyter, it.omsorgsyter)
             }
 
@@ -172,7 +175,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
 
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
-        val melding = repo.persist(
+        val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -212,7 +215,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
 
             assertInstanceOf(
                 GodskrivOpptjening.Persistent::class.java,
-                godskrivOpptjeningRepo.findForMelding(melding.id).single()
+                godskrivOpptjeningRepo.findForMelding(melding!!).single()
             ).also {
                 assertInstanceOf(GodskrivOpptjening.Status.Ferdig::class.java, it.status)
             }
@@ -235,7 +238,10 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
 
-        val melding = repo.persist(
+        val innlesingId = InnlesingId.generate()
+        val correlationId = CorrelationId.generate()
+
+        val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -257,8 +263,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                         ),
                     ),
                     rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
+                    innlesingId = innlesingId,
+                    correlationId = correlationId,
                 )
             ),
         )
@@ -268,8 +274,8 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
             godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
                 assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                 assertEquals(behandling.id, it.behandlingId)
-                assertEquals(melding.correlationId, it.correlationId)
-                assertEquals(melding.innlesingId, it.innlesingId)
+                assertEquals(correlationId, it.correlationId)
+                assertEquals(innlesingId, it.innlesingId)
                 assertEquals(behandling.omsorgsyter, it.omsorgsyter)
             }
 

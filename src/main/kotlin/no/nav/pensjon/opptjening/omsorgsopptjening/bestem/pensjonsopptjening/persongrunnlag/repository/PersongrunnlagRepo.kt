@@ -5,6 +5,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -21,42 +23,41 @@ class PersongrunnlagRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
     private val clock: Clock = Clock.systemUTC()
 ) {
+    private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun persist(melding: PersongrunnlagMelding.Lest): PersongrunnlagMelding.Mottatt {
+    /**
+     * @return Id til rad som ble lagret i databasen - null dersom raden eksisterte fra før (duplikat)
+     */
+    fun lagre(melding: PersongrunnlagMelding.Lest): UUID? {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into melding (melding, correlation_id, innlesing_id, opprettet) values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz)""",
+            //language=postgres-psql
+            """
+                |with pg as (insert into melding (melding, correlation_id, innlesing_id, opprettet) 
+                |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz) 
+                |on conflict on constraint unique_correlation_innlesing do nothing 
+                |returning id, to_jsonb(:status::jsonb) as status, to_jsonb(:statushistorikk::jsonb) as statushistorikk, :statusType as statusType, :karanteneTil::timestamptz as karanteneTil)
+                |insert into melding_status (id, status, statushistorikk, status_type, karantene_til)
+                |select id, status, statushistorikk, statusType, karanteneTil from pg where id is not null
+                |returning (select id from pg)
+            """
+                .trimMargin(),
             MapSqlParameterSource(
-                mapOf<String, Any>(
+                mapOf<String, Any?>(
                     "melding" to serialize(melding.innhold),
                     "correlation_id" to melding.correlationId.toString(),
                     "innlesing_id" to melding.innlesingId.toString(),
                     "opprettet" to melding.opprettet.toString(),
+                    "status" to serialize(melding.status),
+                    "statusType" to "Klar",
+                    "karanteneTil" to null,
+                    "statushistorikk" to melding.statushistorikk.serializeList(),
                 ),
             ),
             keyHolder
         )
-        jdbcTemplate.update(
-            """insert into melding_status (id, status, statushistorikk, status_type, karantene_til) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb),:statusType, :karanteneTil)""",
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to keyHolder.keys!!["id"] as UUID,
-                    "status" to serialize(melding.status),
-                    "statusType" to when(melding.status) {
-                        is PersongrunnlagMelding.Status.Feilet -> "Feilet"
-                        is PersongrunnlagMelding.Status.Ferdig -> "Ferdig"
-                        is PersongrunnlagMelding.Status.Klar -> "Klar"
-                        is PersongrunnlagMelding.Status.Retry -> "Retry"
-                    },
-                    "karanteneTil" to when (val m = melding.status) {
-                        is PersongrunnlagMelding.Status.Retry -> m.karanteneTil
-                        else -> null
-                     },
-                    "statushistorikk" to melding.statushistorikk.serializeList(),
-                ),
-            ),
-        )
-        return find(keyHolder.keys!!["id"] as UUID)
+        return keyHolder.getKeyAs(UUID::class.java)
+            .also { if (it == null) log.info("Ingen primærnøkkel returnert fra insert, meldingen med correlationId:${melding.correlationId}, innlesingId:${melding.innlesingId} er et duplikat") }
     }
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
@@ -66,7 +67,7 @@ class PersongrunnlagRepo(
                 mapOf<String, Any?>(
                     "id" to melding.id,
                     "status" to serialize(melding.status),
-                    "statusType" to when(melding.status) {
+                    "statusType" to when (melding.status) {
                         is PersongrunnlagMelding.Status.Feilet -> "Feilet"
                         is PersongrunnlagMelding.Status.Ferdig -> "Ferdig"
                         is PersongrunnlagMelding.Status.Klar -> "Klar"
@@ -188,8 +189,7 @@ class PersongrunnlagRepo(
         }
     }
 
-    internal class SimpleStringMapper : RowMapper<String>
-    {
+    internal class SimpleStringMapper : RowMapper<String> {
         override fun mapRow(rs: ResultSet, rowNum: Int): String {
             return rs.toString()
         }

@@ -1,0 +1,1 @@
+alter table melding add constraint unique_correlation_innlesing unique (correlation_id, innlesing_id);

@@ -94,8 +94,7 @@ object StatusServiceTest {
     }
 
     private fun lagOgLagreMelding(opprettet: Instant = now()): PersongrunnlagMelding.Mottatt {
-        val melding = personGrunnlagMelding(opprettet)
-        return personGrunnlagRepo.persist(melding)
+        return lagreOgHent(personGrunnlagMelding(opprettet))
     }
 
     private fun endreStatusTilFeilet(mottatt: PersongrunnlagMelding.Mottatt): PersongrunnlagMelding.Mottatt {
@@ -207,7 +206,7 @@ object StatusServiceTest {
     @Order(2)
     fun testOK() {
         val melding = personGrunnlagMelding(now())
-        personGrunnlagRepo.persist(melding)
+        personGrunnlagRepo.lagre(melding)
         val status = statusService.checkStatus()
         assertThat(status).isEqualTo(ApplicationStatus.OK)
     }
@@ -216,7 +215,7 @@ object StatusServiceTest {
     @Order(3)
     fun testForGammeMelding() {
         val melding = personGrunnlagMelding(700.daysAgo)
-        personGrunnlagRepo.persist(melding)
+        personGrunnlagRepo.lagre(melding)
         val status = statusService.checkStatus()
         assertThat(status).isEqualTo(ApplicationStatus.Feil("Siste melding er for gammel"))
     }
@@ -243,7 +242,7 @@ object StatusServiceTest {
     @Order(6)
     fun testGammelOppgaveIkkeFerdig() {
         val melding = personGrunnlagMelding(now())
-        val mottatt = personGrunnlagRepo.persist(melding)
+        val mottatt = lagreOgHent(melding)
 
         val uuid = UUID.randomUUID()
 
@@ -265,7 +264,7 @@ object StatusServiceTest {
         val uuid1 = UUID.randomUUID()
 
         val melding = personGrunnlagMelding(now())
-        val mottatt = personGrunnlagRepo.persist(melding)
+        val mottatt = lagreOgHent(melding)
 
         lagreDummyBehandling(uuid1, mottatt)
         lagreDummyOppgave(uuid1, mottatt, now())
@@ -296,5 +295,9 @@ object StatusServiceTest {
         jdbcTemplate.queryForList("select * from brev", emptyMap<String, Any>()).forEach { println(" brev $it") }
         jdbcTemplate.queryForList("select * from brev_status", emptyMap<String, Any>())
             .forEach { println(" brev_status $it") }
+    }
+
+    private fun lagreOgHent(melding: PersongrunnlagMelding.Lest): PersongrunnlagMelding.Mottatt {
+        return personGrunnlagRepo.lagre(melding).let { personGrunnlagRepo.find(it!!) }
     }
 }
