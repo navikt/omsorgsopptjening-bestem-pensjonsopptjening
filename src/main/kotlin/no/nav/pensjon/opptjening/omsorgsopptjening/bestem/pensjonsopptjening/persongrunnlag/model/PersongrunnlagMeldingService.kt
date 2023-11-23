@@ -36,39 +36,51 @@ class PersongrunnlagMeldingService(
 
     fun process(): FullførteBehandlinger? {
         return transactionTemplate.execute {
-            persongrunnlagRepo.finnNesteUprosesserte()?.let { melding ->
-                Mdc.scopedMdc(melding.correlationId) {
-                    Mdc.scopedMdc(melding.innlesingId) {
-                        try {
-                            transactionTemplate.execute {
-                                behandle(melding).let { fullførte ->
-                                    persongrunnlagRepo.updateStatus(melding.ferdig())
-                                    fullførte.also {
-                                        it.håndterUtfall(
-                                            innvilget = ::håndterInnvilgelse,
-                                            manuell = oppgaveService::opprettOppgaveHvisNødvendig,
-                                            avslag = {} //noop
-                                        )
-                                        log.info("Melding prosessert")
+            try {
+                finnNesteMeldingForBehandling()?.let { melding ->
+                    Mdc.scopedMdc(melding.correlationId) {
+                        Mdc.scopedMdc(melding.innlesingId) {
+                            try {
+                                log.info("Started behandling av melding")
+                                transactionTemplate.execute {
+                                    behandle(melding).let { fullførte ->
+                                        persongrunnlagRepo.updateStatus(melding.ferdig())
+                                        fullførte.also {
+                                            it.håndterUtfall(
+                                                innvilget = ::håndterInnvilgelse,
+                                                manuell = oppgaveService::opprettOppgaveHvisNødvendig,
+                                                avslag = {} //noop
+                                            )
+                                            log.info("Melding prosessert")
+                                        }
                                     }
                                 }
-                            }
-                        } catch (ex: Throwable) {
-                            transactionTemplate.execute {
-                                melding.retry(ex.stackTraceToString()).let { melding ->
-                                    melding.opprettOppgave()?.let {
-                                        log.error("Gir opp videre prosessering av melding")
-                                        oppgaveService.opprett(it)
+                            } catch (ex: Throwable) {
+                                transactionTemplate.execute {
+                                    melding.retry(ex.stackTraceToString()).let { melding ->
+                                        melding.opprettOppgave()?.let {
+                                            log.error("Gir opp videre prosessering av melding")
+                                            oppgaveService.opprett(it)
+                                        }
+                                        persongrunnlagRepo.updateStatus(melding)
                                     }
-                                    persongrunnlagRepo.updateStatus(melding)
                                 }
+                                throw ex
+                            } finally {
+                                log.info("Avsluttet behandling av melding")
                             }
-                            throw ex
                         }
                     }
                 }
+            } catch (ex: Throwable) {
+                log.error("Fikk exception ved uthenting av melding", ex)
+                throw ex
             }
         }
+    }
+
+    private fun finnNesteMeldingForBehandling() : PersongrunnlagMelding.Mottatt? {
+        return persongrunnlagRepo.finnNesteKlarTilProsessering() ?: persongrunnlagRepo.finnNesteKlarForRetry()
     }
 
     private fun behandle(melding: PersongrunnlagMelding.Mottatt): FullførteBehandlinger {

@@ -19,6 +19,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -177,6 +178,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         }
     }
 
+    // TOOD: JKR: denne testen kan ikke kjøres isolert
     @Test
     fun `gitt at prosessering ender med retry, havner den aktuelle raden i karantene før den forsøkes på nytt igjen`() {
         wiremock.stubFor(
@@ -202,10 +204,13 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 )
         )
         given(clock.instant()).willReturn(
+            // TODO: Må finne en annen løsning på dette
             Clock.systemUTC().instant(), //karantene
+            Clock.systemUTC().instant().plus(1, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
+            Clock.systemUTC().instant().plus(3, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(6, ChronoUnit.HOURS), //karantenetid utløpt
+            Clock.systemUTC().instant().plus(10, ChronoUnit.HOURS), //karantenetid utløpt
         )
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
@@ -237,7 +242,8 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, repo.find(melding!!).status)
+        assertThat(repo.find(melding!!).status)
+            .isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
 
         assertThrows<PersonOppslagException> {
             handler.process()
@@ -246,13 +252,13 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             assertEquals(1, it.antallForsøk)
         }
 
-        assertEquals(null, handler.process())
+        assertThat( handler.process()).isNull()
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
-            assertEquals(1, it.antallForsøk)
+            assertThat(it.antallForsøk).isOne()
         }
 
-        assertEquals(null, handler.process())
+        assertThat(handler.process()).isNull()
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertEquals(1, it.antallForsøk)

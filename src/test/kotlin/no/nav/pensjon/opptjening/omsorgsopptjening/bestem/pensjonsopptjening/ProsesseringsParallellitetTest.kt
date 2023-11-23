@@ -151,21 +151,21 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
-                Assertions.assertNotNull(persongrunnlagRepo.finnNesteUprosesserte())
+                Assertions.assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering())
 
                 //opprett ny transaksjon mens den forrige fortsatt lever
                 transactionTemplate.execute {
                     //skal ikke finne noe siden raden er låst pga "select for update skip locked"
-                    assertNull(persongrunnlagRepo.finnNesteUprosesserte())
+                    assertNull(persongrunnlagRepo.finnNesteKlarTilProsessering())
                 }
                 //fortsatt samme transaksjon
-                Assertions.assertNotNull(persongrunnlagRepo.finnNesteUprosesserte())
+                Assertions.assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering())
             } //rad ikke låst lenger ved transaksjon slutt
 
 
             //ny transaksjon finner raden da den ikke lenger er låst
             transactionTemplate.execute {
-                Assertions.assertNotNull(persongrunnlagRepo.finnNesteUprosesserte())
+                Assertions.assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering())
             }
         }
     }
