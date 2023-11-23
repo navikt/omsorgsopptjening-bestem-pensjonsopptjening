@@ -79,7 +79,7 @@ class PersongrunnlagRepo(
      */
     fun finnNesteKlarTilProsessering(): PersongrunnlagMelding.Mottatt? {
 
-        val result = jdbcTemplate.query(
+        return jdbcTemplate.query(
             """select m.*, ms.statushistorikk 
              |from melding m, melding_status ms 
              |where m.id = ms.id
@@ -90,32 +90,11 @@ class PersongrunnlagRepo(
             ),
             PersongrunnlagMeldingMapper()
         ).singleOrNull()
-        println("finnNesteKlarTilProsessering: $result")
-        return result;
     }
 
     fun finnNesteKlarForRetry(): PersongrunnlagMelding.Mottatt? {
-
         val now = Instant.now(clock).toString()
-
-        println("KLOKKA: $now")
-
-        val resultPre = jdbcTemplate.query(
-            """select m.*, ms.statushistorikk 
-             |from melding m, melding_status ms 
-             |where m.id = ms.id
-             |and ms.status->>'type' = 'Retry' 
-             |and (ms.status->>'karanteneTil')::timestamptz < (:now)::timestamptz 
-             |fetch first row only for no key update of m skip locked""".trimMargin(),
-            mapOf(
-                "now" to now
-            ),
-            SimpleStringMapper()
-        ).singleOrNull()
-        println("resPre: $resultPre")
-        // resultPre.forEach { t -> println("VALUE: $t") }
-
-        val result = jdbcTemplate.query(
+        return jdbcTemplate.query(
             """select m.*, ms.statushistorikk 
              |from melding m, melding_status ms 
              |where m.id = ms.id
@@ -127,8 +106,6 @@ class PersongrunnlagRepo(
             ),
             PersongrunnlagMeldingMapper()
         ).singleOrNull()
-        println("finnNesteKlarForRetry: $result")
-        return result;
     }
 
     fun finnSiste(): PersongrunnlagMelding? {
