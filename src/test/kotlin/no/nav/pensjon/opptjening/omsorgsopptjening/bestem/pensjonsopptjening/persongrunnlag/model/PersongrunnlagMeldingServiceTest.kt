@@ -1742,7 +1742,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 )
         )
 
-        repo.persist(
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = omsorgsyterGammeltFnr,
