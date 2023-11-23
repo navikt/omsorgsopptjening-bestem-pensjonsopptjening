@@ -9,15 +9,15 @@ class FamilierelasjonerTest {
         Familierelasjoner(
             relasjoner = listOf(
                 Familierelasjon(
-                    ident = Ident.FolkeregisterIdent("far"),
+                    ident = Ident.FolkeregisterIdent.Gjeldende("far"),
                     relasjon = Familierelasjon.Relasjon.FAR
                 ),
                 Familierelasjon(
-                    ident = Ident.FolkeregisterIdent("mor"),
+                    ident = Ident.FolkeregisterIdent.Gjeldende("mor"),
                     relasjon = Familierelasjon.Relasjon.MOR
                 ),
                 Familierelasjon(
-                    ident = Ident.FolkeregisterIdent("barn"),
+                    ident = Ident.FolkeregisterIdent.Gjeldende("barn"),
                     relasjon = Familierelasjon.Relasjon.BARN
                 ),
             )
@@ -30,8 +30,8 @@ class FamilierelasjonerTest {
             assertThat(it.erForelder("ikkemor")).isFalse()
             assertThat(it.finnForeldre()).isEqualTo(
                 Foreldre.Identifisert(
-                    farEllerMedmor = Ident.FolkeregisterIdent(ident = "far"),
-                    mor = Ident.FolkeregisterIdent(ident = "mor")
+                    farEllerMedmor = Ident.FolkeregisterIdent.Gjeldende(ident = "far"),
+                    mor = Ident.FolkeregisterIdent.Gjeldende(ident = "mor")
                 )
             )
         }
@@ -42,15 +42,15 @@ class FamilierelasjonerTest {
         Familierelasjoner(
             relasjoner = listOf(
                 Familierelasjon(
-                    ident = Ident.FolkeregisterIdent("medmor"),
+                    ident = Ident.FolkeregisterIdent.Gjeldende("medmor"),
                     relasjon = Familierelasjon.Relasjon.MEDMOR
                 ),
                 Familierelasjon(
-                    ident = Ident.FolkeregisterIdent("mor"),
+                    ident = Ident.FolkeregisterIdent.Gjeldende("mor"),
                     relasjon = Familierelasjon.Relasjon.MOR
                 ),
                 Familierelasjon(
-                    ident = Ident.FolkeregisterIdent("barn"),
+                    ident = Ident.FolkeregisterIdent.Gjeldende("barn"),
                     relasjon = Familierelasjon.Relasjon.BARN
                 ),
             )
@@ -63,8 +63,8 @@ class FamilierelasjonerTest {
             assertThat(it.erForelder("ikkemor")).isFalse()
             assertThat(it.finnForeldre()).isEqualTo(
                 Foreldre.Identifisert(
-                    farEllerMedmor = Ident.FolkeregisterIdent(ident = "medmor"),
-                    mor = Ident.FolkeregisterIdent(ident = "mor")
+                    farEllerMedmor = Ident.FolkeregisterIdent.Gjeldende(ident = "medmor"),
+                    mor = Ident.FolkeregisterIdent.Gjeldende(ident = "mor")
                 )
             )
         }
@@ -79,11 +79,11 @@ class FamilierelasjonerTest {
                     relasjon = Familierelasjon.Relasjon.FAR
                 ),
                 Familierelasjon(
-                    ident = Ident.FolkeregisterIdent("mor"),
+                    ident = Ident.FolkeregisterIdent.Gjeldende("mor"),
                     relasjon = Familierelasjon.Relasjon.MOR
                 ),
                 Familierelasjon(
-                    ident = Ident.FolkeregisterIdent("barn"),
+                    ident = Ident.FolkeregisterIdent.Gjeldende("barn"),
                     relasjon = Familierelasjon.Relasjon.BARN
                 ),
             )

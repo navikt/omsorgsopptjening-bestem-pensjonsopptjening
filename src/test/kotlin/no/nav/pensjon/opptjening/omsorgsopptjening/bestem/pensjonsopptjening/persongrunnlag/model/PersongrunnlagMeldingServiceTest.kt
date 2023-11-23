@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
@@ -32,6 +33,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -995,7 +997,10 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 "12345678910",
                 "01052012345"
             )
-            assertTrue(behandlinger.alle().last().vilkårsvurdering.erEnesteAvslag<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>())
+            assertTrue(
+                behandlinger.alle()
+                    .last().vilkårsvurdering.erEnesteAvslag<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering>()
+            )
         }
     }
 
@@ -1706,6 +1711,81 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                     ), vurdering.grunnlag.gyldigeOmsorgsmåneder.alleMåneder()
                 )
             }
+        }
+    }
+
+
+    @Test
+    fun `utdaterte identer oppdateres med gjeldende ident fra PDL`() {
+        val omsorgsyterGammeltFnr = "61018212345"
+        val omsorgsyterNyttFnr = "01018212345"
+        val omsorgsmottakerGammeltFnr = "67081812345"
+        val omsorgsmottakerNyttFnr = "07081812345"
+
+        wiremock.givenThat(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                .withRequestBody(containing(omsorgsyterGammeltFnr))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_1bruk_pluss_historisk.json")
+                )
+        )
+
+        wiremock.givenThat(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                .withRequestBody(containing(omsorgsmottakerGammeltFnr))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_barn_2ar_2020.json")
+                )
+        )
+
+        repo.persist(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = omsorgsyterGammeltFnr,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = omsorgsyterGammeltFnr,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = omsorgsmottakerGammeltFnr,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 5001,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        handler.process()!!.single().also { behandling ->
+            behandling.assertInnvilget(
+                omsorgsyter = omsorgsyterNyttFnr,
+                omsorgsmottaker = omsorgsmottakerNyttFnr
+            )
+            assertThat(behandling.omsorgsyter).isEqualTo(omsorgsyterNyttFnr)
+            assertThat(behandling.omsorgsmottaker).isEqualTo(omsorgsmottakerNyttFnr)
+            assertThat(behandling.grunnlag.omsorgsyter.fnr).isEqualTo(omsorgsyterNyttFnr)
+            assertThat(behandling.grunnlag.omsorgsmottaker.fnr).isEqualTo(omsorgsmottakerNyttFnr)
+            assertThat(behandling.grunnlag.grunnlag.persongrunnlag.map { it.omsorgsyter.fnr }.single()).isEqualTo(
+                omsorgsyterNyttFnr
+            )
+            assertThat(behandling.grunnlag.grunnlag.persongrunnlag.flatMap { it.omsorgsmottakere().map { it.fnr } }
+                           .single()).isEqualTo(
+                omsorgsmottakerNyttFnr
+            )
         }
     }
 

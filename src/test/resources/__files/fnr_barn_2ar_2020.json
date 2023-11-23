@@ -18,6 +18,15 @@
             "historisk": false,
             "master": "FREG"
           }
+        },
+        {
+          "identifikasjonsnummer": "67081812345",
+          "status": "OPPHOERT",
+          "type": "DNR",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
         }
       ],
       "foedsel": [

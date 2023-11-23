@@ -12,10 +12,10 @@ class OmsorgsmottakerOppfyllerAlderskravTest {
     private val fødselsår = LocalDate.of(2000, Month.JANUARY, 1)
 
     private val person = Person(
-        fnr = fnr,
         fødselsdato = fødselsår,
         dødsdato = null,
-        familierelasjoner = Familierelasjoner(emptyList())
+        familierelasjoner = Familierelasjoner(emptyList()),
+        identhistorikk = IdentHistorikk(setOf(Ident.FolkeregisterIdent.Gjeldende(fnr)))
     )
 
     @Test

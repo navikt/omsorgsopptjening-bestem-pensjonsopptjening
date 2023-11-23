@@ -1,7 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -14,10 +13,10 @@ class OmsorgsyterOppfyllerAlderskravTest {
     private val fødselsår = LocalDate.of(2000, Month.JANUARY, 1)
 
     private val person = Person(
-        fnr = fnr,
         fødselsdato = fødselsår,
         dødsdato = null,
-        familierelasjoner = Familierelasjoner(emptyList())
+        familierelasjoner = Familierelasjoner(emptyList()),
+        identhistorikk = IdentHistorikk(setOf(Ident.FolkeregisterIdent.Gjeldende(fnr)))
     )
 
     @Test

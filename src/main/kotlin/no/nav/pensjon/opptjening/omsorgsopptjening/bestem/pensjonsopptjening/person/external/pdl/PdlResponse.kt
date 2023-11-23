@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Familierelasjoner
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Ident
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.IdentHistorikk
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -27,11 +28,8 @@ internal data class HentPersonQueryResponse(
     val doedsfall: List<Doedsfall?>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
 ) {
-    private fun gjeldendeIdent(): PdlFnr {
-        return folkeregisteridentifikator
-            .firstOrNull { it.status == Folkeregisteridentifikator.Status.I_BRUK }
-            ?.let { PdlFnr(it.identifikasjonsnummer, gjeldende = true) }
-            ?: throw PdlMottatDataException("Fnr i bruk finnes ikke")
+    private fun identhistorikk(): IdentHistorikk {
+        return folkeregisteridentifikator.identhistorikk()
     }
 
     private fun bestemDoedsdato(doedsfall: List<Doedsfall?>): LocalDate? {
@@ -58,7 +56,7 @@ internal data class HentPersonQueryResponse(
     private fun familierelasjoner(): Familierelasjoner {
         return forelderBarnRelasjon.map { relasjon ->
             Familierelasjon(
-                ident = relasjon.relatertPersonsIdent?.let { Ident.FolkeregisterIdent(it) } ?: Ident.Ukjent,
+                ident = relasjon.relatertPersonsIdent?.let { Ident.FolkeregisterIdent.Gjeldende(it) } ?: Ident.Ukjent,
                 relasjon = when (relasjon.relatertPersonsRolle) {
                     ForelderBarnRelasjon.Rolle.BARN -> Familierelasjon.Relasjon.BARN
                     ForelderBarnRelasjon.Rolle.FAR -> Familierelasjon.Relasjon.FAR
@@ -71,12 +69,28 @@ internal data class HentPersonQueryResponse(
         }
     }
 
+    private fun List<Folkeregisteridentifikator>.identhistorikk(): IdentHistorikk {
+        return IdentHistorikk(
+            map {
+                when (it.status) {
+                    Folkeregisteridentifikator.Status.I_BRUK -> {
+                        Ident.FolkeregisterIdent.Gjeldende(it.identifikasjonsnummer)
+                    }
+
+                    Folkeregisteridentifikator.Status.OPPHOERT -> {
+                        Ident.FolkeregisterIdent.Historisk(it.identifikasjonsnummer)
+                    }
+                }
+            }.toSet()
+        )
+    }
+
     fun toDomain(): Person {
         return Person(
-            fnr = gjeldendeIdent().fnr,
             fødselsdato = foedselsdato(),
             dødsdato = bestemDoedsdato(doedsfall),
             familierelasjoner = familierelasjoner(),
+            identhistorikk = identhistorikk(),
         )
     }
 }
@@ -89,6 +103,10 @@ internal data class Folkeregisteridentifikator(
     val metadata: Metadata,
     val folkeregistermetadata: Folkeregistermetadata? = null,
 ) {
+    fun erGjeldende(): Boolean {
+        return status == Status.I_BRUK
+    }
+
     enum class Status { I_BRUK, OPPHOERT }
     enum class Type { FNR, DNR }
 }

@@ -13,16 +13,16 @@ class EllerTest {
     private val fodselAvslag = LocalDate.of(omsorgsår - 10, Month.JANUARY, 1)
     private val fodselInnvilget = LocalDate.of(omsorgsår - 20, Month.JANUARY, 1)
     private val personAvslag = Person(
-        fnr = "1",
         fødselsdato = fodselAvslag,
         dødsdato = null,
-        familierelasjoner = Familierelasjoner(emptyList())
+        familierelasjoner = Familierelasjoner(emptyList()),
+        identhistorikk = IdentHistorikk(setOf(Ident.FolkeregisterIdent.Gjeldende("1")))
     )
     private val personInnvilget = Person(
-        fnr = "1",
         fødselsdato = fodselInnvilget,
         dødsdato = null,
-        familierelasjoner = Familierelasjoner(emptyList())
+        familierelasjoner = Familierelasjoner(emptyList()),
+        identhistorikk = IdentHistorikk(setOf(Ident.FolkeregisterIdent.Gjeldende("1")))
     )
 
     @Test
