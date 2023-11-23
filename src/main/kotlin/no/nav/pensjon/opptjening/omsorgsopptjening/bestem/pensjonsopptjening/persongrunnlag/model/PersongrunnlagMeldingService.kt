@@ -72,10 +72,7 @@ class PersongrunnlagMeldingService(
     }
 
     private fun finnNesteMeldingForBehandling() : PersongrunnlagMelding.Mottatt? {
-        return persongrunnlagRepo.finnNesteKlarTilProsessering()
-            ?: run {
-                return persongrunnlagRepo.finnNesteKlarForRetry()
-            }
+        return persongrunnlagRepo.finnNesteKlarTilProsessering() ?: persongrunnlagRepo.finnNesteKlarForRetry()
     }
 
     private fun behandle(melding: PersongrunnlagMelding.Mottatt): FullførteBehandlinger {
