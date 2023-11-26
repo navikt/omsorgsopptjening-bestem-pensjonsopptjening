@@ -105,6 +105,7 @@ class PersongrunnlagRepo(
              |from melding m, melding_status ms 
              |where m.id = ms.id
              |and ms.status_type = 'Klar' 
+             |order by m.id
              |fetch first row only for no key update of m skip locked""".trimMargin(),
             mapOf(
                 "now" to Instant.now(clock).toString()
@@ -119,8 +120,10 @@ class PersongrunnlagRepo(
             """select m.*, ms.statushistorikk 
              |from melding m, melding_status ms 
              |where m.id = ms.id
-             |and status_type = 'Retry' 
+             |and status_type = 'Retry'
+             |and karantene_til is not null 
              |and karantene_til < (:now)::timestamptz
+             |order by karantene_til
              |fetch first row only for no key update of m skip locked""".trimMargin(),
             mapOf(
                 "now" to now

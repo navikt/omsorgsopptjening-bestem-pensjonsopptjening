@@ -2,12 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.tilOmsorgsopptjeningsgrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
@@ -36,37 +31,35 @@ class PersongrunnlagMeldingService(
     }
 
     fun process(): FullførteBehandlinger? {
-        return transactionTemplate.execute {
+        var nonFatalException: Throwable? = null
+        val behandling = transactionTemplate.execute {
             try {
                 finnNesteMeldingForBehandling()?.let { melding ->
                     Mdc.scopedMdc(melding.correlationId) {
                         Mdc.scopedMdc(melding.innlesingId) {
                             try {
                                 log.info("Started behandling av melding")
-                                transactionTemplate.execute {
-                                    behandle(melding).let { fullførte ->
-                                        persongrunnlagRepo.updateStatus(melding.ferdig())
-                                        fullførte.also {
-                                            it.håndterUtfall(
-                                                innvilget = ::håndterInnvilgelse,
-                                                manuell = oppgaveService::opprettOppgaveHvisNødvendig,
-                                                avslag = {} //noop
-                                            )
-                                            log.info("Melding prosessert")
-                                        }
+                                behandle(melding).let { fullførte ->
+                                    persongrunnlagRepo.updateStatus(melding.ferdig())
+                                    fullførte.also {
+                                        it.håndterUtfall(
+                                            innvilget = ::håndterInnvilgelse,
+                                            manuell = oppgaveService::opprettOppgaveHvisNødvendig,
+                                            avslag = {} //noop
+                                        )
+                                        log.info("Melding prosessert")
                                     }
                                 }
                             } catch (ex: Throwable) {
-                                transactionTemplate.execute {
-                                    melding.retry(ex.stackTraceToString()).let { melding ->
-                                        melding.opprettOppgave()?.let {
-                                            log.error("Gir opp videre prosessering av melding")
-                                            oppgaveService.opprett(it)
-                                        }
-                                        persongrunnlagRepo.updateStatus(melding)
+                                melding.retry(ex.stackTraceToString()).let { melding ->
+                                    melding.opprettOppgave()?.let {
+                                        log.error("Gir opp videre prosessering av melding")
+                                        oppgaveService.opprett(it)
                                     }
+                                    persongrunnlagRepo.updateStatus(melding)
                                 }
-                                throw ex
+                                nonFatalException = ex
+                                null
                             } finally {
                                 log.info("Avsluttet behandling av melding")
                             }
@@ -78,9 +71,11 @@ class PersongrunnlagMeldingService(
                 throw ex
             }
         }
+        nonFatalException?.let { e -> throw e }
+        return behandling
     }
 
-    private fun finnNesteMeldingForBehandling() : PersongrunnlagMelding.Mottatt? {
+    private fun finnNesteMeldingForBehandling(): PersongrunnlagMelding.Mottatt? {
         return persongrunnlagRepo.finnNesteKlarTilProsessering() ?: persongrunnlagRepo.finnNesteKlarForRetry()
     }
 
