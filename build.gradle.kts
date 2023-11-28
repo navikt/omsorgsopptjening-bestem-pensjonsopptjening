@@ -16,7 +16,7 @@ val wiremockVersion = "2.35.1"
 val mockitoVersion = "5.1.0"
 val unleashVersion = "9.1.0"
 
-val snakeYamlVersion = "1.33" // siste er 2.x, men spring bruker 1.x
+val snakeYamlVersion = "2.0" // siste er 2.x, men spring bruker 1.x
 val snappyJavaVersion = "1.1.10.5"
 val httpClient5Version = "5.2.1"
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
