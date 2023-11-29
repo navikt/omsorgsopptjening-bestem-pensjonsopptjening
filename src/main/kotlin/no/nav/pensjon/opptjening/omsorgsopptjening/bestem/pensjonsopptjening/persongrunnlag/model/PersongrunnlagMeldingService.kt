@@ -32,10 +32,10 @@ class PersongrunnlagMeldingService(
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
-    fun process(): FullførteBehandlinger? {
+    fun process(): List<FullførteBehandlinger>? {
         val behandling = transactionTemplate.execute {
             try {
-                finnNesteMeldingForBehandling()?.let { melding ->
+                finnNesteMeldingerForBehandling(1)?.map { melding ->
                     Mdc.scopedMdc(melding.correlationId) {
                         Mdc.scopedMdc(melding.innlesingId) {
                             try {
@@ -51,10 +51,10 @@ class PersongrunnlagMeldingService(
                                         log.info("Melding prosessert")
                                     }
                                 }
-                            } catch(ex: KafkaException) {
+                            } catch (ex: KafkaException) {
                                 log.error("Feil ved prosessering av meldinger, ruller tilbake", ex)
                                 throw ex;
-                            } catch(ex: SQLException) {
+                            } catch (ex: SQLException) {
                                 log.error("Feil ved prosessering av meldinger, ruller tilbake", ex)
                                 throw ex;
                             } catch (ex: Throwable) {
@@ -77,12 +77,13 @@ class PersongrunnlagMeldingService(
                 throw ex
             }
         }
-//        nonFatalException?.let { e -> throw e }
-        return behandling
+        return behandling?.filterNotNull()
     }
 
-    private fun finnNesteMeldingForBehandling(): PersongrunnlagMelding.Mottatt? {
-        return persongrunnlagRepo.finnNesteKlarTilProsessering() ?: persongrunnlagRepo.finnNesteKlarForRetry()
+    private fun finnNesteMeldingerForBehandling(antall: Int): List<PersongrunnlagMelding.Mottatt>? {
+        val meldinger = persongrunnlagRepo.finnNesteKlarTilProsessering(antall)
+            .ifEmpty { persongrunnlagRepo.finnNesteKlarForRetry(antall) }
+        return meldinger.map { persongrunnlagRepo.find(it) }.ifEmpty { null }
     }
 
     private fun behandle(melding: PersongrunnlagMelding.Mottatt): FullførteBehandlinger {

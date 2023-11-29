@@ -119,7 +119,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process()!!.single().also { behandling ->
+        persongrunnlagMeldingService.process()!!.first().single().also { behandling ->
             assertTrue(behandling.erInnvilget())
 
             assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull()).also {
@@ -205,7 +205,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process()!!.single().also { behandling ->
+        persongrunnlagMeldingService.process()!!.first().single().also { behandling ->
             assertTrue(behandling.erInnvilget())
 
             assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull()).also {
@@ -297,7 +297,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process()!!.single().also { behandling ->
+        persongrunnlagMeldingService.process()!!.first().single().also { behandling ->
             assertTrue(behandling.erInnvilget())
             assertTrue(brevRepository.findForBehandling(behandling.id).isEmpty())
         }
@@ -373,9 +373,9 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process()!!.also { behandling ->
-            behandling.alle().let {
-                it[0].let {
+        persongrunnlagMeldingService.process()!!.first().also { behandling ->
+            behandling.alle().let { fullførteBehandlinger ->
+                fullførteBehandlinger[0].let {
                     assertThat(it.erInnvilget()).isTrue()
                     assertThat(it.omsorgsmottaker).isEqualTo("03041212345")
                     assertThat(it.omsorgstype.toString()).isEqualTo("HJELPESTØNAD")
@@ -383,7 +383,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                         assertThat(it.årsak).isEqualTo(BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR)
                     }
                 }
-                it[1].let {
+                fullførteBehandlinger[1].let {
                     assertThat(it.erAvslag()).isTrue()
                     assertThat(it.omsorgsmottaker).isEqualTo("01122012345")
                     assertThat(it.omsorgstype.toString()).isEqualTo("BARNETRYGD")

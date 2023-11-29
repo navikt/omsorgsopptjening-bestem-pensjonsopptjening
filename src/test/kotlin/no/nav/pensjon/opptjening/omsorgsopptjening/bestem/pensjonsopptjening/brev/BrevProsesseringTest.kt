@@ -173,7 +173,7 @@ class BrevProsesseringTest(
                 )
             ),
         ).let {
-            persongrunnlagMeldingService.process()!!.single().let { behandling ->
+            persongrunnlagMeldingService.process()!!.first().single().let { behandling ->
                 Assertions.assertTrue(behandling.erInnvilget())
                 behandling to brevRepository.findForBehandling(behandling.id).singleOrNull()!!
             }
@@ -274,7 +274,7 @@ class BrevProsesseringTest(
                 )
             ),
         ).let {
-            persongrunnlagMeldingService.process()!!.single().let { behandling ->
+            persongrunnlagMeldingService.process()!!.first().single().let { behandling ->
                 Assertions.assertTrue(behandling.erInnvilget())
                 behandling to brevRepository.findForBehandling(behandling.id).singleOrNull()!!
             }

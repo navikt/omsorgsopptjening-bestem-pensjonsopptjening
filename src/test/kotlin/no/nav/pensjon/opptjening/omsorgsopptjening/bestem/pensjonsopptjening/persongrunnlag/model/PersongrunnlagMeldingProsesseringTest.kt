@@ -161,7 +161,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 //        assertEquals(emptyList<FullførtBehandling>(),
         assertThat(behandlingRepo.finnForOmsorgsyter("12345678910")).isEmpty()
 
-        handler.process()!!.also { result ->
+        handler.process()!!.first().also { result ->
             result.single().also {
                 assertEquals(2020, it.omsorgsAr)
                 assertEquals("12345678910", it.omsorgsyter)
@@ -259,7 +259,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             assertEquals(1, it.antallForsøk)
         }
 
-        assertEquals(1, handler.process()!!.antallBehandlinger())
+        assertEquals(1, handler.process()!!.first().antallBehandlinger())
 
         assertInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java, repo.find(melding).status)
     }

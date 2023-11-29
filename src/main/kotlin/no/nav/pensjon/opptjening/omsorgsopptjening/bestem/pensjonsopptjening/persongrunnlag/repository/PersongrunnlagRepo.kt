@@ -98,38 +98,40 @@ class PersongrunnlagRepo(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
-    fun finnNesteKlarTilProsessering(): PersongrunnlagMelding.Mottatt? {
+    fun finnNesteKlarTilProsessering(antall: Int): List<UUID> {
 
-        return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk 
+        return jdbcTemplate.queryForList(
+            """select ms.id 
              |from melding m, melding_status ms 
              |where m.id = ms.id
              |and ms.status_type = 'Klar' 
              |order by m.id
-             |fetch first row only for no key update of m skip locked""".trimMargin(),
+             |fetch first :antall rows only for no key update of m skip locked""".trimMargin(),
             mapOf(
-                "now" to Instant.now(clock).toString()
+                "now" to Instant.now(clock).toString(),
+                "antall" to antall
             ),
-            PersongrunnlagMeldingMapper()
-        ).singleOrNull()
+            UUID::class.java
+            )
     }
 
-    fun finnNesteKlarForRetry(): PersongrunnlagMelding.Mottatt? {
+    fun finnNesteKlarForRetry(antall: Int): List<UUID> {
         val now = Instant.now(clock).toString()
-        return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk 
+        return jdbcTemplate.queryForList(
+            """select ms.id 
              |from melding m, melding_status ms 
              |where m.id = ms.id
              |and status_type = 'Retry'
              |and karantene_til is not null 
              |and karantene_til < (:now)::timestamptz
              |order by karantene_til
-             |fetch first row only for no key update of m skip locked""".trimMargin(),
+             |fetch first :antall rows only for no key update of m skip locked""".trimMargin(),
             mapOf(
-                "now" to now
+                "now" to now,
+                "antall" to antall
             ),
-            PersongrunnlagMeldingMapper()
-        ).singleOrNull()
+            UUID::class.java
+        )
     }
 
     fun finnSiste(): PersongrunnlagMelding? {

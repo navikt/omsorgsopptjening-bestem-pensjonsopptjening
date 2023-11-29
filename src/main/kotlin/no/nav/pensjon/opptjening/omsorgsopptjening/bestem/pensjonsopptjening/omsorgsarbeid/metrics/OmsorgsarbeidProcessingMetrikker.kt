@@ -6,7 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import org.springframework.stereotype.Component
 
 @Component
-class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<FullførteBehandlinger?> {
+class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List<FullførteBehandlinger?>?> {
 
     private val omsorgsarbeidProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "omsorgsarbeidProsessert")
     private val innvilget = registry.counter("behandling", "antall", "innvilget")
@@ -34,9 +34,9 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<Full
         registry.counter("avslag", "antall", "OmsorgsyterHarGyldigOmsorgsarbeid")
 
 
-    override fun oppdater(lambda: () -> FullførteBehandlinger?): FullførteBehandlinger? {
-        return omsorgsarbeidProsessertTidsbruk.recordCallable(lambda)?.also { fullførte ->
-            fullførte.statistikk().let { statistikk ->
+    override fun oppdater(lambda: () -> List<FullførteBehandlinger?>?): List<FullførteBehandlinger?>? {
+        return omsorgsarbeidProsessertTidsbruk.recordCallable(lambda)?.onEach { fullførte ->
+            fullførte?.statistikk()?.let { statistikk ->
                 totalt.increment()
                 innvilget.increment(statistikk.innvilgetOpptjening.toDouble())
                 avslag.increment(statistikk.avslåttOpptjening.toDouble())

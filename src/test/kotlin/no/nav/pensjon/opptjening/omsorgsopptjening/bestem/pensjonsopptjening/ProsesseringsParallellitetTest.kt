@@ -15,7 +15,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -97,7 +99,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
-                Assertions.assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte())
+                assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte())
 
                 //opprett ny transaksjon mens den forrige fortsatt lever
                 transactionTemplate.execute {
@@ -105,13 +107,13 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                     Assertions.assertNull(godskrivOpptjeningRepo.finnNesteUprosesserte())
                 }
                 //fortsatt samme transaksjon
-                Assertions.assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte())
+                assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte())
             } //rad ikke låst lenger ved transaksjon slutt
 
 
             //ny transaksjon finner raden da den ikke lenger er låst
             transactionTemplate.execute {
-                Assertions.assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte())
+                assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte())
             }
         }
     }
@@ -151,21 +153,21 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
-                Assertions.assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering())
+                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(5))
 
                 //opprett ny transaksjon mens den forrige fortsatt lever
                 transactionTemplate.execute {
                     //skal ikke finne noe siden raden er låst pga "select for update skip locked"
-                    assertNull(persongrunnlagRepo.finnNesteKlarTilProsessering())
+                    assertThat(persongrunnlagRepo.finnNesteKlarTilProsessering(5)).isNullOrEmpty()
                 }
                 //fortsatt samme transaksjon
-                Assertions.assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering())
+                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(5))
             } //rad ikke låst lenger ved transaksjon slutt
 
 
             //ny transaksjon finner raden da den ikke lenger er låst
             transactionTemplate.execute {
-                Assertions.assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering())
+                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(5))
             }
         }
     }
@@ -220,7 +222,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
-                Assertions.assertNotNull(oppgaveRepo.finnNesteUprosesserte())
+                assertNotNull(oppgaveRepo.finnNesteUprosesserte())
 
                 //opprett ny transaksjon mens den forrige fortsatt lever
                 transactionTemplate.execute {
@@ -228,13 +230,13 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                     Assertions.assertNull(oppgaveRepo.finnNesteUprosesserte())
                 }
                 //fortsatt samme transaksjon
-                Assertions.assertNotNull(oppgaveRepo.finnNesteUprosesserte())
+                assertNotNull(oppgaveRepo.finnNesteUprosesserte())
             } //rad ikke låst lenger ved transaksjon slutt
 
 
             //ny transaksjon finner raden da den ikke lenger er låst
             transactionTemplate.execute {
-                Assertions.assertNotNull(oppgaveRepo.finnNesteUprosesserte())
+                assertNotNull(oppgaveRepo.finnNesteUprosesserte())
             }
         }
     }
