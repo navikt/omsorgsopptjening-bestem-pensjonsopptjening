@@ -28,7 +28,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.Month
 import java.time.YearMonth
-import kotlin.test.assertNull
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {

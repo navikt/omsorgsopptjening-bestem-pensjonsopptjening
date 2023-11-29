@@ -40,7 +40,7 @@ data class FullførteBehandlinger(
             }
 
             AggregertBehandlingUtfall.Innvilget -> {
-                innvilget(innvilget()!!)
+                innvilget(innvilget())
             }
 
             AggregertBehandlingUtfall.Manuell -> {

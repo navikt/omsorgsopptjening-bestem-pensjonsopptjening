@@ -112,7 +112,7 @@ class PersongrunnlagRepo(
                 "antall" to antall
             ),
             UUID::class.java
-            )
+        )
     }
 
     fun finnNesteKlarForRetry(antall: Int): List<UUID> {

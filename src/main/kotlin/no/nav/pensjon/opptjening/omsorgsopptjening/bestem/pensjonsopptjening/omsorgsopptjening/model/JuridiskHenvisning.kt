@@ -146,7 +146,7 @@ sealed class JuridiskHenvisning(
         tekst = "Opptjening gis den som mottar barnetrygd for barnet etter barnetrygdloven, dersom ikke noe annet er bestemt i forskrift."
     )
 
-    object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_b_Første_Punktum : JuridiskHenvisning(
+    data object Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_b_Første_Punktum : JuridiskHenvisning(
         kortTittel = "Folketrygdloven – ftrl",
         dato = "LOV-1997-02-28-19",
         kapittel = 20,
