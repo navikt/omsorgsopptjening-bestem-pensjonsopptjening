@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import kotlin.reflect.KClass
 
 @Component
@@ -85,7 +85,11 @@ class PersongrunnlagRepo(
 
     fun find(id: UUID): PersongrunnlagMelding.Mottatt {
         return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk from melding m join melding_status ms on m.id = ms.id where m.id = :id""",
+            """select m.*, ms.statushistorikk 
+                |from melding m 
+                |join melding_status ms on m.id = ms.id 
+                |where m.id = :id
+                |and ms.id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -101,12 +105,11 @@ class PersongrunnlagRepo(
     fun finnNesteKlarTilProsessering(antall: Int): List<UUID> {
 
         return jdbcTemplate.queryForList(
-            """select ms.id 
-             |from melding m, melding_status ms 
-             |where m.id = ms.id
-             |and ms.status_type = 'Klar' 
-             |order by m.id
-             |fetch first :antall rows only for no key update of m skip locked""".trimMargin(),
+            """select id 
+             | from melding_status
+             | where status_type = 'Klar' 
+             | order by id
+             | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to Instant.now(clock).toString(),
                 "antall" to antall
@@ -118,14 +121,13 @@ class PersongrunnlagRepo(
     fun finnNesteKlarForRetry(antall: Int): List<UUID> {
         val now = Instant.now(clock).toString()
         return jdbcTemplate.queryForList(
-            """select ms.id 
-             |from melding m, melding_status ms 
-             |where m.id = ms.id
-             |and status_type = 'Retry'
-             |and karantene_til is not null 
-             |and karantene_til < (:now)::timestamptz
-             |order by karantene_til
-             |fetch first :antall rows only for no key update of m skip locked""".trimMargin(),
+            """select id 
+             | from melding_status
+             | where status_type = 'Retry'
+             | and karantene_til is not null
+             | and karantene_til < (:now)::timestamptz
+             | order by karantene_til
+             | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now,
                 "antall" to antall
@@ -136,8 +138,6 @@ class PersongrunnlagRepo(
 
     fun finnSiste(): PersongrunnlagMelding? {
         return jdbcTemplate.query(
-//            """select m.*, ms.statushistorikk from melding m, melding_status ms
-//                |where m.id = ms.id and order by m.opprettet desc limit 1""".trimMargin(),
             """select m.*, ms.statushistorikk from
                   | (select * from melding m order by m.opprettet desc limit 1) m,
                   | melding_status ms
@@ -163,8 +163,8 @@ class PersongrunnlagRepo(
         val name = PersongrunnlagMelding.Status.Ferdig::class.simpleName!!
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m, melding_status ms
-                |where m.id = ms.id and (status->>'type' <> :type) 
-                |order by m.opprettet asc limit 1""".trimMargin(),
+                | where m.id = ms.id and status_type <> :type
+                | order by m.opprettet asc limit 1""".trimMargin(),
             mapOf(
                 "type" to name
             ),
@@ -191,12 +191,6 @@ class PersongrunnlagRepo(
                 innhold = deserialize(rs.getString("melding")),
                 statushistorikk = rs.getString("statushistorikk").deserializeList(),
             )
-        }
-    }
-
-    internal class SimpleStringMapper : RowMapper<String> {
-        override fun mapRow(rs: ResultSet, rowNum: Int): String {
-            return rs.toString()
         }
     }
 }
