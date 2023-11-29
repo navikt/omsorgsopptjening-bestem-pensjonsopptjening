@@ -140,9 +140,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, repo.find(melding!!).status)
 
-        assertThrows<PersonOppslagException> {
-            handler.process()
-        }
+        handler.process()
 
         repo.find(melding).let { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, m.status).let {
@@ -152,9 +150,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         }
         assertEquals(emptyList<FullførtBehandling>(), behandlingRepo.finnForOmsorgsyter("12345678910"))
 
-        assertThrows<PersonOppslagException> {
-            handler.process()
-        }
+        handler.process()
 
         repo.find(melding).let { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, m.status).let {
@@ -162,8 +158,8 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(3, it.maxAntallForsøk)
             }
         }
-        assertEquals(emptyList<FullførtBehandling>(), behandlingRepo.finnForOmsorgsyter("12345678910"))
-
+//        assertEquals(emptyList<FullførtBehandling>(),
+        assertThat(behandlingRepo.finnForOmsorgsyter("12345678910")).isEmpty()
 
         handler.process()!!.also { result ->
             result.single().also {
@@ -245,14 +241,13 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         assertThat(repo.find(melding!!).status)
             .isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
 
-        assertThrows<PersonOppslagException> {
-            handler.process()
-        }
+        handler.process()
+
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertEquals(1, it.antallForsøk)
         }
 
-        assertThat( handler.process()).isNull()
+        assertThat(handler.process()).isNull()
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertThat(it.antallForsøk).isOne()
@@ -334,20 +329,12 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, repo.find(melding!!).status)
 
-        assertThrows<PersonOppslagException> {
-            handler.process()
-        }
-        assertThrows<PersonOppslagException> {
-            handler.process()
-        }
-        assertThrows<PersonOppslagException> {
-            handler.process()
-        }
-        assertThrows<PersonOppslagException> {
-            handler.process()
-        }
+        handler.process()
+        handler.process()
+        handler.process()
+        handler.process()
 
-        assertEquals(null, handler.process())
+        assertThat(handler.process()).isNull()
 
         repo.find(melding).also { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, m.statushistorikk[0])

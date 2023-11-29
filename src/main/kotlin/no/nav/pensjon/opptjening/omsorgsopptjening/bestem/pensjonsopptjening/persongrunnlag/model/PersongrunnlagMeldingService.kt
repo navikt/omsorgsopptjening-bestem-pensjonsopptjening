@@ -8,11 +8,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import org.apache.kafka.common.KafkaException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.lang.RuntimeException
+import java.sql.SQLException
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 @Service
@@ -31,7 +33,6 @@ class PersongrunnlagMeldingService(
     }
 
     fun process(): FullførteBehandlinger? {
-        var nonFatalException: Throwable? = null
         val behandling = transactionTemplate.execute {
             try {
                 finnNesteMeldingForBehandling()?.let { melding ->
@@ -50,6 +51,12 @@ class PersongrunnlagMeldingService(
                                         log.info("Melding prosessert")
                                     }
                                 }
+                            } catch(ex: KafkaException) {
+                                log.error("Feil ved prosessering av meldinger, ruller tilbake", ex)
+                                throw ex;
+                            } catch(ex: SQLException) {
+                                log.error("Feil ved prosessering av meldinger, ruller tilbake", ex)
+                                throw ex;
                             } catch (ex: Throwable) {
                                 melding.retry(ex.stackTraceToString()).let { melding ->
                                     melding.opprettOppgave()?.let {
@@ -58,7 +65,6 @@ class PersongrunnlagMeldingService(
                                     }
                                     persongrunnlagRepo.updateStatus(melding)
                                 }
-                                nonFatalException = ex
                                 null
                             } finally {
                                 log.info("Avsluttet behandling av melding")
@@ -71,7 +77,7 @@ class PersongrunnlagMeldingService(
                 throw ex
             }
         }
-        nonFatalException?.let { e -> throw e }
+//        nonFatalException?.let { e -> throw e }
         return behandling
     }
 
