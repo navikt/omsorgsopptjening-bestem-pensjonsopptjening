@@ -96,16 +96,41 @@ class BrevRepository(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
+
     fun finnNesteUprosesserte(): Brev.Persistent? {
-        return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""",
+        val antall = 1
+        val nesteUprosesserte = finnNesteUprosesserteKlar(antall) ?: finnNesteUprosesserteRetry(antall)
+        return nesteUprosesserte?.let { find(it) }
+    }
+
+    fun finnNesteUprosesserteKlar(antall: Int): UUID? {
+        return jdbcTemplate.queryForList(
+            """select os.id 
+                |from brev_status os
+                |where (os.status->>'type' = 'Klar') 
+                |fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
-                "now" to Instant.now(clock).toString()
+                "now" to Instant.now(clock).toString(),
+                "antall" to antall,
             ),
-            BrevMapper()
+            UUID::class.java
         ).singleOrNull()
     }
 
+    fun finnNesteUprosesserteRetry(antall: Int): UUID? {
+        return jdbcTemplate.queryForList(
+            """select os.id 
+                |from brev_status os
+                |where (os.status->>'type' = 'Retry' 
+                |  and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) 
+                |fetch first :antall rows only for no key update skip locked""".trimMargin(),
+            mapOf(
+                "now" to Instant.now(clock).toString(),
+                "antall" to antall,
+            ),
+            UUID::class.java
+        ).singleOrNull()
+    }
     private fun BrevÅrsak.toDb(): String {
         return when (this) {
             BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR -> BrevÅrsakDb.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR
