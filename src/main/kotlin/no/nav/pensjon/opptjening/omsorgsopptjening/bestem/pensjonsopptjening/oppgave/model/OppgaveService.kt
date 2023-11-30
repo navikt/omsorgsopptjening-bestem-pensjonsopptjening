@@ -77,29 +77,26 @@ class OppgaveService(
         }
     }
 
-
     fun process(): Oppgave? {
         return transactionTemplate.execute {
             oppgaveRepo.finnNesteUprosesserte()?.let { oppgave ->
                 Mdc.scopedMdc(oppgave.correlationId) {
                     Mdc.scopedMdc(oppgave.innlesingId) {
                         try {
-                            transactionTemplate.execute {
-                                personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
-                                    sakKlient.bestemSak(
-                                        aktørId = aktørId
-                                    ).let { omsorgssak ->
-                                        oppgaveKlient.opprettOppgave(
-                                            aktoerId = aktørId,
-                                            sakId = omsorgssak.sakId,
-                                            // TODO: Skal ikke kunne være tom
-                                            beskrivelse = FlereOppgaveteksterFormatter.format(oppgave.oppgavetekst),
-                                            tildeltEnhetsnr = omsorgssak.enhet
-                                        ).let { oppgaveId ->
-                                            oppgave.ferdig(oppgaveId).also {
-                                                oppgaveRepo.updateStatus(it)
-                                                log.info("Oppgave opprettet")
-                                            }
+                            personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
+                                sakKlient.bestemSak(
+                                    aktørId = aktørId
+                                ).let { omsorgssak ->
+                                    oppgaveKlient.opprettOppgave(
+                                        aktoerId = aktørId,
+                                        sakId = omsorgssak.sakId,
+                                        // TODO: Skal ikke kunne være tom
+                                        beskrivelse = FlereOppgaveteksterFormatter.format(oppgave.oppgavetekst),
+                                        tildeltEnhetsnr = omsorgssak.enhet
+                                    ).let { oppgaveId ->
+                                        oppgave.ferdig(oppgaveId).also {
+                                            oppgaveRepo.updateStatus(it)
+                                            log.info("Oppgave opprettet")
                                         }
                                     }
                                 }
@@ -111,13 +108,11 @@ class OppgaveService(
                             log.error("Feil ved prosessering av oppgaver", ex)
                             throw ex
                         } catch (ex: Throwable) {
-                            transactionTemplate.execute {
-                                oppgave.retry(ex.stackTraceToString()).let {
-                                    if (it.status is Oppgave.Status.Feilet) {
-                                        log.error("Gir opp videre prosessering av oppgave")
-                                    }
-                                    oppgaveRepo.updateStatus(it)
+                            oppgave.retry(ex.stackTraceToString()).let {
+                                if (it.status is Oppgave.Status.Feilet) {
+                                    log.error("Gir opp videre prosessering av oppgave")
                                 }
+                                oppgaveRepo.updateStatus(it)
                                 null
                             }
                         }
