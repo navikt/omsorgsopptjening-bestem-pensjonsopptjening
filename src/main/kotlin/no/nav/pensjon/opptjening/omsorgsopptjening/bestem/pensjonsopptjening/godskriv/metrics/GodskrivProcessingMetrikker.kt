@@ -6,12 +6,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.met
 import org.springframework.stereotype.Component
 
 @Component
-class GodskrivProcessingMetrikker(registry: MeterRegistry) : Metrikker<GodskrivOpptjening.Persistent?> {
+class GodskrivProcessingMetrikker(registry: MeterRegistry) : Metrikker<List<GodskrivOpptjening.Persistent>?> {
 
     private val godskrivProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "godskrivProsessert")
     private val antallGodskrevet = registry.counter("godskriving", "antall", "opprettet")
 
-    override fun oppdater(lambda: () -> GodskrivOpptjening.Persistent?): GodskrivOpptjening.Persistent? {
+    override fun oppdater(lambda: () -> List<GodskrivOpptjening.Persistent>?): List<GodskrivOpptjening.Persistent>? {
         return godskrivProsessertTidsbruk.recordCallable(lambda)?.also {
             antallGodskrevet.increment()
         }

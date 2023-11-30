@@ -19,6 +19,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -122,7 +123,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.first().single().also { behandling ->
-            godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5)!!.first().also {
                 assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                 assertEquals(behandling.id, it.behandlingId)
                 assertEquals(correlationId, it.correlationId)
@@ -130,11 +131,9 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                 assertEquals(behandling.omsorgsyter, it.omsorgsyter)
             }
 
-            assertThrows<PoppClientExecption> {
-                godskrivOpptjeningService.process()
-            }
+            godskrivOpptjeningService.process()
 
-            godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5)!!.first().also {
                 assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also {
                     assertEquals(1, it.antallForsøk)
                     assertEquals(3, it.maxAntallForsøk)
@@ -142,7 +141,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                 }
             }
 
-            assertInstanceOf(GodskrivOpptjening.Persistent::class.java, godskrivOpptjeningService.process()).also {
+            assertInstanceOf(GodskrivOpptjening.Persistent::class.java, godskrivOpptjeningService.process()?.first()).also {
                 assertInstanceOf(GodskrivOpptjening.Status.Ferdig::class.java, it.status)
             }
         }
@@ -205,13 +204,11 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
 
 
         handler.process()!!.single().also {
-            assertThrows<PoppClientExecption> {
-                godskrivOpptjeningService.process()
-            }
+            godskrivOpptjeningService.process()
 
-            assertNull(godskrivOpptjeningService.process())
-            assertNull(godskrivOpptjeningService.process())
-            assertNotNull(godskrivOpptjeningService.process())
+            assertThat(godskrivOpptjeningService.process()).isNullOrEmpty()
+            assertThat(godskrivOpptjeningService.process()).isNullOrEmpty()
+            assertThat(godskrivOpptjeningService.process()).isNotEmpty()
 
             assertInstanceOf(
                 GodskrivOpptjening.Persistent::class.java,
@@ -271,7 +268,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
 
 
         handler.process()!!.first().single().also { behandling ->
-            godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5)!!.first().also {
                 assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                 assertEquals(behandling.id, it.behandlingId)
                 assertEquals(correlationId, it.correlationId)
@@ -279,11 +276,9 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                 assertEquals(behandling.omsorgsyter, it.omsorgsyter)
             }
 
-            assertThrows<PoppClientExecption> {
-                godskrivOpptjeningService.process()
-            }
+            godskrivOpptjeningService.process()
 
-            godskrivOpptjeningRepo.finnNesteUprosesserte()!!.also {
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5)!!.first().also {
                 assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also {
                     assertEquals(1, it.antallForsøk)
                     assertEquals(3, it.maxAntallForsøk)
@@ -291,15 +286,9 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
                 }
             }
 
-            assertThrows<PoppClientExecption> {
-                godskrivOpptjeningService.process()
-            }
-            assertThrows<PoppClientExecption> {
-                godskrivOpptjeningService.process()
-            }
-            assertThrows<PoppClientExecption> {
-                godskrivOpptjeningService.process()
-            }
+            godskrivOpptjeningService.process()
+            godskrivOpptjeningService.process()
+            godskrivOpptjeningService.process()
 
             godskrivOpptjeningRepo.findForBehandling(behandling.id).single().also { godskrivOpptjening ->
                 assertInstanceOf(GodskrivOpptjening.Status.Feilet::class.java, godskrivOpptjening.status)

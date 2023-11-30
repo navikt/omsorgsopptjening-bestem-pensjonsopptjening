@@ -92,15 +92,40 @@ class GodskrivOpptjeningRepo(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
-    fun finnNesteUprosesserte(): GodskrivOpptjening.Persistent? {
-        return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId  where (os.status->>'type' = 'Klar') or (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""",
-            mapOf(
-                "now" to Instant.now(clock).toString()
-            ),
-            GodskrivOpptjeningMapper()
-        ).singleOrNull()
+    fun finnNesteUprosesserte(antall: Int): List<GodskrivOpptjening.Persistent> {
+        val now = Instant.now(clock)
+        val neste = finnNesteUprosesserteKlar(now, antall).ifEmpty { finnNesteUprosesserteRetry(now, antall) }
+        return neste.map { find(it) }
     }
+
+    fun finnNesteUprosesserteKlar(now: Instant, antall: Int): List<UUID> {
+        return jdbcTemplate.queryForList(
+            """select os.id
+                | from godskriv_opptjening_status os
+                | where (os.status->>'type' = 'Klar') 
+                | fetch first :antall rows only for no key update skip locked""".trimMargin(),
+            mapOf(
+                "now" to now.toString(),
+                "antall" to antall,
+            ),
+            UUID::class.java
+        )
+    }
+
+    fun finnNesteUprosesserteRetry(now: Instant, antall: Int): List<UUID> {
+        return jdbcTemplate.queryForList(
+            """select os.id
+                | from godskriv_opptjening_status os
+                | where (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz)
+                | fetch first :antall rows only for no key update skip locked""".trimMargin(),
+            mapOf(
+                "now" to now.toString(),
+                "antall" to antall,
+            ),
+            UUID::class.java
+        )
+    }
+
 
     fun finnEldsteIkkeFerdig(): GodskrivOpptjening.Persistent? {
         return jdbcTemplate.query(
