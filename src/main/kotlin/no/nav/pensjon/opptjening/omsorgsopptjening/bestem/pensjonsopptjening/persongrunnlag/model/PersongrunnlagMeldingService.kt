@@ -52,10 +52,10 @@ class PersongrunnlagMeldingService(
                                 }
                             } catch (ex: KafkaException) {
                                 log.error("Feil ved prosessering av meldinger, ruller tilbake", ex)
-                                throw ex;
+                                throw ex
                             } catch (ex: SQLException) {
                                 log.error("Feil ved prosessering av meldinger, ruller tilbake", ex)
-                                throw ex;
+                                throw ex
                             } catch (ex: Throwable) {
                                 melding.retry(ex.stackTraceToString()).let { melding ->
                                     melding.opprettOppgave()?.let {

@@ -24,7 +24,7 @@ import pensjon.opptjening.azure.ad.client.TokenProvider
 class BestemSakKlient(
     @Value("\${PEN_BASE_URL}") private val bestemSakUrl: String,
     @Qualifier("PENTokenProvider") private val tokenProvider: TokenProvider,
-    private val registry: MeterRegistry
+    registry: MeterRegistry
 ) {
     private val antallSakerHentet = registry.counter("saker", "antall", "hentet")
     private val logger: Logger by lazy { LoggerFactory.getLogger(BestemSakKlient::class.java) }

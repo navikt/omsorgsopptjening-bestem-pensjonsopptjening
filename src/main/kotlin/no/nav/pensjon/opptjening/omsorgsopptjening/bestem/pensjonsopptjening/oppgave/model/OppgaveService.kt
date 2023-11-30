@@ -79,7 +79,7 @@ class OppgaveService(
 
     fun process(): List<Oppgave>? {
         return transactionTemplate.execute {
-            oppgaveRepo.finnNesteUprosesserte(10).map { oppgave ->
+            oppgaveRepo.finnNesteUprosesserte(10).mapNotNull { oppgave ->
                 Mdc.scopedMdc(oppgave.correlationId) {
                     Mdc.scopedMdc(oppgave.innlesingId) {
                         try {
@@ -118,7 +118,7 @@ class OppgaveService(
                         }
                     }
                 }
-            }.filterNotNull()
+            }
         }
     }
 }

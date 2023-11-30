@@ -5,12 +5,10 @@ import java.util.UUID
 object OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr :
     ParagrafVilkår<OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
-        return bestemUtfall(grunnlag).let {
-            Vurdering(
-                grunnlag = grunnlag,
-                utfall = it,
-            )
-        }
+        return Vurdering(
+            grunnlag = grunnlag,
+            utfall = bestemUtfall(grunnlag),
+        )
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
