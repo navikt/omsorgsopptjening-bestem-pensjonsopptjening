@@ -150,7 +150,7 @@ class PersongrunnlagRepo(
         val name = kclass.simpleName!!
         return jdbcTemplate.query(
             """select m.*, ms.statushistorikk from melding m, melding_status ms
-                |where m.id = ms.id and (status->>'type' = :type) 
+                |where m.id = ms.id and status_type = :type 
                 |order by m.opprettet asc limit 1""".trimMargin(),
             mapOf(
                 "type" to name
@@ -175,7 +175,7 @@ class PersongrunnlagRepo(
     fun antallMedStatus(kclass: KClass<*>): Long {
         val name = kclass.simpleName!!
         return jdbcTemplate.queryForObject(
-            """select count(*) from melding_status where (status->>'type' = :type)""",
+            """select count(*) from melding_status where status_type = :type""",
             mapOf(
                 "type" to name
             ),

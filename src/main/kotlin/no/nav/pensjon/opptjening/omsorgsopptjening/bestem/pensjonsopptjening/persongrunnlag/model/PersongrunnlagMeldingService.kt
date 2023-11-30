@@ -34,7 +34,7 @@ class PersongrunnlagMeldingService(
     fun process(): List<FullførteBehandlinger>? {
         val behandling = transactionTemplate.execute {
             try {
-                finnNesteMeldingerForBehandling(1)?.map { melding ->
+                finnNesteMeldingerForBehandling(10)?.map { melding ->
                     Mdc.scopedMdc(melding.correlationId) {
                         Mdc.scopedMdc(melding.innlesingId) {
                             try {
