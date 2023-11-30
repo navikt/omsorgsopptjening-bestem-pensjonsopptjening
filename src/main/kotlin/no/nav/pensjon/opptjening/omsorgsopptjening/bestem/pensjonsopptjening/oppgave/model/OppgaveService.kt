@@ -7,12 +7,14 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import org.apache.kafka.common.KafkaException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
+import java.sql.SQLException
 
 @Component
 class OppgaveService(
@@ -102,6 +104,12 @@ class OppgaveService(
                                     }
                                 }
                             }
+                        } catch (ex: SQLException) {
+                            log.error("Feil ved prosessering av oppgaver", ex)
+                            throw ex
+                        } catch (ex: KafkaException) {
+                            log.error("Feil ved prosessering av oppgaver", ex)
+                            throw ex
                         } catch (ex: Throwable) {
                             transactionTemplate.execute {
                                 oppgave.retry(ex.stackTraceToString()).let {
@@ -110,8 +118,8 @@ class OppgaveService(
                                     }
                                     oppgaveRepo.updateStatus(it)
                                 }
+                                null
                             }
-                            throw ex
                         }
                     }
                 }

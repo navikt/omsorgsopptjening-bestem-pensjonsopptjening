@@ -17,6 +17,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -179,9 +180,9 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         oppgaveRepo.findForMelding(melding!!).single().also {
             assertInstanceOf(Oppgave.Status.Klar::class.java, it.status)
         }
-        assertThrows<BestemSakClientException> {
-            oppgaveService.process()
-        }
+
+        oppgaveService.process()
+
         oppgaveRepo.findForMelding(melding).single().also { oppgave ->
             assertInstanceOf(Oppgave.Status.Retry::class.java, oppgave.status).also {
                 assertEquals(1, it.antallForsøk)
@@ -315,15 +316,13 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(Oppgave.Status.Klar::class.java, oppgaveRepo.findForMelding(melding!!).single().status)
 
-        assertThrows<BestemSakClientException> {
-            oppgaveService.process()
-        }
+        oppgaveService.process()
 
         assertInstanceOf(
             Oppgave.Status.Retry::class.java,
             oppgaveRepo.findForMelding(melding).single().status
         ).also {
-            assertEquals(1, it.antallForsøk)
+            assertThat(it.antallForsøk).isEqualTo(1)
         }
 
         assertNull(oppgaveService.process())
@@ -415,9 +414,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         oppgaveRepo.findForMelding(melding!!).single().also {
             assertInstanceOf(Oppgave.Status.Klar::class.java, it.status)
         }
-        assertThrows<BestemSakClientException> {
-            oppgaveService.process()
-        }
+        oppgaveService.process()
 
         oppgaveRepo.findForMelding(melding).single().also { oppgave ->
             assertInstanceOf(Oppgave.Status.Retry::class.java, oppgave.status).also {
@@ -429,15 +426,9 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             }
         }
 
-        assertThrows<BestemSakClientException> {
-            oppgaveService.process()
-        }
-        assertThrows<BestemSakClientException> {
-            oppgaveService.process()
-        }
-        assertThrows<BestemSakClientException> {
-            oppgaveService.process()
-        }
+        oppgaveService.process()
+        oppgaveService.process()
+        oppgaveService.process()
 
         oppgaveRepo.findForMelding(melding).single().also { oppgave ->
             oppgave.statushistorikk
