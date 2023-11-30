@@ -4,19 +4,19 @@ val domeneVersion = "1.0.65"
 val azureAdClient = "0.0.7"
 val jacksonVersion = "2.15.3"
 val logbackEncoderVersion = "7.4"
-val postgresqlVersion = "42.6.0"
+val postgresqlVersion = "42.7.0"
 val flywayCoreVersion = "9.22.3" // 10.x krever nyere postgres-database
-val springKafkaTestVersion = "3.0.12"
+val springKafkaTestVersion = "3.1.0"
 val springCloudContractVersion = "4.0.4"
-val testcontainersVersion = "1.19.1"
+val testcontainersVersion = "1.19.3"
 val mockkVersion = "1.13.8"
 val assertJVersion = "3.24.2"
 val jsonAssertVersion = "1.5.1"
 val wiremockVersion = "2.35.1"
 val mockitoVersion = "5.1.0"
-val unleashVersion = "9.1.0"
+val unleashVersion = "9.1.1"
 
-val snakeYamlVersion = "1.33" // siste er 2.x, men spring bruker 1.x
+val snakeYamlVersion = "2.2"
 val snappyJavaVersion = "1.1.10.5"
 val httpClient5Version = "5.2.1"
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
@@ -26,8 +26,8 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.1.5"
-    id("com.github.ben-manes.versions") version "0.49.0"
+    id("org.springframework.boot") version "3.2.0"
+    id("com.github.ben-manes.versions") version "0.50.0"
 }
 
 apply(plugin = "io.spring.dependency-management")

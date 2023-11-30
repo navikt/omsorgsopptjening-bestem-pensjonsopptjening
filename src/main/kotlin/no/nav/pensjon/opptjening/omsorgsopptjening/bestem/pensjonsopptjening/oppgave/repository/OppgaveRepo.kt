@@ -59,7 +59,12 @@ class OppgaveRepo(
 
     fun find(id: UUID): Oppgave.Persistent {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId where o.id = :id""",
+            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id
+                | from oppgave o
+                | join oppgave_status os on o.id = os.id
+                | join melding m on m.id = o.meldingId
+                | where o.id = :id
+                |   and os.id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -118,12 +123,14 @@ class OppgaveRepo(
     fun finnNesteUprosesserte(): Oppgave.Persistent? {
         val now = Instant.now(clock)
         val antall = 1
-        return finnNesteUprosesserteKlar(now, antall) ?: finnNesteUprosesserteRetry(now, antall)
+        val oppgave: UUID? =
+            finnNesteUprosesserteKlar(now, antall) ?: finnNesteUprosesserteRetry(now, antall)
+        return oppgave?.let { find(it) }
     }
 
-    fun finnNesteUprosesserteKlar(now: Instant, antall: Int): Oppgave.Persistent? {
-        return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id
+    fun finnNesteUprosesserteKlar(now: Instant, antall: Int): UUID? {
+        return jdbcTemplate.queryForList(
+            """select os.id
                 | from oppgave o
                 | join oppgave_status os on o.id = os.id
                 | join melding m on m.id = o.meldingId
@@ -132,13 +139,13 @@ class OppgaveRepo(
             mapOf(
                 "now" to now.toString()
             ),
-            OppgaveMapper()
+            UUID::class.java
         ).singleOrNull()
     }
 
-    fun finnNesteUprosesserteRetry(now: Instant, antall: Int): Oppgave.Persistent? {
-        return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id
+    fun finnNesteUprosesserteRetry(now: Instant, antall: Int): UUID? {
+        return jdbcTemplate.queryForList(
+            """select os.id
                 | from oppgave o
                 | join oppgave_status os on o.id = os.id
                 | join melding m on m.id = o.meldingId
@@ -147,7 +154,7 @@ class OppgaveRepo(
             mapOf(
                 "now" to now.toString()
             ),
-            OppgaveMapper()
+            UUID::class.java
         ).singleOrNull()
     }
 
