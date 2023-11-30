@@ -77,9 +77,9 @@ class OppgaveService(
         }
     }
 
-    fun process(): Oppgave? {
+    fun process(): List<Oppgave>? {
         return transactionTemplate.execute {
-            oppgaveRepo.finnNesteUprosesserte()?.let { oppgave ->
+            oppgaveRepo.finnNesteUprosesserte(10).map { oppgave ->
                 Mdc.scopedMdc(oppgave.correlationId) {
                     Mdc.scopedMdc(oppgave.innlesingId) {
                         try {
@@ -118,7 +118,7 @@ class OppgaveService(
                         }
                     }
                 }
-            }
+            }.filterNotNull()
         }
     }
 }

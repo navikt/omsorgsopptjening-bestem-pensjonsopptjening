@@ -192,7 +192,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                 assertContains(it.melding, "BAD_REQUEST")
             }
         }
-        oppgaveService.process()!!.also { oppgave ->
+        oppgaveService.process()!!.first().also { oppgave ->
             assertInstanceOf(Oppgave.Status.Ferdig::class.java, oppgave.status).also {
                 assertEquals("123", it.oppgaveId)
             }
@@ -325,14 +325,14 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             assertThat(it.antallForsøk).isEqualTo(1)
         }
 
-        assertNull(oppgaveService.process())
-        assertNull(oppgaveService.process())
-        assertNotNull(oppgaveService.process())
+        assertThat(oppgaveService.process()).isNullOrEmpty()
+        assertThat(oppgaveService.process()).isNullOrEmpty()
+        assertThat(oppgaveService.process()).isNotNull()
 
         assertInstanceOf(Oppgave::class.java, oppgaveRepo.findForMelding(melding).single())
             .also {
                 assertInstanceOf(Oppgave.Status.Ferdig::class.java, it.status).also {
-                    assertEquals("123", it.oppgaveId)
+                    assertThat(it.oppgaveId).isEqualTo("123")
                 }
             }
     }

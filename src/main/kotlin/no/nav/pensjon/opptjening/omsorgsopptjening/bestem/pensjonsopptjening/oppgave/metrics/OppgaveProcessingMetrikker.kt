@@ -6,14 +6,14 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import org.springframework.stereotype.Component
 
 @Component
-class OppgaveProcessingMetrikker(registry: MeterRegistry) : Metrikker<Oppgave?> {
+class OppgaveProcessingMetrikker(registry: MeterRegistry) : Metrikker<List<Oppgave>?> {
 
     private val oppgaverProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "oppgaverProsessert")
     private val antallOpprettedeOppgaver = registry.counter("oppgaver", "antall", "opprettet")
 
-    override fun oppdater(lambda: () -> Oppgave?): Oppgave? {
+    override fun oppdater(lambda: () -> List<Oppgave>?): List<Oppgave>? {
         return oppgaverProsessertTidsbruk.recordCallable(lambda)?.also {
-            antallOpprettedeOppgaver.increment()
+            antallOpprettedeOppgaver.increment(lambda()?.size?.toDouble()?:0.0)
         }
     }
 }

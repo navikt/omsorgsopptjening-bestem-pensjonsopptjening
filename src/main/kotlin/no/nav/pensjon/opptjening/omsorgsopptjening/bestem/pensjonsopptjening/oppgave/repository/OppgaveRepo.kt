@@ -120,15 +120,14 @@ class OppgaveRepo(
      * annen connection (pod) så lenge transaksjonen lever.
      */
 
-    fun finnNesteUprosesserte(): Oppgave.Persistent? {
+    fun finnNesteUprosesserte(antall: Int): List<Oppgave.Persistent> {
         val now = Instant.now(clock)
-        val antall = 1
-        val oppgave: UUID? =
-            finnNesteUprosesserteKlar(now, antall) ?: finnNesteUprosesserteRetry(now, antall)
-        return oppgave?.let { find(it) }
+        val oppgave: List<UUID> =
+            finnNesteUprosesserteKlar(now, antall).ifEmpty { finnNesteUprosesserteRetry(now, antall) }
+        return oppgave.map { find(it) }
     }
 
-    fun finnNesteUprosesserteKlar(now: Instant, antall: Int): UUID? {
+    fun finnNesteUprosesserteKlar(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select os.id
                 | from oppgave o
@@ -140,10 +139,10 @@ class OppgaveRepo(
                 "now" to now.toString()
             ),
             UUID::class.java
-        ).singleOrNull()
+        )
     }
 
-    fun finnNesteUprosesserteRetry(now: Instant, antall: Int): UUID? {
+    fun finnNesteUprosesserteRetry(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select os.id
                 | from oppgave o
@@ -155,7 +154,7 @@ class OppgaveRepo(
                 "now" to now.toString()
             ),
             UUID::class.java
-        ).singleOrNull()
+        )
     }
 
     fun finnEldsteUbehandledeOppgave(): Oppgave.Persistent? {
