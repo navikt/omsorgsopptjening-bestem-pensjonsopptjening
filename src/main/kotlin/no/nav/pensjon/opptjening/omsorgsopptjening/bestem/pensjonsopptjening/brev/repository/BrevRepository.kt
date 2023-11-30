@@ -97,13 +97,13 @@ class BrevRepository(
      * annen connection (pod) så lenge transaksjonen lever.
      */
 
-    fun finnNesteUprosesserte(): Brev.Persistent? {
-        val antall = 1
-        val nesteUprosesserte = finnNesteUprosesserteKlar(antall) ?: finnNesteUprosesserteRetry(antall)
-        return nesteUprosesserte?.let { find(it) }
+    fun finnNesteUprosesserte(antall: Int): List<Brev.Persistent> {
+        val nesteUprosesserte = finnNesteUprosesserteKlar(antall)
+            .ifEmpty { finnNesteUprosesserteRetry(antall) }
+        return nesteUprosesserte.map { find(it) }
     }
 
-    fun finnNesteUprosesserteKlar(antall: Int): UUID? {
+    fun finnNesteUprosesserteKlar(antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select os.id 
                 |from brev_status os
@@ -114,10 +114,10 @@ class BrevRepository(
                 "antall" to antall,
             ),
             UUID::class.java
-        ).singleOrNull()
+        )
     }
 
-    fun finnNesteUprosesserteRetry(antall: Int): UUID? {
+    fun finnNesteUprosesserteRetry(antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select os.id 
                 |from brev_status os
@@ -129,8 +129,9 @@ class BrevRepository(
                 "antall" to antall,
             ),
             UUID::class.java
-        ).singleOrNull()
+        )
     }
+
     private fun BrevÅrsak.toDb(): String {
         return when (this) {
             BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR -> BrevÅrsakDb.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR

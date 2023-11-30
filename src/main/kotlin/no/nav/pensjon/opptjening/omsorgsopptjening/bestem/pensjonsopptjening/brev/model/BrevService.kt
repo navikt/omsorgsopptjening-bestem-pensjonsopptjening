@@ -52,9 +52,9 @@ class BrevService(
         }
     }
 
-    fun process(): Brev.Persistent? {
+    fun process(): List<Brev.Persistent>? {
         return transactionTemplate.execute {
-            brevRepository.finnNesteUprosesserte()?.let { brev ->
+            brevRepository.finnNesteUprosesserte(10).map { brev ->
                 Mdc.scopedMdc(brev.correlationId) {
                     Mdc.scopedMdc(brev.innlesingId) {
                         try {

@@ -6,11 +6,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.met
 import org.springframework.stereotype.Component
 
 @Component
-class BrevProcessingMetrikker(registry: MeterRegistry): Metrikker<Brev?> {
+class BrevProcessingMetrikker(registry: MeterRegistry) : Metrikker<List<Brev>?> {
 
     private val brevProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "brevProsessert")
 
-    override fun oppdater(lambda: () -> Brev?): Brev? {
+    override fun oppdater(lambda: () -> List<Brev>?): List<Brev>? {
         return brevProsessertTidsbruk.recordCallable(lambda)?.also {
             //TODO
         }
