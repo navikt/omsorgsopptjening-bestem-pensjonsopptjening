@@ -130,11 +130,9 @@ class OppgaveRepo(
     fun finnNesteUprosesserteKlar(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select os.id
-                | from oppgave o
-                | join oppgave_status os on o.id = os.id
-                | join melding m on m.id = o.meldingId
+                | from oppgave_status os
                 | where (os.status->>'type' = 'Klar')
-                | fetch first row only for no key update of o skip locked""".trimMargin(),
+                | fetch first row only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString()
             ),
@@ -145,11 +143,10 @@ class OppgaveRepo(
     fun finnNesteUprosesserteRetry(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select os.id
-                | from oppgave o
-                | join oppgave_status os on o.id = os.id
-                | join melding m on m.id = o.meldingId
-                | where (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz)
-                | fetch first row only for no key update of o skip locked""".trimMargin(),
+                | from oppgave_status os
+                | where (os.status->>'type' = 'Retry' 
+                |   and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz)
+                | fetch first row only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString()
             ),
