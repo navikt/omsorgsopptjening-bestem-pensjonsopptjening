@@ -7,10 +7,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import org.apache.kafka.common.KafkaException
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
+import java.sql.SQLException
 import java.time.Year
 
 @Component
@@ -22,6 +25,10 @@ class BrevService(
     private val personOppslag: PersonOppslag,
     private val hentPensjonspoeng: HentPensjonspoengClient,
 ) {
+    companion object {
+        val log = LoggerFactory.getLogger(this::class.java)!!
+    }
+
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
     fun opprett(brev: Brev.Transient): Brev.Persistent {
         return brevRepository.persist(brev)
@@ -51,28 +58,29 @@ class BrevService(
                 Mdc.scopedMdc(brev.correlationId) {
                     Mdc.scopedMdc(brev.innlesingId) {
                         try {
-                            transactionTemplate.execute {
-                                personOppslag.hentAktørId(brev.omsorgsyter).let { aktørId ->
-                                    bestemSak.bestemSak(aktørId).let { sak ->
-                                        brevClient.sendBrev(
-                                            sakId = sak.sakId,
-                                            eksternReferanseId = EksternReferanseId(brev.id.toString()),
-                                            omsorgsår = Year.of(brev.omsorgsår),
-                                        ).let { journalpost ->
-                                            brev.ferdig(journalpost).also {
-                                                brevRepository.updateStatus(it)
-                                            }
+                            personOppslag.hentAktørId(brev.omsorgsyter).let { aktørId ->
+                                bestemSak.bestemSak(aktørId).let { sak ->
+                                    brevClient.sendBrev(
+                                        sakId = sak.sakId,
+                                        eksternReferanseId = EksternReferanseId(brev.id.toString()),
+                                        omsorgsår = Year.of(brev.omsorgsår),
+                                    ).let { journalpost ->
+                                        brev.ferdig(journalpost).also {
+                                            brevRepository.updateStatus(it)
                                         }
                                     }
                                 }
                             }
-                        } catch (ex: Throwable) {
-                            transactionTemplate.execute {
-                                brev.retry(ex.stackTraceToString()).also {
-                                    brevRepository.updateStatus(it)
-                                }
-                            }
+                        } catch (ex: SQLException) {
+                            log.error("Feil ved prosessering av brev", ex)
                             throw ex
+                        } catch (ex: KafkaException) {
+                            log.error("Feil ved prosessering av brev", ex)
+                            throw ex
+                        } catch (ex: Throwable) {
+                            brev.retry(ex.stackTraceToString()).also {
+                                brevRepository.updateStatus(it)
+                            }
                         }
                     }
                 }

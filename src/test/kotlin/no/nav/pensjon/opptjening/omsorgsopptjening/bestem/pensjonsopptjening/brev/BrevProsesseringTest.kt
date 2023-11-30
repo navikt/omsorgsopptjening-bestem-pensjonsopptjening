@@ -181,9 +181,7 @@ class BrevProsesseringTest(
 
         assertInstanceOf(Brev.Status.Klar::class.java, brevRepository.find(brev.id).status)
 
-        assertThrows<BrevClientException> {
-            brevService.process()
-        }
+        brevService.process()
 
         brevRepository.find(brev.id).let { m ->
             assertInstanceOf(Brev.Status.Retry::class.java, m.status).let {
@@ -193,9 +191,7 @@ class BrevProsesseringTest(
             }
         }
 
-        assertThrows<BrevClientException> {
-            brevService.process()
-        }
+        brevService.process()
 
         brevRepository.find(brev.id).let { m ->
             assertInstanceOf(Brev.Status.Retry::class.java, m.status).let {
@@ -282,18 +278,10 @@ class BrevProsesseringTest(
 
         assertInstanceOf(Brev.Status.Klar::class.java, brevRepository.find(brev.id).status)
 
-        assertThrows<BrevClientException> {
-            brevService.process()
-        }
-        assertThrows<BrevClientException> {
-            brevService.process()
-        }
-        assertThrows<BrevClientException> {
-            brevService.process()
-        }
-        assertThrows<BrevClientException> {
-            brevService.process()
-        }
+        brevService.process()
+        brevService.process()
+        brevService.process()
+        brevService.process()
 
         brevRepository.find(brev.id).also { b ->
             assertEquals(2020, b.omsorgsår)
