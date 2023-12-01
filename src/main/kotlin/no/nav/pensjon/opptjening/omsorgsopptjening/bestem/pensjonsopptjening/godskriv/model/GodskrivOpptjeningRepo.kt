@@ -32,12 +32,23 @@ class GodskrivOpptjeningRepo(
             keyHolder
         )
         jdbcTemplate.update(
-            """insert into godskriv_opptjening_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
+            """insert into godskriv_opptjening_status (id, status, status_type, karantene_til, statushistorikk) 
+                |values (:id, to_jsonb(:status::jsonb), :status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
-                mapOf<String, Any>(
+                mapOf<String, Any?>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(godskrivOpptjening.status),
                     "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
+                    "status_type" to when(godskrivOpptjening.status) {
+                        is GodskrivOpptjening.Status.Feilet -> "Feilet"
+                        is GodskrivOpptjening.Status.Ferdig -> "Ferdig"
+                        is GodskrivOpptjening.Status.Klar -> "Klar"
+                        is GodskrivOpptjening.Status.Retry -> "Retry"
+                    },
+                    "karantene_til" to when(val s = godskrivOpptjening.status) {
+                        is GodskrivOpptjening.Status.Retry -> s.karanteneTil
+                        else -> null
+                    }
                 ),
             ),
         )
@@ -46,12 +57,27 @@ class GodskrivOpptjeningRepo(
 
     fun updateStatus(godskrivOpptjening: GodskrivOpptjening.Persistent) {
         jdbcTemplate.update(
-            """update godskriv_opptjening_status set status = to_jsonb(:status::jsonb), statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
+            """update godskriv_opptjening_status 
+                | set status = to_jsonb(:status::jsonb),
+                | status_type = :status_type,
+                | karantene_til =:karantene_til::timestamptz,
+                |statushistorikk = to_jsonb(:statushistorikk::jsonb) 
+                |where id = :id""".trimMargin(),
             MapSqlParameterSource(
-                mapOf<String, Any>(
+                mapOf<String, Any?>(
                     "id" to godskrivOpptjening.id,
                     "status" to serialize(godskrivOpptjening.status),
                     "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
+                    "status_type" to when(godskrivOpptjening.status) {
+                        is GodskrivOpptjening.Status.Feilet -> "Feilet"
+                        is GodskrivOpptjening.Status.Ferdig -> "Ferdig"
+                        is GodskrivOpptjening.Status.Klar -> "Klar"
+                        is GodskrivOpptjening.Status.Retry -> "Retry"
+                    },
+                    "karantene_til" to when(val s = godskrivOpptjening.status) {
+                        is GodskrivOpptjening.Status.Retry -> s.karanteneTil.toString()
+                        else -> null
+                    }
                 ),
             ),
         )
@@ -100,9 +126,9 @@ class GodskrivOpptjeningRepo(
 
     fun finnNesteUprosesserteKlar(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
-            """select os.id
-                | from godskriv_opptjening_status os
-                | where (os.status->>'type' = 'Klar') 
+            """select id
+                | from godskriv_opptjening_status
+                | where status_type = 'Klar' 
                 | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString(),
@@ -114,9 +140,10 @@ class GodskrivOpptjeningRepo(
 
     fun finnNesteUprosesserteRetry(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
-            """select os.id
-                | from godskriv_opptjening_status os
-                | where (os.status->>'type' = 'Retry' and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz)
+            """select id
+                | from godskriv_opptjening_status
+                | where status_type = 'Retry'
+                | and karantene_til::timestamptz < (:now)::timestamptz
                 | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString(),

@@ -100,4 +100,3 @@ internal class BehandlingRowMapper : RowMapper<BehandlingDb> {
         )
     }
 }
-

@@ -32,12 +32,23 @@ class OppgaveRepo(
             keyHolder
         )
         jdbcTemplate.update(
-            """insert into oppgave_status (id, status, statushistorikk) values (:id, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb))""",
+            """insert into oppgave_status (id, status, status_type, karantene_til, statushistorikk) 
+                |values (:id, to_jsonb(:status::jsonb), :status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
-                mapOf<String, Any>(
+                mapOf<String, Any?>(
                     "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(oppgave.status),
                     "statushistorikk" to oppgave.statushistorikk.serializeList(),
+                    "status_type" to when (oppgave.status) {
+                        is Oppgave.Status.Feilet -> "Feilet"
+                        is Oppgave.Status.Ferdig -> "Ferdig"
+                        is Oppgave.Status.Klar -> "Klar"
+                        is Oppgave.Status.Retry -> "Retry"
+                    },
+                    "karantene_til" to when (val s = oppgave.status) {
+                        is Oppgave.Status.Retry -> s.karanteneTil.toString()
+                        else -> null
+                    }
                 ),
             ),
         )
@@ -46,12 +57,28 @@ class OppgaveRepo(
 
     fun updateStatus(oppgave: Oppgave.Persistent) {
         jdbcTemplate.update(
-            """update oppgave_status set status = to_jsonb(:status::jsonb), statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
+            """update oppgave_status
+                | set status = to_jsonb(:status::jsonb),
+                | status_type = :status_type,
+                | karantene_til = :karantene_til::timestamptz,
+                | statushistorikk = to_jsonb(:statushistorikk::jsonb) 
+                | where id = :id""".trimMargin(),
             MapSqlParameterSource(
-                mapOf<String, Any>(
+                mapOf<String, Any?>(
                     "id" to oppgave.id,
                     "status" to serialize(oppgave.status),
-                    "statushistorikk" to oppgave.statushistorikk.serializeList()
+                    "statushistorikk" to oppgave.statushistorikk.serializeList(),
+                    "status_type" to when (oppgave.status) {
+                        is Oppgave.Status.Feilet -> "Feilet"
+                        is Oppgave.Status.Ferdig -> "Ferdig"
+                        is Oppgave.Status.Klar -> "Klar"
+                        is Oppgave.Status.Retry -> "Retry"
+                    },
+                    "karantene_til" to when (val s = oppgave.status) {
+                        is Oppgave.Status.Retry -> s.karanteneTil.toString()
+                        else -> null
+                    }
+
                 ),
             ),
         )
@@ -129,9 +156,9 @@ class OppgaveRepo(
 
     fun finnNesteUprosesserteKlar(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
-            """select os.id
-                | from oppgave_status os
-                | where (os.status->>'type' = 'Klar')
+            """select id
+                | from oppgave_status
+                | where status_type = 'Klar'
                 | fetch first row only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString()
@@ -142,10 +169,10 @@ class OppgaveRepo(
 
     fun finnNesteUprosesserteRetry(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
-            """select os.id
-                | from oppgave_status os
-                | where (os.status->>'type' = 'Retry' 
-                |   and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz)
+            """select id
+                | from oppgave_status
+                | where status_type = 'Retry'
+                |   and karantene_til < (:now)::timestamptz
                 | fetch first row only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString()
@@ -166,19 +193,6 @@ class OppgaveRepo(
             ), OppgaveMapper()
         ).singleOrNull()
     }
-
-    fun finnOppgaverIForLangKarantene(): Oppgave? {
-        return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id 
-            |from oppgave o, oppgave_status os, melding m
-            |where o.id = os.id and m.id = o.meldingId
-            |and (os.status->>'type' <> :karanteneTil) order by o.opprettet asc limit 1""".trimMargin(),
-            mapOf(
-                "ferdig" to Instant.now(clock).toString()
-            ), OppgaveMapper()
-        ).singleOrNull()
-    }
-
 
     internal class OppgaveMapper : RowMapper<Oppgave.Persistent> {
 

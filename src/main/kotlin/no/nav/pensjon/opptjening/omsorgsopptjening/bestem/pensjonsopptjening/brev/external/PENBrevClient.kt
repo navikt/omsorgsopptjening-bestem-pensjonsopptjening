@@ -116,7 +116,7 @@ class PENBrevClient(
 
                 else -> throw BrevClientException("PEN Brev returnerte http ${ex.statusCode.value()}", ex)
             }
-        } catch(ex: BrevClientException) {
+        } catch (ex: BrevClientException) {
             throw ex
         } catch (ex: Throwable) {
             """Feil ved kall til $url, feil: $ex""".let {
