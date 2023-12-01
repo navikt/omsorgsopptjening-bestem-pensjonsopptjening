@@ -137,9 +137,10 @@ class BrevRepository(
     fun finnNesteUprosesserteKlar(antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select id 
-                |from brev_status
-                |where status_type = 'Klar' 
-                |fetch first :antall rows only for no key update skip locked""".trimMargin(),
+                | from brev_status
+                | where status_type = 'Klar'
+                | order by id
+                | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to Instant.now(clock).toString(),
                 "antall" to antall,
@@ -154,6 +155,8 @@ class BrevRepository(
                 | from brev_status
                 | where status_type = 'Retry'
                 |   and karantene_til < (:now)::timestamptz
+                |   and karantene_til is not null
+                | order by karantene_til asc
                 | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to Instant.now(clock).toString(),

@@ -159,6 +159,7 @@ class OppgaveRepo(
             """select id
                 | from oppgave_status
                 | where status_type = 'Klar'
+                | order by id
                 | fetch first row only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString()
@@ -173,6 +174,8 @@ class OppgaveRepo(
                 | from oppgave_status
                 | where status_type = 'Retry'
                 |   and karantene_til < (:now)::timestamptz
+                |   and karantene_til is not null
+                |   order by karantene_til
                 | fetch first row only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString()

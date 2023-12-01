@@ -57,12 +57,12 @@ class GodskrivOpptjeningRepo(
 
     fun updateStatus(godskrivOpptjening: GodskrivOpptjening.Persistent) {
         jdbcTemplate.update(
-            """update godskriv_opptjening_status 
+            """update godskriv_opptjening_status
                 | set status = to_jsonb(:status::jsonb),
                 | status_type = :status_type,
                 | karantene_til =:karantene_til::timestamptz,
-                |statushistorikk = to_jsonb(:statushistorikk::jsonb) 
-                |where id = :id""".trimMargin(),
+                | statushistorikk = to_jsonb(:statushistorikk::jsonb)
+                | where id = :id""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to godskrivOpptjening.id,
@@ -128,7 +128,8 @@ class GodskrivOpptjeningRepo(
         return jdbcTemplate.queryForList(
             """select id
                 | from godskriv_opptjening_status
-                | where status_type = 'Klar' 
+                | where status_type = 'Klar'
+                | order by id
                 | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString(),
@@ -144,6 +145,8 @@ class GodskrivOpptjeningRepo(
                 | from godskriv_opptjening_status
                 | where status_type = 'Retry'
                 | and karantene_til::timestamptz < (:now)::timestamptz
+                | and karantene_til is not null
+                | order by karantene_til
                 | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
                 "now" to now.toString(),
@@ -160,19 +163,6 @@ class GodskrivOpptjeningRepo(
                 |from godskriv_opptjening o,godskriv_opptjening_status os, behandling b,melding m
                 |where o.id = os.id and b.id = o.behandlingId and m.id = b.kafkaMeldingId  
                 |and (os.status->>'type' <> 'Ferdig') order by o.opprettet asc limit 1""".trimMargin(),
-            GodskrivOpptjeningMapper()
-        ).singleOrNull()
-    }
-
-    fun finnEttEllerAnnetKarantene(): GodskrivOpptjening.Persistent? {
-        return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
-                |from godskriv_opptjening o,godskriv_opptjening_status os, behandling b,melding m
-                |where o.id = os.id and b.id = o.behandlingId and m.id = b.kafkaMeldingId  
-                |and (os.status->>'type' <> 'Ferdig') and (os.status->>'karanteneTil')::timestamptz < (:now)::timestamptz) fetch first row only for no key update of o skip locked""".trimMargin(),
-            mapOf(
-                "now" to Instant.now(clock).toString()
-            ),
             GodskrivOpptjeningMapper()
         ).singleOrNull()
     }
