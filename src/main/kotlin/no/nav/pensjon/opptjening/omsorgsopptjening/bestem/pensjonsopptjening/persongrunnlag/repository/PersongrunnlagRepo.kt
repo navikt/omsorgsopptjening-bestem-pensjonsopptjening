@@ -33,15 +33,11 @@ class PersongrunnlagRepo(
         jdbcTemplate.update(
             //language=postgres-psql
             """
-                |with pg as (insert into melding (melding, correlation_id, innlesing_id, opprettet) 
-                |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz) 
+                |insert into melding (melding, correlation_id, innlesing_id, opprettet, status, statushistorikk, status_type, karantene_til) 
+                |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb), :statusType, :karanteneTil::timestamptz) 
                 |on conflict on constraint unique_correlation_innlesing do nothing 
-                |returning id, to_jsonb(:status::jsonb) as status, to_jsonb(:statushistorikk::jsonb) as statushistorikk, :statusType as statusType, :karanteneTil::timestamptz as karanteneTil)
-                |insert into melding_status (id, status, statushistorikk, status_type, karantene_til)
-                |select id, status, statushistorikk, statusType, karanteneTil from pg where id is not null
-                |returning (select id from pg)
-            """
-                .trimMargin(),
+                |returning id
+            """.trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "melding" to serialize(melding.innhold),
@@ -62,7 +58,7 @@ class PersongrunnlagRepo(
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
         jdbcTemplate.update(
-            """update melding_status set status = to_jsonb(:status::jsonb), status_type = :statusType, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
+            """update melding set status = to_jsonb(:status::jsonb), status_type = :statusType, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to melding.id,
@@ -85,11 +81,9 @@ class PersongrunnlagRepo(
 
     fun find(id: UUID): PersongrunnlagMelding.Mottatt {
         return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk 
-                |from melding m 
-                |join melding_status ms on m.id = ms.id 
-                |where m.id = :id
-                |and ms.id = :id""".trimMargin(),
+            """select * 
+                |from melding 
+                |where id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -106,7 +100,7 @@ class PersongrunnlagRepo(
 
         return jdbcTemplate.queryForList(
             """select id 
-             | from melding_status
+             | from melding
              | where status_type = 'Klar' 
              | order by id
              | fetch first :antall rows only for no key update skip locked""".trimMargin(),
@@ -122,7 +116,7 @@ class PersongrunnlagRepo(
         val now = Instant.now(clock).toString()
         return jdbcTemplate.queryForList(
             """select id 
-             | from melding_status
+             | from melding
              | where status_type = 'Retry'
              | and karantene_til is not null
              | and karantene_til < (:now)::timestamptz
@@ -138,10 +132,7 @@ class PersongrunnlagRepo(
 
     fun finnSiste(): PersongrunnlagMelding? {
         return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk from
-                  | (select * from melding m order by m.opprettet desc limit 1) m,
-                  | melding_status ms
-                  | where m.id = ms.id""".trimMargin(),
+            """select * from melding order by opprettet desc limit 1""".trimMargin(),
             PersongrunnlagMeldingMapper()
         ).singleOrNull()
     }
@@ -149,9 +140,9 @@ class PersongrunnlagRepo(
     fun finnEldsteMedStatus(kclass: KClass<*>): PersongrunnlagMelding? {
         val name = kclass.simpleName!!
         return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk from melding m, melding_status ms
-                |where m.id = ms.id and status_type = :type 
-                |order by m.opprettet asc limit 1""".trimMargin(),
+            """select * from melding
+                |where status_type = :type 
+                |order by opprettet asc limit 1""".trimMargin(),
             mapOf(
                 "type" to name
             ),
@@ -162,9 +153,9 @@ class PersongrunnlagRepo(
     fun finnEldsteSomIkkeErFerdig(): PersongrunnlagMelding? {
         val name = PersongrunnlagMelding.Status.Ferdig::class.simpleName!!
         return jdbcTemplate.query(
-            """select m.*, ms.statushistorikk from melding m, melding_status ms
-                | where m.id = ms.id and status_type <> :type
-                | order by m.opprettet asc limit 1""".trimMargin(),
+            """select * from melding
+                | where status_type <> :type
+                | order by opprettet asc limit 1""".trimMargin(),
             mapOf(
                 "type" to name
             ),
@@ -175,7 +166,7 @@ class PersongrunnlagRepo(
     fun antallMedStatus(kclass: KClass<*>): Long {
         val name = kclass.simpleName!!
         return jdbcTemplate.queryForObject(
-            """select count(*) from melding_status where status_type = :type""",
+            """select count(*) from melding where status_type = :type""",
             mapOf(
                 "type" to name
             ),

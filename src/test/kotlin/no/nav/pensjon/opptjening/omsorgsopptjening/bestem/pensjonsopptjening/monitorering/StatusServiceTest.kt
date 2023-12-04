@@ -281,20 +281,12 @@ object StatusServiceTest {
     private fun printDatabaseContent() {
         println("Database content:")
         jdbcTemplate.queryForList("select * from melding", emptyMap<String, Any>()).forEach { println(" melding $it") }
-        jdbcTemplate.queryForList("select * from melding_status", emptyMap<String, Any>())
-            .forEach { println(" melding_status $it") }
         jdbcTemplate.queryForList("select * from oppgave", emptyMap<String, Any>()).forEach { println(" oppgave $it") }
-        jdbcTemplate.queryForList("select * from oppgave_status", emptyMap<String, Any>())
-            .forEach { println(" oppgave_status $it") }
         jdbcTemplate.queryForList("select * from behandling", emptyMap<String, Any>())
             .forEach { println(" behandling $it") }
         jdbcTemplate.queryForList("select * from godskriv_opptjening", emptyMap<String, Any>())
             .forEach { println(" godskriv_opptjening $it") }
-        jdbcTemplate.queryForList("select * from godskriv_opptjening_status", emptyMap<String, Any>())
-            .forEach { println(" godskriv_opptjening_status $it") }
         jdbcTemplate.queryForList("select * from brev", emptyMap<String, Any>()).forEach { println(" brev $it") }
-        jdbcTemplate.queryForList("select * from brev_status", emptyMap<String, Any>())
-            .forEach { println(" brev_status $it") }
     }
 
     private fun lagreOgHent(melding: PersongrunnlagMelding.Lest): PersongrunnlagMelding.Mottatt {

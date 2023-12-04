@@ -55,7 +55,6 @@ class PostgresqlTestContainer private constructor(image: String) : PostgreSQLCon
                         DELETE FROM OPPGAVE_STATUS;
                         DELETE FROM OPPGAVE;
                         DELETE FROM BEHANDLING;
-                        DELETE FROM MELDING_STATUS;
                         DELETE FROM MELDING;
                     """
                 )
