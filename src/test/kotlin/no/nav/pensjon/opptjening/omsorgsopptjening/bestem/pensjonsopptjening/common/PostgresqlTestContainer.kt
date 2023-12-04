@@ -48,11 +48,8 @@ class PostgresqlTestContainer private constructor(image: String) : PostgreSQLCon
             dataSource.connection.apply {
                 createStatement().execute(
                     """           
-                        DELETE FROM BREV_STATUS;
                         DELETE FROM BREV;
-                        DELETE FROM GODSKRIV_OPPTJENING_STATUS;   
                         DELETE FROM GODSKRIV_OPPTJENING;
-                        DELETE FROM OPPGAVE_STATUS;
                         DELETE FROM OPPGAVE;
                         DELETE FROM BEHANDLING;
                         DELETE FROM MELDING;

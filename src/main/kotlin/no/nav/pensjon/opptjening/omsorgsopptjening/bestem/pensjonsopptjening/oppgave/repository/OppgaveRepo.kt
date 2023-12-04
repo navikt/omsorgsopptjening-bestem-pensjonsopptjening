@@ -21,22 +21,13 @@ class OppgaveRepo(
     fun persist(oppgave: Oppgave.Transient): Oppgave.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into oppgave (behandlingId, meldingId, detaljer) values (:behandlingId, :meldingId, to_jsonb(:detaljer::jsonb))""",
+            """insert into oppgave (behandlingId, meldingId, detaljer, status, status_type, karantene_til, statushistorikk) 
+                |values (:behandlingId, :meldingId, to_jsonb(:detaljer::jsonb), to_jsonb(:status::jsonb), :status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to oppgave.behandlingId,
                     "meldingId" to oppgave.meldingId,
-                    "detaljer" to serialize(oppgave.detaljer)
-                ),
-            ),
-            keyHolder
-        )
-        jdbcTemplate.update(
-            """insert into oppgave_status (id, status, status_type, karantene_til, statushistorikk) 
-                |values (:id, to_jsonb(:status::jsonb), :status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to keyHolder.keys!!["id"] as UUID,
+                    "detaljer" to serialize(oppgave.detaljer),
                     "status" to serialize(oppgave.status),
                     "statushistorikk" to oppgave.statushistorikk.serializeList(),
                     "status_type" to when (oppgave.status) {
@@ -51,13 +42,14 @@ class OppgaveRepo(
                     }
                 ),
             ),
+            keyHolder
         )
         return find(keyHolder.keys!!["id"] as UUID)
     }
 
     fun updateStatus(oppgave: Oppgave.Persistent) {
         jdbcTemplate.update(
-            """update oppgave_status
+            """update oppgave
                 | set status = to_jsonb(:status::jsonb),
                 | status_type = :status_type,
                 | karantene_til = :karantene_til::timestamptz,
@@ -86,12 +78,10 @@ class OppgaveRepo(
 
     fun find(id: UUID): Oppgave.Persistent {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id
+            """select o.*, m.correlation_id, m.innlesing_id
                 | from oppgave o
-                | join oppgave_status os on o.id = os.id
                 | join melding m on m.id = o.meldingId
-                | where o.id = :id
-                |   and os.id = :id""".trimMargin(),
+                | where o.id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -101,7 +91,10 @@ class OppgaveRepo(
 
     fun findForMelding(id: UUID): List<Oppgave.Persistent> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId where o.meldingId = :id""",
+            """select o.*, m.correlation_id, m.innlesing_id 
+                |from oppgave o 
+                |join melding m on m.id = o.meldingId 
+                |where o.meldingId = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -111,7 +104,11 @@ class OppgaveRepo(
 
     fun findForBehandling(id: UUID): List<Oppgave.Persistent> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id from oppgave o join oppgave_status os on o.id = os.id join melding m on m.id = o.meldingId join behandling b on b.id = o.behandlingId where b.id = :id""",
+            """select o.*, m.correlation_id, m.innlesing_id 
+                |from oppgave o 
+                |join melding m on m.id = o.meldingId 
+                |join behandling b on b.id = o.behandlingId 
+                |where b.id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -121,7 +118,9 @@ class OppgaveRepo(
 
     fun existsForOmsorgsyterOgÅr(omsorgsyter: String, år: Int): Boolean {
         return jdbcTemplate.query(
-            """select count(1) as antall from oppgave o join behandling b on b.id = o.behandlingId where b.omsorgsyter = :omsorgsyter and b.omsorgs_ar = :omsorgsar""",
+            """select count(1) as antall from oppgave o 
+                |join behandling b on b.id = o.behandlingId
+                | where b.omsorgsyter = :omsorgsyter and b.omsorgs_ar = :omsorgsar""".trimMargin(),
             mapOf<String, Any>(
                 "omsorgsyter" to omsorgsyter,
                 "omsorgsar" to år
@@ -132,7 +131,10 @@ class OppgaveRepo(
 
     fun existsForOmsorgsmottakerOgÅr(omsorgsmottaker: String, år: Int): Boolean {
         return jdbcTemplate.query(
-            """select count(1) as antall from oppgave o join behandling b on b.id = o.behandlingId where b.omsorgsmottaker = :omsorgsmottaker and b.omsorgs_ar = :omsorgsar""",
+            """select count(1) as antall from oppgave o 
+                |join behandling b on b.id = o.behandlingId 
+                |where b.omsorgsmottaker = :omsorgsmottaker 
+                |and b.omsorgs_ar = :omsorgsar""".trimMargin(),
             mapOf<String, Any>(
                 "omsorgsmottaker" to omsorgsmottaker,
                 "omsorgsar" to år
@@ -157,7 +159,7 @@ class OppgaveRepo(
     fun finnNesteUprosesserteKlar(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select id
-                | from oppgave_status
+                | from oppgave
                 | where status_type = 'Klar'
                 | order by id
                 | fetch first row only for no key update skip locked""".trimMargin(),
@@ -171,7 +173,7 @@ class OppgaveRepo(
     fun finnNesteUprosesserteRetry(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select id
-                | from oppgave_status
+                | from oppgave
                 | where status_type = 'Retry'
                 |   and karantene_til < (:now)::timestamptz
                 |   and karantene_til is not null
@@ -186,11 +188,10 @@ class OppgaveRepo(
 
     fun finnEldsteUbehandledeOppgave(): Oppgave.Persistent? {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.correlation_id, m.innlesing_id 
-            |from oppgave o, oppgave_status os, melding m
-            |where o.id = os.id and m.id = o.meldingId
+            """select o.*, m.correlation_id, m.innlesing_id 
+            |from oppgave o, melding m
+            |where m.id = o.meldingId
             |order by o.opprettet asc limit 1""".trimMargin(),
-//            |and (os.status->>'type' <> :ferdig) order by o.opprettet asc limit 1""".trimMargin(),
             mapOf(
                 "ferdig" to Oppgave.Status.Ferdig::class.simpleName
             ), OppgaveMapper()

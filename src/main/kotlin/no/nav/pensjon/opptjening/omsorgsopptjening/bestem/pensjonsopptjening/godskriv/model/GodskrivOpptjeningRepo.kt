@@ -23,20 +23,11 @@ class GodskrivOpptjeningRepo(
     fun persist(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into godskriv_opptjening (behandlingId) values (:behandlingId)""",
+            """insert into godskriv_opptjening (behandlingId,status, status_type, karantene_til, statushistorikk)
+                |values (:behandlingId,to_jsonb(:status::jsonb), :status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to godskrivOpptjening.behandlingId,
-                ),
-            ),
-            keyHolder
-        )
-        jdbcTemplate.update(
-            """insert into godskriv_opptjening_status (id, status, status_type, karantene_til, statushistorikk) 
-                |values (:id, to_jsonb(:status::jsonb), :status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to keyHolder.keys!!["id"] as UUID,
                     "status" to serialize(godskrivOpptjening.status),
                     "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
                     "status_type" to when(godskrivOpptjening.status) {
@@ -51,13 +42,14 @@ class GodskrivOpptjeningRepo(
                     }
                 ),
             ),
+            keyHolder
         )
         return find(keyHolder.keys!!["id"] as UUID)
     }
 
     fun updateStatus(godskrivOpptjening: GodskrivOpptjening.Persistent) {
         jdbcTemplate.update(
-            """update godskriv_opptjening_status
+            """update godskriv_opptjening
                 | set status = to_jsonb(:status::jsonb),
                 | status_type = :status_type,
                 | karantene_til =:karantene_til::timestamptz,
@@ -85,7 +77,11 @@ class GodskrivOpptjeningRepo(
 
     fun find(id: UUID): GodskrivOpptjening.Persistent {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where o.id = :id""",
+            """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
+                |from godskriv_opptjening o 
+                |join behandling b on b.id = o.behandlingId 
+                |join melding m on m.id = b.kafkaMeldingId 
+                |where o.id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -95,7 +91,11 @@ class GodskrivOpptjeningRepo(
 
     fun findForMelding(id: UUID): List<GodskrivOpptjening.Persistent> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where m.id = :id""",
+            """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
+                |from godskriv_opptjening o 
+                |join behandling b on b.id = o.behandlingId 
+                |join melding m on m.id = b.kafkaMeldingId 
+                |where m.id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -105,7 +105,11 @@ class GodskrivOpptjeningRepo(
 
     fun findForBehandling(id: UUID): List<GodskrivOpptjening.Persistent> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk,  m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter from godskriv_opptjening o join godskriv_opptjening_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where b.id = :id""",
+            """select o.*,  m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
+                |from godskriv_opptjening o 
+                |join behandling b on b.id = o.behandlingId 
+                |join melding m on m.id = b.kafkaMeldingId 
+                |where b.id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -127,7 +131,7 @@ class GodskrivOpptjeningRepo(
     fun finnNesteUprosesserteKlar(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select id
-                | from godskriv_opptjening_status
+                | from godskriv_opptjening
                 | where status_type = 'Klar'
                 | order by id
                 | fetch first :antall rows only for no key update skip locked""".trimMargin(),
@@ -142,7 +146,7 @@ class GodskrivOpptjeningRepo(
     fun finnNesteUprosesserteRetry(now: Instant, antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select id
-                | from godskriv_opptjening_status
+                | from godskriv_opptjening
                 | where status_type = 'Retry'
                 | and karantene_til::timestamptz < (:now)::timestamptz
                 | and karantene_til is not null
@@ -159,10 +163,10 @@ class GodskrivOpptjeningRepo(
 
     fun finnEldsteIkkeFerdig(): GodskrivOpptjening.Persistent? {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
-                |from godskriv_opptjening o,godskriv_opptjening_status os, behandling b,melding m
-                |where o.id = os.id and b.id = o.behandlingId and m.id = b.kafkaMeldingId  
-                |and (os.status->>'type' <> 'Ferdig') order by o.opprettet asc limit 1""".trimMargin(),
+            """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
+                |from godskriv_opptjening o,behandling b,melding m
+                |where b.id = o.behandlingId and m.id = b.kafkaMeldingId  
+                |and (o.status_type <> 'Ferdig') order by o.opprettet asc limit 1""".trimMargin(),
             GodskrivOpptjeningMapper()
         ).singleOrNull()
     }

@@ -110,14 +110,18 @@ object StatusServiceTest {
         opprettet: Instant = now(),
     ) {
         jdbcTemplate.update(
-            """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer) values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json) )""",
+            """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer, status, statushistorikk, status_type) 
+                |values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json), cast(:status as json), cast (:statushistorikk as json),:statusType)""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to id,
                     "behandlingId" to id,
                     "opprettet" to opprettet.toString(),
                     "meldingId" to mottatt.id,
-                    "detaljer" to """{"type":"MottakerOgTekst", "oppgavemottaker":"12345123451", "oppgavetekst":["blah blah", "blah"]}"""
+                    "detaljer" to """{"type":"MottakerOgTekst", "oppgavemottaker":"12345123451", "oppgavetekst":["blah blah", "blah"]}""",
+                    "status" to """{"type": "Klar"}""",
+                    "statushistorikk" to """[{"type": "Klar", "tidspunkt": "2023-10-30T08:46:19.690871Z"}]""",
+                    "statusType" to "Klar",
                 ),
             ),
         )
@@ -129,27 +133,16 @@ object StatusServiceTest {
         opprettet: Instant = now()
     ) {
         jdbcTemplate.update(
-            """insert into godskriv_opptjening (id, opprettet, behandlingId) 
-                    |values (:id, (:opprettet)::timestamptz, :behandlingId)""".trimMargin(),
+            """insert into godskriv_opptjening (id, opprettet, behandlingId, status, statushistorikk,status_type) 
+                    |values (:id, (:opprettet)::timestamptz, :behandlingId, cast (:status as json), cast (:statushistorikk as json),:statusType)""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to uuid1,
                     "opprettet" to opprettet.toString(),
                     "behandlingId" to behandlingId,
-                ),
-            ),
-        )
-    }
-
-    private fun lagreDummyOppgaveStatus(id: UUID) {
-        jdbcTemplate.update(
-            """insert into oppgave_status (id, status, statushistorikk) 
-                    |values (:id, cast(:status as json), cast (:statushistorikk as json))""".trimMargin(),
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to id,
-                    "status" to """{"type": "Klar"}""",
-                    "statushistorikk" to """[{"type": "Klar", "tidspunkt": "2023-10-30T08:46:19.690871Z"}]"""
+                    "status" to """{"type":"x"}""",
+                    "statushistorikk" to """[]""",
+                    "statusType" to "x"
                 ),
             ),
         )
@@ -174,22 +167,6 @@ object StatusServiceTest {
                     "vilkarsvurdering" to "{}",
                     "utfall" to "{}",
                     "kafkaMeldingId" to mottatt.id,
-                ),
-            ),
-        )
-    }
-
-    private fun lagreDummyGodskrivOpptjeningStatus(
-        godskrivOpptjeningId: UUID
-    ) {
-        jdbcTemplate.update(
-            """insert into godskriv_opptjening_status (id, status, statushistorikk) 
-                    |values (:id, cast (:status as json), cast (:statushistorikk as json))""".trimMargin(),
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to godskrivOpptjeningId,
-                    "status" to """{"type":"x"}""",
-                    "statushistorikk" to """[]""",
                 ),
             ),
         )
@@ -249,8 +226,6 @@ object StatusServiceTest {
         lagreDummyBehandling(uuid, mottatt)
         lagreDummyOppgave(uuid, mottatt, 200.daysAgo)
 
-        lagreDummyOppgaveStatus(uuid)
-
         printDatabaseContent()
 
         val status = statusService.checkStatus()
@@ -268,9 +243,7 @@ object StatusServiceTest {
 
         lagreDummyBehandling(uuid1, mottatt)
         lagreDummyOppgave(uuid1, mottatt, now())
-        lagreDummyOppgaveStatus(uuid1)
         lagreDummyGodskrivOpptjening(uuid1, uuid1, 10.daysAgo)
-        lagreDummyGodskrivOpptjeningStatus(uuid1)
 
         printDatabaseContent()
 

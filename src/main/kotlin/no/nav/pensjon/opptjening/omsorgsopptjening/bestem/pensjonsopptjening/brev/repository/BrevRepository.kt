@@ -26,21 +26,12 @@ class BrevRepository(
     fun persist(brev: Brev.Transient): Brev.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into brev (behandlingId, årsak) values (:behandlingId, :arsak)""",
+            """insert into brev (behandlingId, årsak, status, status_type, karantene_til, statushistorikk) 
+                |values (:behandlingId, :arsak, to_jsonb(:status::jsonb),:status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to brev.behandlingId,
-                    "arsak" to brev.årsak.toDb()
-                ),
-            ),
-            keyHolder
-        )
-        jdbcTemplate.update(
-            """insert into brev_status (id, status, status_type, karantene_til, statushistorikk) 
-                |values (:id, to_jsonb(:status::jsonb),:status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
-            MapSqlParameterSource(
-                mapOf<String, Any?>(
-                    "id" to keyHolder.keys!!["id"] as UUID,
+                    "arsak" to brev.årsak.toDb(),
                     "status" to serialize(brev.status),
                     "statushistorikk" to brev.statushistorikk.serializeList(),
                     "status_type" to when (val s = brev.status) {
@@ -55,13 +46,15 @@ class BrevRepository(
                     }
                 ),
             ),
+            keyHolder
         )
+
         return find(keyHolder.keys!!["id"] as UUID)
     }
 
     fun updateStatus(brev: Brev.Persistent) {
         jdbcTemplate.update(
-            """update brev_status set 
+            """update brev set 
                 | status = to_jsonb(:status::jsonb), 
                 | statushistorikk = to_jsonb(:statushistorikk::jsonb),
                 | status_type = :status_type,
@@ -89,7 +82,11 @@ class BrevRepository(
 
     fun find(id: UUID): Brev.Persistent {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where o.id = :id""",
+            """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  
+                |from brev o 
+                |join behandling b on b.id = o.behandlingId 
+                |join melding m on m.id = b.kafkaMeldingId 
+                |where o.id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -99,7 +96,11 @@ class BrevRepository(
 
     fun findForMelding(id: UUID): List<Brev.Persistent> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  from brev o join brev_status os on o.id = os.id join behandling b on b.id = o.behandlingId join melding m on m.id = b.kafkaMeldingId where m.id = :id""",
+            """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  
+                |from brev o 
+                |join behandling b on b.id = o.behandlingId 
+                |join melding m on m.id = b.kafkaMeldingId 
+                |where m.id = :id""".trimMargin(),
             mapOf<String, Any>(
                 "id" to id
             ),
@@ -109,9 +110,8 @@ class BrevRepository(
 
     fun findForBehandling(id: UUID): List<Brev.Persistent> {
         return jdbcTemplate.query(
-            """select o.*, os.statushistorikk,  m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar
+            """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar
                 | from brev o
-                | join brev_status os on o.id = os.id
                 | join behandling b on b.id = o.behandlingId
                 | join melding m on m.id = b.kafkaMeldingId 
                 | where b.id = :id""".trimMargin(),
@@ -137,7 +137,7 @@ class BrevRepository(
     fun finnNesteUprosesserteKlar(antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select id 
-                | from brev_status
+                | from brev
                 | where status_type = 'Klar'
                 | order by id
                 | fetch first :antall rows only for no key update skip locked""".trimMargin(),
@@ -152,7 +152,7 @@ class BrevRepository(
     fun finnNesteUprosesserteRetry(antall: Int): List<UUID> {
         return jdbcTemplate.queryForList(
             """select id
-                | from brev_status
+                | from brev
                 | where status_type = 'Retry'
                 |   and karantene_til < (:now)::timestamptz
                 |   and karantene_til is not null
