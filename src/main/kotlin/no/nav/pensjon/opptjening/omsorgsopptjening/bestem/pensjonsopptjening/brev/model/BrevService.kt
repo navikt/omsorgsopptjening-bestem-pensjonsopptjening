@@ -74,9 +74,6 @@ class BrevService(
                         } catch (ex: SQLException) {
                             log.error("Feil ved prosessering av brev", ex)
                             throw ex
-                        } catch (ex: KafkaException) {
-                            log.error("Feil ved prosessering av brev", ex)
-                            throw ex
                         } catch (ex: Throwable) {
                             brev.retry(ex.stackTraceToString()).also {
                                 brevRepository.updateStatus(it)

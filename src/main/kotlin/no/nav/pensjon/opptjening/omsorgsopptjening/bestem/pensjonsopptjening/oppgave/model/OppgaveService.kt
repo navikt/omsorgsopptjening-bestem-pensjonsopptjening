@@ -104,9 +104,6 @@ class OppgaveService(
                         } catch (ex: SQLException) {
                             log.error("Feil ved prosessering av oppgaver", ex)
                             throw ex
-                        } catch (ex: KafkaException) {
-                            log.error("Feil ved prosessering av oppgaver", ex)
-                            throw ex
                         } catch (ex: Throwable) {
                             oppgave.retry(ex.stackTraceToString()).let {
                                 if (it.status is Oppgave.Status.Feilet) {

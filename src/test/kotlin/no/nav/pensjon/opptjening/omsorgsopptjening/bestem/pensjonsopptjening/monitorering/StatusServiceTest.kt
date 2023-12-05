@@ -110,8 +110,8 @@ object StatusServiceTest {
         opprettet: Instant = now(),
     ) {
         jdbcTemplate.update(
-            """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer, status, statushistorikk, status_type) 
-                |values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json), cast(:status as json), cast (:statushistorikk as json),:statusType)""".trimMargin(),
+            """insert into oppgave (id, behandlingId, opprettet, meldingId, detaljer, statushistorikk, status) 
+                |values (:id,:behandlingId, (:opprettet)::timestamptz, :meldingId, cast (:detaljer as json), cast (:statushistorikk as json),:status)""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to id,
@@ -119,9 +119,8 @@ object StatusServiceTest {
                     "opprettet" to opprettet.toString(),
                     "meldingId" to mottatt.id,
                     "detaljer" to """{"type":"MottakerOgTekst", "oppgavemottaker":"12345123451", "oppgavetekst":["blah blah", "blah"]}""",
-                    "status" to """{"type": "Klar"}""",
                     "statushistorikk" to """[{"type": "Klar", "tidspunkt": "2023-10-30T08:46:19.690871Z"}]""",
-                    "statusType" to "Klar",
+                    "status" to "Klar",
                 ),
             ),
         )
@@ -133,16 +132,15 @@ object StatusServiceTest {
         opprettet: Instant = now()
     ) {
         jdbcTemplate.update(
-            """insert into godskriv_opptjening (id, opprettet, behandlingId, status, statushistorikk,status_type) 
-                    |values (:id, (:opprettet)::timestamptz, :behandlingId, cast (:status as json), cast (:statushistorikk as json),:statusType)""".trimMargin(),
+            """insert into godskriv_opptjening (id, opprettet, behandlingId, statushistorikk,status) 
+                    |values (:id, (:opprettet)::timestamptz, :behandlingId, cast (:statushistorikk as json),:status)""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to uuid1,
                     "opprettet" to opprettet.toString(),
                     "behandlingId" to behandlingId,
-                    "status" to """{"type":"x"}""",
                     "statushistorikk" to """[]""",
-                    "statusType" to "x"
+                    "status" to "x"
                 ),
             ),
         )

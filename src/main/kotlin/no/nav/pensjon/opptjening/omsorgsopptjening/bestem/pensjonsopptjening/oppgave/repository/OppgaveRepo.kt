@@ -21,16 +21,15 @@ class OppgaveRepo(
     fun persist(oppgave: Oppgave.Transient): Oppgave.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into oppgave (behandlingId, meldingId, detaljer, status, status_type, karantene_til, statushistorikk) 
-                |values (:behandlingId, :meldingId, to_jsonb(:detaljer::jsonb), to_jsonb(:status::jsonb), :status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
+            """insert into oppgave (behandlingId, meldingId, detaljer, status, karantene_til, statushistorikk) 
+                |values (:behandlingId, :meldingId, to_jsonb(:detaljer::jsonb), :status, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to oppgave.behandlingId,
                     "meldingId" to oppgave.meldingId,
                     "detaljer" to serialize(oppgave.detaljer),
-                    "status" to serialize(oppgave.status),
                     "statushistorikk" to oppgave.statushistorikk.serializeList(),
-                    "status_type" to when (oppgave.status) {
+                    "status" to when (oppgave.status) {
                         is Oppgave.Status.Feilet -> "Feilet"
                         is Oppgave.Status.Ferdig -> "Ferdig"
                         is Oppgave.Status.Klar -> "Klar"
@@ -50,8 +49,7 @@ class OppgaveRepo(
     fun updateStatus(oppgave: Oppgave.Persistent) {
         jdbcTemplate.update(
             """update oppgave
-                | set status = to_jsonb(:status::jsonb),
-                | status_type = :status_type,
+                | set status = :status,
                 | karantene_til = :karantene_til::timestamptz,
                 | statushistorikk = to_jsonb(:statushistorikk::jsonb) 
                 | where id = :id""".trimMargin(),
@@ -60,7 +58,7 @@ class OppgaveRepo(
                     "id" to oppgave.id,
                     "status" to serialize(oppgave.status),
                     "statushistorikk" to oppgave.statushistorikk.serializeList(),
-                    "status_type" to when (oppgave.status) {
+                    "status" to when (oppgave.status) {
                         is Oppgave.Status.Feilet -> "Feilet"
                         is Oppgave.Status.Ferdig -> "Ferdig"
                         is Oppgave.Status.Klar -> "Klar"
@@ -160,7 +158,7 @@ class OppgaveRepo(
         return jdbcTemplate.queryForList(
             """select id
                 | from oppgave
-                | where status_type = 'Klar'
+                | where status = 'Klar'
                 | order by id
                 | fetch first row only for no key update skip locked""".trimMargin(),
             mapOf(
@@ -174,7 +172,7 @@ class OppgaveRepo(
         return jdbcTemplate.queryForList(
             """select id
                 | from oppgave
-                | where status_type = 'Retry'
+                | where status = 'Retry'
                 |   and karantene_til < (:now)::timestamptz
                 |   and karantene_til is not null
                 |   order by karantene_til

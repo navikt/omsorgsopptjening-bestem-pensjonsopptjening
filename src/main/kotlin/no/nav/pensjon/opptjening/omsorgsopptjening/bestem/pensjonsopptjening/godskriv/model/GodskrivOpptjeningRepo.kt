@@ -23,14 +23,13 @@ class GodskrivOpptjeningRepo(
     fun persist(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into godskriv_opptjening (behandlingId,status, status_type, karantene_til, statushistorikk)
-                |values (:behandlingId,to_jsonb(:status::jsonb), :status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
+            """insert into godskriv_opptjening (behandlingId,status, karantene_til, statushistorikk)
+                |values (:behandlingId,:status, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to godskrivOpptjening.behandlingId,
-                    "status" to serialize(godskrivOpptjening.status),
                     "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
-                    "status_type" to when(godskrivOpptjening.status) {
+                    "status" to when(godskrivOpptjening.status) {
                         is GodskrivOpptjening.Status.Feilet -> "Feilet"
                         is GodskrivOpptjening.Status.Ferdig -> "Ferdig"
                         is GodskrivOpptjening.Status.Klar -> "Klar"
@@ -50,8 +49,7 @@ class GodskrivOpptjeningRepo(
     fun updateStatus(godskrivOpptjening: GodskrivOpptjening.Persistent) {
         jdbcTemplate.update(
             """update godskriv_opptjening
-                | set status = to_jsonb(:status::jsonb),
-                | status_type = :status_type,
+                | set status = :status,
                 | karantene_til =:karantene_til::timestamptz,
                 | statushistorikk = to_jsonb(:statushistorikk::jsonb)
                 | where id = :id""".trimMargin(),
@@ -60,7 +58,7 @@ class GodskrivOpptjeningRepo(
                     "id" to godskrivOpptjening.id,
                     "status" to serialize(godskrivOpptjening.status),
                     "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
-                    "status_type" to when(godskrivOpptjening.status) {
+                    "status" to when(godskrivOpptjening.status) {
                         is GodskrivOpptjening.Status.Feilet -> "Feilet"
                         is GodskrivOpptjening.Status.Ferdig -> "Ferdig"
                         is GodskrivOpptjening.Status.Klar -> "Klar"
@@ -132,7 +130,7 @@ class GodskrivOpptjeningRepo(
         return jdbcTemplate.queryForList(
             """select id
                 | from godskriv_opptjening
-                | where status_type = 'Klar'
+                | where status = 'Klar'
                 | order by id
                 | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
@@ -147,7 +145,7 @@ class GodskrivOpptjeningRepo(
         return jdbcTemplate.queryForList(
             """select id
                 | from godskriv_opptjening
-                | where status_type = 'Retry'
+                | where status = 'Retry'
                 | and karantene_til::timestamptz < (:now)::timestamptz
                 | and karantene_til is not null
                 | order by karantene_til
@@ -166,7 +164,7 @@ class GodskrivOpptjeningRepo(
             """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
                 |from godskriv_opptjening o,behandling b,melding m
                 |where b.id = o.behandlingId and m.id = b.kafkaMeldingId  
-                |and (o.status_type <> 'Ferdig') order by o.opprettet asc limit 1""".trimMargin(),
+                |and (o.status <> 'Ferdig') order by o.opprettet asc limit 1""".trimMargin(),
             GodskrivOpptjeningMapper()
         ).singleOrNull()
     }

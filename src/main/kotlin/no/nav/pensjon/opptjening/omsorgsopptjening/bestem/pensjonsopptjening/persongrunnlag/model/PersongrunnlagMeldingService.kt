@@ -50,9 +50,6 @@ class PersongrunnlagMeldingService(
                                         log.info("Melding prosessert")
                                     }
                                 }
-                            } catch (ex: KafkaException) {
-                                log.error("Feil ved prosessering av meldinger, ruller tilbake", ex)
-                                throw ex
                             } catch (ex: SQLException) {
                                 log.error("Feil ved prosessering av meldinger, ruller tilbake", ex)
                                 throw ex

@@ -26,15 +26,14 @@ class BrevRepository(
     fun persist(brev: Brev.Transient): Brev.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into brev (behandlingId, årsak, status, status_type, karantene_til, statushistorikk) 
-                |values (:behandlingId, :arsak, to_jsonb(:status::jsonb),:status_type, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
+            """insert into brev (behandlingId, årsak, status, karantene_til, statushistorikk) 
+                |values (:behandlingId, :arsak, :status, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to brev.behandlingId,
                     "arsak" to brev.årsak.toDb(),
-                    "status" to serialize(brev.status),
                     "statushistorikk" to brev.statushistorikk.serializeList(),
-                    "status_type" to when (val s = brev.status) {
+                    "status" to when (val s = brev.status) {
                         is Brev.Status.Feilet -> "Feilet"
                         is Brev.Status.Ferdig -> "Ferdig"
                         is Brev.Status.Klar -> "Klar"
@@ -55,17 +54,15 @@ class BrevRepository(
     fun updateStatus(brev: Brev.Persistent) {
         jdbcTemplate.update(
             """update brev set 
-                | status = to_jsonb(:status::jsonb), 
                 | statushistorikk = to_jsonb(:statushistorikk::jsonb),
-                | status_type = :status_type,
+                | status = :status,
                 | karantene_til = :karantene_til::timestamptz
                 | where id = :id""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to brev.id,
-                    "status" to serialize(brev.status),
                     "statushistorikk" to brev.statushistorikk.serializeList(),
-                    "status_type" to when (val s = brev.status) {
+                    "status" to when (val s = brev.status) {
                         is Brev.Status.Feilet -> "Feilet"
                         is Brev.Status.Ferdig -> "Ferdig"
                         is Brev.Status.Klar -> "Klar"
@@ -138,7 +135,7 @@ class BrevRepository(
         return jdbcTemplate.queryForList(
             """select id 
                 | from brev
-                | where status_type = 'Klar'
+                | where status = 'Klar'
                 | order by id
                 | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
@@ -153,7 +150,7 @@ class BrevRepository(
         return jdbcTemplate.queryForList(
             """select id
                 | from brev
-                | where status_type = 'Retry'
+                | where status = 'Retry'
                 |   and karantene_til < (:now)::timestamptz
                 |   and karantene_til is not null
                 | order by karantene_til asc

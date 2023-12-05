@@ -33,8 +33,8 @@ class PersongrunnlagRepo(
         jdbcTemplate.update(
             //language=postgres-psql
             """
-                |insert into melding (melding, correlation_id, innlesing_id, opprettet, status, statushistorikk, status_type, karantene_til) 
-                |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:status::jsonb), to_jsonb(:statushistorikk::jsonb), :statusType, :karanteneTil::timestamptz) 
+                |insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, status, karantene_til) 
+                |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:statushistorikk::jsonb), :status, :karanteneTil::timestamptz) 
                 |on conflict on constraint unique_correlation_innlesing do nothing 
                 |returning id
             """.trimMargin(),
@@ -44,8 +44,7 @@ class PersongrunnlagRepo(
                     "correlation_id" to melding.correlationId.toString(),
                     "innlesing_id" to melding.innlesingId.toString(),
                     "opprettet" to melding.opprettet.toString(),
-                    "status" to serialize(melding.status),
-                    "statusType" to "Klar",
+                    "status" to "Klar",
                     "karanteneTil" to null,
                     "statushistorikk" to melding.statushistorikk.serializeList(),
                 ),
@@ -58,12 +57,11 @@ class PersongrunnlagRepo(
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
         jdbcTemplate.update(
-            """update melding set status = to_jsonb(:status::jsonb), status_type = :statusType, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
+            """update melding set status = :status, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to melding.id,
-                    "status" to serialize(melding.status),
-                    "statusType" to when (melding.status) {
+                    "status" to when (melding.status) {
                         is PersongrunnlagMelding.Status.Feilet -> "Feilet"
                         is PersongrunnlagMelding.Status.Ferdig -> "Ferdig"
                         is PersongrunnlagMelding.Status.Klar -> "Klar"
@@ -101,7 +99,7 @@ class PersongrunnlagRepo(
         return jdbcTemplate.queryForList(
             """select id 
              | from melding
-             | where status_type = 'Klar' 
+             | where status = 'Klar' 
              | order by id
              | fetch first :antall rows only for no key update skip locked""".trimMargin(),
             mapOf(
@@ -117,7 +115,7 @@ class PersongrunnlagRepo(
         return jdbcTemplate.queryForList(
             """select id 
              | from melding
-             | where status_type = 'Retry'
+             | where status = 'Retry'
              | and karantene_til is not null
              | and karantene_til < (:now)::timestamptz
              | order by karantene_til
@@ -141,7 +139,7 @@ class PersongrunnlagRepo(
         val name = kclass.simpleName!!
         return jdbcTemplate.query(
             """select * from melding
-                |where status_type = :type 
+                |where status = :type 
                 |order by opprettet asc limit 1""".trimMargin(),
             mapOf(
                 "type" to name
@@ -154,7 +152,7 @@ class PersongrunnlagRepo(
         val name = PersongrunnlagMelding.Status.Ferdig::class.simpleName!!
         return jdbcTemplate.query(
             """select * from melding
-                | where status_type <> :type
+                | where status <> :type
                 | order by opprettet asc limit 1""".trimMargin(),
             mapOf(
                 "type" to name
@@ -166,7 +164,7 @@ class PersongrunnlagRepo(
     fun antallMedStatus(kclass: KClass<*>): Long {
         val name = kclass.simpleName!!
         return jdbcTemplate.queryForObject(
-            """select count(*) from melding where status_type = :type""",
+            """select count(*) from melding where status = :type""",
             mapOf(
                 "type" to name
             ),
