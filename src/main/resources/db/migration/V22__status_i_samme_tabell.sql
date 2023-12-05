@@ -22,6 +22,18 @@ alter table brev add column statushistorikk jsonb not null;
 alter table brev add column karantene_til timestamp with time zone;
 alter table brev add column status_type varchar(10) not null;
 
+create index melding_status_id on melding(innlesing_id, status_type, id);
+create index melding_status_karantene on melding(innlesing_id, status_type, karantene_til);
+
+create index oppgave_status_id on oppgave(status_type, id);
+create index oppgave_status_karantene on oppgave(status_type, karantene_til);
+
+create index godskriv_opptjening_status_id on godskriv_opptjening(status_type, id);
+create index godskriv_opptjening_status_karantene on godskriv_opptjening(status_type, karantene_til);
+
+create index brev_status_id on brev(status_type, id);
+create index brev_status_karantene on brev(status_type, karantene_til);
+
 
 -- oppgave_status
 -- godskriv_opptjening_status
