@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -15,6 +16,7 @@ import java.time.Month
 import java.time.YearMonth
 
 class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
+
 
     @Autowired
     private lateinit var persongrunnlagRepo: PersongrunnlagRepo

@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.*
 import org.springframework.jdbc.core.ResultSetExtractor
@@ -18,6 +19,22 @@ class OppgaveRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
     private val clock: Clock = Clock.systemUTC()
 ) {
+    private fun Oppgave.Status.databaseName(): String {
+        return when (this) {
+            is Oppgave.Status.Feilet -> "Feilet"
+            is Oppgave.Status.Ferdig -> "Ferdig"
+            is Oppgave.Status.Klar -> "Klar"
+            is Oppgave.Status.Retry -> "Retry"
+        }
+    }
+
+    private fun Oppgave.Status.karanteneTilString(): String? {
+        return when (val s = this) {
+            is Oppgave.Status.Retry -> s.karanteneTil.toString()
+            else -> null
+        }
+    }
+
     fun persist(oppgave: Oppgave.Transient): Oppgave.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
@@ -29,16 +46,8 @@ class OppgaveRepo(
                     "meldingId" to oppgave.meldingId,
                     "detaljer" to serialize(oppgave.detaljer),
                     "statushistorikk" to oppgave.statushistorikk.serializeList(),
-                    "status" to when (oppgave.status) {
-                        is Oppgave.Status.Feilet -> "Feilet"
-                        is Oppgave.Status.Ferdig -> "Ferdig"
-                        is Oppgave.Status.Klar -> "Klar"
-                        is Oppgave.Status.Retry -> "Retry"
-                    },
-                    "karantene_til" to when (val s = oppgave.status) {
-                        is Oppgave.Status.Retry -> s.karanteneTil.toString()
-                        else -> null
-                    }
+                    "status" to oppgave.status.databaseName(),
+                    "karantene_til" to oppgave.status.karanteneTilString(),
                 ),
             ),
             keyHolder
@@ -58,17 +67,8 @@ class OppgaveRepo(
                     "id" to oppgave.id,
                     "status" to serialize(oppgave.status),
                     "statushistorikk" to oppgave.statushistorikk.serializeList(),
-                    "status" to when (oppgave.status) {
-                        is Oppgave.Status.Feilet -> "Feilet"
-                        is Oppgave.Status.Ferdig -> "Ferdig"
-                        is Oppgave.Status.Klar -> "Klar"
-                        is Oppgave.Status.Retry -> "Retry"
-                    },
-                    "karantene_til" to when (val s = oppgave.status) {
-                        is Oppgave.Status.Retry -> s.karanteneTil.toString()
-                        else -> null
-                    }
-
+                    "status" to oppgave.status.databaseName(),
+                    "karantene_til" to oppgave.status.karanteneTilString(),
                 ),
             ),
         )

@@ -20,6 +20,22 @@ class GodskrivOpptjeningRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
     private val clock: Clock = Clock.systemUTC()
 ) {
+    private fun GodskrivOpptjening.Status.databaseName(): String {
+        return when (this) {
+            is GodskrivOpptjening.Status.Feilet -> "Feilet"
+            is GodskrivOpptjening.Status.Ferdig -> "Ferdig"
+            is GodskrivOpptjening.Status.Klar -> "Klar"
+            is GodskrivOpptjening.Status.Retry -> "Retry"
+        }
+    }
+
+    private fun GodskrivOpptjening.Status.karanteneTilString(): String? {
+        return when (val s = this) {
+            is GodskrivOpptjening.Status.Retry -> s.karanteneTil.toString()
+            else -> null
+        }
+    }
+
     fun persist(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
@@ -29,16 +45,8 @@ class GodskrivOpptjeningRepo(
                 mapOf<String, Any?>(
                     "behandlingId" to godskrivOpptjening.behandlingId,
                     "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
-                    "status" to when(godskrivOpptjening.status) {
-                        is GodskrivOpptjening.Status.Feilet -> "Feilet"
-                        is GodskrivOpptjening.Status.Ferdig -> "Ferdig"
-                        is GodskrivOpptjening.Status.Klar -> "Klar"
-                        is GodskrivOpptjening.Status.Retry -> "Retry"
-                    },
-                    "karantene_til" to when(val s = godskrivOpptjening.status) {
-                        is GodskrivOpptjening.Status.Retry -> s.karanteneTil
-                        else -> null
-                    }
+                    "status" to godskrivOpptjening.status.databaseName(),
+                    "karantene_til" to godskrivOpptjening.status.karanteneTilString(),
                 ),
             ),
             keyHolder
@@ -58,16 +66,8 @@ class GodskrivOpptjeningRepo(
                     "id" to godskrivOpptjening.id,
                     "status" to serialize(godskrivOpptjening.status),
                     "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
-                    "status" to when(godskrivOpptjening.status) {
-                        is GodskrivOpptjening.Status.Feilet -> "Feilet"
-                        is GodskrivOpptjening.Status.Ferdig -> "Ferdig"
-                        is GodskrivOpptjening.Status.Klar -> "Klar"
-                        is GodskrivOpptjening.Status.Retry -> "Retry"
-                    },
-                    "karantene_til" to when(val s = godskrivOpptjening.status) {
-                        is GodskrivOpptjening.Status.Retry -> s.karanteneTil.toString()
-                        else -> null
-                    }
+                    "status" to godskrivOpptjening.status.databaseName(),
+                    "karantene_til" to godskrivOpptjening.status.karanteneTilString(),
                 ),
             ),
         )

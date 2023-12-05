@@ -25,6 +25,23 @@ class PersongrunnlagRepo(
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
+    private fun PersongrunnlagMelding.Status.databaseName(): String {
+        return when (this) {
+            is PersongrunnlagMelding.Status.Feilet -> "Feilet"
+            is PersongrunnlagMelding.Status.Ferdig -> "Ferdig"
+            is PersongrunnlagMelding.Status.Klar -> "Klar"
+            is PersongrunnlagMelding.Status.Retry -> "Retry"
+        }
+    }
+
+    private fun PersongrunnlagMelding.Status.karanteneTilString(): String? {
+        return when (val s = this) {
+            is PersongrunnlagMelding.Status.Retry -> s.karanteneTil.toString()
+            else -> null
+        }
+    }
+
+
     /**
      * @return Id til rad som ble lagret i databasen - null dersom raden eksisterte fra før (duplikat)
      */
@@ -61,16 +78,8 @@ class PersongrunnlagRepo(
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to melding.id,
-                    "status" to when (melding.status) {
-                        is PersongrunnlagMelding.Status.Feilet -> "Feilet"
-                        is PersongrunnlagMelding.Status.Ferdig -> "Ferdig"
-                        is PersongrunnlagMelding.Status.Klar -> "Klar"
-                        is PersongrunnlagMelding.Status.Retry -> "Retry"
-                    },
-                    "karanteneTil" to when (val m = melding.status) {
-                        is PersongrunnlagMelding.Status.Retry -> m.karanteneTil.toString()
-                        else -> null
-                    },
+                    "status" to melding.status.databaseName(),
+                    "karanteneTil" to melding.status.karanteneTilString(),
                     "statushistorikk" to melding.statushistorikk.serializeList()
                 ),
             ),

@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -23,6 +24,22 @@ class BrevRepository(
     private val clock: Clock = Clock.systemUTC()
 ) {
 
+    private fun Brev.Status.databaseName(): String {
+        return when (this) {
+            is Brev.Status.Feilet -> "Feilet"
+            is Brev.Status.Ferdig -> "Ferdig"
+            is Brev.Status.Klar -> "Klar"
+            is Brev.Status.Retry -> "Retry"
+        }
+    }
+
+    private fun Brev.Status.karanteneTilString(): String? {
+        return when (val s = this) {
+            is Brev.Status.Retry -> s.karanteneTil.toString()
+            else -> null
+        }
+    }
+
     fun persist(brev: Brev.Transient): Brev.Persistent {
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
@@ -33,16 +50,8 @@ class BrevRepository(
                     "behandlingId" to brev.behandlingId,
                     "arsak" to brev.årsak.toDb(),
                     "statushistorikk" to brev.statushistorikk.serializeList(),
-                    "status" to when (val s = brev.status) {
-                        is Brev.Status.Feilet -> "Feilet"
-                        is Brev.Status.Ferdig -> "Ferdig"
-                        is Brev.Status.Klar -> "Klar"
-                        is Brev.Status.Retry -> "Retry"
-                    },
-                    "karantene_til" to when(val s = brev.status) {
-                        is Brev.Status.Retry -> s.karanteneTil.toString()
-                        else -> null
-                    }
+                    "status" to brev.status.databaseName(),
+                    "karantene_til" to brev.status.karanteneTilString(),
                 ),
             ),
             keyHolder
@@ -62,16 +71,8 @@ class BrevRepository(
                 mapOf<String, Any?>(
                     "id" to brev.id,
                     "statushistorikk" to brev.statushistorikk.serializeList(),
-                    "status" to when (val s = brev.status) {
-                        is Brev.Status.Feilet -> "Feilet"
-                        is Brev.Status.Ferdig -> "Ferdig"
-                        is Brev.Status.Klar -> "Klar"
-                        is Brev.Status.Retry -> "Retry"
-                    },
-                    "karantene_til" to when(val s = brev.status) {
-                        is Brev.Status.Retry -> s.karanteneTil.toString()
-                        else -> null
-                    }
+                    "status" to brev.status.databaseName(),
+                    "karantene_til" to brev.status.karanteneTilString(),
                 ),
             ),
         )
