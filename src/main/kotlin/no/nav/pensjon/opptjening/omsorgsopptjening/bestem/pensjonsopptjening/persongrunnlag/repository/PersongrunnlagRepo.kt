@@ -49,11 +49,10 @@ class PersongrunnlagRepo(
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             //language=postgres-psql
-            """
-                |insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, status, karantene_til) 
-                |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:statushistorikk::jsonb), :status, :karanteneTil::timestamptz) 
-                |on conflict on constraint unique_correlation_innlesing do nothing 
-                |returning id
+            """insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, status, karantene_til) 
+              |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:statushistorikk::jsonb), :status, :karanteneTil::timestamptz) 
+              |on conflict on constraint unique_correlation_innlesing do nothing 
+              |returning id
             """.trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
