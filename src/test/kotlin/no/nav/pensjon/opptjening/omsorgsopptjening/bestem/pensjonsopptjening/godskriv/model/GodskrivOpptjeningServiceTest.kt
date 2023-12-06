@@ -162,7 +162,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         )
         given(clock.instant()).willReturn(
             Clock.systemUTC().instant(), //karantene -- handler kalles
-            Clock.systemUTC().instant(), //karantene
+//            Clock.systemUTC().instant(), //karantene
             Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(6, ChronoUnit.HOURS), //karantenetid utløpt

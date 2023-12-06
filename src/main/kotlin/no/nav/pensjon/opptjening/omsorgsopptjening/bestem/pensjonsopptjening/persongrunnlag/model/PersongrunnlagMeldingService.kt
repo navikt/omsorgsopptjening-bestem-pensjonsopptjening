@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
 import java.sql.SQLException
+import java.util.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 @Service
@@ -31,13 +32,20 @@ class PersongrunnlagMeldingService(
     }
 
     fun process(): List<FullførteBehandlinger>? {
-        val behandling = transactionTemplate.execute {
-            try {
-                finnNesteMeldingerForBehandling(10)?.map { melding ->
-                    Mdc.scopedMdc(melding.correlationId) {
-                        Mdc.scopedMdc(melding.innlesingId) {
-                            try {
-                                log.info("Started behandling av melding")
+        val lockId = UUID.randomUUID()
+        val meldinger = transactionTemplate.execute {
+            finnNesteMeldingerForBehandling(lockId, 10)
+        }
+        println("### Process $lockId")
+        meldinger?.forEach { println("  $it") }
+
+        try {
+            return meldinger?.map { melding ->
+                Mdc.scopedMdc(melding.correlationId) {
+                    Mdc.scopedMdc(melding.innlesingId) {
+                        try {
+                            log.info("Started behandling av melding $melding")
+                            transactionTemplate.execute {
                                 behandle(melding).let { fullførte ->
                                     persongrunnlagRepo.updateStatus(melding.ferdig())
                                     fullførte.also {
@@ -49,10 +57,9 @@ class PersongrunnlagMeldingService(
                                         log.info("Melding prosessert")
                                     }
                                 }
-                            } catch (ex: SQLException) {
-                                log.error("Feil ved prosessering av meldinger, ruller tilbake", ex)
-                                throw ex
-                            } catch (ex: Throwable) {
+                            }
+                        } catch (ex: Throwable) {
+                            transactionTemplate.execute {
                                 melding.retry(ex.stackTraceToString()).let { melding ->
                                     melding.opprettOppgave()?.let {
                                         log.error("Gir opp videre prosessering av melding")
@@ -60,24 +67,29 @@ class PersongrunnlagMeldingService(
                                     }
                                     persongrunnlagRepo.updateStatus(melding)
                                 }
-                                null
-                            } finally {
-                                log.info("Avsluttet behandling av melding")
                             }
+                            null
+//                            throw ex
+                        } finally {
+                            log.info("Avsluttet behandling av melding")
                         }
                     }
                 }
-            } catch (ex: Throwable) {
-                log.error("Fikk exception ved uthenting av melding", ex)
-                throw ex
+            }?.filterNotNull()
+        } catch (ex: Throwable) {
+            log.error("Fikk exception ved uthenting av meldinger", ex)
+            return null // throw ex
+        } finally {
+            transactionTemplate.execute {
+                persongrunnlagRepo.frigi(lockId)
             }
         }
-        return behandling?.filterNotNull()
+        // return behandlinger
     }
 
-    private fun finnNesteMeldingerForBehandling(antall: Int): List<PersongrunnlagMelding.Mottatt>? {
-        val meldinger = persongrunnlagRepo.finnNesteKlarTilProsessering(antall)
-            .ifEmpty { persongrunnlagRepo.finnNesteKlarForRetry(antall) }
+    private fun finnNesteMeldingerForBehandling(lockId: UUID, antall: Int): List<PersongrunnlagMelding.Mottatt>? {
+        val meldinger = persongrunnlagRepo.finnNesteKlarTilProsessering(lockId, antall)
+            .ifEmpty { persongrunnlagRepo.finnNesteKlarForRetry(lockId, antall) }
         return meldinger.map { persongrunnlagRepo.find(it) }.ifEmpty { null }
     }
 

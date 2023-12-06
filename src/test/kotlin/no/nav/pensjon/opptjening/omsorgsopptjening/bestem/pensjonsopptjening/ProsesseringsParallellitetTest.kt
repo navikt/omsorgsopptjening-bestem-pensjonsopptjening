@@ -27,6 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.Month
 import java.time.YearMonth
+import java.util.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
@@ -151,21 +152,21 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
 
             transactionTemplate.execute {
                 //låser den aktuelle raden for denne transaksjonens varighet
-                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(5))
+                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(UUID.randomUUID(), 5))
 
                 //opprett ny transaksjon mens den forrige fortsatt lever
                 transactionTemplate.execute {
                     //skal ikke finne noe siden raden er låst pga "select for update skip locked"
-                    assertThat(persongrunnlagRepo.finnNesteKlarTilProsessering(5)).isNullOrEmpty()
+                    assertThat(persongrunnlagRepo.finnNesteKlarTilProsessering(UUID.randomUUID(), 5)).isNullOrEmpty()
                 }
                 //fortsatt samme transaksjon
-                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(5))
+                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(UUID.randomUUID(), 5))
             } //rad ikke låst lenger ved transaksjon slutt
 
 
             //ny transaksjon finner raden da den ikke lenger er låst
             transactionTemplate.execute {
-                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(5))
+                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(UUID.randomUUID(), 5))
             }
         }
     }

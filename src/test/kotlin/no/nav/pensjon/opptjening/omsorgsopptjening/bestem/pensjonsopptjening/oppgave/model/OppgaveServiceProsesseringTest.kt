@@ -199,7 +199,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
     fun `gitt at prosesseringen ender med retry, havner den aktuelle raden i karantene før den forsøkes på nytt igjen`() {
         wiremock.stubForPdlTransformer()
         given(clock.instant()).willReturn(
-            Clock.systemUTC().instant(), //karantene -- handler kalles
+//            Clock.systemUTC().instant(), //karantene -- handler kalles
             Clock.systemUTC().instant(), //karantene
             Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
@@ -323,7 +323,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 
         assertThat(oppgaveService.process()).isNullOrEmpty()
         assertThat(oppgaveService.process()).isNullOrEmpty()
-        assertThat(oppgaveService.process()).isNotNull()
+        assertThat(oppgaveService.process()).isNotEmpty()
 
         assertInstanceOf(Oppgave::class.java, oppgaveRepo.findForMelding(melding).single())
             .also {

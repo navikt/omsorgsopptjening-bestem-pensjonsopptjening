@@ -102,37 +102,78 @@ class PersongrunnlagRepo(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
-    fun finnNesteKlarTilProsessering(antall: Int): List<UUID> {
+    fun finnNesteKlarTilProsessering(lockId: UUID, antall: Int): List<UUID> {
+
+        // todo: legge på locktime
+        jdbcTemplate.update(
+            """update melding set lockId = :lockId
+             | where id in (
+             |   select id 
+             |   from melding
+             |   where status = 'Klar'
+             |   and lockId is null
+             |   order by id
+             |   fetch first :antall rows only
+             |   for update skip locked)""".trimMargin(),
+            mapOf(
+                "antall" to antall,
+                "lockId" to lockId,
+            )
+        )
 
         return jdbcTemplate.queryForList(
             """select id 
              | from melding
-             | where status = 'Klar' 
-             | order by id
-             | fetch first :antall rows only for no key update skip locked""".trimMargin(),
+             | where lockId = :lockId""".trimMargin(),
             mapOf(
-                "now" to Instant.now(clock).toString(),
-                "antall" to antall
+                "lockId" to lockId
             ),
             UUID::class.java
         )
     }
 
-    fun finnNesteKlarForRetry(antall: Int): List<UUID> {
+    fun finnNesteKlarForRetry(lockId: UUID, antall: Int): List<UUID> {
         val now = Instant.now(clock).toString()
+        println("finnNesteKlarForRetry lockId: $lockId now=$now")
+
+        jdbcTemplate.update(
+            """update melding set lockId = :lockId
+             | where id in (
+             |   select id 
+             |   from melding
+             |   where status = 'Retry'
+             |   and karantene_til is not null
+             |   and karantene_til < (:now)::timestamptz
+             |   and lockId is null
+             |   order by karantene_til
+             |   fetch first :antall rows only
+             |   for update skip locked)""".trimMargin(),
+            mapOf(
+                "now" to now,
+                "antall" to antall,
+                "lockId" to lockId,
+            )
+        )
+
         return jdbcTemplate.queryForList(
             """select id 
              | from melding
-             | where status = 'Retry'
-             | and karantene_til is not null
-             | and karantene_til < (:now)::timestamptz
-             | order by karantene_til
-             | fetch first :antall rows only for no key update skip locked""".trimMargin(),
+             | where lockId = :lockId""".trimMargin(),
+//             | for no key update skip locked"""
             mapOf(
-                "now" to now,
-                "antall" to antall
+                "lockId" to lockId,
             ),
             UUID::class.java
+        )
+    }
+
+    fun frigi(lockId: UUID) {
+        println("frigi $lockId")
+        jdbcTemplate.update(
+            """update melding set lockId = null where lockId = :lockId""",
+            mapOf(
+                "lockId" to lockId,
+            ),
         )
     }
 

@@ -200,9 +200,9 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         given(clock.instant()).willReturn(
             // TODO: Må finne en annen løsning på dette
             Clock.systemUTC().instant(), //karantene
-            Clock.systemUTC().instant().plus(1, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(3, ChronoUnit.HOURS), //karantene
+//            Clock.systemUTC().instant().plus(1, ChronoUnit.HOURS), //karantene
+//            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
+//            Clock.systemUTC().instant().plus(3, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(10, ChronoUnit.HOURS), //karantenetid utløpt
         )
@@ -254,10 +254,10 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         assertThat(handler.process()).isNull()
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
-            assertEquals(1, it.antallForsøk)
+            assertThat(it.antallForsøk).isEqualTo(1)
         }
 
-        assertEquals(1, handler.process()!!.first().antallBehandlinger())
+        assertThat(handler.process()!!.first().antallBehandlinger()).isEqualTo(1)
 
         assertInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java, repo.find(melding).status)
     }

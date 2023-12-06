@@ -37,6 +37,7 @@ class MicrometerStatusMalere(registry: MeterRegistry) {
     fun oppdater(status: ApplicationStatus) {
         log.info("Oppdaterer applikasjonsstatus til: $status")
         this.status = status
+        status
     }
 
     fun antallOk() : Int {
