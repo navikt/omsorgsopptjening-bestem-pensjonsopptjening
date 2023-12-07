@@ -30,38 +30,52 @@ class GodskrivOpptjeningService(
     }
 
     fun process(): List<GodskrivOpptjening.Persistent>? {
-        return transactionTemplate.execute {
-            godskrivOpptjeningRepo.finnNesteUprosesserte(10).map { godskrivOpptjening ->
+        val låsteGodskrivOpptjeninger = transactionTemplate.execute {
+            godskrivOpptjeningRepo.finnNesteUprosesserte(10)
+        }!!
+
+        return try {
+            låsteGodskrivOpptjeninger.data.map { godskrivOpptjening ->
                 Mdc.scopedMdc(godskrivOpptjening.correlationId) {
                     Mdc.scopedMdc(godskrivOpptjening.innlesingId) {
                         try {
-                            behandlingRepo.finn(godskrivOpptjening.behandlingId).let { behandling ->
-                                godskrivOpptjening.ferdig().also {
-                                    godskrivClient.godskriv(
-                                        omsorgsyter = behandling.omsorgsyter,
-                                        omsorgsÅr = behandling.omsorgsAr,
-                                        omsorgstype = behandling.omsorgstype,
-                                        omsorgsmottaker = behandling.omsorgsmottaker,
-                                    )
-                                    godskrivOpptjeningRepo.updateStatus(it)
+                            transactionTemplate.execute {
+                                behandlingRepo.finn(godskrivOpptjening.behandlingId).let { behandling ->
+                                    godskrivOpptjening.ferdig().also {
+                                        godskrivClient.godskriv(
+                                            omsorgsyter = behandling.omsorgsyter,
+                                            omsorgsÅr = behandling.omsorgsAr,
+                                            omsorgstype = behandling.omsorgstype,
+                                            omsorgsmottaker = behandling.omsorgsmottaker,
+                                        )
+                                        godskrivOpptjeningRepo.updateStatus(it)
+                                    }
                                 }
                             }
                         } catch (ex: SQLException) {
                             log.error("Feil under prosessering av godskriv opptjening", ex)
                             throw ex
                         } catch (ex: Throwable) {
-                            godskrivOpptjening.retry(ex.stackTraceToString()).let { retry ->
-                                retry.opprettOppgave()?.let {
-                                    log.error("Gir opp videre prosessering av godskriv opptjening")
-                                    oppgaveService.opprett(it)
+                            try {
+                                transactionTemplate.execute {
+                                    godskrivOpptjening.retry(ex.stackTraceToString()).let { retry ->
+                                        retry.opprettOppgave()?.let {
+                                            log.error("Gir opp videre prosessering av godskriv opptjening")
+                                            oppgaveService.opprett(it)
+                                        }
+                                        godskrivOpptjeningRepo.updateStatus(retry)
+                                    }
                                 }
-                                godskrivOpptjeningRepo.updateStatus(retry)
+                            } catch (ex: Throwable) {
+                                log.error("Feil ved setting av feilstatus", ex)
                             }
                             null
                         }
                     }
                 }
-            }
-        }?.filterNotNull()
+            }.filterNotNull()
+        } finally {
+            godskrivOpptjeningRepo.frigi(låsteGodskrivOpptjeninger)
+        }
     }
 }

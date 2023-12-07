@@ -119,25 +119,34 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.first().single().also { behandling ->
-            godskrivOpptjeningRepo.finnNesteUprosesserte(5).first().also {
-                assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
-                assertEquals(behandling.id, it.behandlingId)
-                assertEquals(correlationId, it.correlationId)
-                assertEquals(innlesingId, it.innlesingId)
-                assertEquals(behandling.omsorgsyter, it.omsorgsyter)
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also {
+                it.data.first().also {
+                    assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
+                    assertEquals(behandling.id, it.behandlingId)
+                    assertEquals(correlationId, it.correlationId)
+                    assertEquals(innlesingId, it.innlesingId)
+                    assertEquals(behandling.omsorgsyter, it.omsorgsyter)
+                }
+                godskrivOpptjeningRepo.frigi(it)
             }
 
             godskrivOpptjeningService.process()
 
-            godskrivOpptjeningRepo.finnNesteUprosesserte(5).first().also {
-                assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also {
-                    assertEquals(1, it.antallForsøk)
-                    assertEquals(3, it.maxAntallForsøk)
-                    assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also {
+                it.data.first().also {
+                    assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also {
+                        assertEquals(1, it.antallForsøk)
+                        assertEquals(3, it.maxAntallForsøk)
+                        assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
+                    }
                 }
+                godskrivOpptjeningRepo.frigi(it)
             }
 
-            assertInstanceOf(GodskrivOpptjening.Persistent::class.java, godskrivOpptjeningService.process()?.first()).also {
+            assertInstanceOf(
+                GodskrivOpptjening.Persistent::class.java,
+                godskrivOpptjeningService.process()?.first()
+            ).also {
                 assertInstanceOf(GodskrivOpptjening.Status.Ferdig::class.java, it.status)
             }
         }
@@ -264,22 +273,28 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
 
 
         handler.process()!!.first().single().also { behandling ->
-            godskrivOpptjeningRepo.finnNesteUprosesserte(5).first().also {
-                assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
-                assertEquals(behandling.id, it.behandlingId)
-                assertEquals(correlationId, it.correlationId)
-                assertEquals(innlesingId, it.innlesingId)
-                assertEquals(behandling.omsorgsyter, it.omsorgsyter)
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also {
+                it.data.first().also {
+                    assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
+                    assertEquals(behandling.id, it.behandlingId)
+                    assertEquals(correlationId, it.correlationId)
+                    assertEquals(innlesingId, it.innlesingId)
+                    assertEquals(behandling.omsorgsyter, it.omsorgsyter)
+                }
+                godskrivOpptjeningRepo.frigi(it)
             }
 
             godskrivOpptjeningService.process()
 
-            godskrivOpptjeningRepo.finnNesteUprosesserte(5).first().also {
-                assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also {
-                    assertEquals(1, it.antallForsøk)
-                    assertEquals(3, it.maxAntallForsøk)
-                    assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also {
+                it.data.first().also {
+                    assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also {
+                        assertEquals(1, it.antallForsøk)
+                        assertEquals(3, it.maxAntallForsøk)
+                        assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
+                    }
                 }
+                godskrivOpptjeningRepo.frigi(it)
             }
 
             godskrivOpptjeningService.process()

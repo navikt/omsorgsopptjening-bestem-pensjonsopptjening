@@ -120,39 +120,74 @@ class GodskrivOpptjeningRepo(
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
      * annen connection (pod) så lenge transaksjonen lever.
      */
-    fun finnNesteUprosesserte(antall: Int): List<GodskrivOpptjening.Persistent> {
+    fun finnNesteUprosesserte(antall: Int): Locked {
+        val lockId = UUID.randomUUID()
+        println("LOCK ${lockId}")
         val now = Instant.now(clock)
-        val neste = finnNesteUprosesserteKlar(now, antall).ifEmpty { finnNesteUprosesserteRetry(now, antall) }
-        return neste.map { find(it) }
+        val neste =
+            finnNesteUprosesserteKlar(lockId, now, antall).ifEmpty { finnNesteUprosesserteRetry(lockId, now, antall) }
+        return Locked(lockId, neste.map { find(it) })
     }
 
-    fun finnNesteUprosesserteKlar(now: Instant, antall: Int): List<UUID> {
-        return jdbcTemplate.queryForList(
-            """select id
+    fun frigi(locked: Locked) {
+        println("FREE ${locked.lockId}")
+        jdbcTemplate.update(
+            """update godskriv_opptjening set lockId = null, lockTime = null where lockId = :lockId""",
+            mapOf<String, Any>(
+                "lockId" to locked.lockId
+            )
+        )
+    }
+
+    fun finnNesteUprosesserteKlar(lockId: UUID, now: Instant, antall: Int): List<UUID> {
+        jdbcTemplate.update(
+            """update godskriv_opptjening set lockId = :lockId, lockTime = :now::timestamptz
+                |where id in (
+                |select id
                 | from godskriv_opptjening
                 | where status = 'Klar'
+                |   and lockId is null
                 | order by id
-                | fetch first :antall rows only for no key update skip locked""".trimMargin(),
+                | fetch first :antall rows only for no key update skip locked)""".trimMargin(),
             mapOf(
                 "now" to now.toString(),
                 "antall" to antall,
+                "lockId" to lockId,
+            )
+        )
+
+        return jdbcTemplate.queryForList(
+            """select id from godskriv_opptjening where lockId = :lockId""",
+            mapOf(
+                "lockId" to lockId,
             ),
             UUID::class.java
         )
     }
 
-    fun finnNesteUprosesserteRetry(now: Instant, antall: Int): List<UUID> {
-        return jdbcTemplate.queryForList(
-            """select id
+    fun finnNesteUprosesserteRetry(lockId: UUID, now: Instant, antall: Int): List<UUID> {
+        jdbcTemplate.update(
+            """update godskriv_opptjening set lockId = :lockId, lockTime = :now::timestamptz
+                |where id in (
+                |select id
                 | from godskriv_opptjening
                 | where status = 'Retry'
                 | and karantene_til::timestamptz < (:now)::timestamptz
                 | and karantene_til is not null
+                | and lockId is null
                 | order by karantene_til
-                | fetch first :antall rows only for no key update skip locked""".trimMargin(),
+                | fetch first :antall rows only for no key update skip locked)""".trimMargin(),
             mapOf(
                 "now" to now.toString(),
                 "antall" to antall,
+                "lockId" to lockId,
+            )
+        )
+
+        return jdbcTemplate.queryForList(
+            """select id from godskriv_opptjening where lockId = :lockId""",
+            mapOf(
+                "lockId" to lockId,
             ),
             UUID::class.java
         )
@@ -183,4 +218,6 @@ class GodskrivOpptjeningRepo(
             )
         }
     }
+
+    data class Locked(var lockId: UUID, val data: List<GodskrivOpptjening.Persistent>)
 }

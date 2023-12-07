@@ -103,7 +103,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                 //opprett ny transaksjon mens den forrige fortsatt lever
                 transactionTemplate.execute {
                     //skal ikke finne noe siden raden er låst pga "select for update skip locked"
-                    assertThat(godskrivOpptjeningRepo.finnNesteUprosesserte(5)).isNullOrEmpty()
+                    assertThat(godskrivOpptjeningRepo.finnNesteUprosesserte(5).data).isNullOrEmpty()
                 }
                 //fortsatt samme transaksjon
                 assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte(5))
