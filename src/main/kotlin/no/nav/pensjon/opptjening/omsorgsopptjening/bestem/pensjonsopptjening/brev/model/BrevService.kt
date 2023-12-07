@@ -52,20 +52,23 @@ class BrevService(
     }
 
     fun process(): List<Brev.Persistent>? {
-        return transactionTemplate.execute {
-            brevRepository.finnNesteUprosesserte(10).map { brev ->
+        val låsteBrev = brevRepository.finnNesteUprosesserte(10)
+        try {
+            return låsteBrev.data.map { brev ->
                 Mdc.scopedMdc(brev.correlationId) {
                     Mdc.scopedMdc(brev.innlesingId) {
                         try {
-                            personOppslag.hentAktørId(brev.omsorgsyter).let { aktørId ->
-                                bestemSak.bestemSak(aktørId).let { sak ->
-                                    brevClient.sendBrev(
-                                        sakId = sak.sakId,
-                                        eksternReferanseId = EksternReferanseId(brev.id.toString()),
-                                        omsorgsår = Year.of(brev.omsorgsår),
-                                    ).let { journalpost ->
-                                        brev.ferdig(journalpost).also {
-                                            brevRepository.updateStatus(it)
+                            transactionTemplate.execute {
+                                personOppslag.hentAktørId(brev.omsorgsyter).let { aktørId ->
+                                    bestemSak.bestemSak(aktørId).let { sak ->
+                                        brevClient.sendBrev(
+                                            sakId = sak.sakId,
+                                            eksternReferanseId = EksternReferanseId(brev.id.toString()),
+                                            omsorgsår = Year.of(brev.omsorgsår),
+                                        ).let { journalpost ->
+                                            brev.ferdig(journalpost).also {
+                                                brevRepository.updateStatus(it)
+                                            }
                                         }
                                     }
                                 }
@@ -74,13 +77,23 @@ class BrevService(
                             log.error("Feil ved prosessering av brev", ex)
                             throw ex
                         } catch (ex: Throwable) {
-                            brev.retry(ex.stackTraceToString()).also {
-                                brevRepository.updateStatus(it)
+                            try {
+                                transactionTemplate.execute {
+                                    brev.retry(ex.stackTraceToString()).also {
+                                        brevRepository.updateStatus(it)
+                                    }
+                                }
+                            } catch (ex: Throwable) {
+                                log.error("Feil ved setting av feil-status på brev", ex)
+                                null
                             }
                         }
                     }
                 }
-            }
+            }.filterNotNull()
+        } finally {
+            brevRepository.frigi(låsteBrev)
+
         }
     }
 }
