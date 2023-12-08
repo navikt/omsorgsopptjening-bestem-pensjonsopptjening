@@ -15,6 +15,8 @@ import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
 import java.util.*
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.toJavaDuration
 
 @Component
 class BrevRepository(
@@ -138,6 +140,15 @@ class BrevRepository(
                 "lockId" to locked.lockId
             )
         )
+    }
+
+    fun frigiGamleLåser() {
+        val oneHourAgo = Instant.now(clock).minus(1.hours.toJavaDuration()).toString()
+        jdbcTemplate.update("""update brev set lockId = null, lockTime = null 
+            |where lockId is not null and lockTime < :oneHourAgo::timestamptz""".trimMargin(),
+            mapOf<String,Any> (
+                "oneHourAgo" to oneHourAgo
+            ))
     }
 
     fun finnNesteUprosesserteKlar(lockId: UUID, antall: Int): List<UUID> {

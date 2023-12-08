@@ -10,15 +10,22 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.mock.mockito.MockBean
+import java.time.Clock
 import java.time.Month
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 
 class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
 
 
     @Autowired
     private lateinit var persongrunnlagRepo: PersongrunnlagRepo
+
+    @MockBean
+    private lateinit var clock: Clock
 
     @Test
     fun `kan lagre en persongrunnlagmelding`() {
@@ -52,6 +59,34 @@ class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
         assertThat(peristert.innlesingId).isEqualTo(innlesingId)
         assertThat(peristert.innhold).isEqualTo(persongrunnlag.innhold)
     }
+
+    @Test
+    fun `gjenåpner låste persongrunnlagmeldinger etter en time`() {
+
+        BDDMockito.given(clock.instant()).willReturn(
+            Clock.systemUTC().instant(),
+            Clock.systemUTC().instant(),
+            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
+        )
+
+        val innlesingId = InnlesingId.generate()
+        val correlationId = CorrelationId.generate()
+        val persongrunnlag = persongrunnlag(innlesingId, correlationId)
+
+        persongrunnlagRepo.lagre(persongrunnlag)
+
+        val meldinger1 = persongrunnlagRepo.finnNesteMeldingerForBehandling(5)
+        persongrunnlagRepo.frigiGamleLåser()
+        val meldinger2 = persongrunnlagRepo.finnNesteMeldingerForBehandling(5)
+        persongrunnlagRepo.frigiGamleLåser()
+        val meldinger3 = persongrunnlagRepo.finnNesteMeldingerForBehandling(5)
+        persongrunnlagRepo.frigi(meldinger3)
+
+        assertThat(meldinger1.data).isNotEmpty()
+        assertThat(meldinger2.data).isEmpty()
+        assertThat(meldinger3.data).isNotEmpty
+    }
+
 
     private fun persongrunnlag(innlesingId: InnlesingId, correlationId: CorrelationId) =
         no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding.Lest(

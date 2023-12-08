@@ -245,13 +245,13 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             assertEquals(1, it.antallForsøk)
         }
 
-        assertThat(handler.process()).isNull()
+        assertThat(handler.process()).isEmpty()
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertThat(it.antallForsøk).isOne()
         }
 
-        assertThat(handler.process()).isNull()
+        assertThat(handler.process()).isEmpty()
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertThat(it.antallForsøk).isEqualTo(1)
@@ -332,7 +332,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         handler.process()
         handler.process()
 
-        assertThat(handler.process()).isNull()
+        assertThat(handler.process()).isEmpty()
 
         repo.find(melding).also { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, m.statushistorikk[0])

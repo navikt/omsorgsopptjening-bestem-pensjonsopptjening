@@ -13,10 +13,12 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Component
 import java.sql.ResultSet
-import java.time.Clock
+import java.time.Clock import java.time.Duration
 import java.time.Instant
 import java.util.*
 import kotlin.reflect.KClass
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.toJavaDuration
 
 @Component
 class PersongrunnlagRepo(
@@ -97,6 +99,13 @@ class PersongrunnlagRepo(
         ).single()
     }
 
+    fun finnNesteMeldingerForBehandling(antall: Int): Locked {
+        val lockId = UUID.randomUUID()
+        val meldinger = finnNesteKlarTilProsessering(lockId, antall)
+            .ifEmpty { finnNesteKlarForRetry(lockId, antall) }
+        return Locked(lockId, meldinger.map { find(it) })
+    }
+
     /**
      * Utformet for å være mekanismen som tilrettelegger for at flere podder kan prosessere data i paralell.
      * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
@@ -167,13 +176,24 @@ class PersongrunnlagRepo(
         )
     }
 
-    fun frigi(lockId: UUID) {
-        println("frigi $lockId")
+    fun frigi(locked:Locked) {
+        println("frigi ${locked.lockId}")
         jdbcTemplate.update(
             """update melding set lockId = null where lockId = :lockId""",
             mapOf(
-                "lockId" to lockId,
+                "lockId" to locked.lockId,
             ),
+        )
+    }
+
+    fun frigiGamleLåser() {
+        val oneHourAgo = Instant.now(clock).minus(1.hours.toJavaDuration()).toString()
+        jdbcTemplate.update(
+            """update melding set lockId = null, lockTime = null 
+            |where lockId is not null and lockTime < :oneHourAgo::timestamptz""".trimMargin(),
+            mapOf<String, Any>(
+                "oneHourAgo" to oneHourAgo
+            )
         )
     }
 
@@ -231,4 +251,7 @@ class PersongrunnlagRepo(
             )
         }
     }
+
+    data class Locked(val lockId: UUID, val data: List<PersongrunnlagMelding.Mottatt>)
+
 }

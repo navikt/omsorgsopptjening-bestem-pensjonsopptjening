@@ -34,12 +34,12 @@ class PersongrunnlagMeldingService(
     fun process(): List<FullførteBehandlinger>? {
         val lockId = UUID.randomUUID()
         val meldinger = transactionTemplate.execute {
-            finnNesteMeldingerForBehandling(lockId, 10)
-        }
-        meldinger?.forEach { println("  $it") }
+            persongrunnlagRepo.finnNesteMeldingerForBehandling(10)
+        }!!
+        meldinger.data.forEach { println("  $it") }
 
         try {
-            return meldinger?.map { melding ->
+            return meldinger.data.map { melding ->
                 Mdc.scopedMdc(melding.correlationId) {
                     Mdc.scopedMdc(melding.innlesingId) {
                         try {
@@ -79,16 +79,11 @@ class PersongrunnlagMeldingService(
             return null // throw ex
         } finally {
             transactionTemplate.execute {
-                persongrunnlagRepo.frigi(lockId)
+                persongrunnlagRepo.frigi(meldinger)
             }
         }
     }
 
-    private fun finnNesteMeldingerForBehandling(lockId: UUID, antall: Int): List<PersongrunnlagMelding.Mottatt>? {
-        val meldinger = persongrunnlagRepo.finnNesteKlarTilProsessering(lockId, antall)
-            .ifEmpty { persongrunnlagRepo.finnNesteKlarForRetry(lockId, antall) }
-        return meldinger.map { persongrunnlagRepo.find(it) }.ifEmpty { null }
-    }
 
     private fun behandle(melding: PersongrunnlagMelding.Mottatt): FullførteBehandlinger {
         return FullførteBehandlinger(

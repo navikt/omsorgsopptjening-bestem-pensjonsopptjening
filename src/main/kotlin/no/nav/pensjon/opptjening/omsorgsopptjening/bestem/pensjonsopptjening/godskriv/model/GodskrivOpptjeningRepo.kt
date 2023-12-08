@@ -14,6 +14,8 @@ import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
 import java.util.UUID
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.toJavaDuration
 
 @Component
 class GodskrivOpptjeningRepo(
@@ -136,6 +138,16 @@ class GodskrivOpptjeningRepo(
             )
         )
     }
+
+    fun frigiGamleLåser() {
+        val oneHourAgo = Instant.now(clock).minus(1.hours.toJavaDuration()).toString()
+        jdbcTemplate.update("""update godskriv_opptjening set lockId = null, lockTime = null 
+            |where lockId is not null and lockTime < :oneHourAgo::timestamptz""".trimMargin(),
+            mapOf<String,Any> (
+                "oneHourAgo" to oneHourAgo
+            ))
+    }
+
 
     fun finnNesteUprosesserteKlar(lockId: UUID, now: Instant, antall: Int): List<UUID> {
         jdbcTemplate.update(
