@@ -146,38 +146,75 @@ class OppgaveRepo(
      * annen connection (pod) så lenge transaksjonen lever.
      */
 
-    fun finnNesteUprosesserte(antall: Int): List<Oppgave.Persistent> {
+    fun finnNesteUprosesserte(antall: Int): Locked {
+        val lockId = UUID.randomUUID()
         val now = Instant.now(clock)
         val oppgave: List<UUID> =
-            finnNesteUprosesserteKlar(now, antall).ifEmpty { finnNesteUprosesserteRetry(now, antall) }
-        return oppgave.map { find(it) }
+            finnNesteUprosesserteKlar(lockId, now, antall).ifEmpty { finnNesteUprosesserteRetry(lockId, now, antall) }
+        return Locked(lockId, oppgave.map { find(it) })
     }
 
-    fun finnNesteUprosesserteKlar(now: Instant, antall: Int): List<UUID> {
-        return jdbcTemplate.queryForList(
-            """select id
+    fun frigi(locked: Locked) {
+        jdbcTemplate.update(
+            """update oppgave set lockId = null, lockTime = null where lockId = :lockId""",
+            mapOf<String, Any>(
+                "lockId" to locked.lockId
+            )
+        )
+    }
+
+    fun finnNesteUprosesserteKlar(lockId: UUID, now: Instant, antall: Int): List<UUID> {
+        jdbcTemplate.update(
+            """update oppgave
+                |set lockId = :lockId, lockTime = :now::timestamptz
+                |where id in (
+                |select id
                 | from oppgave
                 | where status = 'Klar'
+                |   and lockId is null
                 | order by id
-                | fetch first row only for no key update skip locked""".trimMargin(),
+                | fetch first :antall rows only for no key update skip locked)""".trimMargin(),
             mapOf(
-                "now" to now.toString()
+                "antall" to antall,
+                "now" to now.toString(),
+                "lockId" to lockId,
+            ),
+        )
+
+        return jdbcTemplate.queryForList(
+            """select id from oppgave where lockId = :lockId""",
+            mapOf(
+                "now" to now.toString(),
+                "lockId" to lockId,
             ),
             UUID::class.java
         )
     }
 
-    fun finnNesteUprosesserteRetry(now: Instant, antall: Int): List<UUID> {
-        return jdbcTemplate.queryForList(
-            """select id
+    fun finnNesteUprosesserteRetry(lockId: UUID, now: Instant, antall: Int): List<UUID> {
+        jdbcTemplate.update(
+            """update oppgave
+                |set lockId = :lockId, lockTime = :now::timestamptz
+                |where id in (
+                |select id
                 | from oppgave
                 | where status = 'Retry'
                 |   and karantene_til < (:now)::timestamptz
                 |   and karantene_til is not null
+                |   and lockId is null
                 |   order by karantene_til
-                | fetch first row only for no key update skip locked""".trimMargin(),
+                | fetch first :antall rows only for no key update skip locked)""".trimMargin(),
             mapOf(
-                "now" to now.toString()
+                "now" to now.toString(),
+                "lockId" to lockId,
+                "antall" to antall,
+            )
+        )
+
+        return jdbcTemplate.queryForList(
+            """select id from oppgave where lockId = :lockId""",
+            mapOf(
+                "lockId" to lockId,
             ),
             UUID::class.java
         )
@@ -210,4 +247,6 @@ class OppgaveRepo(
             )
         }
     }
+
+    data class Locked(val lockId: UUID, val data: List<Oppgave.Persistent>)
 }

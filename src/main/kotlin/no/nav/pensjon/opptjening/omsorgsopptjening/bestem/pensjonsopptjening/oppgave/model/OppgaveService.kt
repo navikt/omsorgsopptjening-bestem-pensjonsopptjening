@@ -77,44 +77,49 @@ class OppgaveService(
     }
 
     fun process(): List<Oppgave>? {
-        return transactionTemplate.execute {
-            oppgaveRepo.finnNesteUprosesserte(10).mapNotNull { oppgave ->
-                Mdc.scopedMdc(oppgave.correlationId) {
-                    Mdc.scopedMdc(oppgave.innlesingId) {
-                        try {
-                            personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
-                                sakKlient.bestemSak(
-                                    aktørId = aktørId
-                                ).let { omsorgssak ->
-                                    oppgaveKlient.opprettOppgave(
-                                        aktoerId = aktørId,
-                                        sakId = omsorgssak.sakId,
-                                        // TODO: Skal ikke kunne være tom
-                                        beskrivelse = FlereOppgaveteksterFormatter.format(oppgave.oppgavetekst),
-                                        tildeltEnhetsnr = omsorgssak.enhet
-                                    ).let { oppgaveId ->
-                                        oppgave.ferdig(oppgaveId).also {
-                                            oppgaveRepo.updateStatus(it)
-                                            log.info("Oppgave opprettet")
+        val låsteOppgaver = oppgaveRepo.finnNesteUprosesserte(10)
+        return try {
+            transactionTemplate.execute {
+                låsteOppgaver.data.mapNotNull { oppgave ->
+                    Mdc.scopedMdc(oppgave.correlationId) {
+                        Mdc.scopedMdc(oppgave.innlesingId) {
+                            try {
+                                personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
+                                    sakKlient.bestemSak(
+                                        aktørId = aktørId
+                                    ).let { omsorgssak ->
+                                        oppgaveKlient.opprettOppgave(
+                                            aktoerId = aktørId,
+                                            sakId = omsorgssak.sakId,
+                                            // TODO: Skal ikke kunne være tom
+                                            beskrivelse = FlereOppgaveteksterFormatter.format(oppgave.oppgavetekst),
+                                            tildeltEnhetsnr = omsorgssak.enhet
+                                        ).let { oppgaveId ->
+                                            oppgave.ferdig(oppgaveId).also {
+                                                oppgaveRepo.updateStatus(it)
+                                                log.info("Oppgave opprettet")
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        } catch (ex: SQLException) {
-                            log.error("Feil ved prosessering av oppgaver", ex)
-                            throw ex
-                        } catch (ex: Throwable) {
-                            oppgave.retry(ex.stackTraceToString()).let {
-                                if (it.status is Oppgave.Status.Feilet) {
-                                    log.error("Gir opp videre prosessering av oppgave")
+                            } catch (ex: SQLException) {
+                                log.error("Feil ved prosessering av oppgaver", ex)
+                                throw ex
+                            } catch (ex: Throwable) {
+                                oppgave.retry(ex.stackTraceToString()).let {
+                                    if (it.status is Oppgave.Status.Feilet) {
+                                        log.error("Gir opp videre prosessering av oppgave")
+                                    }
+                                    oppgaveRepo.updateStatus(it)
+                                    null
                                 }
-                                oppgaveRepo.updateStatus(it)
-                                null
                             }
                         }
                     }
                 }
             }
+        } finally {
+            oppgaveRepo.frigi(låsteOppgaver)
         }
     }
 }
