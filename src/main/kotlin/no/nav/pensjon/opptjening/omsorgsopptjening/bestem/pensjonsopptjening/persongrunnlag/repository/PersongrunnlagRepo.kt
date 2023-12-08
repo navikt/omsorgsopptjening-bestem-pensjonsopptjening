@@ -103,10 +103,11 @@ class PersongrunnlagRepo(
      * annen connection (pod) så lenge transaksjonen lever.
      */
     fun finnNesteKlarTilProsessering(lockId: UUID, antall: Int): List<UUID> {
+        val now = Instant.now(clock).toString()
 
         // todo: legge på locktime
         jdbcTemplate.update(
-            """update melding set lockId = :lockId
+            """update melding set lockId = :lockId, lockTime = :now::timestamptz
              | where id in (
              |   select id 
              |   from melding
@@ -116,6 +117,7 @@ class PersongrunnlagRepo(
              |   fetch first :antall rows only
              |   for update skip locked)""".trimMargin(),
             mapOf(
+                "now" to now,
                 "antall" to antall,
                 "lockId" to lockId,
             )
@@ -136,7 +138,7 @@ class PersongrunnlagRepo(
         val now = Instant.now(clock).toString()
 
         jdbcTemplate.update(
-            """update melding set lockId = :lockId
+            """update melding set lockId = :lockId, lockTime = :now::timestamptz
              | where id in (
              |   select id 
              |   from melding

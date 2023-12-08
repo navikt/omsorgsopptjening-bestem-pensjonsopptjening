@@ -200,9 +200,9 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         given(clock.instant()).willReturn(
             // TODO: Må finne en annen løsning på dette
             Clock.systemUTC().instant(), //karantene
-//            Clock.systemUTC().instant().plus(1, ChronoUnit.HOURS), //karantene
-//            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
-//            Clock.systemUTC().instant().plus(3, ChronoUnit.HOURS), //karantene
+            Clock.systemUTC().instant().plus(1, ChronoUnit.HOURS), //karantene
+            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
+            Clock.systemUTC().instant().plus(3, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(10, ChronoUnit.HOURS), //karantenetid utløpt
         )
