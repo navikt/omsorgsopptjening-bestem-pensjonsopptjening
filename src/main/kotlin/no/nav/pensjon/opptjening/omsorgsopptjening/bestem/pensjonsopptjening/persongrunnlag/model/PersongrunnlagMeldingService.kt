@@ -36,7 +36,6 @@ class PersongrunnlagMeldingService(
         val meldinger = transactionTemplate.execute {
             finnNesteMeldingerForBehandling(lockId, 10)
         }
-        println("### Process $lockId")
         meldinger?.forEach { println("  $it") }
 
         try {
@@ -69,7 +68,6 @@ class PersongrunnlagMeldingService(
                                 }
                             }
                             null
-//                            throw ex
                         } finally {
                             log.info("Avsluttet behandling av melding")
                         }
@@ -84,7 +82,6 @@ class PersongrunnlagMeldingService(
                 persongrunnlagRepo.frigi(lockId)
             }
         }
-        // return behandlinger
     }
 
     private fun finnNesteMeldingerForBehandling(lockId: UUID, antall: Int): List<PersongrunnlagMelding.Mottatt>? {

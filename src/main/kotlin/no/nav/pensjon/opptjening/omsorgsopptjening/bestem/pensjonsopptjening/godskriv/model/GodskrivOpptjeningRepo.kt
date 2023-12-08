@@ -122,7 +122,6 @@ class GodskrivOpptjeningRepo(
      */
     fun finnNesteUprosesserte(antall: Int): Locked {
         val lockId = UUID.randomUUID()
-        println("LOCK ${lockId}")
         val now = Instant.now(clock)
         val neste =
             finnNesteUprosesserteKlar(lockId, now, antall).ifEmpty { finnNesteUprosesserteRetry(lockId, now, antall) }
@@ -130,7 +129,6 @@ class GodskrivOpptjeningRepo(
     }
 
     fun frigi(locked: Locked) {
-        println("FREE ${locked.lockId}")
         jdbcTemplate.update(
             """update godskriv_opptjening set lockId = null, lockTime = null where lockId = :lockId""",
             mapOf<String, Any>(

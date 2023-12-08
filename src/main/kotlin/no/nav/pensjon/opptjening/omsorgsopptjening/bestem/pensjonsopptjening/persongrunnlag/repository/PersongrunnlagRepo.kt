@@ -134,7 +134,6 @@ class PersongrunnlagRepo(
 
     fun finnNesteKlarForRetry(lockId: UUID, antall: Int): List<UUID> {
         val now = Instant.now(clock).toString()
-        println("finnNesteKlarForRetry lockId: $lockId now=$now")
 
         jdbcTemplate.update(
             """update melding set lockId = :lockId
@@ -159,7 +158,6 @@ class PersongrunnlagRepo(
             """select id 
              | from melding
              | where lockId = :lockId""".trimMargin(),
-//             | for no key update skip locked"""
             mapOf(
                 "lockId" to lockId,
             ),
