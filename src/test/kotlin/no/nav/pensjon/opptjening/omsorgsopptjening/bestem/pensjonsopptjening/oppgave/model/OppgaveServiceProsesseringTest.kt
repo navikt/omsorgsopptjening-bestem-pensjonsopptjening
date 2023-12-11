@@ -326,9 +326,9 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         assertThat(oppgaveService.process()).isNotEmpty()
 
         assertInstanceOf(Oppgave::class.java, oppgaveRepo.findForMelding(melding).single())
-            .also {
-                assertInstanceOf(Oppgave.Status.Ferdig::class.java, it.status).also {
-                    assertThat(it.oppgaveId).isEqualTo("123")
+            .also { oppgave ->
+                assertInstanceOf(Oppgave.Status.Ferdig::class.java, oppgave.status).also { ferdig ->
+                    assertThat(ferdig.oppgaveId).isEqualTo("123")
                 }
             }
     }

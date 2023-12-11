@@ -20,23 +20,26 @@ class ScheduledTasksConfig {
 
     @Autowired
     private lateinit var statusRapporteringsService: StatusRapporteringCachingAdapter
+
     @Autowired
     private lateinit var persongrunnlagRepo: PersongrunnlagRepo
+
     @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
+
     @Autowired
     private lateinit var brevRepository: BrevRepository
+
     @Autowired
     private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
 
-
     @Bean
-    fun statusCheckTask() : StatusCheckTask {
+    fun statusCheckTask(): StatusCheckTask {
         return StatusCheckTask(statusRapporteringsService)
     }
 
     @Bean
-    fun frigiLaserTask() : FrigiLaserTask {
-        return FrigiLaserTask(persongrunnlagRepo,oppgaveRepo,brevRepository,godskrivOpptjeningRepo)
+    fun frigiLaserTask(): FrigiLaserTask {
+        return FrigiLaserTask(persongrunnlagRepo, oppgaveRepo, brevRepository, godskrivOpptjeningRepo)
     }
 }

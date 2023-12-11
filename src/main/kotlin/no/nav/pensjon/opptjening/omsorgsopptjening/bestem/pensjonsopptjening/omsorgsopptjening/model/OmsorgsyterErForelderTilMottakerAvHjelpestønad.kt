@@ -33,7 +33,9 @@ object OmsorgsyterErForelderTilMottakerAvHjelpestønad :
         val omsorgsmottakersFamilierelasjoner: Familierelasjoner,
     ) : ParagrafGrunnlag() {
         fun erBarnOgForelder(): Boolean {
-            return omsorgsytersFamilierelasjoner.erBarn(omsorgsmottaker) && omsorgsmottakersFamilierelasjoner.erForelder(omsorgsyter)
+            return omsorgsytersFamilierelasjoner.erBarn(omsorgsmottaker) && omsorgsmottakersFamilierelasjoner.erForelder(
+                omsorgsyter
+            )
         }
     }
 }

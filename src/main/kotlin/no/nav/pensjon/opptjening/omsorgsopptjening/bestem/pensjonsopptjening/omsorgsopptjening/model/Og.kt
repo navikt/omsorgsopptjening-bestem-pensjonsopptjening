@@ -36,4 +36,4 @@ data class OgVurdering(
 
 data object OgInnvilget : VilkårsvurderingUtfall.Innvilget()
 
-data object OgAvslått: VilkårsvurderingUtfall.Avslag()
+data object OgAvslått : VilkårsvurderingUtfall.Avslag()

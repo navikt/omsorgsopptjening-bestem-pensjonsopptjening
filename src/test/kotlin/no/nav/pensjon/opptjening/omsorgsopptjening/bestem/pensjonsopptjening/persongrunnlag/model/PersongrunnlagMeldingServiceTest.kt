@@ -541,18 +541,19 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
             )
-            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                assertTrue(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
-                assertFalse(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
-                assertEquals(
-                    mapOf(
-                        "12345678910" to 8,
-                        "04010012797" to 7,
-                        "01019212345" to 2,
-                    ),
-                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
-                )
-            }
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()
+                .let { vurdering ->
+                    assertTrue(vurdering.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                    assertFalse(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
+                    assertEquals(
+                        mapOf(
+                            "12345678910" to 8,
+                            "04010012797" to 7,
+                            "01019212345" to 2,
+                        ),
+                        vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
+                    )
+                }
         }
     }
 
@@ -615,17 +616,18 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
             )
-            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                assertTrue(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
-                assertFalse(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
-                assertEquals(
-                    mapOf(
-                        "12345678910" to 6,
-                        "04010012797" to 5,
-                    ),
-                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
-                )
-            }
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()
+                .let { vurdering ->
+                    assertTrue(vurdering.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                    assertFalse(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
+                    assertEquals(
+                        mapOf(
+                            "12345678910" to 6,
+                            "04010012797" to 5,
+                        ),
+                        vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
+                    )
+                }
         }
     }
 
@@ -712,19 +714,20 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
             )
-            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                assertFalse(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
-                assertFalse(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
-                assertEquals(
-                    mapOf(
-                        "04010012797" to 8,
-                        "12345678910" to 7,
-                        "01019212345" to 2,
-                    ),
-                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
-                )
-                assertTrue(it.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>())
-            }
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()
+                .let { vurdering ->
+                    assertFalse(vurdering.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                    assertFalse(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
+                    assertEquals(
+                        mapOf(
+                            "04010012797" to 8,
+                            "12345678910" to 7,
+                            "01019212345" to 2,
+                        ),
+                        vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
+                    )
+                    assertTrue(vurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>())
+                }
         }
     }
 
@@ -861,17 +864,18 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsmottaker = "01122012345"
             )
             assertTrue(behandling.vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>())
-            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                assertFalse(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
-                assertFalse(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
-                assertEquals(
-                    mapOf(
-                        "04010012797" to 5,
-                        "12345678910" to 2,
-                    ),
-                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
-                )
-            }
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()
+                .let { vurdering ->
+                    assertFalse(vurdering.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                    assertFalse(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
+                    assertEquals(
+                        mapOf(
+                            "04010012797" to 5,
+                            "12345678910" to 2,
+                        ),
+                        vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
+                    )
+                }
         }
     }
 
@@ -1070,18 +1074,19 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsmottaker = "07081812345"
             )
             assertTrue(behandling.vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>())
-            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                assertFalse(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
-                kotlin.test.assertTrue(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
-                assertEquals(
-                    mapOf(
-                        "12345678910" to 7,
-                        "04010012797" to 7,
-                        "01019212345" to 7,
-                    ),
-                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
-                )
-            }
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()
+                .let { vurdering ->
+                    assertFalse(vurdering.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                    kotlin.test.assertTrue(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
+                    assertEquals(
+                        mapOf(
+                            "12345678910" to 7,
+                            "04010012797" to 7,
+                            "01019212345" to 7,
+                        ),
+                        vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
+                    )
+                }
             assertEquals(
                 listOf(
                     Oppgaveopplysninger.Ingen
@@ -1142,17 +1147,18 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsmottaker = "01122012345"
             )
             assertTrue(behandling.vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>())
-            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>().let {
-                assertFalse(it.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
-                assertTrue(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
-                assertEquals(
-                    mapOf(
-                        "12345678910" to 6,
-                        "04010012797" to 6,
-                    ),
-                    it.grunnlag.data.associate { it.omsorgsyter to it.antall() }
-                )
-            }
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()
+                .let { vurdering ->
+                    assertFalse(vurdering.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
+                    assertTrue(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
+                    assertEquals(
+                        mapOf(
+                            "12345678910" to 6,
+                            "04010012797" to 6,
+                        ),
+                        vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
+                    )
+                }
             assertEquals(
                 listOf(
                     Oppgaveopplysninger.Generell(

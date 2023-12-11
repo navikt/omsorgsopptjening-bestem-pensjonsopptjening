@@ -37,7 +37,7 @@ class PersongrunnlagMeldingService(
             persongrunnlagRepo.finnNesteMeldingerForBehandling(10)
         }!!
         try {
-            return meldinger.data.map { melding ->
+            return meldinger.data.mapNotNull { melding ->
                 Mdc.scopedMdc(melding.correlationId) {
                     Mdc.scopedMdc(melding.innlesingId) {
                         try {
@@ -71,7 +71,7 @@ class PersongrunnlagMeldingService(
                         }
                     }
                 }
-            }?.filterNotNull()
+            }
         } catch (ex: Throwable) {
             log.error("Fikk exception ved uthenting av meldinger", ex)
             return null // throw ex

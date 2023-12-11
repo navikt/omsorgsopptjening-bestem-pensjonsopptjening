@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 sealed class AntallMånederRegel {
     abstract val antall: Int
+
     data object FødtIOmsorgsår : AntallMånederRegel() {
         override val antall: Int get() = 1
     }

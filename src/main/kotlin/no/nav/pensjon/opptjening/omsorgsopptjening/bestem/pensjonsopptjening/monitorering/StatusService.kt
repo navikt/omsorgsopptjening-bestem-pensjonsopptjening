@@ -28,7 +28,7 @@ class StatusService(
     fun checkStatus(): ApplicationStatus {
 
         val sisteMelding = persongrunnlagRepo.finnSiste()
-        val eldsteUbehandlede : PersongrunnlagMelding? = persongrunnlagRepo.finnEldsteSomIkkeErFerdig()
+        val eldsteUbehandlede: PersongrunnlagMelding? = persongrunnlagRepo.finnEldsteSomIkkeErFerdig()
 
         if (sisteMelding == null) {
             return ApplicationStatus.IkkeKjort
@@ -53,25 +53,25 @@ class StatusService(
         return ApplicationStatus.OK
     }
 
-    fun meldingErForGammel(persongrunnlagMelding: PersongrunnlagMelding) : Boolean {
+    fun meldingErForGammel(persongrunnlagMelding: PersongrunnlagMelding): Boolean {
         val opprettet: Instant = persongrunnlagMelding.opprettet
         return opprettet < 400.daysAgo // etter januar, ikke kjørt etter 1 oktober
     }
 
-    fun feiledeMeldinger() : Boolean {
+    fun feiledeMeldinger(): Boolean {
         return persongrunnlagRepo.antallMedStatus(PersongrunnlagMelding.Status.Feilet::class) > 0
     }
 
-    fun forGammelSomIkkeErFerdig(persongrunnlagMelding: PersongrunnlagMelding?) : Boolean {
+    fun forGammelSomIkkeErFerdig(persongrunnlagMelding: PersongrunnlagMelding?): Boolean {
         return persongrunnlagMelding != null && persongrunnlagMelding.opprettet < 2.daysAgo
     }
 
-    fun gamleOppgaverSomIkkeErFerdig() : Boolean {
+    fun gamleOppgaverSomIkkeErFerdig(): Boolean {
         val oppgave = oppgaveRepo.finnEldsteUbehandledeOppgave()
         return oppgave != null && oppgave.opprettet < 60.daysAgo // disable - ikke mulighet til å sjekke
     }
 
-    fun ubehandledGodskrivOpptjening() : Boolean {
+    fun ubehandledGodskrivOpptjening(): Boolean {
         val godskriving = godskrivOpptjeningRepo.finnEldsteIkkeFerdig()
         return godskriving != null && godskriving.opprettet < 7.daysAgo
     }

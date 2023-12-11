@@ -7,7 +7,7 @@ sealed class Omsorgsmåneder {
     protected abstract val måneder: Set<YearMonth>
     protected val sortert get() = måneder.toSortedSet()
 
-    fun alle(): Set<YearMonth>{
+    fun alle(): Set<YearMonth> {
         return sortert
     }
 
@@ -16,7 +16,7 @@ sealed class Omsorgsmåneder {
     }
 
     fun omsorgstype(): DomainOmsorgstype {
-        return when(this){
+        return when (this) {
             is Barnetrygd -> DomainOmsorgstype.BARNETRYGD
             is Hjelpestønad -> DomainOmsorgstype.HJELPESTØNAD
         }

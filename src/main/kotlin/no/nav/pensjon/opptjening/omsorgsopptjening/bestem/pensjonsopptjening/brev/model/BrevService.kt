@@ -54,7 +54,7 @@ class BrevService(
     fun process(): List<Brev.Persistent>? {
         val låsteBrev = brevRepository.finnNesteUprosesserte(10)
         try {
-            return låsteBrev.data.map { brev ->
+            return låsteBrev.data.mapNotNull { brev ->
                 Mdc.scopedMdc(brev.correlationId) {
                     Mdc.scopedMdc(brev.innlesingId) {
                         try {
@@ -90,7 +90,7 @@ class BrevService(
                         }
                     }
                 }
-            }.filterNotNull()
+            }
         } finally {
             brevRepository.frigi(låsteBrev)
 

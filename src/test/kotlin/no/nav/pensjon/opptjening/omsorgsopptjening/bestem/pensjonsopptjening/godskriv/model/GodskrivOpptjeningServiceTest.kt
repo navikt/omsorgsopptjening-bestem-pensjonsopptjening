@@ -119,28 +119,28 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.first().single().also { behandling ->
-            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also {
-                it.data.first().also {
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also { låsteGodskrivOpptjeninger ->
+                låsteGodskrivOpptjeninger.data.first().also {
                     assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                     assertEquals(behandling.id, it.behandlingId)
                     assertEquals(correlationId, it.correlationId)
                     assertEquals(innlesingId, it.innlesingId)
                     assertEquals(behandling.omsorgsyter, it.omsorgsyter)
                 }
-                godskrivOpptjeningRepo.frigi(it)
+                godskrivOpptjeningRepo.frigi(låsteGodskrivOpptjeninger)
             }
 
             godskrivOpptjeningService.process()
 
-            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also {
-                it.data.first().also {
-                    assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also {
-                        assertEquals(1, it.antallForsøk)
-                        assertEquals(3, it.maxAntallForsøk)
-                        assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also { låsteGodskrivOpptjeninger ->
+                låsteGodskrivOpptjeninger.data.first().also {
+                    assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also { retry ->
+                        assertEquals(1, retry.antallForsøk)
+                        assertEquals(3, retry.maxAntallForsøk)
+                        assertEquals(retry.tidspunkt.plus(5, ChronoUnit.HOURS), retry.karanteneTil)
                     }
                 }
-                godskrivOpptjeningRepo.frigi(it)
+                godskrivOpptjeningRepo.frigi(låsteGodskrivOpptjeninger)
             }
 
             assertInstanceOf(
@@ -273,28 +273,28 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
 
 
         handler.process()!!.first().single().also { behandling ->
-            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also {
-                it.data.first().also {
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also { låsteGodskrivOpptjeninger ->
+                låsteGodskrivOpptjeninger.data.first().also {
                     assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
                     assertEquals(behandling.id, it.behandlingId)
                     assertEquals(correlationId, it.correlationId)
                     assertEquals(innlesingId, it.innlesingId)
                     assertEquals(behandling.omsorgsyter, it.omsorgsyter)
                 }
-                godskrivOpptjeningRepo.frigi(it)
+                godskrivOpptjeningRepo.frigi(låsteGodskrivOpptjeninger)
             }
 
             godskrivOpptjeningService.process()
 
-            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also {
-                it.data.first().also {
-                    assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also {
-                        assertEquals(1, it.antallForsøk)
-                        assertEquals(3, it.maxAntallForsøk)
-                        assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
+            godskrivOpptjeningRepo.finnNesteUprosesserte(5).also { låsteGodskrivOpptjeninger ->
+                låsteGodskrivOpptjeninger.data.first().also {
+                    assertInstanceOf(GodskrivOpptjening.Status.Retry::class.java, it.status).also { retry ->
+                        assertEquals(1, retry.antallForsøk)
+                        assertEquals(3, retry.maxAntallForsøk)
+                        assertEquals(retry.tidspunkt.plus(5, ChronoUnit.HOURS), retry.karanteneTil)
                     }
                 }
-                godskrivOpptjeningRepo.frigi(it)
+                godskrivOpptjeningRepo.frigi(låsteGodskrivOpptjeninger)
             }
 
             godskrivOpptjeningService.process()

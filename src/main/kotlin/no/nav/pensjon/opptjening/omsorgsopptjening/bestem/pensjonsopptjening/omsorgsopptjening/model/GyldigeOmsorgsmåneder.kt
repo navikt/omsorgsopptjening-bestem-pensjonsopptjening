@@ -8,7 +8,7 @@ import java.time.YearMonth
  */
 data class GyldigeOmsorgsmåneder(
     val måneder: Set<YearMonth>
-){
+) {
     fun alleMåneder() = måneder
 
     companion object {
@@ -16,6 +16,7 @@ data class GyldigeOmsorgsmåneder(
         fun none(): GyldigeOmsorgsmåneder {
             return GyldigeOmsorgsmåneder(emptySet())
         }
+
         fun of(
             omsorgsmåneder: Omsorgsmåneder,
             utbetalingsmåneder: Utbetalingsmåneder,

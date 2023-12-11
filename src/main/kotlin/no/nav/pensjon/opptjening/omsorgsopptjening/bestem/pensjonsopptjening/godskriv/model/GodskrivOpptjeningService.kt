@@ -35,7 +35,7 @@ class GodskrivOpptjeningService(
         }!!
 
         return try {
-            låsteGodskrivOpptjeninger.data.map { godskrivOpptjening ->
+            låsteGodskrivOpptjeninger.data.mapNotNull { godskrivOpptjening ->
                 Mdc.scopedMdc(godskrivOpptjening.correlationId) {
                     Mdc.scopedMdc(godskrivOpptjening.innlesingId) {
                         try {
@@ -73,7 +73,7 @@ class GodskrivOpptjeningService(
                         }
                     }
                 }
-            }.filterNotNull()
+            }
         } finally {
             godskrivOpptjeningRepo.frigi(låsteGodskrivOpptjeninger)
         }

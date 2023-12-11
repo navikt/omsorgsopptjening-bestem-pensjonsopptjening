@@ -141,13 +141,14 @@ class GodskrivOpptjeningRepo(
 
     fun frigiGamleLåser() {
         val oneHourAgo = Instant.now(clock).minus(1.hours.toJavaDuration()).toString()
-        jdbcTemplate.update("""update godskriv_opptjening set lockId = null, lockTime = null 
+        jdbcTemplate.update(
+            """update godskriv_opptjening set lockId = null, lockTime = null 
             |where lockId is not null and lockTime < :oneHourAgo::timestamptz""".trimMargin(),
-            mapOf<String,Any> (
+            mapOf<String, Any>(
                 "oneHourAgo" to oneHourAgo
-            ))
+            )
+        )
     }
-
 
     fun finnNesteUprosesserteKlar(lockId: UUID, now: Instant, antall: Int): List<UUID> {
         jdbcTemplate.update(

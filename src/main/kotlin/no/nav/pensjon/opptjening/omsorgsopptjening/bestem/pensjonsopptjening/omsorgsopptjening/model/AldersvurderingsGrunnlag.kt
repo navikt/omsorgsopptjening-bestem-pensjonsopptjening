@@ -3,9 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 import java.time.LocalDate
 
 data class AldersvurderingsGrunnlag(
-    val person: AldersvurderingsPerson,
-    val omsorgsAr: Int,
-    val alder: Int = omsorgsAr - person.fødselsdato.year
+    val person: AldersvurderingsPerson, val omsorgsAr: Int, val alder: Int = omsorgsAr - person.fødselsdato.year
 ) : ParagrafGrunnlag() {
 
     constructor(
@@ -13,8 +11,7 @@ data class AldersvurderingsGrunnlag(
         omsorgsAr: Int,
     ) : this(
         person = AldersvurderingsPerson(
-            fnr = person.fnr,
-            fødselsdato = person.fødselsdato
+            fnr = person.fnr, fødselsdato = person.fødselsdato
         ),
         omsorgsAr = omsorgsAr,
     )
@@ -24,7 +21,6 @@ data class AldersvurderingsGrunnlag(
     }
 
     data class AldersvurderingsPerson(
-        val fnr: String,
-        val fødselsdato: LocalDate
+        val fnr: String, val fødselsdato: LocalDate
     )
 }

@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 object OmsorgsyterOppfyllerAlderskrav : ParagrafVilkår<AldersvurderingsGrunnlag>() {
-    private val ALDERSINTERVALL_OMSORGSYTER : IntRange = 17 .. 69
+    private val ALDERSINTERVALL_OMSORGSYTER: IntRange = 17..69
     override fun vilkarsVurder(grunnlag: AldersvurderingsGrunnlag): Vurdering {
         return Vurdering(
             grunnlag = grunnlag,

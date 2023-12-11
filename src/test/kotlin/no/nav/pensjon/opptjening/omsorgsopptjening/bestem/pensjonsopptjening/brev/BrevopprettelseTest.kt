@@ -379,8 +379,8 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                     assertThat(it.erInnvilget()).isTrue()
                     assertThat(it.omsorgsmottaker).isEqualTo("03041212345")
                     assertThat(it.omsorgstype.toString()).isEqualTo("HJELPESTØNAD")
-                    assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(it.id).single()).also {
-                        assertThat(it.årsak).isEqualTo(BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR)
+                    assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(it.id).single()).also { brev ->
+                        assertThat(brev.årsak).isEqualTo(BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR)
                     }
                 }
                 fullførteBehandlinger[1].let {

@@ -42,4 +42,3 @@ object OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr :
         )
     }
 }
-

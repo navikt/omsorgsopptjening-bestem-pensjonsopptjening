@@ -18,7 +18,7 @@ class OppgaveProcessingThread(
     private val oppgaveProcessingMetricsMåling: OppgaveProcessingMetrikker,
     private val oppgaveProcessingMetricsFeilmåling: OppgaveProcessingMetricsFeilmåling,
     private val datasourceReadinessCheck: DatasourceReadinessCheck,
-    ) : Runnable {
+) : Runnable {
 
     companion object {
         val log = LoggerFactory.getLogger(this::class.java)!!

@@ -65,5 +65,6 @@ class IdentHistorikk(
         return identer.map { it.ident }.contains(ident)
     }
 
-    class IdentHistorikkManglerGjeldendeException(msg: String = "Fant ingen gjeldende identer i identhistorikk") : RuntimeException(msg)
+    class IdentHistorikkManglerGjeldendeException(msg: String = "Fant ingen gjeldende identer i identhistorikk") :
+        RuntimeException(msg)
 }

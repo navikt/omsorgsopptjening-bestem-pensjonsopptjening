@@ -176,15 +176,16 @@ sealed class JuridiskHenvisning(
         tekst = "Forhøyet hjelpestønad ytes til et medlem under 18 år som har vesentlig større behov for tilsyn, pleie og annen hjelp enn det som hjelpestønad etter § 6-4 dekker"
     )
 
-    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum : JuridiskHenvisning(
-        kortTittel = "Forskrift om alderspensjon i folketrygden",
-        dato = "FOR-2009-12-22-1810",
-        kapittel = 3,
-        paragraf = 4,
-        ledd = 1,
-        punktum = 1,
-        tekst = "Omsorgsopptjening på grunnlag av omsorgen for ett barn eller for flere barn som bor sammen, gis bare én omsorgsyter for det enkelte kalenderår."
-    )
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum :
+        JuridiskHenvisning(
+            kortTittel = "Forskrift om alderspensjon i folketrygden",
+            dato = "FOR-2009-12-22-1810",
+            kapittel = 3,
+            paragraf = 4,
+            ledd = 1,
+            punktum = 1,
+            tekst = "Omsorgsopptjening på grunnlag av omsorgen for ett barn eller for flere barn som bor sammen, gis bare én omsorgsyter for det enkelte kalenderår."
+        )
 
     data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd : JuridiskHenvisning(
         kortTittel = "Forskrift om alderspensjon i folketrygden",
@@ -208,28 +209,30 @@ sealed class JuridiskHenvisning(
         """.trimIndent()
     )
 
-    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Andre_Ledd_Første_Punktum : JuridiskHenvisning(
-        kortTittel = "Forskrift om alderspensjon i folketrygden",
-        dato = "FOR-2009-12-22-1810",
-        kapittel = 3,
-        paragraf = 11,
-        ledd = 2,
-        punktum = 1,
-        tekst = """
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Andre_Ledd_Første_Punktum :
+        JuridiskHenvisning(
+            kortTittel = "Forskrift om alderspensjon i folketrygden",
+            dato = "FOR-2009-12-22-1810",
+            kapittel = 3,
+            paragraf = 11,
+            ledd = 2,
+            punktum = 1,
+            tekst = """
             Omsorgsopptjening etter første ledd gis den av foreldrene som mottar barnetrygd for barnet.
         """.trimIndent()
-    )
+        )
 
-    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Tredje_Ledd_Første_Punktum : JuridiskHenvisning(
-        kortTittel = "Forskrift om alderspensjon i folketrygden",
-        dato = "FOR-2009-12-22-1810",
-        kapittel = 3,
-        paragraf = 11,
-        ledd = 3,
-        punktum = 1,
-        tekst = """
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Tredje_Ledd_Første_Punktum :
+        JuridiskHenvisning(
+            kortTittel = "Forskrift om alderspensjon i folketrygden",
+            dato = "FOR-2009-12-22-1810",
+            kapittel = 3,
+            paragraf = 11,
+            ledd = 3,
+            punktum = 1,
+            tekst = """
             Omsorgsopptjening etter første og andre ledd gis til og med kalenderåret retten til forhøyet hjelpestønad faller bort.
         """.trimIndent()
-    )
+        )
 }
 

@@ -17,6 +17,7 @@ internal class BeanConfig(
         baseUrl = baseUrl,
         tokenProvider = tokenProvider
     )
+
     @Bean("godskrivOpptjening")
     fun godskrivOpptjening(): GodskrivOpptjeningClient {
         return poppClient
