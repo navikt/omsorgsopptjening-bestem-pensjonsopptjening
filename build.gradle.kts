@@ -4,7 +4,7 @@ val domeneVersion = "1.0.65"
 val azureAdClient = "0.0.7"
 val jacksonVersion = "2.15.3"
 val logbackEncoderVersion = "7.4"
-val postgresqlVersion = "42.7.0"
+val postgresqlVersion = "42.7.1"
 val flywayCoreVersion = "9.22.3" // 10.x krever nyere postgres-database
 val springKafkaTestVersion = "3.1.0"
 val springCloudContractVersion = "4.0.4"
@@ -13,12 +13,12 @@ val mockkVersion = "1.13.8"
 val assertJVersion = "3.24.2"
 val jsonAssertVersion = "1.5.1"
 val wiremockVersion = "2.35.1"
-val mockitoVersion = "5.1.0"
-val unleashVersion = "9.1.1"
+val mockitoVersion = "5.2.1"
+val unleashVersion = "9.2.0"
 
 val snakeYamlVersion = "2.2"
 val snappyJavaVersion = "1.1.10.5"
-val httpClient5Version = "5.2.1"
+val httpClient5Version = "5.3"
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {
@@ -78,7 +78,6 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5:$httpClient5Version")
-    implementation("org.apache.httpcomponents:httpclient:$httpClientVersion")
 
     // Test
     testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
