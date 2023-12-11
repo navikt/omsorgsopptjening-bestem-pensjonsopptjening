@@ -36,8 +36,6 @@ class PersongrunnlagMeldingService(
         val meldinger = transactionTemplate.execute {
             persongrunnlagRepo.finnNesteMeldingerForBehandling(10)
         }!!
-        meldinger.data.forEach { println("  $it") }
-
         try {
             return meldinger.data.map { melding ->
                 Mdc.scopedMdc(melding.correlationId) {

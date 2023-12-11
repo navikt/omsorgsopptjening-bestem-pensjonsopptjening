@@ -177,7 +177,6 @@ class PersongrunnlagRepo(
     }
 
     fun frigi(locked:Locked) {
-        println("frigi ${locked.lockId}")
         jdbcTemplate.update(
             """update melding set lockId = null where lockId = :lockId""",
             mapOf(
