@@ -30,7 +30,7 @@ spec:
     - name: OMSORGSOPPTJENING_CONSUMER_GROUP
       value: omsorgsopptjening-bestem-pensjonsopptjening-q1
     - name: GYLDIG_OPPTJENINGSAR
-      value: "2022"
+      value: "2021"
   envFrom:
     - secret: unleash-api-token
   kafka:
