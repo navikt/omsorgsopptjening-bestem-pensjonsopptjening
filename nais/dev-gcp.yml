@@ -60,8 +60,6 @@ spec:
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
   image: {{ image }}
-  ingresses:
-    - https://omsorgsopptjening-bestem-pensjonsopptjening.intern.dev.nav.no
   liveness:
     path: /actuator/health/liveness
     port: 8080
