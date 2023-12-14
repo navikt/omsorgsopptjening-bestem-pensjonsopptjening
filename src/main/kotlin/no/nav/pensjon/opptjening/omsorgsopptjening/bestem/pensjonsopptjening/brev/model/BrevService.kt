@@ -84,7 +84,7 @@ class BrevService(
                                     }
                                 }
                             } catch (ex: Throwable) {
-                                log.error("Feil ved setting av feil-status på brev", ex)
+                                log.error("Feil ved setting av feil-status på brev: ${ex::class.qualifiedName}")
                                 null
                             }
                         }
@@ -93,7 +93,6 @@ class BrevService(
             }
         } finally {
             brevRepository.frigi(låsteBrev)
-
         }
     }
 }

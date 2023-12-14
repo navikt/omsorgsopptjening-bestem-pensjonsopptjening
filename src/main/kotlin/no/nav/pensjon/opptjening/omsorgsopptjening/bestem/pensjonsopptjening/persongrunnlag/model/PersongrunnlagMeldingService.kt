@@ -73,7 +73,7 @@ class PersongrunnlagMeldingService(
                 }
             }
         } catch (ex: Throwable) {
-            log.error("Fikk exception ved uthenting av meldinger", ex)
+            log.error("Fikk exception ved uthenting av meldinger: ${ex::class.qualifiedName}")
             return null // throw ex
         } finally {
             transactionTemplate.execute {

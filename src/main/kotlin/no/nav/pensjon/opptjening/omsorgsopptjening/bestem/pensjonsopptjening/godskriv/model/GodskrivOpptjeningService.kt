@@ -67,7 +67,7 @@ class GodskrivOpptjeningService(
                                     }
                                 }
                             } catch (ex: Throwable) {
-                                log.error("Feil ved setting av feilstatus", ex)
+                                log.error("Feil ved setting av feilstatus: ${ex::class.qualifiedName}")
                             }
                             null
                         }

@@ -103,7 +103,7 @@ class OppgaveService(
                                     }
                                 }
                             } catch (ex: SQLException) {
-                                log.error("Feil ved prosessering av oppgaver", ex)
+                                log.error("Feil ved prosessering av oppgaver", ex) // OK, sql exception is safe to log
                                 throw ex
                             } catch (ex: Throwable) {
                                 oppgave.retry(ex.stackTraceToString()).let {

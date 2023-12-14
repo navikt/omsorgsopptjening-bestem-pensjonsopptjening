@@ -44,7 +44,7 @@ class PersongrunnlagMeldingProcessingThread(
                 }
             } catch (exception: Throwable) {
                 omsorgsarbeidMetricsFeilmåling.oppdater {
-                    log.warn("Exception caught while processing", exception)
+                    log.warn("Exception caught while processing ${exception::class.qualifiedName}")
                 }
             }
         }

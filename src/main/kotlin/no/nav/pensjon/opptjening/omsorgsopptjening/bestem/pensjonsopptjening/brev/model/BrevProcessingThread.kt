@@ -39,7 +39,8 @@ class BrevProcessingThread(
                 }
             } catch (exception: Throwable) {
                 brevProcessingMetricsFeilmåling.oppdater {
-                    log.warn("Exception caught while processing", exception)
+                    log.warn("Exception caught while processing ${exception::class.qualifiedName}")
+                    // TODO:LOG
                 }
             }
         }

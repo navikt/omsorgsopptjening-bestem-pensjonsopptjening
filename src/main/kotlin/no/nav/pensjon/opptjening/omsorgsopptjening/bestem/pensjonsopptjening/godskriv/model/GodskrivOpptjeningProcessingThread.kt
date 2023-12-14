@@ -41,7 +41,7 @@ class GodskrivOpptjeningProcessingThread(
                 }
             } catch (exception: Throwable) {
                 godskrivProcessingMetricsFeilmåling.oppdater {
-                    log.warn("Exception caught while processing", exception)
+                    log.warn("Exception caught while processing: ${exception::class.qualifiedName}")
                 }
             }
         }
