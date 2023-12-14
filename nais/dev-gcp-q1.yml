@@ -14,13 +14,13 @@ spec:
     - name: PDL_API_ID
       value: dev-fss.pdl.pdl-api-q1
     - name: PEN_BASE_URL
-      value: https://disabled.com
+      value: deaktivert
     - name: PEN_API_ID
-      value: tbd
+      value: deaktivert
     - name: OPPGAVE_URL
-      value: https://disabled.com
+      value: deaktivert
     - name: OPPGAVE_API_ID
-      value: tbd
+      value: deaktivert
     - name: POPP_URL
       value: https://pensjon-popp.dev-fss-pub.nais.io/popp/api
     - name: POPP_API_ID
@@ -57,7 +57,7 @@ spec:
         - host: pdl-api-q1.dev-fss-pub.nais.io
         - host: pensjon-popp.dev-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
-  image: {{ image }}
+  image: { { image } }
   liveness:
     path: /actuator/health/liveness
     port: 8080
