@@ -57,7 +57,7 @@ spec:
         - host: pdl-api-q1.dev-fss-pub.nais.io
         - host: pensjon-popp.dev-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
-  image: { { image } }
+  image: {{ image }}
   liveness:
     path: /actuator/health/liveness
     port: 8080
