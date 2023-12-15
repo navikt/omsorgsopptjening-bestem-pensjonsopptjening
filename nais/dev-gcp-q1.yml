@@ -14,11 +14,11 @@ spec:
     - name: PDL_API_ID
       value: dev-fss.pdl.pdl-api-q1
     - name: PEN_BASE_URL
-      value: deaktivert
+      value: http://localhost
     - name: PEN_API_ID
       value: deaktivert
     - name: OPPGAVE_URL
-      value: deaktivert
+      value: http://localhost
     - name: OPPGAVE_API_ID
       value: deaktivert
     - name: POPP_URL
