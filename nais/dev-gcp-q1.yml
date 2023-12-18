@@ -74,8 +74,8 @@ spec:
     max: 4
   resources:
     limits:
-      cpu: 2
+      cpu: "2"
       memory: "4096Mi"
     requests:
-      cpu: 100m
+      cpu: "100m"
       memory: "2048Mi"
