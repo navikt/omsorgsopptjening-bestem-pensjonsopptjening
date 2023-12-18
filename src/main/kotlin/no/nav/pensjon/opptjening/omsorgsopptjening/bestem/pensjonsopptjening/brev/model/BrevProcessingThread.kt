@@ -9,7 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unl
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-∫
+
 @Component
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
 class BrevProcessingThread(
