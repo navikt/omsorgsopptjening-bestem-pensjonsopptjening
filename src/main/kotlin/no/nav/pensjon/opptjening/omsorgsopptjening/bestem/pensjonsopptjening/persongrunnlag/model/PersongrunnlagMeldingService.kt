@@ -41,7 +41,7 @@ class PersongrunnlagMeldingService(
                 Mdc.scopedMdc(melding.correlationId) {
                     Mdc.scopedMdc(melding.innlesingId) {
                         try {
-                            log.info("Started behandling av melding $melding")
+                            log.info("Started behandling av melding")
                             transactionTemplate.execute {
                                 behandle(melding).let { fullførte ->
                                     persongrunnlagRepo.updateStatus(melding.ferdig())
