@@ -18,7 +18,7 @@ class PersongrunnlagMeldingProcessingThread(
     private val omsorgsarbeidMetricsMåling: OmsorgsarbeidProcessingMetrikker,
     private val omsorgsarbeidMetricsFeilmåling: OmsorgsarbeidProcessingMetricsFeilmåling,
     private val datasourceReadinessCheck: DatasourceReadinessCheck,
-    ) : Runnable {
+) : Runnable {
 
     companion object {
         val log = LoggerFactory.getLogger(this::class.java)!!
@@ -36,7 +36,7 @@ class PersongrunnlagMeldingProcessingThread(
             try {
                 if (unleash.isEnabled(NavUnleashConfig.Feature.BEHANDLING.toggleName) && datasourceReadinessCheck.isReady()) {
                     omsorgsarbeidMetricsMåling.oppdater {
-                        handler.process() ?: run {
+                        handler.process()?.let { null } ?: run {
                             Thread.sleep(1000)
                             null
                         }

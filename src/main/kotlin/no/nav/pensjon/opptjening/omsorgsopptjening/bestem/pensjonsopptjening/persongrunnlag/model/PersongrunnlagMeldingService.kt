@@ -32,7 +32,6 @@ class PersongrunnlagMeldingService(
     }
 
     fun process(): List<FullførteBehandlinger>? {
-        val lockId = UUID.randomUUID()
         val meldinger = transactionTemplate.execute {
             persongrunnlagRepo.finnNesteMeldingerForBehandling(10)
         }!!
