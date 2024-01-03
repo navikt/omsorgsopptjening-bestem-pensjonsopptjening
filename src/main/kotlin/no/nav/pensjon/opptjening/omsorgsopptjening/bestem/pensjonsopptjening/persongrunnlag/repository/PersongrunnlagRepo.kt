@@ -114,7 +114,6 @@ class PersongrunnlagRepo(
     fun finnNesteKlarTilProsessering(lockId: UUID, antall: Int): List<UUID> {
         val now = Instant.now(clock).toString()
 
-        // todo: legge på locktime
         jdbcTemplate.update(
             """update melding set lockId = :lockId, lockTime = :now::timestamptz
              | where id in (

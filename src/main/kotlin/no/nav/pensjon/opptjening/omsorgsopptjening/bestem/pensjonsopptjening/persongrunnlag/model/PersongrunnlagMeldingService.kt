@@ -12,9 +12,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.support.TransactionTemplate
-import java.sql.SQLException
-import java.util.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding.Persongrunnlag as KafkaPersongrunnlag
+
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.KanSlåsSammen.Companion.slåSammenLike
+
 
 @Service
 class PersongrunnlagMeldingService(
@@ -117,6 +119,30 @@ class PersongrunnlagMeldingService(
         return berikDatagrunnlag(personer)
     }
 
+    private fun consolidatePersongrunnlag(
+        key: (KafkaPersongrunnlag) -> Any,
+        persongrunnlag: List<KafkaPersongrunnlag>
+    ): List<KafkaPersongrunnlag> {
+        fun merge(persongrunnlag: List<KafkaPersongrunnlag>): KafkaPersongrunnlag {
+            // todo : sjekk omsorgsperioder
+            val omsorgsyter = persongrunnlag.first().omsorgsyter
+            val omsorgsperioder = persongrunnlag.flatMap { it.omsorgsperioder }.sortedBy { it.fom }.slåSammenLike()
+            val hjelpestønadperioder = persongrunnlag.flatMap { it.hjelpestønadsperioder }.sortedBy { it.fom }.slåSammenLike()
+            return KafkaPersongrunnlag(
+                omsorgsyter = omsorgsyter,
+                omsorgsperioder = omsorgsperioder,
+                hjelpestønadsperioder = hjelpestønadperioder,
+            )
+        }
+
+        val persongrunnlag = persongrunnlag.groupBy { key(it) }.values.map { merge(it) }
+        return persongrunnlag
+    }
+
+    private fun List<KafkaPersongrunnlag>.consolidate(key: (KafkaPersongrunnlag) -> Any): List<KafkaPersongrunnlag> {
+        return consolidatePersongrunnlag(key, this)
+    }
+
     private fun PersongrunnlagMeldingKafka.berikDatagrunnlag(persondata: Set<Person>): BeriketDatagrunnlag {
         fun Set<Person>.finnPerson(fnr: String): Person {
             return singleOrNull { it.identifisertAv(fnr) } ?: throw PersonIkkeIdentifisertAvIdentException()
@@ -124,32 +150,33 @@ class PersongrunnlagMeldingService(
 
         return BeriketDatagrunnlag(
             omsorgsyter = persondata.finnPerson(omsorgsyter),
-            persongrunnlag = persongrunnlag.map { persongrunnlag ->
-                val omsorgsyter = persondata.finnPerson(persongrunnlag.omsorgsyter)
-                Persongrunnlag(
-                    omsorgsyter = omsorgsyter,
-                    omsorgsperioder = persongrunnlag.omsorgsperioder.map { omsorgVedtakPeriode ->
-                        Omsorgsperiode(
-                            fom = omsorgVedtakPeriode.fom,
-                            tom = omsorgVedtakPeriode.tom,
-                            omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain(),
-                            omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
-                            kilde = omsorgVedtakPeriode.kilde.toDomain(),
-                            utbetalt = omsorgVedtakPeriode.utbetalt,
-                            landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain()
-                        )
-                    },
-                    hjelpestønadperioder = persongrunnlag.hjelpestønadsperioder.map { hjelpestønadperiode ->
-                        Hjelpestønadperiode(
-                            fom = hjelpestønadperiode.fom,
-                            tom = hjelpestønadperiode.tom,
-                            omsorgstype = hjelpestønadperiode.omsorgstype.toDomain(),
-                            omsorgsmottaker = persondata.finnPerson(hjelpestønadperiode.omsorgsmottaker),
-                            kilde = hjelpestønadperiode.kilde.toDomain()
-                        )
-                    }
-                )
-            },
+            persongrunnlag = persongrunnlag.consolidate { persondata.finnPerson(it.omsorgsyter) }
+                .map { persongrunnlag ->
+                    val omsorgsyter = persondata.finnPerson(persongrunnlag.omsorgsyter)
+                    Persongrunnlag(
+                        omsorgsyter = omsorgsyter,
+                        omsorgsperioder = persongrunnlag.omsorgsperioder.map { omsorgVedtakPeriode ->
+                            Omsorgsperiode(
+                                fom = omsorgVedtakPeriode.fom,
+                                tom = omsorgVedtakPeriode.tom,
+                                omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain(),
+                                omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
+                                kilde = omsorgVedtakPeriode.kilde.toDomain(),
+                                utbetalt = omsorgVedtakPeriode.utbetalt,
+                                landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain()
+                            )
+                        },
+                        hjelpestønadperioder = persongrunnlag.hjelpestønadsperioder.map { hjelpestønadperiode ->
+                            Hjelpestønadperiode(
+                                fom = hjelpestønadperiode.fom,
+                                tom = hjelpestønadperiode.tom,
+                                omsorgstype = hjelpestønadperiode.omsorgstype.toDomain(),
+                                omsorgsmottaker = persondata.finnPerson(hjelpestønadperiode.omsorgsmottaker),
+                                kilde = hjelpestønadperiode.kilde.toDomain()
+                            )
+                        }
+                    )
+                },
             innlesingId = innlesingId,
             correlationId = correlationId
         )

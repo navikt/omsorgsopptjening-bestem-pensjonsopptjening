@@ -18,6 +18,9 @@ sealed class OppgaveDetaljer {
         val oppgavemottaker: String,
         val oppgavetekst: Set<String>,
     ) : OppgaveDetaljer() {
+        init {
+            require(oppgavetekst.isNotEmpty()) { "Oppgavetekster må ha minst en verdi" }
+        }
         override fun mottaker(): String {
             return oppgavemottaker
         }

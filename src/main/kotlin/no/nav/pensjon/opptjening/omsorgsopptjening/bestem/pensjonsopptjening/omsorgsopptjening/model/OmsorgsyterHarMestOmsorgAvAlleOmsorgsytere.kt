@@ -15,13 +15,13 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return if (grunnlag.omsorgsyterHarFlestOmsorgsmåneder()) {
-            VilkårsvurderingUtfall.Innvilget.Vilkår.from(emptySet()) //TODO har egentlig ikke noe godt å hekte dette på
+            VilkårsvurderingUtfall.Innvilget.Vilkår.from(emptySet()) // Har egentlig ikke noe godt å hekte dette på
         } else if (grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder()) {
             VilkårsvurderingUtfall.Ubestemt(
                 setOf(Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder).map { it.henvisning }.toSet()
             )
         } else {
-            VilkårsvurderingUtfall.Avslag.Vilkår.from(emptySet()) //TODO har egentlig ikke noe godt å hekte dette på
+            VilkårsvurderingUtfall.Avslag.Vilkår.from(emptySet()) // Har egentlig ikke noe godt å hekte dette på
         }
     }
 
@@ -91,7 +91,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
     data class Grunnlag(
         val omsorgsyter: String,
-        val data: List<OmsorgsmånederForMottakerOgÅr> //TODO stramme opp modellen slik at det ikke er teoretisk mulig med flere mottakere?
+        val data: List<OmsorgsmånederForMottakerOgÅr> // Det er teoretisk mulig med flere mottakere, men i praksis kun en
     ) : ParagrafGrunnlag() {
         private val omsorgsytereGruppertEtterOmsorgsmåneder = data
             .groupBy { it.antall() }

@@ -19,7 +19,6 @@ data class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
             }
 
             DomainOmsorgstype.HJELPESTØNAD -> {
-                //TODO føles som man kanskje burde sjekke begge omsorgstyper for å unngå brev for tilfeller hvor omsorgsyter har poeng fra barnetryg for året før?
                 hentPensjonspoengForOmsorgsopptjening(
                     omsorgsyter.fnr,
                     omsorgsAr - 1,

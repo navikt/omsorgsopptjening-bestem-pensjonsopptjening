@@ -214,10 +214,10 @@ private enum class PoppOmsorgType {
 
     fun toDomain(): DomainOmsorgstype {
         return when (this) {
-            OSFE -> TODO("Never mapped")
+            OSFE -> throw NotImplementedError("Never mapped: OSFE")
             OBO6H -> DomainOmsorgstype.HJELPESTØNAD
             OBU6 -> DomainOmsorgstype.BARNETRYGD
-            PPI -> TODO("Never mapped")
+            PPI -> throw NotImplementedError("Never mapped: PPI")
         }
     }
 

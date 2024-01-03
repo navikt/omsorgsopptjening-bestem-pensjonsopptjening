@@ -126,9 +126,7 @@ class PENBrevClientTest(
                             )
                         )
                         .willReturn(
-                            notFound() // TODO: noe mer her? 404 kan skyldes andre ting også
-//                                .withBody("""{"journalpostId":"123"}""")
-//                                .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                            notFound()
                         )
                 )
                 assertThatThrownBy {

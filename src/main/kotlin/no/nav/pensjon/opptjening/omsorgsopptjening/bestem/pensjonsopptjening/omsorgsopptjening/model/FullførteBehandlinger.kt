@@ -49,7 +49,7 @@ data class FullførteBehandlinger(
         }
     }
 
-    //TODO denne bør ikke brukes, men er praktisk for tester som kun forventer en behandling
+    // Denne bør ikke brukes, men er praktisk for tester som kun forventer en behandling
     @TestOnly
     fun single(): FullførtBehandling {
         return behandlinger.single()

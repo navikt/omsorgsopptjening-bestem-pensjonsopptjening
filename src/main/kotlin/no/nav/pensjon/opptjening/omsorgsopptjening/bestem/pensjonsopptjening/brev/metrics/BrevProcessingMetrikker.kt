@@ -11,8 +11,6 @@ class BrevProcessingMetrikker(registry: MeterRegistry) : Metrikker<List<Brev>?> 
     private val brevProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "brevProsessert")
 
     override fun oppdater(lambda: () -> List<Brev>?): List<Brev>? {
-        return brevProsessertTidsbruk.recordCallable(lambda)?.also {
-            //TODO
-        }
+        return brevProsessertTidsbruk.recordCallable(lambda)
     }
 }

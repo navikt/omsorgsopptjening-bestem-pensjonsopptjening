@@ -1825,6 +1825,175 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         assertThat(repo.find(melding!!).status).isInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java)
     }
 
+
+    @Test
+    fun `Flere personnummer tilhørende samme person skal behandles som ett persongrunnlag`() {
+        val omsorgsyterGammeltFnr = "61018212345"
+        val omsorgsyterNyttFnr = "01018212345"
+        val omsorgsmottakerFnr = "07081812345"
+
+        wiremock.givenThat(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                .withRequestBody(containing(omsorgsyterGammeltFnr))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_1bruk_pluss_historisk.json")
+                )
+        )
+
+        wiremock.givenThat(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                .withRequestBody(containing(omsorgsmottakerFnr))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_barn_2ar_2020.json")
+                )
+        )
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = omsorgsyterGammeltFnr,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = omsorgsyterGammeltFnr,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.APRIL),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = omsorgsmottakerFnr,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 5001,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = omsorgsyterNyttFnr,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.MAY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = omsorgsmottakerFnr,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 5001,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        handler.process()!!.first().single().also { behandling ->
+            behandling.assertInnvilget(
+                omsorgsyter = omsorgsyterNyttFnr,
+                omsorgsmottaker = omsorgsmottakerFnr
+            )
+            assertThat(behandling.omsorgsyter).isEqualTo(omsorgsyterNyttFnr)
+            assertThat(behandling.omsorgsmottaker).isEqualTo(omsorgsmottakerFnr)
+            assertThat(behandling.grunnlag.omsorgsyter.fnr).isEqualTo(omsorgsyterNyttFnr)
+            assertThat(behandling.grunnlag.omsorgsmottaker.fnr).isEqualTo(omsorgsmottakerFnr)
+            assertThat(behandling.grunnlag.grunnlag.persongrunnlag.map { it.omsorgsyter.fnr }.single()).isEqualTo(
+                omsorgsyterNyttFnr
+            )
+        }
+    }
+
+    @Test
+    fun `Flere personnummer tilhørende samme person med overlappende perioder håndteres`() {
+        val omsorgsyterGammeltFnr = "61018212345"
+        val omsorgsyterNyttFnr = "01018212345"
+        val omsorgsmottakerFnr = "07081812345"
+
+        wiremock.givenThat(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                .withRequestBody(containing(omsorgsyterGammeltFnr))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_1bruk_pluss_historisk.json")
+                )
+        )
+
+        wiremock.givenThat(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+                .withRequestBody(containing(omsorgsmottakerFnr))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("fnr_barn_2ar_2020.json")
+                )
+        )
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = omsorgsyterGammeltFnr,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = omsorgsyterGammeltFnr,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = omsorgsmottakerFnr,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 5001,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = omsorgsyterNyttFnr,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = omsorgsmottakerFnr,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 5001,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        handler.process()!!.first().single().also { behandling ->
+            behandling.assertInnvilget(
+                omsorgsyter = omsorgsyterNyttFnr,
+                omsorgsmottaker = omsorgsmottakerFnr
+            )
+            assertThat(behandling.omsorgsyter).isEqualTo(omsorgsyterNyttFnr)
+            assertThat(behandling.omsorgsmottaker).isEqualTo(omsorgsmottakerFnr)
+            assertThat(behandling.grunnlag.omsorgsyter.fnr).isEqualTo(omsorgsyterNyttFnr)
+            assertThat(behandling.grunnlag.omsorgsmottaker.fnr).isEqualTo(omsorgsmottakerFnr)
+            assertThat(behandling.grunnlag.grunnlag.persongrunnlag.map { it.omsorgsyter.fnr }.single()).isEqualTo(
+                omsorgsyterNyttFnr
+            )
+        }
+    }
+
     private fun FullførtBehandling.assertInnvilget(
         omsorgsyter: String,
         omsorgsmottaker: String,

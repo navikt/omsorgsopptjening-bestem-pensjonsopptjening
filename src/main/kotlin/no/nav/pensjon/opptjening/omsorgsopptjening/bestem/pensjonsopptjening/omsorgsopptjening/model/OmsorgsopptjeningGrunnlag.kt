@@ -307,7 +307,7 @@ private fun BeriketDatagrunnlag.`avgrens for omsorgsår`(): Map<Int, BeriketData
                                 barnetrygdPeriode.periode.overlappendeMåneder(år)
                                     .let {
                                         Omsorgsperiode(
-                                            fom = it.min(), //TODO det er vel ingen garanti for at dette blir korrekt
+                                            fom = it.min(),
                                             tom = it.max(),
                                             omsorgstype = barnetrygdPeriode.omsorgstype,
                                             omsorgsmottaker = barnetrygdPeriode.omsorgsmottaker,

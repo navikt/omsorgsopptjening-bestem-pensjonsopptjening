@@ -61,7 +61,6 @@ class OppgaveService(
                 .groupBy { it.oppgavemottaker }
                 .mapValues { o -> o.value.map { it.oppgaveTekst }.toSet() }
                 .forEach { (oppgavemottaker, oppgaveTekster) ->
-                    //TODO legg alle oppgavetekster for den samme behandlingen i en og samme oppgave
                     opprett(
                         Oppgave.Transient(
                             behandlingId = behandling.id,
@@ -91,7 +90,6 @@ class OppgaveService(
                                         oppgaveKlient.opprettOppgave(
                                             aktoerId = aktørId,
                                             sakId = omsorgssak.sakId,
-                                            // TODO: Skal ikke kunne være tom
                                             beskrivelse = FlereOppgaveteksterFormatter.format(oppgave.oppgavetekst),
                                             tildeltEnhetsnr = omsorgssak.enhet
                                         ).let { oppgaveId ->
