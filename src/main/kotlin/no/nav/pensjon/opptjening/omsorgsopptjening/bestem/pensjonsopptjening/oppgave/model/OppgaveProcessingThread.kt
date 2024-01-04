@@ -41,7 +41,7 @@ class OppgaveProcessingThread(
                 }
             } catch (exception: Throwable) {
                 oppgaveProcessingMetricsFeilmåling.oppdater {
-                    log.warn("Exception caught while processing ${exception::class.qualifiedName}")
+                    log.warn("Exception caught while processing ${exception::class.qualifiedName}",exception)
                 }
             }
         }

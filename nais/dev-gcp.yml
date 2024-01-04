@@ -49,8 +49,15 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: "7ef907b4-ec9f-47dd-ab41-4e54ba32ceb1" #AAD pensjonopptjening testgruppe
+
   secureLogs:
     enabled: true
+  ingresses:
+    - https://omsorgsopptjening-bestem-pensjonsopptjening.intern.dev.nav.no
   accessPolicy:
     outbound:
       external:

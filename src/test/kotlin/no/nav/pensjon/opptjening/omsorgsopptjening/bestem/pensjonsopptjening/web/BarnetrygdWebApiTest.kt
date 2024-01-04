@@ -136,10 +136,15 @@ class BarnetrygdWebApiTest : SpringContextTest.WithKafka() {
     }
 
     @Test
-    fun testX() {
-        val melding = lagreOgProsesserMeldingSomGirOppgave()
-        webApi.rekjørMelding(melding)
-        assertThat(webApi).isEqualTo("42")
+    // TODO: endre så dette kun kan gjøres på feilede transaksaksjoner (utsatt pga for mye styr med testene)
+    fun `kan avslutte en transaksjon`() {
+        val meldingsId= lagreOgProsesserMeldingSomGirOppgave()
+        repo.find(meldingsId).let { melding ->
+            webApi.avsluttMelding(meldingsId)
+        }
+        repo.find(meldingsId).let { melding ->
+            assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Avsluttet::class.java)
+        }
     }
 
     private fun FullførtBehandling.assertManuell(

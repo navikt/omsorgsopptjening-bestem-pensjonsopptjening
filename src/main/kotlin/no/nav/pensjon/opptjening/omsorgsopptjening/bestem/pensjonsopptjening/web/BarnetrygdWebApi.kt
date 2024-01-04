@@ -33,15 +33,17 @@ class BarnetrygdWebApi(
     }
 
     @GetMapping("/bestem/avslutt/{meldingId}")
-    fun avsluttFeiletMelding(@PathVariable meldingId: UUID): ResponseEntity<String> {
+    fun avsluttMelding(@PathVariable meldingId: UUID): ResponseEntity<String> {
         log.info("""Avsluttet behandling av: $meldingId feilede rader for innlesning""")
-        return ResponseEntity.ok("hello")
+        persongrunnlagMeldingService.avsluttMelding(meldingId)
+        return ResponseEntity.ok("Melding avsluttet")
     }
 
     @GetMapping("/bestem/avslutt-alle/")
     fun avslettAlleFeilede(): ResponseEntity<String> {
         log.info("""Avsluttet behandling av alle feilede meldinger for innlesning""")
-        return ResponseEntity.ok("hello")
+        // TODO: Implementere denne
+        throw NotImplementedError("Avslutting acv alle meldinger er ikke implementert")
     }
 
 }

@@ -42,6 +42,10 @@ sealed class PersongrunnlagMelding {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 
+        fun avsluttet(): Mottatt {
+            return copy(statushistorikk = statushistorikk + status.avsluttet())
+        }
+
         fun opprettOppgave(): Oppgave.Transient? {
             return if (status is Status.Feilet) {
                 Oppgave.Transient(
@@ -73,6 +77,10 @@ sealed class PersongrunnlagMelding {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Retry")
         }
 
+        open fun avsluttet(): Avsluttet {
+            throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Avsluttet")
+        }
+
         @JsonTypeName("Klar")
         data class Klar(
             val tidspunkt: Instant = now()
@@ -84,10 +92,24 @@ sealed class PersongrunnlagMelding {
             override fun retry(melding: String): Status {
                 return Retry(melding = melding)
             }
+
+            override fun avsluttet() : Avsluttet {
+                return Avsluttet()
+            }
         }
 
         @JsonTypeName("Ferdig")
         data class Ferdig(
+            val tidspunkt: Instant = now(),
+
+        ) : Status() {
+            override fun avsluttet() : Avsluttet {
+                return Avsluttet()
+            }
+        }
+
+        @JsonTypeName("Avsluttet")
+        data class Avsluttet(
             val tidspunkt: Instant = now(),
         ) : Status()
 
@@ -101,6 +123,10 @@ sealed class PersongrunnlagMelding {
         ) : Status() {
             override fun ferdig(): Ferdig {
                 return Ferdig()
+            }
+
+            override fun avsluttet(): Avsluttet {
+                return Avsluttet()
             }
 
             override fun retry(melding: String): Status {

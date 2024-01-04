@@ -16,6 +16,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding.Persongrunnlag as KafkaPersongrunnlag
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.KanSlåsSammen.Companion.slåSammenLike
+import java.util.*
 
 
 @Service
@@ -127,7 +128,8 @@ class PersongrunnlagMeldingService(
             // todo : sjekk omsorgsperioder
             val omsorgsyter = persongrunnlag.first().omsorgsyter
             val omsorgsperioder = persongrunnlag.flatMap { it.omsorgsperioder }.sortedBy { it.fom }.slåSammenLike()
-            val hjelpestønadperioder = persongrunnlag.flatMap { it.hjelpestønadsperioder }.sortedBy { it.fom }.slåSammenLike()
+            val hjelpestønadperioder =
+                persongrunnlag.flatMap { it.hjelpestønadsperioder }.sortedBy { it.fom }.slåSammenLike()
             return KafkaPersongrunnlag(
                 omsorgsyter = omsorgsyter,
                 omsorgsperioder = omsorgsperioder,
@@ -180,6 +182,18 @@ class PersongrunnlagMeldingService(
             innlesingId = innlesingId,
             correlationId = correlationId
         )
+    }
+
+    fun avsluttMelding(id: UUID) {
+        try {
+            persongrunnlagRepo.find(id).avsluttet().let {
+                persongrunnlagRepo.updateStatus(it)
+            }
+        } catch (ex: Throwable) {
+            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}", ex)
+            throw RuntimeException("Kunne ikke oppdatere status")
+        }
+
     }
 
     class PersonIkkeIdentifisertAvIdentException(msg: String = "Person kunne ikke identifiseres av oppgitt ident") :
