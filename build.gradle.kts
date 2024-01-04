@@ -6,15 +6,16 @@ val jacksonVersion = "2.15.3"
 val logbackEncoderVersion = "7.4"
 val postgresqlVersion = "42.7.1"
 val flywayCoreVersion = "9.22.3" // 10.x krever nyere postgres-database
-val springKafkaTestVersion = "3.1.0"
+val springKafkaTestVersion = "3.1.1"
 val springCloudContractVersion = "4.0.4"
 val testcontainersVersion = "1.19.3"
 val mockkVersion = "1.13.8"
-val assertJVersion = "3.24.2"
+val assertJVersion = "3.25.1"
 val jsonAssertVersion = "1.5.1"
 val wiremockVersion = "2.35.1"
 val mockitoVersion = "5.2.1"
 val unleashVersion = "9.2.0"
+val navTokenSupportVersion = "3.2.0"
 
 val snakeYamlVersion = "2.2"
 val snappyJavaVersion = "1.1.10.5"
@@ -22,11 +23,11 @@ val httpClient5Version = "5.3"
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {
-    val kotlinVersion = "1.9.10"
+    val kotlinVersion = "1.9.22"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.2.0"
+    id("org.springframework.boot") version "3.2.1"
     id("com.github.ben-manes.versions") version "0.50.0"
 }
 
@@ -60,6 +61,7 @@ dependencies {
     implementation("org.springframework:spring-aspects")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("io.getunleash:unleash-client-java:$unleashVersion")
+    implementation("no.nav.security:token-validation-spring:$navTokenSupportVersion")
 
     // Internal libraries
     implementation("no.nav.pensjon.opptjening:omsorgsopptjening-domene-lib:$domeneVersion")
@@ -79,6 +81,7 @@ dependencies {
     implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5:$httpClient5Version")
 
+
     // Test
     testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
     testImplementation(kotlin("test"))
@@ -89,6 +92,7 @@ dependencies {
     testImplementation("io.mockk:mockk:${mockkVersion}")
     testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:$wiremockVersion")
     testImplementation("org.assertj:assertj-core:$assertJVersion")
+    testImplementation("no.nav.security:token-validation-spring-test:$navTokenSupportVersion")
 }
 
 tasks.test {
