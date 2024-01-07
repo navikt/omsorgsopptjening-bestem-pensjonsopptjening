@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration
 class NavUnleashConfig {
     @Bean
     fun unleashConfig(): Unleash {
-        return FakeUnleash().also { it.enableAll() }
+        // return FakeUnleash().also { it.enableAll() }
+        return FakeUnleash().also { it.disableAll() }
     }
 }
 

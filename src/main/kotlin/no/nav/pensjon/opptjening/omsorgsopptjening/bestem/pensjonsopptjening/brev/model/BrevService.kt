@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
 import java.sql.SQLException
 import java.time.Year
+import java.util.*
 
 @Component
 class BrevService(
@@ -93,6 +94,15 @@ class BrevService(
             }
         } finally {
             brevRepository.frigi(låsteBrev)
+        }
+    }
+
+    fun stoppForMelding(meldingsId: UUID) {
+        brevRepository.findForMelding(meldingsId).forEach { brev ->
+            log.info("Stopper brev: ${brev.id}")
+            brev.stoppet().let {
+                brevRepository.updateStatus(it)
+            }
         }
     }
 }

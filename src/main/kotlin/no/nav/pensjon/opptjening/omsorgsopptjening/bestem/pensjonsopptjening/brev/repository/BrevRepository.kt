@@ -30,6 +30,7 @@ class BrevRepository(
             is Brev.Status.Ferdig -> "Ferdig"
             is Brev.Status.Klar -> "Klar"
             is Brev.Status.Retry -> "Retry"
+            is Brev.Status.Stoppet -> "Stoppet"
         }
     }
 

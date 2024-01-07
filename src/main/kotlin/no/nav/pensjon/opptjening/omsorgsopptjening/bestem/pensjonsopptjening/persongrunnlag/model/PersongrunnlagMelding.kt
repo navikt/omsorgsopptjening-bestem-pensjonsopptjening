@@ -46,6 +46,10 @@ sealed class PersongrunnlagMelding {
             return copy(statushistorikk = statushistorikk + status.avsluttet())
         }
 
+        fun stoppet(): Mottatt {
+            return copy(statushistorikk = statushistorikk + status.stoppet())
+        }
+
         fun opprettOppgave(): Oppgave.Transient? {
             return if (status is Status.Feilet) {
                 Oppgave.Transient(
@@ -81,6 +85,10 @@ sealed class PersongrunnlagMelding {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Avsluttet")
         }
 
+        open fun stoppet(): Stoppet {
+            throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
+        }
+
         @JsonTypeName("Klar")
         data class Klar(
             val tidspunkt: Instant = now()
@@ -96,6 +104,10 @@ sealed class PersongrunnlagMelding {
             override fun avsluttet() : Avsluttet {
                 return Avsluttet()
             }
+
+            override fun stoppet() : Stoppet {
+                return Stoppet()
+            }
         }
 
         @JsonTypeName("Ferdig")
@@ -106,10 +118,23 @@ sealed class PersongrunnlagMelding {
             override fun avsluttet() : Avsluttet {
                 return Avsluttet()
             }
+
+            override fun stoppet() : Stoppet {
+                return Stoppet()
+            }
         }
 
         @JsonTypeName("Avsluttet")
         data class Avsluttet(
+            val tidspunkt: Instant = now(),
+        ) : Status() {
+            override fun stoppet() : Stoppet {
+                return Stoppet()
+            }
+        }
+
+        @JsonTypeName("Stoppet")
+        data class Stoppet(
             val tidspunkt: Instant = now(),
         ) : Status()
 

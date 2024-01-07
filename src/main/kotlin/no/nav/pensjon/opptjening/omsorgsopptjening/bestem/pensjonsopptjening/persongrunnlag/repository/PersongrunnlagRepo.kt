@@ -34,6 +34,7 @@ class PersongrunnlagRepo(
             is PersongrunnlagMelding.Status.Klar -> "Klar"
             is PersongrunnlagMelding.Status.Retry -> "Retry"
             is PersongrunnlagMelding.Status.Avsluttet -> "Avsluttet"
+            is PersongrunnlagMelding.Status.Stoppet -> "Stoppet"
         }
     }
 

@@ -54,6 +54,10 @@ sealed class Oppgave {
             return copy(statushistorikk = statushistorikk + status.ferdig(oppgaveId))
         }
 
+        fun stoppet(): Persistent {
+            return copy(statushistorikk = statushistorikk + status.stoppet())
+        }
+
         fun retry(melding: String): Persistent {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
@@ -74,6 +78,11 @@ sealed class Oppgave {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Retry")
         }
 
+        open fun stoppet(): Status {
+            throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Retry")
+        }
+
+
         @JsonTypeName("Klar")
         data class Klar(
             val tidspunkt: Instant = Instant.now()
@@ -85,12 +94,26 @@ sealed class Oppgave {
             override fun retry(melding: String): Status {
                 return Retry(melding = melding)
             }
+
+            override fun stoppet(): Stoppet {
+                return Stoppet()
+            }
+
         }
 
         @JsonTypeName("Ferdig")
         data class Ferdig(
             val tidspunkt: Instant = Instant.now(),
             val oppgaveId: String,
+        ) : Status() {
+            override fun stoppet(): Stoppet {
+                return Stoppet()
+            }
+        }
+
+        @JsonTypeName("Stoppet")
+        data class Stoppet(
+            val tidspunkt: Instant = Instant.now(),
         ) : Status()
 
         @JsonTypeName("Retry")
@@ -124,11 +147,18 @@ sealed class Oppgave {
                     }
                 }
             }
+            override fun stoppet(): Stoppet {
+                return Stoppet()
+            }
         }
 
         @JsonTypeName("Feilet")
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
-        ) : Status()
+        ) : Status() {
+            override fun stoppet(): Stoppet {
+                return Stoppet()
+            }
+        }
     }
 }

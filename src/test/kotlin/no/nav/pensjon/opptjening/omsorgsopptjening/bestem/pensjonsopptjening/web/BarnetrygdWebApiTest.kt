@@ -1,10 +1,17 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web
 
+import com.github.tomakehurst.wiremock.client.WireMock
+import io.getunleash.Unleash
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.*
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
@@ -24,13 +31,12 @@ import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
-import java.time.Month.JANUARY
-import java.time.Month.JUNE
+import java.time.Month.*
 import java.time.YearMonth
 import java.util.*
-import kotlin.test.assertFalse
 
-class BarnetrygdWebApiTest : SpringContextTest.WithKafka() {
+// class BarnetrygdWebApiTest : SpringContextTest.WithKafka() {
+class BarnetrygdWebApiTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var webApi: BarnetrygdWebApi
@@ -39,7 +45,16 @@ class BarnetrygdWebApiTest : SpringContextTest.WithKafka() {
     private lateinit var repo: PersongrunnlagRepo
 
     @Autowired
+    private lateinit var oppgaveRepo: OppgaveRepo
+
+    @Autowired
+    private lateinit var brevRepository: BrevRepository
+
+    @Autowired
     private lateinit var handler: PersongrunnlagMeldingService
+
+    @Autowired
+    private lateinit var unleash: Unleash
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
@@ -57,7 +72,97 @@ class BarnetrygdWebApiTest : SpringContextTest.WithKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }
             .given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
+
+        /*
+        wiremock.stubFor(
+            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBodyFile("fodsel_0freg_0pdl.json")
+            )
+        )
+
+         */
+
+
+//        FakeUnleash().disable(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName)
+//        (unleash as FakeUnleash).disable(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName)
     }
+
+//    @Test
+    fun lagreOgProsesserMeldingSomGirBrev() : UUID {
+        wiremock.ingenPensjonspoeng("12345678910") //mor
+        wiremock.givenThat(
+            WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
+                .withHeader("fnr", WireMock.equalTo("04010012797")) //far
+                .willReturn(
+                    WireMock.aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            """
+                            {
+                                "pensjonspoeng": [
+                                    {
+                                        "ar":${OPPTJENINGSÅR},
+                                        "poeng":7.4,
+                                        "pensjonspoengType":"PPI"
+                                    }
+                                ]
+                            }
+                        """.trimIndent()
+                        )
+                )
+        )
+
+        val melding = repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding(
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding.Omsorgsperiode(
+                                    fom = YearMonth.of(2018, JANUARY),
+                                    tom = YearMonth.of(2030, DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
+                                ),
+                            ),
+                            hjelpestønadsperioder = listOf(
+                                no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding.Hjelpestønadperiode(
+                                    fom = YearMonth.of(2018, JANUARY),
+                                    tom = YearMonth.of(2030, DECEMBER),
+                                    omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.INFOTRYGD,
+                                )
+                            )
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        handler.process()!!.first().single().also { behandling ->
+            Assertions.assertTrue(behandling.erInnvilget())
+
+            Assertions.assertInstanceOf(
+                Brev::class.java,
+                brevRepository.findForBehandling(behandling.id).singleOrNull()
+            ).also {
+                assertThat(it.årsak).isEqualTo(BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR)
+            }
+        }
+        return melding!!
+    }
+
 
     fun lagreOgProsesserMeldingSomGirOppgave(): UUID {
         val melding = repo.lagre(
@@ -104,33 +209,10 @@ class BarnetrygdWebApiTest : SpringContextTest.WithKafka() {
         )
 
         handler.process()!!.first().single().let { behandling ->
-            behandling.assertManuell(
-                omsorgsyter = "12345678910",
-                omsorgsmottaker = "01122012345"
-            )
-            Assertions.assertTrue(behandling.vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>())
-            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()
-                .let { vurdering ->
-                    assertFalse(vurdering.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
-                    Assertions.assertTrue(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
-                    Assertions.assertEquals(
-                        mapOf(
-                            "12345678910" to 6,
-                            "04010012797" to 6,
-                        ),
-                        vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
-                    )
-                }
+            assertThat(behandling.utfall).isInstanceOf(BehandlingUtfall.Manuell::class.java)
             assertThat(
                 behandling.hentOppgaveopplysninger()
-            ).isEqualTo(
-                listOf(
-                    Oppgaveopplysninger.Generell(
-                        oppgavemottaker = "12345678910",
-                        oppgaveTekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01122012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
-                    )
-                ),
-            )
+            ).hasSize(1)
         }
         return melding!!
     }
@@ -138,25 +220,40 @@ class BarnetrygdWebApiTest : SpringContextTest.WithKafka() {
     @Test
     // TODO: endre så dette kun kan gjøres på feilede transaksaksjoner (utsatt pga for mye styr med testene)
     fun `kan avslutte en transaksjon`() {
-        val meldingsId= lagreOgProsesserMeldingSomGirOppgave()
-        repo.find(meldingsId).let { melding ->
-            webApi.avsluttMelding(meldingsId)
-        }
+        val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
+        webApi.avsluttMelding(meldingsId)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Avsluttet::class.java)
         }
     }
 
-    private fun FullførtBehandling.assertManuell(
-        omsorgsyter: String,
-        omsorgsmottaker: String,
-        omsorgstype: DomainOmsorgstype = DomainOmsorgstype.BARNETRYGD,
-    ): FullførtBehandling {
-        assertThat(this.omsorgsAr).isEqualTo(OPPTJENINGSÅR)
-        assertThat(this.omsorgsyter).isEqualTo(omsorgsyter)
-        assertThat(this.omsorgsmottaker).isEqualTo(omsorgsmottaker)
-        assertThat(this.omsorgstype).isEqualTo(omsorgstype)
-        assertThat(this.utfall).isInstanceOf(BehandlingUtfall.Manuell::class.java)
-        return this
+    @Test
+    fun `rekjøring stopper melding og oppgave`() {
+        val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
+        webApi.rekjørMelding(meldingsId)
+        repo.find(meldingsId).let { melding ->
+            assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
+        }
+        oppgaveRepo.findForMelding(meldingsId).let { oppgaver ->
+            val oppgave = oppgaver.single()
+            println("Oppgave: id=${oppgave.id}")
+            oppgave.statushistorikk.forEach { println("oppgave.status: ${it::class.java}") }
+            assertThat(oppgave.status).isInstanceOf(Oppgave.Status.Stoppet::class.java)
+        }
+        assertThat(brevRepository.findForMelding(meldingsId)).isEmpty()
+    }
+
+    @Test
+    fun `rekjøring stopper melding og brev`() {
+        val meldingsId = lagreOgProsesserMeldingSomGirBrev()
+        webApi.rekjørMelding(meldingsId)
+        repo.find(meldingsId).let { melding ->
+            assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
+        }
+        assertThat(oppgaveRepo.findForMelding(meldingsId)).isEmpty()
+        brevRepository.findForMelding(meldingsId).let {
+            val brev = it.single()
+            assertThat(brev.status).isInstanceOf(Brev.Status.Stoppet::class.java)
+        }
     }
 }

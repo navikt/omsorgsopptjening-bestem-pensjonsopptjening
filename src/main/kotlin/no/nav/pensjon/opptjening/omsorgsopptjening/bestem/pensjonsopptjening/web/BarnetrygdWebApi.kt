@@ -21,15 +21,16 @@ class BarnetrygdWebApi(
 
     @GetMapping("/bestem/rekjor/{meldingId}")
     fun rekjørMelding(@PathVariable meldingId: UUID): ResponseEntity<String> {
-        log.info("rekjør melding ${meldingId}")
-        return ResponseEntity.ok("hello")
+        persongrunnlagMeldingService.stoppMelding(meldingId)
+        // TODO: rekjør
+        return ResponseEntity.ok("Melding avsluttet")
     }
 
 
     @GetMapping("/bestem/rekjor/avslutt-alle/")
     fun rekjørAlleFeilede(@PathVariable meldingId: UUID): ResponseEntity<String> {
         log.info("""Avsluttet behandling av: $meldingId feilede rader for innlesning""")
-        return ResponseEntity.ok("hello")
+        throw NotImplementedError()
     }
 
     @GetMapping("/bestem/avslutt/{meldingId}")

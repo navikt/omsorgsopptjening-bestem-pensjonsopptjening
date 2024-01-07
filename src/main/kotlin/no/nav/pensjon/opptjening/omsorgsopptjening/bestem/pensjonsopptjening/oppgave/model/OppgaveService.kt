@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
 import java.sql.SQLException
+import java.util.*
 
 @Component
 class OppgaveService(
@@ -118,6 +119,13 @@ class OppgaveService(
             }
         } finally {
             oppgaveRepo.frigi(låsteOppgaver)
+        }
+    }
+
+    fun stoppForMelding(meldingsId: UUID) {
+        oppgaveRepo.findForMelding(meldingsId).forEach { oppgave ->
+            log.info("Stopper oppgave: ${oppgave.id}")
+            oppgave.stoppet().let { oppgaveRepo.updateStatus(it) }
         }
     }
 }

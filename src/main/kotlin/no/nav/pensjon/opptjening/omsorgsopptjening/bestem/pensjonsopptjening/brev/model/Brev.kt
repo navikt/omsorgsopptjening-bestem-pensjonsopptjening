@@ -45,6 +45,11 @@ sealed class Brev {
         fun retry(melding: String): Persistent {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
+
+        fun stoppet(): Persistent {
+            return copy(statushistorikk = statushistorikk + status.stoppet())
+        }
+
     }
 
 
@@ -63,6 +68,10 @@ sealed class Brev {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Retry")
         }
 
+        open fun stoppet(): Status {
+            throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
+        }
+
         @JsonTypeName("Klar")
         data class Klar(
             val tidspunkt: Instant = Instant.now()
@@ -74,13 +83,27 @@ sealed class Brev {
             override fun retry(melding: String): Status {
                 return Retry(melding = melding)
             }
+
+            override fun stoppet(): Status {
+                return Stoppet()
+            }
         }
 
         @JsonTypeName("Ferdig")
         data class Ferdig(
             val tidspunkt: Instant = Instant.now(),
             val journalpost: String,
+        ) : Status() {
+            override fun stoppet(): Status {
+                return Stoppet()
+            }
+        }
+
+        @JsonTypeName("Stoppet")
+        data class Stoppet(
+            val tidspunkt: Instant = Instant.now(),
         ) : Status()
+
 
         @JsonTypeName("Retry")
         data class Retry(
@@ -113,11 +136,20 @@ sealed class Brev {
                     }
                 }
             }
+
+            override fun stoppet(): Status {
+                return Stoppet()
+            }
+
         }
 
         @JsonTypeName("Feilet")
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
-        ) : Status()
+        ) : Status() {
+            override fun stoppet(): Status {
+                return Stoppet()
+            }
+        }
     }
 }

@@ -91,7 +91,8 @@ class PersongrunnlagMeldingService(
                 .berikDatagrunnlag()
                 .tilOmsorgsopptjeningsgrunnlag()
                 .filter { grunnlag -> gyldigOpptjeningsår.erGyldig(grunnlag.omsorgsAr) }
-                .map {
+                .map { it ->
+                    val foo = it
                     behandlingRepo.persist(
                         Behandling(
                             grunnlag = it,
@@ -194,6 +195,32 @@ class PersongrunnlagMeldingService(
             throw RuntimeException("Kunne ikke oppdatere status")
         }
 
+    }
+
+    fun rekjørStoppetMelding(id: UUID) {
+        try {
+            persongrunnlagRepo.find(id).avsluttet().let {
+                persongrunnlagRepo.updateStatus(it)
+            }
+        } catch (ex: Throwable) {
+            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}", ex)
+            throw RuntimeException("Kunne ikke oppdatere status")
+        }
+    }
+
+
+    fun stoppMelding(id: UUID) {
+        try {
+            log.info("Stopper melding: $id")
+            persongrunnlagRepo.find(id).stoppet().let {
+                persongrunnlagRepo.updateStatus(it)
+            }
+            oppgaveService.stoppForMelding(meldingsId = id)
+            brevService.stoppForMelding(meldingsId = id)
+        } catch (ex: Throwable) {
+            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}", ex)
+            throw RuntimeException("Kunne ikke oppdatere status")
+        }
     }
 
     class PersonIkkeIdentifisertAvIdentException(msg: String = "Person kunne ikke identifiseres av oppgitt ident") :
