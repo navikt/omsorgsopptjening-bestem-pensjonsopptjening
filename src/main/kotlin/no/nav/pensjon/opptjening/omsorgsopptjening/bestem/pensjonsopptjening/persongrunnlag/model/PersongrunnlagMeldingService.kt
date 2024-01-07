@@ -16,6 +16,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding.Persongrunnlag as KafkaPersongrunnlag
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.KanSlåsSammen.Companion.slåSammenLike
+import java.time.Instant
 import java.util.*
 
 
@@ -209,7 +210,7 @@ class PersongrunnlagMeldingService(
     }
 
 
-    fun stoppMelding(id: UUID) {
+    fun stoppMelding(id: UUID) : UUID {
         try {
             log.info("Stopper melding: $id")
             persongrunnlagRepo.find(id).stoppet().let {
@@ -217,9 +218,27 @@ class PersongrunnlagMeldingService(
             }
             oppgaveService.stoppForMelding(meldingsId = id)
             brevService.stoppForMelding(meldingsId = id)
+            return id
         } catch (ex: Throwable) {
             log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}", ex)
             throw RuntimeException("Kunne ikke oppdatere status")
+        }
+    }
+
+    fun opprettKopiAvStoppetMelding(meldingId: UUID): UUID? {
+        log.info("Oppretter kopi av melding: $meldingId")
+        val gammelMelding = persongrunnlagRepo.tryFind(meldingId)
+        when (val status = gammelMelding?.status) {
+            null -> throw RuntimeException("Fant ikke melding i databasen: $meldingId")
+            is PersongrunnlagMelding.Status.Stoppet -> { gammelMelding }
+            else -> { throw RuntimeException("Gammel melding har status: ${status::class.simpleName}") }
+        }.let {
+            PersongrunnlagMelding.Lest(innhold = it.innhold,
+                opprettet = Instant.now(),
+                kopiertFra = it
+            )
+        }.let {
+            return persongrunnlagRepo.lagre(it)
         }
     }
 

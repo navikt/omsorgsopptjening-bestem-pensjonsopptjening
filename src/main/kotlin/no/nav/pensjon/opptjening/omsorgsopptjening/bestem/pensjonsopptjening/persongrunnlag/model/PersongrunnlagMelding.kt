@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import java.time.Instant
@@ -22,10 +23,15 @@ sealed class PersongrunnlagMelding {
 
     data class Lest(
         override val innhold: PersongrunnlagMeldingKafka,
-        override val opprettet: Instant = now()
+        override val opprettet: Instant = now(),
+        val kopiertFra : Mottatt? = null,
     ) : PersongrunnlagMelding() {
+        override val statushistorikk: List<Status> =
+            when (kopiertFra) {
+                null -> listOf(Status.Klar())
+                else -> listOf(Status.Kopiert(kopiertFra.id),Status.Klar())
+            }
         override val id: UUID? = null
-        override val statushistorikk: List<Status> = listOf(Status.Klar())
     }
 
     data class Mottatt(
@@ -174,6 +180,11 @@ sealed class PersongrunnlagMelding {
                 }
             }
         }
+
+        // TODO: riktig måte å håndtere dette på? Inngår ikke i mormal flyt, er bare her for å ta vare på info
+        data class Kopiert(
+            val kopiertFra : UUID
+        ) : Status()
 
         @JsonTypeName("Feilet")
         data class Feilet(

@@ -22,6 +22,7 @@ class BarnetrygdWebApi(
     @GetMapping("/bestem/rekjor/{meldingId}")
     fun rekjørMelding(@PathVariable meldingId: UUID): ResponseEntity<String> {
         persongrunnlagMeldingService.stoppMelding(meldingId)
+        persongrunnlagMeldingService.opprettKopiAvStoppetMelding(meldingId)
         // TODO: rekjør
         return ResponseEntity.ok("Melding avsluttet")
     }

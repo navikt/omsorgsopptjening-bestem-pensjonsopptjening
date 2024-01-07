@@ -1,4 +1,4 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import io.getunleash.Unleash
@@ -16,6 +16,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web.BarnetrygdWebApi
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
@@ -35,8 +36,7 @@ import java.time.Month.*
 import java.time.YearMonth
 import java.util.*
 
-// class BarnetrygdWebApiTest : SpringContextTest.WithKafka() {
-class BarnetrygdWebApiTest : SpringContextTest.NoKafka() {
+class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var webApi: BarnetrygdWebApi
@@ -103,7 +103,7 @@ class BarnetrygdWebApiTest : SpringContextTest.NoKafka() {
                             {
                                 "pensjonspoeng": [
                                     {
-                                        "ar":${OPPTJENINGSÅR},
+                                        "ar":$OPPTJENINGSÅR,
                                         "poeng":7.4,
                                         "pensjonspoengType":"PPI"
                                     }
@@ -218,19 +218,18 @@ class BarnetrygdWebApiTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    // TODO: endre så dette kun kan gjøres på feilede transaksaksjoner (utsatt pga for mye styr med testene)
     fun `kan avslutte en transaksjon`() {
         val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
-        webApi.avsluttMelding(meldingsId)
+        handler.avsluttMelding(meldingsId)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Avsluttet::class.java)
         }
     }
 
     @Test
-    fun `rekjøring stopper melding og oppgave`() {
+    fun `stopping av melding stopper også oppgave`() {
         val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
-        webApi.rekjørMelding(meldingsId)
+        handler.stoppMelding(meldingsId)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
         }
@@ -244,9 +243,9 @@ class BarnetrygdWebApiTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    fun `rekjøring stopper melding og brev`() {
+    fun `stopping av melding stopper også brev`() {
         val meldingsId = lagreOgProsesserMeldingSomGirBrev()
-        webApi.rekjørMelding(meldingsId)
+        handler.stoppMelding(meldingsId)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
         }
@@ -255,5 +254,19 @@ class BarnetrygdWebApiTest : SpringContextTest.NoKafka() {
             val brev = it.single()
             assertThat(brev.status).isInstanceOf(Brev.Status.Stoppet::class.java)
         }
+    }
+
+    @Test
+    fun `kan kopiere og rekjøre melding med oppgave`() {
+        val stoppetmelding = lagreOgProsesserMeldingSomGirOppgave().let {
+            handler.stoppMelding(it)
+        }
+        val nyMelding =
+            handler.opprettKopiAvStoppetMelding(stoppetmelding)!!.let {
+                repo.find(it)
+            }
+        assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
+        val behandling = handler.process()!!.single()
+
     }
 }

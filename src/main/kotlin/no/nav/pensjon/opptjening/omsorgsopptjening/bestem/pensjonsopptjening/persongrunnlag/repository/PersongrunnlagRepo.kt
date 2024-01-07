@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
@@ -35,6 +36,7 @@ class PersongrunnlagRepo(
             is PersongrunnlagMelding.Status.Retry -> "Retry"
             is PersongrunnlagMelding.Status.Avsluttet -> "Avsluttet"
             is PersongrunnlagMelding.Status.Stoppet -> "Stoppet"
+            is PersongrunnlagMelding.Status.Kopiert -> "Kopiert"
         }
     }
 
@@ -55,7 +57,7 @@ class PersongrunnlagRepo(
             //language=postgres-psql
             """insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, status, karantene_til) 
               |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:statushistorikk::jsonb), :status, :karanteneTil::timestamptz) 
-              |on conflict on constraint unique_correlation_innlesing do nothing 
+              |on conflict (correlation_id, innlesing_id) where status <> 'Stoppet' do nothing 
               |returning id
             """.trimMargin(),
             MapSqlParameterSource(
@@ -100,6 +102,19 @@ class PersongrunnlagRepo(
             PersongrunnlagMeldingMapper()
         ).single()
     }
+
+    fun tryFind(id: UUID): PersongrunnlagMelding.Mottatt? {
+        return jdbcTemplate.query(
+            """select * 
+                |from melding 
+                |where id = :id""".trimMargin(),
+            mapOf<String, Any>(
+                "id" to id
+            ),
+            PersongrunnlagMeldingMapper()
+        ).singleOrNull()
+    }
+
 
     fun finnNesteMeldingerForBehandling(antall: Int): Locked {
         val lockId = UUID.randomUUID()
