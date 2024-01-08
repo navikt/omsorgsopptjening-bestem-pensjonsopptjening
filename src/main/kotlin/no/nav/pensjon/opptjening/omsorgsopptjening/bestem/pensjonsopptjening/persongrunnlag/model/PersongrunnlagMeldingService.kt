@@ -221,6 +221,7 @@ class PersongrunnlagMeldingService(
             oppgaveService.stoppForMelding(meldingsId = id)
             brevService.stoppForMelding(meldingsId = id)
             behandlingRepo.stoppBehandlingerForMelding(meldingsId = id)
+            godskrivOpptjeningService.stoppForMelding(meldingsId = id)
             return id
         } catch (ex: Throwable) {
             log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}", ex)

@@ -8,6 +8,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
@@ -51,6 +53,9 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
     private lateinit var brevRepository: BrevRepository
 
     @Autowired
+    private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
+
+    @Autowired
     private lateinit var handler: PersongrunnlagMeldingService
 
     @Autowired
@@ -89,8 +94,8 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
 //        (unleash as FakeUnleash).disable(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName)
     }
 
-//    @Test
-    fun lagreOgProsesserMeldingSomGirBrev() : UUID {
+    //    @Test
+    fun lagreOgProsesserMeldingSomGirBrev(): UUID {
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.givenThat(
             WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
@@ -257,6 +262,20 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
     }
 
     @Test
+    fun `stopping av melding stopper også godskriving`() {
+        val meldingsId = lagreOgProsesserMeldingSomGirBrev()
+        handler.stoppMelding(meldingsId)
+        repo.find(meldingsId).let { melding ->
+            assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
+        }
+        assertThat(oppgaveRepo.findForMelding(meldingsId)).isEmpty()
+        godskrivOpptjeningRepo.findForMelding(meldingsId).let {
+            val godskriving = it.single()
+            assertThat(godskriving.status).isInstanceOf(GodskrivOpptjening.Status.Stoppet::class.java)
+        }
+    }
+
+    @Test
     fun `kan kopiere og rekjøre melding med oppgave`() {
         val stoppetmeldingId = lagreOgProsesserMeldingSomGirOppgave().let {
             handler.stoppMelding(it)
@@ -266,18 +285,38 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetmeldingId)
-        val gammelOppgave = oppgaveRepo.findForMelding(stoppetmeldingId)!!.single()
+        val stoppetOppgave = oppgaveRepo.findForMelding(stoppetmeldingId)!!.single()
 
         val behandling = handler.process()!!.single()
-        println("behandling: $behandling")
-        behandling.alle().forEach {
-            println("behandling:${it.id} : oppgoppl=${it.hentOppgaveopplysninger()}")
-        }
         val nyOppgave = oppgaveRepo.findForBehandling(behandling.alle().single().id).single()
-        println("Ny oppgave: status = ${nyOppgave.status::class}")
+
         assertThat(stoppetMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
+        assertThat(stoppetOppgave.status).isInstanceOf(Oppgave.Status.Stoppet::class.java)
+
         assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
-        assertThat(gammelOppgave.status).isInstanceOf(Oppgave.Status.Stoppet::class.java)
         assertThat(nyOppgave.status).isInstanceOf(Oppgave.Status.Klar::class.java)
+    }
+
+    @Test
+    fun `kan kopiere og rekjøre melding med brev`() {
+        val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
+            handler.stoppMelding(it)
+        }
+        val nyMelding =
+            handler.opprettKopiAvStoppetMelding(stoppetMeldingId)!!.let {
+                repo.find(it)
+            }
+        val stoppetMelding = repo.find(stoppetMeldingId)
+        val stoppetBrev = brevRepository.findForMelding(stoppetMeldingId)!!.single()
+
+        val behandling = handler.process()!!.single()
+
+        val nyttBrev = brevRepository.findForBehandling(behandling.alle().single().id).single()
+
+        assertThat(stoppetMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
+        assertThat(stoppetBrev.status).isInstanceOf(Brev.Status.Stoppet::class.java)
+
+        assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
+        assertThat(nyttBrev.status).isInstanceOf(Brev.Status.Klar::class.java)
     }
 }

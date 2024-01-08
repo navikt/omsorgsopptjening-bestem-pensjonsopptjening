@@ -28,6 +28,7 @@ class GodskrivOpptjeningRepo(
             is GodskrivOpptjening.Status.Ferdig -> "Ferdig"
             is GodskrivOpptjening.Status.Klar -> "Klar"
             is GodskrivOpptjening.Status.Retry -> "Retry"
+            is GodskrivOpptjening.Status.Stoppet -> "Stoppet"
         }
     }
 

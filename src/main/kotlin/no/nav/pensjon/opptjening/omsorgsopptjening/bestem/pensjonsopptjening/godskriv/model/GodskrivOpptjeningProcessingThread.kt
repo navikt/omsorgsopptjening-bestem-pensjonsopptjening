@@ -36,6 +36,7 @@ class GodskrivOpptjeningProcessingThread(
             try {
                 if (unleash.isEnabled(NavUnleashConfig.Feature.GODSKRIV.toggleName) && datasourceReadinessCheck.isReady()) {
                     godskrivProcessingMetricsMåling.oppdater {
+                        println("XXXXXXXXX GODSKRIV THREAD")
                         service.process()
                     }
                 }

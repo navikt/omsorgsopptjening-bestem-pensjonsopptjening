@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
 import java.sql.SQLException
+import java.util.*
 
 @Component
 class GodskrivOpptjeningService(
@@ -76,6 +78,15 @@ class GodskrivOpptjeningService(
             }
         } finally {
             godskrivOpptjeningRepo.frigi(låsteGodskrivOpptjeninger)
+        }
+    }
+
+    fun stoppForMelding(meldingsId: UUID) {
+        godskrivOpptjeningRepo.findForMelding(meldingsId).forEach { godkjenn ->
+            log.info("Stopper godkjenning: ${godkjenn.id}")
+            godkjenn.stoppet().let {
+                godskrivOpptjeningRepo.updateStatus(it)
+            }
         }
     }
 }
