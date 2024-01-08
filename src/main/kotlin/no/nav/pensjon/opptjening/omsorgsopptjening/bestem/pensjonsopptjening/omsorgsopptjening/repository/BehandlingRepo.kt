@@ -85,7 +85,7 @@ class BehandlingRepo(
     fun finnForOmsorgsmottakerOgAr(omsorgsmottaker: String, ar: Int): List<FullførtBehandling> {
         return jdbcTemplate.query(
             """select * from behandling where omsorgsmottaker = :omsorgsmottaker and omsorgs_ar = :ar
-                | and not (stoppet = true)
+                | and stoppet <> true
             """.trimMargin(),
             mapOf<String, Any>(
                 "omsorgsmottaker" to omsorgsmottaker,

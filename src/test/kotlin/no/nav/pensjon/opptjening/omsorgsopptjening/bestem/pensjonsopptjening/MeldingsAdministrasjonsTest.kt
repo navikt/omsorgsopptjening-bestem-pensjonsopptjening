@@ -41,9 +41,6 @@ import java.util.*
 class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Autowired
-    private lateinit var webApi: BarnetrygdWebApi
-
-    @Autowired
     private lateinit var repo: PersongrunnlagRepo
 
     @Autowired
@@ -57,9 +54,6 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var handler: PersongrunnlagMeldingService
-
-    @Autowired
-    private lateinit var unleash: Unleash
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
@@ -77,24 +71,8 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }
             .given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
-
-        /*
-        wiremock.stubFor(
-            WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
-                WireMock.aResponse()
-                    .withHeader("Content-Type", "application/json")
-                    .withBodyFile("fodsel_0freg_0pdl.json")
-            )
-        )
-
-         */
-
-
-//        FakeUnleash().disable(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName)
-//        (unleash as FakeUnleash).disable(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName)
     }
 
-    //    @Test
     fun lagreOgProsesserMeldingSomGirBrev(): UUID {
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.givenThat(
@@ -194,8 +172,8 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "04010012797",
                             omsorgsperioder = listOf(
                                 no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding.Omsorgsperiode(
-                                    fom = YearMonth.of(2021, Month.JULY),
-                                    tom = YearMonth.of(2021, Month.DECEMBER),
+                                    fom = YearMonth.of(2021, JULY),
+                                    tom = YearMonth.of(2021, DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
@@ -318,5 +296,28 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
 
         assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
         assertThat(nyttBrev.status).isInstanceOf(Brev.Status.Klar::class.java)
+    }
+
+    @Test
+    fun `kan kopiere og rekjøre melding med godskriving`() {
+        val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
+            handler.stoppMelding(it)
+        }
+        val nyMelding =
+            handler.opprettKopiAvStoppetMelding(stoppetMeldingId)!!.let {
+                repo.find(it)
+            }
+        val stoppetMelding = repo.find(stoppetMeldingId)
+        val stoppetGodskriv = godskrivOpptjeningRepo.findForMelding(stoppetMeldingId)!!.single()
+
+        val behandling = handler.process()!!.single()
+
+        val nyGodskriv = godskrivOpptjeningRepo.findForBehandling(behandling.alle().single().id).single()
+
+        assertThat(stoppetMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
+        assertThat(stoppetGodskriv.status).isInstanceOf(GodskrivOpptjening.Status.Stoppet::class.java)
+
+        assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
+        assertThat(nyGodskriv.status).isInstanceOf(GodskrivOpptjening.Status.Klar::class.java)
     }
 }

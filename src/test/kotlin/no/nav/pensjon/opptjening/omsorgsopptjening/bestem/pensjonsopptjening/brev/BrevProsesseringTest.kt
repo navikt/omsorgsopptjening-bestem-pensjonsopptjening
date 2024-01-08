@@ -50,9 +50,6 @@ class BrevProsesseringTest(
     private lateinit var persongrunnlagRepo: PersongrunnlagRepo
 
     @Autowired
-    private lateinit var behandlingRepo: BehandlingRepo
-
-    @Autowired
     private lateinit var persongrunnlagMeldingService: PersongrunnlagMeldingService
 
     @MockBean
@@ -62,17 +59,10 @@ class BrevProsesseringTest(
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @Autowired
-    private lateinit var oppgaveRepo: OppgaveRepo
-
-    @Autowired
     private lateinit var brevRepository: BrevRepository
 
     @Autowired
     private lateinit var brevService: BrevService
-
-    @Autowired
-    private lateinit var brevClient: BrevClient
-
 
     companion object {
         @JvmField

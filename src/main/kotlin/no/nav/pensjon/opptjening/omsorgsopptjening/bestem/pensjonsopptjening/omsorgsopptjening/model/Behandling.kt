@@ -49,7 +49,6 @@ data class Behandling(
         return og(
             vurderVilkår.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(),
             /**
-             * @see FullførtBehandling.sendBrev
              * Ikke et kriterium i bpen030
              */
             //vurderVilkår.OmsorgsyterErForelderTilMottakerAvHjelpestønad()

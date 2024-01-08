@@ -94,8 +94,7 @@ class PersongrunnlagMeldingService(
                 .berikDatagrunnlag()
                 .tilOmsorgsopptjeningsgrunnlag()
                 .filter { grunnlag -> gyldigOpptjeningsår.erGyldig(grunnlag.omsorgsAr) }
-                .map { it ->
-                    val foo = it
+                .map {
                     behandlingRepo.persist(
                         Behandling(
                             grunnlag = it,
