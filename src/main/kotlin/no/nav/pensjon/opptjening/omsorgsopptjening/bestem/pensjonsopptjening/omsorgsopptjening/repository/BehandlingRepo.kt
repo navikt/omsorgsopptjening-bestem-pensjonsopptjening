@@ -52,7 +52,7 @@ class BehandlingRepo(
 
     fun finnForOmsorgsyter(fnr: String): List<FullførtBehandling> {
         return jdbcTemplate.query(
-            """select * from behandling where omsorgsyter = :omsorgsyter""",
+            """select * from behandling where omsorgsyter = :omsorgsyter  and (stoppet = false or stoppet is null)""",
             mapOf<String, Any>(
                 "omsorgsyter" to fnr
             ),
@@ -62,8 +62,9 @@ class BehandlingRepo(
 
     fun finnForOmsorgsyterOgAr(fnr: String, ar: Int): List<FullførtBehandling> {
         return jdbcTemplate.query(
-            """select * from behandling where omsorgsyter = :omsorgsyter and omsorgs_ar = :ar and stoppet <> true
+            """select * from behandling where omsorgsyter = :omsorgsyter and omsorgs_ar = :ar and (stoppet = false or stoppet is null) 
             """.trimMargin(),
+            //   and stoppet <> true
             mapOf<String, Any>(
                 "omsorgsyter" to fnr,
                 "ar" to ar
@@ -85,7 +86,7 @@ class BehandlingRepo(
     fun finnForOmsorgsmottakerOgAr(omsorgsmottaker: String, ar: Int): List<FullførtBehandling> {
         return jdbcTemplate.query(
             """select * from behandling where omsorgsmottaker = :omsorgsmottaker and omsorgs_ar = :ar
-                | and stoppet <> true
+                | and (stoppet = false or stoppet is null)
             """.trimMargin(),
             mapOf<String, Any>(
                 "omsorgsmottaker" to omsorgsmottaker,
