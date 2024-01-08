@@ -120,7 +120,8 @@ class OppgaveRepo(
         return jdbcTemplate.query(
             """select count(1) as antall from oppgave o 
                 |join behandling b on b.id = o.behandlingId
-                | where b.omsorgsyter = :omsorgsyter and b.omsorgs_ar = :omsorgsar""".trimMargin(),
+                | where b.omsorgsyter = :omsorgsyter and b.omsorgs_ar = :omsorgsar
+                | and o.status <> 'Stoppet'""".trimMargin(),
             mapOf<String, Any>(
                 "omsorgsyter" to omsorgsyter,
                 "omsorgsar" to år
@@ -134,7 +135,8 @@ class OppgaveRepo(
             """select count(1) as antall from oppgave o 
                 |join behandling b on b.id = o.behandlingId 
                 |where b.omsorgsmottaker = :omsorgsmottaker 
-                |and b.omsorgs_ar = :omsorgsar""".trimMargin(),
+                |and b.omsorgs_ar = :omsorgsar
+                |and o.status <> 'Stoppet'""".trimMargin(),
             mapOf<String, Any>(
                 "omsorgsmottaker" to omsorgsmottaker,
                 "omsorgsar" to år

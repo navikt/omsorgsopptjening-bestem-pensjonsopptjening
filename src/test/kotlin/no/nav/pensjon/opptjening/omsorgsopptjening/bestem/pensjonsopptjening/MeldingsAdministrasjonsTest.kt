@@ -258,15 +258,26 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `kan kopiere og rekjøre melding med oppgave`() {
-        val stoppetmelding = lagreOgProsesserMeldingSomGirOppgave().let {
+        val stoppetmeldingId = lagreOgProsesserMeldingSomGirOppgave().let {
             handler.stoppMelding(it)
         }
         val nyMelding =
-            handler.opprettKopiAvStoppetMelding(stoppetmelding)!!.let {
+            handler.opprettKopiAvStoppetMelding(stoppetmeldingId)!!.let {
                 repo.find(it)
             }
-        assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
-        val behandling = handler.process()!!.single()
+        val stoppetMelding = repo.find(stoppetmeldingId)
+        val gammelOppgave = oppgaveRepo.findForMelding(stoppetmeldingId)!!.single()
 
+        val behandling = handler.process()!!.single()
+        println("behandling: $behandling")
+        behandling.alle().forEach {
+            println("behandling:${it.id} : oppgoppl=${it.hentOppgaveopplysninger()}")
+        }
+        val nyOppgave = oppgaveRepo.findForBehandling(behandling.alle().single().id).single()
+        println("Ny oppgave: status = ${nyOppgave.status::class}")
+        assertThat(stoppetMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
+        assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
+        assertThat(gammelOppgave.status).isInstanceOf(Oppgave.Status.Stoppet::class.java)
+        assertThat(nyOppgave.status).isInstanceOf(Oppgave.Status.Klar::class.java)
     }
 }

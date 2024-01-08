@@ -1,0 +1,1 @@
+alter table behandling add column stoppet bool;

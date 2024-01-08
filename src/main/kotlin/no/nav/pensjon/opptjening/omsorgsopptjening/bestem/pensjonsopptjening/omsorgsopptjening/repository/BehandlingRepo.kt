@@ -62,7 +62,8 @@ class BehandlingRepo(
 
     fun finnForOmsorgsyterOgAr(fnr: String, ar: Int): List<FullførtBehandling> {
         return jdbcTemplate.query(
-            """select * from behandling where omsorgsyter = :omsorgsyter and omsorgs_ar = :ar""",
+            """select * from behandling where omsorgsyter = :omsorgsyter and omsorgs_ar = :ar and stoppet <> true
+            """.trimMargin(),
             mapOf<String, Any>(
                 "omsorgsyter" to fnr,
                 "ar" to ar
@@ -71,9 +72,21 @@ class BehandlingRepo(
         ).toDomain()
     }
 
+    // TODO: gjøre dette penere
+    fun stoppBehandlingerForMelding(meldingsId: UUID) {
+        jdbcTemplate.update(
+            """update behandling set stoppet = true where kafkaMeldingId = :meldingsId""",
+            mapOf<String, Any>(
+                "meldingsId" to meldingsId
+            )
+        )
+    }
+
     fun finnForOmsorgsmottakerOgAr(omsorgsmottaker: String, ar: Int): List<FullførtBehandling> {
         return jdbcTemplate.query(
-            """select * from behandling where omsorgsmottaker = :omsorgsmottaker and omsorgs_ar = :ar""",
+            """select * from behandling where omsorgsmottaker = :omsorgsmottaker and omsorgs_ar = :ar
+                | and not (stoppet = true)
+            """.trimMargin(),
             mapOf<String, Any>(
                 "omsorgsmottaker" to omsorgsmottaker,
                 "ar" to ar

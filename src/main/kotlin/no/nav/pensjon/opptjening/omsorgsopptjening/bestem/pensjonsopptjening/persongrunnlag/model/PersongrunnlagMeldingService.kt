@@ -59,6 +59,8 @@ class PersongrunnlagMeldingService(
                                 }
                             }
                         } catch (ex: Throwable) {
+                            // TODO:
+                            log.info("TODO: fjern denne: ", ex)
                             transactionTemplate.execute {
                                 melding.retry(ex.stackTraceToString()).let { melding ->
                                     melding.opprettOppgave()?.let {
@@ -218,6 +220,7 @@ class PersongrunnlagMeldingService(
             }
             oppgaveService.stoppForMelding(meldingsId = id)
             brevService.stoppForMelding(meldingsId = id)
+            behandlingRepo.stoppBehandlingerForMelding(meldingsId = id)
             return id
         } catch (ex: Throwable) {
             log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}", ex)

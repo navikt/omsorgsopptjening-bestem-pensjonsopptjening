@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
@@ -14,7 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Component
 import java.sql.ResultSet
-import java.time.Clock import java.time.Duration
+import java.time.Clock
 import java.time.Instant
 import java.util.*
 import kotlin.reflect.KClass
@@ -214,7 +213,7 @@ class PersongrunnlagRepo(
 
     fun finnSiste(): PersongrunnlagMelding? {
         return jdbcTemplate.query(
-            """select * from melding order by opprettet desc limit 1""".trimMargin(),
+            """select * from melding where status <> 'Stoppet' order by opprettet desc limit 1""".trimMargin(),
             PersongrunnlagMeldingMapper()
         ).singleOrNull()
     }
@@ -233,14 +232,11 @@ class PersongrunnlagRepo(
     }
 
     fun finnEldsteSomIkkeErFerdig(): PersongrunnlagMelding? {
-        val name = PersongrunnlagMelding.Status.Ferdig::class.simpleName!!
         return jdbcTemplate.query(
             """select * from melding
-                | where status <> :type
+                | where status <> 'Ferdig' AND status <> 'Stoppet'
                 | order by opprettet asc limit 1""".trimMargin(),
-            mapOf(
-                "type" to name
-            ),
+            emptyMap<String,Any>(),
             PersongrunnlagMeldingMapper()
         ).singleOrNull()
     }
