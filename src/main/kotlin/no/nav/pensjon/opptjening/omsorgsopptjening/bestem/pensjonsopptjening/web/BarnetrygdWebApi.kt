@@ -27,10 +27,22 @@ class BarnetrygdWebApi(
     }
 
     @PostMapping("/bestem/rekjor-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun rekjørMeldinger(@RequestParam("meldinger") meldingerString: String) {
+    fun rekjørMeldinger(@RequestParam("meldinger") meldingerString: String) : ResponseEntity<String> {
         val meldinger = meldingerString.lines().map { UUID.fromString(it.trim()) }
+
+        val responsStrenger =
+            meldinger.map {id ->
+                try {
+                    persongrunnlagMeldingService.stoppMelding(id)
+                    val nyId = persongrunnlagMeldingService.opprettKopiAvStoppetMelding(id)
+                    "$id OK, erstattet av: $nyId"
+                } catch (ex:Throwable) {
+                    "$id: Feilet, ${ex::class.simpleName}"
+                }
+            }
+        val respons = responsStrenger.joinToString("\n")
         println("meldinger: $meldinger")
-        throw NotImplementedError("Ikke implementert")
+        return ResponseEntity.ok(respons)
     }
 
     @GetMapping("/bestem/rekjor/avslutt-alle/")
