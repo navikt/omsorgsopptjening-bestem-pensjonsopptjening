@@ -171,7 +171,7 @@ class BrevProsesseringTest(
             assertInstanceOf(Brev.Status.Retry::class.java, m.status).let {
                 assertEquals(1, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
-                assertContains(it.melding, "Forbidden")
+                assertThat(it.melding).contains("Forbidden")
             }
         }
 

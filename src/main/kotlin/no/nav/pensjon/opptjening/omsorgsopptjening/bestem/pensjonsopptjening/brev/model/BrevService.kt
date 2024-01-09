@@ -26,7 +26,7 @@ class BrevService(
     private val hentPensjonspoeng: HentPensjonspoengClient,
 ) {
     companion object {
-        val log = LoggerFactory.getLogger(this::class.java)!!
+        private val log = LoggerFactory.getLogger(this::class.java)!!
     }
 
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)

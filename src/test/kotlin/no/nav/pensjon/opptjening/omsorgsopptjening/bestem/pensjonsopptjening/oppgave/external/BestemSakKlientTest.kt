@@ -7,6 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -55,7 +56,7 @@ class BestemSakKlientTest : SpringContextTest.NoKafka() {
                 {
                     client.bestemSak("blabla")
                 }.also {
-                    assertTrue(it.toString().contains("Feil i respons fra bestem sak"))
+                    assertThat(it.toString()).contains("Feil ved kall")
                 }
             }
         }
@@ -88,7 +89,7 @@ class BestemSakKlientTest : SpringContextTest.NoKafka() {
                 {
                     client.bestemSak("blabla")
                 }.also {
-                    assertTrue(it.toString().contains("BAD_REQUEST"))
+                    assertThat(it.toString()).contains("Feil ved kall")
                 }
             }
         }
@@ -135,7 +136,7 @@ class BestemSakKlientTest : SpringContextTest.NoKafka() {
                 {
                     client.bestemSak("blabla")
                 }.also {
-                    assertTrue(it.toString().contains("Klarte ikke å identifisere unik omsorgssak"))
+                    assertThat(it.toString()).contains("Feil ved kall")
                 }
             }
         }

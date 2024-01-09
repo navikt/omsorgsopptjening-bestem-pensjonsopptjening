@@ -26,7 +26,7 @@ internal class PoppClient(
     private val restTemplate = RestTemplateBuilder().build()
 
     companion object {
-        val logger: Logger = LoggerFactory.getLogger(this::class.java)
+        private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
     override fun godskriv(
@@ -68,7 +68,7 @@ internal class PoppClient(
             )
         } catch (ex: Throwable) {
             """Feil ved kall til $url, feil: ${ex::class.qualifiedName}""".let {
-                logger.warn(it)
+                log.warn(it)
                 throw PoppClientExecption(it, ex)
             }
         }
@@ -105,7 +105,7 @@ internal class PoppClient(
 
         } catch (ex: Throwable) {
             """Feil ved kall til $url, feil: ${ex::class.qualifiedName}""".let {
-                logger.warn(it)
+                log.warn(it)
                 throw HentPensjonspoengClientException(it)
             }
         }
@@ -142,7 +142,7 @@ internal class PoppClient(
 
         } catch (ex: Throwable) {
             """Feil ved kall til $url, feil: ${ex::class.qualifiedName}""".let {
-                logger.warn(it)
+                log.warn(it)
                 throw HentPensjonspoengClientException(it)
             }
         }

@@ -27,7 +27,7 @@ class OppgaveKlient(
     @Value("\${OPPGAVE_URL}") private val oppgaveUrl: String,
     @Qualifier("oppgaveTokenProvider") private val tokenProvider: TokenProvider,
 ) {
-    private val logger = LoggerFactory.getLogger(OppgaveKlient::class.java)
+    private val log = LoggerFactory.getLogger(OppgaveKlient::class.java)
     private val restTemplate = RestTemplateBuilder().build()
 
     fun opprettOppgave(
@@ -59,7 +59,7 @@ class OppgaveKlient(
             response.body!!.id.toString()
         } catch (ex: Exception) {
             """Feil ved kall til $oppgaveUrl, feil: ${ex::class.qualifiedName}""".let {
-                logger.warn(it)
+                log.warn(it)
                 throw OppgaveKlientException(it, ex)
             }
         }

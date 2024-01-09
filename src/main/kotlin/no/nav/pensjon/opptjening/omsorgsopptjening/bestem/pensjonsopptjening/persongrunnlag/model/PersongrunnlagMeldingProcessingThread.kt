@@ -21,7 +21,7 @@ class PersongrunnlagMeldingProcessingThread(
 ) : Runnable {
 
     companion object {
-        val log = LoggerFactory.getLogger(this::class.java)!!
+        private val log = LoggerFactory.getLogger(this::class.java)!!
     }
 
     @PostConstruct

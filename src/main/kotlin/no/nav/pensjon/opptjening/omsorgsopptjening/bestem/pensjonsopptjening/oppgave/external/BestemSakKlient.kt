@@ -27,7 +27,7 @@ class BestemSakKlient(
     registry: MeterRegistry
 ) {
     private val antallSakerHentet = registry.counter("saker", "antall", "hentet")
-    private val logger: Logger by lazy { LoggerFactory.getLogger(BestemSakKlient::class.java) }
+    private val log: Logger by lazy { LoggerFactory.getLogger(BestemSakKlient::class.java) }
     private val restTemplate = RestTemplateBuilder().build()
 
     /**
@@ -64,7 +64,7 @@ class BestemSakKlient(
             }
         } catch (ex: Exception) {
             """Feil ved kall til $url, feil: ${ex::class.qualifiedName}""".let {
-                logger.warn(it)
+                log.warn(it)
                 throw BestemSakClientException(it, ex)
             }
         }

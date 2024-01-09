@@ -3,12 +3,12 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.PENBrevMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.*
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient.Companion.logger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
@@ -36,6 +36,8 @@ class PENBrevClient(
         fun sendBrevUrl(baseUrl: String, sakId: String): String {
             return "$baseUrl/springapi/brev/sak/$sakId/PE_OMSORG_HJELPESTOENAD_AUTO"
         }
+
+        private val log = LoggerFactory.getLogger(this::class.java)
     }
 
     override fun sendBrev(
@@ -119,7 +121,8 @@ class PENBrevClient(
         } catch (ex: BrevClientException) {
             throw ex
         } catch (ex: Throwable) {
-            logger.warn("""Feil ved kall til $url, feil: ${ex::class.qualifiedName}""")
+            """Feil ved kall til $url, feil: ${ex::class.qualifiedName}""".let {
+                log.error(it)
                 throw BrevClientException("Feil ved kall til: $url", ex)
             }
         }

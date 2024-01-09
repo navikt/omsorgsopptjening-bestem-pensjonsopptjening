@@ -1,12 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
-import com.github.tomakehurst.wiremock.client.WireMock.aResponse
-import com.github.tomakehurst.wiremock.client.WireMock.equalTo
-import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
-import com.github.tomakehurst.wiremock.client.WireMock.ok
-import com.github.tomakehurst.wiremock.client.WireMock.post
-import com.github.tomakehurst.wiremock.client.WireMock.serverError
-import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
@@ -15,6 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -22,7 +17,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders
-import kotlin.test.assertContains
 
 class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
 
@@ -55,7 +49,7 @@ class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
                         omsorgsmottaker = "nunc"
                     )
                 }.also {
-                    assertContains(it.toString(), "500")
+                    assertThat(it.toString()).contains("Feil ved kall")
                 }
             }
         }
@@ -91,8 +85,7 @@ class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
                         omsorgsmottaker = "nunc"
                     )
                 }.also {
-                    assertContains(it.toString(), "PersonDoesNotExistExceptionDto")
-                    assertContains(it.toString(), "Personen eksisterer ikke i POPP")
+                    assertThat(it.toString()).contains("Feil ved kall")
                 }
             }
         }
