@@ -4,11 +4,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE
 import org.springframework.http.MediaType.TEXT_PLAIN_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.UUID
+import java.util.*
 
 @RestController
 @Protected
@@ -26,7 +26,7 @@ class BarnetrygdWebApi(
         return ResponseEntity.ok("Melding avsluttet: $meldingId")
     }
 
-    @PostMapping("/bestem/rekjor-flere", consumes = [TEXT_PLAIN_VALUE], produces = [TEXT_PLAIN_VALUE])
+    @PostMapping("/bestem/rekjor-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
     fun rekjørMeldinger(@RequestParam("meldinger") meldingerString: String) {
         println("meldinger: $meldingerString")
         throw NotImplementedError("Ikke implementert")
