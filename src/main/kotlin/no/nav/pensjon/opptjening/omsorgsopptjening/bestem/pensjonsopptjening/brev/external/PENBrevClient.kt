@@ -119,8 +119,7 @@ class PENBrevClient(
         } catch (ex: BrevClientException) {
             throw ex
         } catch (ex: Throwable) {
-            """Feil ved kall til $url, feil: $ex""".let {
-                logger.warn(it, ex)
+            logger.warn("""Feil ved kall til $url, feil: ${ex::class.qualifiedName}""")
                 throw BrevClientException("Feil ved kall til: $url", ex)
             }
         }
@@ -130,7 +129,6 @@ class PENBrevClient(
     data class Overstyr(val spraak: BrevSpraak)
 
     data class SendBrevRequest(
-//        val omsorgsår: Year,
         val brevdata: BrevData,
         val eksternReferanseId: String,
         @JsonInclude(JsonInclude.Include.NON_NULL)

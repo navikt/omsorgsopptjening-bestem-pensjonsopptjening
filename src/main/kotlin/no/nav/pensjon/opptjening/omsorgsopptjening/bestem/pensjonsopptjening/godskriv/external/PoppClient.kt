@@ -67,8 +67,8 @@ internal class PoppClient(
                 LagreOmsorgRespons::class.java
             )
         } catch (ex: Throwable) {
-            """Feil ved kall til $url, feil: $ex""".let {
-                logger.warn(it, ex)
+            """Feil ved kall til $url, feil: ${ex::class.qualifiedName}""".let {
+                logger.warn(it)
                 throw PoppClientExecption(it, ex)
             }
         }
@@ -104,8 +104,8 @@ internal class PoppClient(
             }
 
         } catch (ex: Throwable) {
-            """Feil ved kall til $url, feil: $ex""".let {
-                logger.warn(it, ex)
+            """Feil ved kall til $url, feil: ${ex::class.qualifiedName}""".let {
+                logger.warn(it)
                 throw HentPensjonspoengClientException(it)
             }
         }
@@ -141,8 +141,8 @@ internal class PoppClient(
             }
 
         } catch (ex: Throwable) {
-            """Feil ved kall til $url, feil: $ex""".let {
-                logger.warn(it, ex)
+            """Feil ved kall til $url, feil: ${ex::class.qualifiedName}""".let {
+                logger.warn(it)
                 throw HentPensjonspoengClientException(it)
             }
         }

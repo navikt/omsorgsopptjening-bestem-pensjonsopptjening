@@ -58,8 +58,8 @@ class OppgaveKlient(
             val response = restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OppgaveResponse::class.java)
             response.body!!.id.toString()
         } catch (ex: Exception) {
-            """Feil ved kall til $oppgaveUrl, feil: $ex""".let {
-                logger.warn(it, ex)
+            """Feil ved kall til $oppgaveUrl, feil: ${ex::class.qualifiedName}""".let {
+                logger.warn(it)
                 throw OppgaveKlientException(it, ex)
             }
         }

@@ -59,8 +59,6 @@ class PersongrunnlagMeldingService(
                                 }
                             }
                         } catch (ex: Throwable) {
-                            // TODO:
-                            log.info("TODO: fjern denne: ", ex)
                             transactionTemplate.execute {
                                 melding.retry(ex.stackTraceToString()).let { melding ->
                                     melding.opprettOppgave()?.let {
@@ -193,7 +191,7 @@ class PersongrunnlagMeldingService(
                 persongrunnlagRepo.updateStatus(it)
             }
         } catch (ex: Throwable) {
-            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}", ex)
+            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}")
             throw RuntimeException("Kunne ikke oppdatere status")
         }
 
@@ -205,7 +203,7 @@ class PersongrunnlagMeldingService(
                 persongrunnlagRepo.updateStatus(it)
             }
         } catch (ex: Throwable) {
-            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}", ex)
+            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}")
             throw RuntimeException("Kunne ikke oppdatere status")
         }
     }
@@ -223,7 +221,7 @@ class PersongrunnlagMeldingService(
             godskrivOpptjeningService.stoppForMelding(meldingsId = id)
             return id
         } catch (ex: Throwable) {
-            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}", ex)
+            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}")
             throw RuntimeException("Kunne ikke oppdatere status")
         }
     }

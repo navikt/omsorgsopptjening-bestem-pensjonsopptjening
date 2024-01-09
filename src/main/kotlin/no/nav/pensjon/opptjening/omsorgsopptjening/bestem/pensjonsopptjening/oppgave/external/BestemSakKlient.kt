@@ -63,8 +63,8 @@ class BestemSakKlient(
                 )
             }
         } catch (ex: Exception) {
-            """Feil ved kall til $url, feil: $ex""".let {
-                logger.warn(it, ex)
+            """Feil ved kall til $url, feil: ${ex::class.qualifiedName}""".let {
+                logger.warn(it)
                 throw BestemSakClientException(it, ex)
             }
         }

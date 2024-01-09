@@ -218,8 +218,6 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
         }
         oppgaveRepo.findForMelding(meldingsId).let { oppgaver ->
             val oppgave = oppgaver.single()
-            println("Oppgave: id=${oppgave.id}")
-            oppgave.statushistorikk.forEach { println("oppgave.status: ${it::class.java}") }
             assertThat(oppgave.status).isInstanceOf(Oppgave.Status.Stoppet::class.java)
         }
         assertThat(brevRepository.findForMelding(meldingsId)).isEmpty()
