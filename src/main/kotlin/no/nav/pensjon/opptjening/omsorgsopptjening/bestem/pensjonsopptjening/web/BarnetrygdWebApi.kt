@@ -4,10 +4,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.http.MediaType
+import org.springframework.http.MediaType.TEXT_PLAIN_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
@@ -23,10 +23,14 @@ class BarnetrygdWebApi(
     fun rekjørMelding(@PathVariable meldingId: UUID): ResponseEntity<String> {
         persongrunnlagMeldingService.stoppMelding(meldingId)
         persongrunnlagMeldingService.opprettKopiAvStoppetMelding(meldingId)
-        // TODO: rekjør
-        return ResponseEntity.ok("Melding avsluttet")
+        return ResponseEntity.ok("Melding avsluttet: $meldingId")
     }
 
+    @PostMapping("/bestem/rekjor-flere", consumes = [TEXT_PLAIN_VALUE], produces = [TEXT_PLAIN_VALUE])
+    fun rekjørMeldinger(@RequestParam("meldinger") meldingerString: String) {
+        println("meldinger: $meldingerString")
+        throw NotImplementedError("Ikke implementert")
+    }
 
     @GetMapping("/bestem/rekjor/avslutt-alle/")
     fun rekjørAlleFeilede(@PathVariable meldingId: UUID): ResponseEntity<String> {
@@ -42,10 +46,9 @@ class BarnetrygdWebApi(
     }
 
     @GetMapping("/bestem/avslutt-alle/")
-    fun avslettAlleFeilede(): ResponseEntity<String> {
+    fun avsluttAlleFeilede(): ResponseEntity<String> {
         log.info("""Avsluttet behandling av alle feilede meldinger for innlesning""")
         // TODO: Implementere denne
         throw NotImplementedError("Avslutting acv alle meldinger er ikke implementert")
     }
-
 }
