@@ -49,8 +49,14 @@ spec:
   azure:
     application:
       enabled: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: "abd710c7-b01d-48e6-98b9-83ff615edf26" #AAD nais-team-pensjonopptjening
   secureLogs:
     enabled: true
+  ingresses:
+    - https://omsorgsopptjening-bestem-pensjonsopptjening.intern.nav.no
   accessPolicy:
     outbound:
       external:

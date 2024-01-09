@@ -1,9 +1,16 @@
 <html>
-    <h1>hello world</h1>
+    <h1>Omsorgsopptjening - Rekjøring av meldinger</h1>
+
+    <p>
+        Send inn en liste med gyldige meldingsid'er. Det må være én per linje, uten quotes eller kommaer.
+    </p>
+    <p>
+        Prosessering av disse meldingene vil bli stoppet, men allerede videresendt informasjon (brev, oppgaver,
+        godskriving) vil ikke bli kansellert/tilbakekalt.
+    </p>
 
     <form action="/bestem/rekjor-flere" method="post">
-        <textarea name="meldinger" rows="50" cols="50">
-        </textarea>
+        <textarea name="meldinger" rows="50" cols="50"></textarea>
         <br>
         <button type="submit">Rekjør</button>
     </form>
