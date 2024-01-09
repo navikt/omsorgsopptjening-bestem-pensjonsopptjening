@@ -28,7 +28,8 @@ class BarnetrygdWebApi(
 
     @PostMapping("/bestem/rekjor-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
     fun rekjørMeldinger(@RequestParam("meldinger") meldingerString: String) {
-        println("meldinger: $meldingerString")
+        val meldinger = meldingerString.lines().map { UUID.fromString(it.trim()) }
+        println("meldinger: $meldinger")
         throw NotImplementedError("Ikke implementert")
     }
 
