@@ -9,13 +9,13 @@ val flywayCoreVersion = "9.22.3" // 10.x krever nyere postgres-database
 val springKafkaTestVersion = "3.1.1"
 val springCloudContractVersion = "4.0.4"
 val testcontainersVersion = "1.19.3"
-val mockkVersion = "1.13.8"
+val mockkVersion = "1.13.9"
 val assertJVersion = "3.25.1"
 val jsonAssertVersion = "1.5.1"
 val wiremockVersion = "2.35.1"
 val mockitoVersion = "5.2.1"
 val unleashVersion = "9.2.0"
-val navTokenSupportVersion = "3.2.0"
+val navTokenSupportVersion = "3.2.0" // TODO: 4.0.3 requires newer jvm
 
 val snakeYamlVersion = "2.2"
 val snappyJavaVersion = "1.1.10.5"
