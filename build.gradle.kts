@@ -16,6 +16,8 @@ val wiremockVersion = "2.35.1"
 val mockitoVersion = "5.2.1"
 val unleashVersion = "9.2.0"
 val navTokenSupportVersion = "3.2.0" // TODO: 4.0.3 requires newer jvm
+val hibernateValidatorVersion = "8.0.1.Final"
+
 
 val snakeYamlVersion = "2.2"
 val snappyJavaVersion = "1.1.10.5"
@@ -81,7 +83,6 @@ dependencies {
     implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5:$httpClient5Version")
 
-
     // Test
     testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
     testImplementation(kotlin("test"))
@@ -93,6 +94,10 @@ dependencies {
     testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:$wiremockVersion")
     testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("no.nav.security:token-validation-spring-test:$navTokenSupportVersion")
+    testImplementation("org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion")
+
+
+
 }
 
 tasks.test {

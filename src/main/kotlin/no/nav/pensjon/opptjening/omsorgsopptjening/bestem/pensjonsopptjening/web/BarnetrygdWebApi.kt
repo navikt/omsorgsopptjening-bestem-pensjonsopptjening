@@ -33,8 +33,7 @@ class BarnetrygdWebApi(
         val responsStrenger =
             meldinger.map {id ->
                 try {
-                    persongrunnlagMeldingService.stoppMelding(id)
-                    val nyId = persongrunnlagMeldingService.opprettKopiAvStoppetMelding(id)
+                    val nyId = persongrunnlagMeldingService.stoppOgOpprettKopiAvMelding(id)
                     "$id OK, erstattet av: $nyId"
                 } catch (ex:Throwable) {
                     "$id: Feilet, ${ex::class.simpleName}"

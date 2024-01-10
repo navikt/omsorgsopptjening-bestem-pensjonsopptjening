@@ -52,7 +52,7 @@ class BehandlingRepo(
 
     fun finnForOmsorgsyter(fnr: String): List<FullførtBehandling> {
         return jdbcTemplate.query(
-            """select * from behandling where omsorgsyter = :omsorgsyter  and (stoppet = false or stoppet is null)""",
+            """select * from behandling where omsorgsyter = :omsorgsyter and (stoppet = false or stoppet is null)""",
             mapOf<String, Any>(
                 "omsorgsyter" to fnr
             ),

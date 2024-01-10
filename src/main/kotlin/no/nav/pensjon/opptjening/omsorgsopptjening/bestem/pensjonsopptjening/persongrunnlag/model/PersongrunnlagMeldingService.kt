@@ -33,6 +33,7 @@ class PersongrunnlagMeldingService(
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
+        private val secureLog: Logger = LoggerFactory.getLogger("secure")
     }
 
     fun process(): List<FullførteBehandlinger>? {
@@ -210,20 +211,15 @@ class PersongrunnlagMeldingService(
 
 
     fun stoppMelding(id: UUID) : UUID {
-        try {
-            log.info("Stopper melding: $id")
-            persongrunnlagRepo.find(id).stoppet().let {
-                persongrunnlagRepo.updateStatus(it)
-            }
-            oppgaveService.stoppForMelding(meldingsId = id)
-            brevService.stoppForMelding(meldingsId = id)
-            behandlingRepo.stoppBehandlingerForMelding(meldingsId = id)
-            godskrivOpptjeningService.stoppForMelding(meldingsId = id)
-            return id
-        } catch (ex: Throwable) {
-            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}")
-            throw RuntimeException("Kunne ikke oppdatere status")
+        log.info("Stopper melding: $id")
+        persongrunnlagRepo.find(id).stoppet().let {
+            persongrunnlagRepo.updateStatus(it)
         }
+        oppgaveService.stoppForMelding(meldingsId = id)
+        brevService.stoppForMelding(meldingsId = id)
+        behandlingRepo.stoppBehandlingerForMelding(meldingsId = id)
+        godskrivOpptjeningService.stoppForMelding(meldingsId = id)
+        return id
     }
 
     fun opprettKopiAvStoppetMelding(meldingId: UUID): UUID? {
@@ -240,6 +236,18 @@ class PersongrunnlagMeldingService(
             )
         }.let {
             return persongrunnlagRepo.lagre(it)
+        }
+    }
+
+    fun stoppOgOpprettKopiAvMelding(meldingId: UUID): UUID? {
+        try {
+            return transactionTemplate.execute {
+                stoppMelding(meldingId)
+                opprettKopiAvStoppetMelding(meldingId)
+            }
+        } catch (ex: Throwable) {
+            secureLog.warn("Fikk feil ved stopp og opprettelse av  melding", ex)
+            throw ex
         }
     }
 
