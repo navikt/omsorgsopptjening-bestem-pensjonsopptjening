@@ -82,6 +82,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5:$httpClient5Version")
+    implementation("org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion")
 
     // Test
     testImplementation("org.springframework.kafka:spring-kafka-test:$springKafkaTestVersion")
@@ -94,7 +95,6 @@ dependencies {
     testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:$wiremockVersion")
     testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("no.nav.security:token-validation-spring-test:$navTokenSupportVersion")
-    testImplementation("org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion")
 
 
 
