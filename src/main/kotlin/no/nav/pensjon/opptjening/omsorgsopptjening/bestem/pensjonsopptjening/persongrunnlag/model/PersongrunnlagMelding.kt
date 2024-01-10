@@ -188,7 +188,14 @@ sealed class PersongrunnlagMelding {
         @JsonTypeName("Feilet")
         data class Feilet(
             val tidspunkt: Instant = now(),
-        ) : Status()
+        ) : Status() {
+            override fun stoppet() : Stoppet {
+                return Stoppet()
+            }
+
+            override fun avsluttet(): Avsluttet {
+                return Avsluttet()
+            }
+        }
     }
 }
-
