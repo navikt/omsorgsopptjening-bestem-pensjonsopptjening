@@ -47,6 +47,9 @@ spec:
           - name: omsorgsopptjening-bestem-pensjonsopptjening-db
             envVarPrefix: DATABASE
   azure:
+    sidecar:
+      enabled: true
+      autoLogin: true
     application:
       enabled: true
       allowAllUsers: false
