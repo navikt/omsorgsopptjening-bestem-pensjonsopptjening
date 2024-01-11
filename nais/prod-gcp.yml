@@ -16,7 +16,7 @@ spec:
     - name: PEN_BASE_URL
       value: https://pensjon-pen.prod-fss-pub.nais.io/pen
     - name: PEN_API_ID
-      value: prod-fss.teampensjon.pensjon-pen
+      value: prod-fss.pensjondeployer.pensjon-pen
     - name: OPPGAVE_URL
       value: https://oppgave.prod-fss-pub.nais.io/api/v1/oppgaver
     - name: OPPGAVE_API_ID
