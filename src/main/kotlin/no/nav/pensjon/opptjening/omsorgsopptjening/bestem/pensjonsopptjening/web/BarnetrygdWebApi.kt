@@ -83,7 +83,7 @@ class BarnetrygdWebApi(
         throw NotImplementedError("Avslutting acv alle meldinger er ikke implementert")
     }
 
-    @GetMapping("/bestem/restart-oppgaver/")
+    @PostMapping("/bestem/restart-oppgaver/")
     fun restartOppgaver(@RequestParam("uuidliste") oppgaverString: String): ResponseEntity<String> {
 
         val oppgaver = try {
