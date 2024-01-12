@@ -47,7 +47,7 @@ class BarnetrygdWebApi(
             val respons = responsStrenger.joinToString("\n")
             println("meldinger: $meldinger")
             return ResponseEntity.ok(respons)
-        } catch (ex) {
+        } catch (ex: Throwable) {
             return ResponseEntity.internalServerError().body("Feil ved prosessering: $ex")
         }
     }
