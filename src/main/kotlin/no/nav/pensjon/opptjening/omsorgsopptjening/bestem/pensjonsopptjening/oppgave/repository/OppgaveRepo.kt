@@ -89,6 +89,20 @@ class OppgaveRepo(
         ).single()
     }
 
+    fun tryFind(id: UUID): Oppgave.Persistent? {
+        return jdbcTemplate.query(
+            """select o.*, m.correlation_id, m.innlesing_id
+                | from oppgave o
+                | join melding m on m.id = o.meldingId
+                | where o.id = :id""".trimMargin(),
+            mapOf<String, Any>(
+                "id" to id
+            ),
+            OppgaveMapper()
+        ).singleOrNull()
+    }
+
+
     fun findForMelding(id: UUID): List<Oppgave.Persistent> {
         return jdbcTemplate.query(
             """select o.*, m.correlation_id, m.innlesing_id 

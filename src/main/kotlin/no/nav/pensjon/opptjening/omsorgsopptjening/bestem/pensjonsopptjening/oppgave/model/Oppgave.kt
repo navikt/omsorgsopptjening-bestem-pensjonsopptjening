@@ -61,6 +61,10 @@ sealed class Oppgave {
         fun retry(melding: String): Persistent {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
+
+        fun restart() : Persistent {
+            return copy(statushistorikk = statushistorikk + status.klar())
+        }
     }
 
     @JsonTypeInfo(
@@ -82,6 +86,10 @@ sealed class Oppgave {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Retry")
         }
 
+        open fun klar(): Status {
+            throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Klar")
+        }
+
 
         @JsonTypeName("Klar")
         data class Klar(
@@ -97,6 +105,10 @@ sealed class Oppgave {
 
             override fun stoppet(): Stoppet {
                 return Stoppet()
+            }
+
+            override fun klar(): Status {
+                return Klar()
             }
 
         }
@@ -150,6 +162,11 @@ sealed class Oppgave {
             override fun stoppet(): Stoppet {
                 return Stoppet()
             }
+
+            override fun klar(): Status {
+                return Klar()
+            }
+
         }
 
         @JsonTypeName("Feilet")
@@ -159,6 +176,11 @@ sealed class Oppgave {
             override fun stoppet(): Stoppet {
                 return Stoppet()
             }
+
+            override fun klar(): Status {
+                return Klar()
+            }
+
         }
     }
 }

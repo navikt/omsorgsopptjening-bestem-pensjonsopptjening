@@ -28,6 +28,11 @@
                 case "avslutt_meldinger":
                     setActionAndText("/bestem/avslutt-flere","Avslutt meldinger")
                     break;
+                case "restart_oppgaver":
+                    setActionAndText("/bestem/restart-oppgaver/","Restart oppgaver")
+                    break;
+                default:
+                    setActionAndText("INVALID", "Feil: ukjent tjeneste: "+tjeneste)
             }
         }
 
@@ -55,6 +60,7 @@
         <option value="rekjor_meldinger">Rekjør meldinger (stopp og opprett ny kopi)</option>
         <option value="stopp_meldinger">Stopp meldinger (stopper også oppgaver og brev)</option>
         <option value="avslutt_meldinger">Avslutt meldinger (marker som ferdige)</option>
+        <option value="restart_oppgaver">Restart oppgaver (begynn prosessering igjen fra klar)</option>
     </select>
 </form>
 

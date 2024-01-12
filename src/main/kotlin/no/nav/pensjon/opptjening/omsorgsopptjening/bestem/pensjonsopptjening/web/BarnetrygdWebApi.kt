@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.Logger
@@ -14,6 +15,7 @@ import java.util.*
 @Protected
 class BarnetrygdWebApi(
     private val persongrunnlagMeldingService: PersongrunnlagMeldingService,
+    private val oppgaveService: OppgaveService
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(BarnetrygdWebApi::class.java)
@@ -45,7 +47,6 @@ class BarnetrygdWebApi(
                     }
                 }
             val respons = responsStrenger.joinToString("\n")
-            println("meldinger: $meldinger")
             return ResponseEntity.ok(respons)
         } catch (ex: Throwable) {
             return ResponseEntity.internalServerError().body("Feil ved prosessering: $ex")
@@ -81,4 +82,32 @@ class BarnetrygdWebApi(
         // TODO: Implementere denne
         throw NotImplementedError("Avslutting acv alle meldinger er ikke implementert")
     }
+
+    @GetMapping("/bestem/restart-oppgaver/")
+    fun restartOppgaver(@RequestParam("uuidliste") oppgaverString: String): ResponseEntity<String> {
+
+        val oppgaver = try {
+            oppgaverString.lines().map { UUID.fromString(it.trim()) }
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        try {
+            val responsStrenger =
+                oppgaver.map { id ->
+                    try {
+                        val nyId = oppgaveService.restart(id)
+                        val status = nyId?.let { "Restartet" } ?: { "Fant ikke oppgaven" }
+                        "$id $status"
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError().body("Feil ved prosessering: $ex")
+        }
+    }
+
 }

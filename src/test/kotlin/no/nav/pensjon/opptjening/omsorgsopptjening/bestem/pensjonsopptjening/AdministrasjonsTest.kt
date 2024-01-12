@@ -1,7 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
 import com.github.tomakehurst.wiremock.client.WireMock
-import io.getunleash.Unleash
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
@@ -13,12 +12,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web.BarnetrygdWebApi
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
@@ -33,12 +32,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
-import java.time.Month
 import java.time.Month.*
 import java.time.YearMonth
 import java.util.*
 
-class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
+class AdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var repo: PersongrunnlagRepo
@@ -55,8 +53,12 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
     @Autowired
     private lateinit var handler: PersongrunnlagMeldingService
 
+    @Autowired
+    private lateinit var oppgaveService: OppgaveService
+
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
+
 
     companion object {
         @JvmField
@@ -317,5 +319,26 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
 
         assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
         assertThat(nyGodskriv.status).isInstanceOf(GodskrivOpptjening.Status.Klar::class.java)
+    }
+
+
+    @Test
+    fun `kan restarte oppgave`() {
+        val oppgaveId = lagreOgProsesserMeldingSomGirOppgave().let { meldingId ->
+            oppgaveRepo.findForMelding(meldingId).single()
+        }.retry("1").retry("2").retry("4").retry("feiler").let { oppgave ->
+            assertThat(oppgave.status).isInstanceOf(Oppgave.Status.Feilet::class.java)
+            oppgaveRepo.updateStatus(oppgave)
+            oppgave.id
+        }
+        assertThat(oppgaveRepo.find(oppgaveId).status).isInstanceOf(Oppgave.Status.Feilet::class.java)
+
+        val id = oppgaveService.restart(oppgaveId)!!
+        assertThat(id).isEqualTo(oppgaveId)
+
+        oppgaveRepo.find(oppgaveId).let { oppgave ->
+            assertThat(oppgave.status).isInstanceOf(Oppgave.Status.Klar::class.java)
+            assertThat(oppgave.status.retry("etter start")).isInstanceOf(Oppgave.Status.Retry::class.java)
+        }
     }
 }

@@ -128,4 +128,13 @@ class OppgaveService(
             oppgave.stoppet().let { oppgaveRepo.updateStatus(it) }
         }
     }
+
+    fun restart(oppgaveId: UUID) : UUID? {
+        return transactionTemplate.execute {
+            oppgaveRepo.tryFind(oppgaveId)?.restart()?.let { oppgave ->
+                oppgaveRepo.updateStatus(oppgave)
+                oppgave.id
+            }
+        }
+    }
 }
