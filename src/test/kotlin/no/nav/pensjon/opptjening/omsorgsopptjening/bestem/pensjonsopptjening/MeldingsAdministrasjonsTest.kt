@@ -254,10 +254,10 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kopiere og rekjøre melding med oppgave`() {
         val stoppetmeldingId = lagreOgProsesserMeldingSomGirOppgave().let {
-            handler.stoppMelding(it)
+            handler.stoppMelding(it)!!
         }
         val nyMelding =
-            handler.opprettKopiAvStoppetMelding(stoppetmeldingId)!!.let {
+            handler.rekjørStoppetMelding(stoppetmeldingId)!!.let {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetmeldingId)
@@ -276,10 +276,10 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kopiere og rekjøre melding med brev`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
-            handler.stoppMelding(it)
+            handler.stoppMelding(it)!!
         }
         val nyMelding =
-            handler.opprettKopiAvStoppetMelding(stoppetMeldingId)!!.let {
+            handler.rekjørStoppetMelding(stoppetMeldingId)!!.let {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetMeldingId)
@@ -299,10 +299,10 @@ class MeldingsAdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kopiere og rekjøre melding med godskriving`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
-            handler.stoppMelding(it)
+            handler.stoppMelding(it)!!
         }
         val nyMelding =
-            handler.opprettKopiAvStoppetMelding(stoppetMeldingId)!!.let {
+            handler.rekjørStoppetMelding(stoppetMeldingId)!!.let {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetMeldingId)

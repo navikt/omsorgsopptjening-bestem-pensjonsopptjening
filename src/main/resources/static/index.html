@@ -1,17 +1,87 @@
 <html>
-    <h1>Omsorgsopptjening - Rekjøring av meldinger</h1>
+<head>
+    <meta charset="utf8">
+    <script>
+        function init() {
+            var tjeneste = localStorage.getItem("tjeneste")
+            if (tjeneste) {
+                document.getElementById("tjeneste").value = tjeneste
+                oppdater_tjeneste()
+            } else {
+                alert("tjeneste ikke satt")
+            }
+        }
 
-    <p>
-        Send inn en liste med gyldige meldingsid'er. Det må være én per linje, uten quotes eller kommaer.
-    </p>
-    <p>
-        Prosessering av disse meldingene vil bli stoppet, men allerede videresendt informasjon (brev, oppgaver,
-        godskriving) vil ikke bli kansellert/tilbakekalt.
-    </p>
+        function oppdater_tjeneste() {
+            var tjeneste = document.getElementById("tjeneste").value
+            function setActionAndText(action,text) {
+                document.getElementById("mainForm").action = action
+                document.getElementById("mainForm_submit").textContent = text
+            }
+            switch (tjeneste) {
+                case "rekjor_meldinger":
+                    setActionAndText("/bestem/rekjor-flere","Rekjør meldinger")
+                    break;
+                case "stopp_meldinger":
+                    setActionAndText("/bestem/stopp-flere","Stopp meldinger")
+                    break;
+                case "avslutt_meldinger":
+                    setActionAndText("/bestem/avslutt-flere","Avslutt meldinger")
+                    break;
+            }
+        }
 
-    <form action="/bestem/rekjor-flere" method="post">
-        <textarea name="meldinger" rows="50" cols="50"></textarea>
-        <br>
-        <button type="submit">Rekjør</button>
-    </form>
+        function velg_tjeneste() {
+            var tjeneste = document.getElementById("tjeneste").value
+            localStorage.setItem("tjeneste", tjeneste)
+            oppdater_tjeneste()
+        }
+    </script>
+</head>
+<body onload="init()">
+<h1>Omsorgsopptjening - Administrasjon av meldinger</h1>
+
+<p>
+    Send inn en liste med gyldige meldingsid'er. Det må være én per linje, uten quotes eller kommaer.
+</p>
+<p>
+    Prosessering av disse meldingene vil bli stoppet, men allerede videresendt informasjon (brev, oppgaver,
+    godskriving) vil ikke bli kansellert/tilbakekalt.
+</p>
+
+<form>
+    <label for="tjeneste">Velg funksjon</label>
+    <select id="tjeneste" onchange="javascript:velg_tjeneste()">
+        <option value="rekjor_meldinger">Rekjør meldinger (stopp og opprett ny kopi)</option>
+        <option value="stopp_meldinger">Stopp meldinger (stopper også oppgaver og brev)</option>
+        <option value="avslutt_meldinger">Avslutt meldinger (marker som ferdige)</option>
+    </select>
+</form>
+
+<form id="mainForm" action="/bestem/rekjor-flere" method="post">
+    <table>
+        <tbody>
+        <tr>
+            <td>
+                <label for="begrunnelse">Begrunnelse</label>
+            </td>
+            <td>
+                <input type="text" id="begrunnelse" name="begrunnelse" size="50" maxlength="50"/>
+            </td>
+            <td>
+                <button type="submit" id="mainForm_submit">Velg tjeneste</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="uuidliste">UUID'er</label>
+            </td>
+            <td>
+                <textarea name="uuidliste" id="uuidliste" rows="50" cols="50"></textarea>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+</body>
 </html>

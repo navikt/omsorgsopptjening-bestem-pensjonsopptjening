@@ -15,7 +15,7 @@ val jsonAssertVersion = "1.5.1"
 val wiremockVersion = "2.35.1"
 val mockitoVersion = "5.2.1"
 val unleashVersion = "9.2.0"
-val navTokenSupportVersion = "3.2.0" // TODO: 4.0.3 requires newer jvm
+val navTokenSupportVersion = "4.0.3"
 val hibernateValidatorVersion = "8.0.1.Final"
 
 
@@ -41,7 +41,7 @@ group = "no.nav.pensjon.opptjening"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -107,7 +107,7 @@ tasks.test {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
 }
 

@@ -60,6 +60,7 @@ class PersongrunnlagMeldingService(
                                 }
                             }
                         } catch (ex: Throwable) {
+                            // TODO: SQLException og andre tekniske feil bør ikke medføre retry, kun rollback
                             transactionTemplate.execute {
                                 melding.retry(ex.stackTraceToString()).let { melding ->
                                     melding.opprettOppgave()?.let {
@@ -186,10 +187,13 @@ class PersongrunnlagMeldingService(
         )
     }
 
-    fun avsluttMelding(id: UUID) {
+    fun avsluttMelding(id: UUID) : UUID? {
         try {
-            persongrunnlagRepo.find(id).avsluttet().let {
-                persongrunnlagRepo.updateStatus(it)
+            return transactionTemplate.execute {
+                persongrunnlagRepo.find(id).avsluttet().let {
+                    persongrunnlagRepo.updateStatus(it)
+                    id
+                }
             }
         } catch (ex: Throwable) {
             log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}")
@@ -198,19 +202,7 @@ class PersongrunnlagMeldingService(
 
     }
 
-    fun rekjørStoppetMelding(id: UUID) {
-        try {
-            persongrunnlagRepo.find(id).avsluttet().let {
-                persongrunnlagRepo.updateStatus(it)
-            }
-        } catch (ex: Throwable) {
-            log.warn("Exception ved avslutting av melding id=$id: ${ex::class.qualifiedName}")
-            throw RuntimeException("Kunne ikke oppdatere status")
-        }
-    }
-
-
-    fun stoppMelding(id: UUID) : UUID {
+    private fun stoppMeldingIntern(id: UUID) : UUID {
         log.info("Stopper melding: $id")
         persongrunnlagRepo.find(id).stoppet().let {
             persongrunnlagRepo.updateStatus(it)
@@ -222,7 +214,7 @@ class PersongrunnlagMeldingService(
         return id
     }
 
-    fun opprettKopiAvStoppetMelding(meldingId: UUID): UUID? {
+    private fun opprettKopiAvStoppetMelding(meldingId: UUID): UUID? {
         log.info("Oppretter kopi av melding: $meldingId")
         val gammelMelding = persongrunnlagRepo.tryFind(meldingId)
         when (val status = gammelMelding?.status) {
@@ -239,15 +231,27 @@ class PersongrunnlagMeldingService(
         }
     }
 
+    fun rekjørStoppetMelding(meldingsId: UUID) : UUID? {
+        return transactionTemplate.execute {
+            opprettKopiAvStoppetMelding(meldingsId)
+        }
+    }
+
     fun stoppOgOpprettKopiAvMelding(meldingId: UUID): UUID? {
         try {
             return transactionTemplate.execute {
-                stoppMelding(meldingId)
+                stoppMeldingIntern(meldingId)
                 opprettKopiAvStoppetMelding(meldingId)
             }
         } catch (ex: Throwable) {
             secureLog.warn("Fikk feil ved stopp og opprettelse av  melding", ex)
             throw ex
+        }
+    }
+
+    fun stoppMelding(id: UUID) : UUID? {
+        return transactionTemplate.execute {
+            stoppMeldingIntern(id)
         }
     }
 

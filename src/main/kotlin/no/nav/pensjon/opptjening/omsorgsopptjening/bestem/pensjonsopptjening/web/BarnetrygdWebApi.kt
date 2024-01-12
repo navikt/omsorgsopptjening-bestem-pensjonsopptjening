@@ -26,7 +26,7 @@ class BarnetrygdWebApi(
     }
 
     @PostMapping("/bestem/rekjor-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun rekjørMeldinger(@RequestParam("meldinger") meldingerString: String) : ResponseEntity<String> {
+    fun rekjørMeldinger(@RequestParam("uuidliste") meldingerString: String) : ResponseEntity<String> {
         val meldinger = meldingerString.lines().map { UUID.fromString(it.trim()) }
 
         val responsStrenger =
@@ -41,6 +41,16 @@ class BarnetrygdWebApi(
         val respons = responsStrenger.joinToString("\n")
         println("meldinger: $meldinger")
         return ResponseEntity.ok(respons)
+    }
+
+    @PostMapping("/bestem/stopp-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    fun stoppMeldinger(@RequestParam("uuidliste") meldingerString: String) : ResponseEntity<String> {
+        return ResponseEntity.ok("Ikke implementert: stopp-flere")
+    }
+
+    @PostMapping("/bestem/avslutt-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    fun avsluttMeldinger(@RequestParam("uuidliste") meldingerString: String) : ResponseEntity<String> {
+        return ResponseEntity.ok("Ikke implementert: avslutt-flere")
     }
 
     @GetMapping("/bestem/rekjor/avslutt-alle/")
