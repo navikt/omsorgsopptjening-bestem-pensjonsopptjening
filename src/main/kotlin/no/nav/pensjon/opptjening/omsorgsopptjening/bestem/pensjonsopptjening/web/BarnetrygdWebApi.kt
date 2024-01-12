@@ -26,30 +26,39 @@ class BarnetrygdWebApi(
     }
 
     @PostMapping("/bestem/rekjor-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun rekjørMeldinger(@RequestParam("uuidliste") meldingerString: String) : ResponseEntity<String> {
-        val meldinger = meldingerString.lines().map { UUID.fromString(it.trim()) }
+    fun rekjørMeldinger(@RequestParam("uuidliste") meldingerString: String): ResponseEntity<String> {
 
-        val responsStrenger =
-            meldinger.map {id ->
-                try {
-                    val nyId = persongrunnlagMeldingService.stoppOgOpprettKopiAvMelding(id)
-                    "$id OK, erstattet av: $nyId"
-                } catch (ex:Throwable) {
-                    "$id: Feilet, ${ex::class.simpleName}"
+        val meldinger = try {
+            meldingerString.lines().map { UUID.fromString(it.trim()) }
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        try {
+            val responsStrenger =
+                meldinger.map { id ->
+                    try {
+                        val nyId = persongrunnlagMeldingService.stoppOgOpprettKopiAvMelding(id)
+                        "$id OK, erstattet av: $nyId"
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
                 }
-            }
-        val respons = responsStrenger.joinToString("\n")
-        println("meldinger: $meldinger")
-        return ResponseEntity.ok(respons)
+            val respons = responsStrenger.joinToString("\n")
+            println("meldinger: $meldinger")
+            return ResponseEntity.ok(respons)
+        } catch (ex) {
+            return ResponseEntity.internalServerError().body("Feil ved prosessering: $ex")
+        }
     }
 
     @PostMapping("/bestem/stopp-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun stoppMeldinger(@RequestParam("uuidliste") meldingerString: String) : ResponseEntity<String> {
+    fun stoppMeldinger(@RequestParam("uuidliste") meldingerString: String): ResponseEntity<String> {
         return ResponseEntity.ok("Ikke implementert: stopp-flere")
     }
 
     @PostMapping("/bestem/avslutt-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun avsluttMeldinger(@RequestParam("uuidliste") meldingerString: String) : ResponseEntity<String> {
+    fun avsluttMeldinger(@RequestParam("uuidliste") meldingerString: String): ResponseEntity<String> {
         return ResponseEntity.ok("Ikke implementert: avslutt-flere")
     }
 
