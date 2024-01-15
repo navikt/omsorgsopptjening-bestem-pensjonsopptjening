@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
@@ -55,6 +56,9 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var oppgaveService: OppgaveService
+
+    @Autowired
+    private lateinit var brevService: BrevService
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
@@ -339,6 +343,26 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
         oppgaveRepo.find(oppgaveId).let { oppgave ->
             assertThat(oppgave.status).isInstanceOf(Oppgave.Status.Klar::class.java)
             assertThat(oppgave.status.retry("etter start")).isInstanceOf(Oppgave.Status.Retry::class.java)
+        }
+    }
+
+    @Test
+    fun `kan restarte brev`() {
+        val brevId = lagreOgProsesserMeldingSomGirBrev().let { meldingId ->
+            brevRepository.findForMelding(meldingId).single()
+        }.retry("1").retry("2").retry("4").retry("feiler").let { brev ->
+            assertThat(brev.status).isInstanceOf(Brev.Status.Feilet::class.java)
+            brevRepository.updateStatus(brev)
+            brev.id
+        }
+        assertThat(brevRepository.find(brevId).status).isInstanceOf(Brev.Status.Feilet::class.java)
+
+        val id = brevService.restart(brevId)!!
+        assertThat(id).isEqualTo(brevId)
+
+        brevRepository.find(brevId).let { brev ->
+            assertThat(brev.status).isInstanceOf(Brev.Status.Klar::class.java)
+            assertThat(brev.status.retry("etter start")).isInstanceOf(Brev.Status.Retry::class.java)
         }
     }
 }

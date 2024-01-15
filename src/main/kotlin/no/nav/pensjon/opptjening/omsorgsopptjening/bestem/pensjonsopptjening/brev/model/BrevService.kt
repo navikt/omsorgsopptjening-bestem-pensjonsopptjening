@@ -105,4 +105,15 @@ class BrevService(
             }
         }
     }
+
+    fun restart(brevId: UUID) : UUID? {
+        return transactionTemplate.execute {
+            brevRepository.find(brevId).let {
+                it.restart()
+            }.let {
+                brevRepository.updateStatus(it)
+                brevId
+            }
+        }
+    }
 }

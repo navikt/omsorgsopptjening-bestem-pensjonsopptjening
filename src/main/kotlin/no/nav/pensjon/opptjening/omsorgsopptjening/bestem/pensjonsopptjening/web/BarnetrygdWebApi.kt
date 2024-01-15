@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.security.token.support.core.api.Protected
@@ -14,7 +15,8 @@ import java.util.*
 @Protected
 class BarnetrygdWebApi(
     private val persongrunnlagMeldingService: PersongrunnlagMeldingService,
-    private val oppgaveService: OppgaveService
+    private val oppgaveService: OppgaveService,
+    private val brevService: BrevService,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(BarnetrygdWebApi::class.java)
@@ -104,7 +106,12 @@ class BarnetrygdWebApi(
             val responsStrenger =
                 brev.map { id ->
                     try {
-                        throw NotImplementedError("Ikke implementert")
+                        val retId = brevService.restart(id)
+                        if (retId ==null) {
+                            "$id: Fant ikke brevet"
+                        } else {
+                            "$id: Restartet"
+                        }
                     } catch (ex: Throwable) {
                         "$id: Feilet, ${ex::class.simpleName}"
                     }

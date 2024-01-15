@@ -180,7 +180,6 @@ sealed class Oppgave {
             override fun klar(): Status {
                 return Klar()
             }
-
         }
     }
 }

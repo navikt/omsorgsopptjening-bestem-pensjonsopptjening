@@ -50,6 +50,9 @@ sealed class Brev {
             return copy(statushistorikk = statushistorikk + status.stoppet())
         }
 
+        fun restart(): Persistent {
+            return copy(statushistorikk = statushistorikk + status.restart())
+        }
     }
 
 
@@ -72,6 +75,11 @@ sealed class Brev {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
         }
 
+        open fun restart(): Status {
+            throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
+        }
+
+
         @JsonTypeName("Klar")
         data class Klar(
             val tidspunkt: Instant = Instant.now()
@@ -87,6 +95,10 @@ sealed class Brev {
             override fun stoppet(): Status {
                 return Stoppet()
             }
+
+            override fun restart() : Status {
+                return Klar()
+            }
         }
 
         @JsonTypeName("Ferdig")
@@ -97,12 +109,20 @@ sealed class Brev {
             override fun stoppet(): Status {
                 return Stoppet()
             }
+            override fun restart() : Status {
+                return Klar()
+            }
+
         }
 
         @JsonTypeName("Stoppet")
         data class Stoppet(
             val tidspunkt: Instant = Instant.now(),
-        ) : Status()
+        ) : Status() {
+            override fun restart() : Status {
+                return Klar()
+            }
+        }
 
 
         @JsonTypeName("Retry")
@@ -141,6 +161,9 @@ sealed class Brev {
                 return Stoppet()
             }
 
+            override fun restart() : Status {
+                return Klar()
+            }
         }
 
         @JsonTypeName("Feilet")
@@ -150,6 +173,11 @@ sealed class Brev {
             override fun stoppet(): Status {
                 return Stoppet()
             }
+
+            override fun restart() : Status {
+                return Klar()
+            }
+
         }
     }
 }

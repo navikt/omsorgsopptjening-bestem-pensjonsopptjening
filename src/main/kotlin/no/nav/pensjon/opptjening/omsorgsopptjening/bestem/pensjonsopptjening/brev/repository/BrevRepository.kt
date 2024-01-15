@@ -93,6 +93,20 @@ class BrevRepository(
         ).single()
     }
 
+    fun tryFind(id: UUID): Brev.Persistent? {
+        return jdbcTemplate.query(
+            """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  
+                |from brev o 
+                |join behandling b on b.id = o.behandlingId 
+                |join melding m on m.id = b.kafkaMeldingId 
+                |where o.id = :id""".trimMargin(),
+            mapOf<String, Any>(
+                "id" to id
+            ),
+            BrevMapper()
+        ).singleOrNull()
+    }
+
     fun findForMelding(id: UUID): List<Brev.Persistent> {
         return jdbcTemplate.query(
             """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter, b.omsorgs_ar  
