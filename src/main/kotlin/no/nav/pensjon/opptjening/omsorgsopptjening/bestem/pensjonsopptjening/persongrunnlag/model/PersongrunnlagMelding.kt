@@ -51,8 +51,8 @@ sealed class PersongrunnlagMelding {
             return copy(statushistorikk = statushistorikk + status.avsluttet())
         }
 
-        fun stoppet(): Mottatt {
-            return copy(statushistorikk = statushistorikk + status.stoppet())
+        fun stoppet(begrunnelse: String? = null): Mottatt {
+            return copy(statushistorikk = statushistorikk + status.stoppet(begrunnelse))
         }
 
         fun opprettOppgave(): Oppgave.Transient? {
@@ -90,7 +90,7 @@ sealed class PersongrunnlagMelding {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Avsluttet")
         }
 
-        open fun stoppet(): Stoppet {
+        open fun stoppet(begrunnelse: String?): Stoppet {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
         }
 
@@ -110,8 +110,8 @@ sealed class PersongrunnlagMelding {
                 return Avsluttet()
             }
 
-            override fun stoppet() : Stoppet {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?) : Stoppet {
+                return Stoppet(begrunnelse = begrunnelse)
             }
         }
 
@@ -124,8 +124,8 @@ sealed class PersongrunnlagMelding {
                 return Avsluttet()
             }
 
-            override fun stoppet() : Stoppet {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?) : Stoppet {
+                return Stoppet(begrunnelse = begrunnelse)
             }
         }
 
@@ -133,14 +133,15 @@ sealed class PersongrunnlagMelding {
         data class Avsluttet(
             val tidspunkt: Instant = now(),
         ) : Status() {
-            override fun stoppet() : Stoppet {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?) : Stoppet {
+                return Stoppet(begrunnelse = begrunnelse)
             }
         }
 
         @JsonTypeName("Stoppet")
         data class Stoppet(
             val tidspunkt: Instant = now(),
+            val begrunnelse: String? = null,
         ) : Status()
 
         @JsonTypeName("Retry")
@@ -178,6 +179,11 @@ sealed class PersongrunnlagMelding {
                     }
                 }
             }
+
+            override fun stoppet(begrunnelse: String?) : Stoppet {
+                return Stoppet(begrunnelse = begrunnelse)
+            }
+
         }
 
         // TODO: riktig måte å håndtere dette på? Inngår ikke i mormal flyt, er bare her for å ta vare på info
@@ -189,8 +195,8 @@ sealed class PersongrunnlagMelding {
         data class Feilet(
             val tidspunkt: Instant = now(),
         ) : Status() {
-            override fun stoppet() : Stoppet {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?) : Stoppet {
+                return Stoppet(begrunnelse = begrunnelse)
             }
 
             override fun avsluttet(): Avsluttet {

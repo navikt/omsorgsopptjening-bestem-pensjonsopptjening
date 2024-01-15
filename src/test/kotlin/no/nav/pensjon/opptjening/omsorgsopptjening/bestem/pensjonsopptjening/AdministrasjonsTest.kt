@@ -230,6 +230,25 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     }
 
     @Test
+    fun `stoppet melding har lagret beskrivelse`() {
+        val begrunnelse = "Fordi jeg vil!"
+        val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
+        handler.stoppMelding(meldingsId,begrunnelse)
+        repo.find(meldingsId).let { melding ->
+            assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
+            (melding.status as PersongrunnlagMelding.Status.Stoppet).let {
+                assertThat(it.begrunnelse).isEqualTo(begrunnelse)
+            }
+        }
+        oppgaveRepo.findForMelding(meldingsId).let { oppgaver ->
+            val oppgave = oppgaver.single()
+            assertThat(oppgave.status).isInstanceOf(Oppgave.Status.Stoppet::class.java)
+        }
+        assertThat(brevRepository.findForMelding(meldingsId)).isEmpty()
+    }
+
+
+    @Test
     fun `stopping av melding stopper også brev`() {
         val meldingsId = lagreOgProsesserMeldingSomGirBrev()
         handler.stoppMelding(meldingsId)

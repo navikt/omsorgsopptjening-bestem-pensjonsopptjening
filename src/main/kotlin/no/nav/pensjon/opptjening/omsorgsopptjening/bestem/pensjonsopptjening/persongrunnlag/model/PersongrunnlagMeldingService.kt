@@ -187,7 +187,7 @@ class PersongrunnlagMeldingService(
         )
     }
 
-    fun avsluttMelding(id: UUID) : UUID? {
+    fun avsluttMelding(id: UUID): UUID? {
         try {
             return transactionTemplate.execute {
                 persongrunnlagRepo.find(id).avsluttet().let {
@@ -202,9 +202,9 @@ class PersongrunnlagMeldingService(
 
     }
 
-    private fun stoppMeldingIntern(id: UUID) : UUID {
+    private fun stoppMeldingIntern(id: UUID, begrunnelse: String?): UUID {
         log.info("Stopper melding: $id")
-        persongrunnlagRepo.find(id).stoppet().let {
+        persongrunnlagRepo.find(id).stoppet(begrunnelse).let {
             persongrunnlagRepo.updateStatus(it)
         }
         oppgaveService.stoppForMelding(meldingsId = id)
@@ -219,10 +219,16 @@ class PersongrunnlagMeldingService(
         val gammelMelding = persongrunnlagRepo.tryFind(meldingId)
         when (val status = gammelMelding?.status) {
             null -> throw RuntimeException("Fant ikke melding i databasen: $meldingId")
-            is PersongrunnlagMelding.Status.Stoppet -> { gammelMelding }
-            else -> { throw RuntimeException("Gammel melding har status: ${status::class.simpleName}") }
+            is PersongrunnlagMelding.Status.Stoppet -> {
+                gammelMelding
+            }
+
+            else -> {
+                throw RuntimeException("Gammel melding har status: ${status::class.simpleName}")
+            }
         }.let {
-            PersongrunnlagMelding.Lest(innhold = it.innhold,
+            PersongrunnlagMelding.Lest(
+                innhold = it.innhold,
                 opprettet = Instant.now(),
                 kopiertFra = it
             )
@@ -231,16 +237,16 @@ class PersongrunnlagMeldingService(
         }
     }
 
-    fun rekjørStoppetMelding(meldingsId: UUID) : UUID? {
+    fun rekjørStoppetMelding(meldingsId: UUID): UUID? {
         return transactionTemplate.execute {
             opprettKopiAvStoppetMelding(meldingsId)
         }
     }
 
-    fun stoppOgOpprettKopiAvMelding(meldingId: UUID): UUID? {
+    fun stoppOgOpprettKopiAvMelding(meldingId: UUID, begrunnelse: String? = null): UUID? {
         try {
             return transactionTemplate.execute {
-                stoppMeldingIntern(meldingId)
+                stoppMeldingIntern(meldingId, begrunnelse)
                 opprettKopiAvStoppetMelding(meldingId)
             }
         } catch (ex: Throwable) {
@@ -249,9 +255,9 @@ class PersongrunnlagMeldingService(
         }
     }
 
-    fun stoppMelding(id: UUID) : UUID? {
+    fun stoppMelding(id: UUID, begrunnelse: String? = null): UUID? {
         return transactionTemplate.execute {
-            stoppMeldingIntern(id)
+            stoppMeldingIntern(id, begrunnelse)
         }
     }
 
