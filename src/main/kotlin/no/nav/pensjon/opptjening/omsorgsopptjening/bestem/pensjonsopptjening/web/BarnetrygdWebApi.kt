@@ -152,6 +152,35 @@ class BarnetrygdWebApi(
         }
     }
 
+    @PostMapping("/bestem/test", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    fun testkall(@RequestParam("uuidliste") oppgaverString: String,
+                    @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+
+        val uuids = try {
+            parseUUIDListe(oppgaverString)
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        try {
+            val responsStrenger =
+                uuids.map { id ->
+                    try {
+                        val oppgaveInfo = oppgaveService.hentOppgaveInfo(id)
+                        oppgaveInfo.toString()
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError()
+                .contentType(TEXT_PLAIN)
+                .body("Feil ved prosessering: $ex")
+        }
+    }
+
     private fun parseUUIDListe(meldingerString: String) : List<UUID> {
         return meldingerString.lines()
             .map { it.replace("[^0-9a-f]".toRegex(),"") }

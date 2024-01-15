@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
@@ -139,6 +140,28 @@ class OppgaveService(
     }
 
     fun kanseller(oppgaveId: UUID) : UUID? {
+        when (val status = oppgaveRepo.tryFind(oppgaveId)?.status) {
+            is Oppgave.Status.Ferdig -> status.oppgaveId
+            else -> null
+        }?.let {
+            oppgaveKlient.kansellerOppgave(it)
+        }
         throw NotImplementedError("Ikke implementert")
+    }
+
+    // TODO: fjern denne når ferdig med den
+    fun hentOppgaveInfo(oppgaveId: UUID) : OppgaveInfo? {
+        return oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
+            Mdc.scopedMdc(oppgave.correlationId) {
+                Mdc.scopedMdc(oppgave.innlesingId) {
+                    when (val status = oppgaveRepo.tryFind(oppgaveId)?.status) {
+                        is Oppgave.Status.Ferdig -> status.oppgaveId
+                        else -> null
+                    }?.let { id ->
+                        oppgaveKlient.hentOppgaveInfo(id)
+                    }
+                }
+            }
+        }
     }
 }

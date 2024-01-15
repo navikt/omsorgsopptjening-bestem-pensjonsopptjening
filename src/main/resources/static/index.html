@@ -56,6 +56,10 @@
                     setActionAndText("/bestem/restart-brev", "Restart brev")
                     setBeskrivelseEnabled(false)
                     break;
+                case "test":
+                    setActionAndText("/bestem/test","TEST")
+                    setBeskrivelseEnabled(true)
+                    break;
                 default:
                     setActionAndText("INVALID", "Feil: ukjent tjeneste: " + tjeneste)
             }
@@ -124,6 +128,7 @@
         <option value="restart_oppgaver">Restart oppgaver (begynn prosessering igjen fra klar)</option>
         <option value="kanseller_oppgaver">Kanseller (trekk tilbake) oppgaver</option>
         <option value="restart_brev">Restart brev (begynn prosessering igjen fra klar)</option>
+        <option value="test">TEST (intern, midlertidig)</option>
     </select>
 </form>
 

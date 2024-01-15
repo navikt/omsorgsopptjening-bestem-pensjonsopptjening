@@ -55,7 +55,63 @@ class OppgaveKlient(
             }
         )
         return try {
-            val response = restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OppgaveResponse::class.java)
+            val response =
+                restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OpprettOppgaveResponse::class.java)
+            response.body!!.id.toString()
+        } catch (ex: Exception) {
+            """Feil ved kall til $oppgaveUrl, feil: ${ex::class.qualifiedName}""".let {
+                log.warn(it)
+                throw OppgaveKlientException(it, ex)
+            }
+        }
+    }
+
+    fun hentOppgaveInfo(
+        oppgaveId: String,
+    ): OppgaveInfo {
+        val requestEntity = HttpEntity<Any>(
+            HttpHeaders().apply {
+                add(CorrelationId.identifier, Mdc.getCorrelationId())
+                add(InnlesingId.identifier, Mdc.getInnlesingId())
+                add("X-Correlation-ID", Mdc.getCorrelationId()) //ulik casing fra CorrelationId.identifier
+                accept = listOf(MediaType.APPLICATION_JSON)
+                contentType = MediaType.APPLICATION_JSON
+                setBearerAuth(tokenProvider.getToken())
+            })
+        val oppgaveUrl = "oppgaveUrl/$oppgaveId"
+        return try {
+            val response =
+                restTemplate.exchange(oppgaveUrl, HttpMethod.GET, requestEntity, HentOppgaveResponse::class.java)
+                    .body!!
+            OppgaveInfo(response.id,response.versjon,response.status)
+        } catch (ex: Exception) {
+            """Feil ved kall til $oppgaveUrl, feil: ${ex::class.qualifiedName}""".let {
+                log.warn(it)
+                throw OppgaveKlientException(it, ex)
+            }
+        }
+    }
+
+    fun kansellerOppgave(
+        oppgaveId: String,
+    ): String {
+        val kansellerRequest = KansellerOppgaveRequest(1)
+        val requestBody = serialize(kansellerRequest)
+        val httpEntity = HttpEntity(
+            requestBody,
+            HttpHeaders().apply {
+                add(CorrelationId.identifier, Mdc.getCorrelationId())
+                add(InnlesingId.identifier, Mdc.getInnlesingId())
+                add("X-Correlation-ID", Mdc.getCorrelationId()) //ulik casing fra CorrelationId.identifier
+                accept = listOf(MediaType.APPLICATION_JSON)
+                contentType = MediaType.APPLICATION_JSON
+                setBearerAuth(tokenProvider.getToken())
+            }
+        )
+        val oppgaveUrl = "oppgaveUrl/$oppgaveId"
+        return try {
+            val response =
+                restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OpprettOppgaveResponse::class.java)
             response.body!!.id.toString()
         } catch (ex: Exception) {
             """Feil ved kall til $oppgaveUrl, feil: ${ex::class.qualifiedName}""".let {
@@ -105,8 +161,28 @@ private data class OpprettOppgaveRequest(
     }
 }
 
-private data class OppgaveResponse(
+private data class KansellerOppgaveRequest(
+    val versjon: Int,
+) {
+    val status = "FEILREGISTRERT"
+}
+
+private data class OpprettOppgaveResponse(
     val id: Long
 )
 
+private data class HentOppgaveResponse(
+    val id: String,
+    val status: OppgaveStatus,
+    val versjon: Int,
+)
+
 class OppgaveKlientException(message: String, throwable: Throwable) : RuntimeException(message, throwable)
+
+data class OppgaveInfo(val id: String, val versjon: Int, val status: OppgaveStatus) {
+
+}
+
+enum class OppgaveStatus {
+    OPPRETTET, AAPNET, UNDER_BEHANDLING, FERDIGSTILT, FEILREGISTRERT
+}
