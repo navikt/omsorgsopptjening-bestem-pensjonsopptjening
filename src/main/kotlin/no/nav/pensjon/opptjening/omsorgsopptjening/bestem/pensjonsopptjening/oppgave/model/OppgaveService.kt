@@ -137,4 +137,8 @@ class OppgaveService(
             }
         }
     }
+
+    fun kanseller(oppgaveId: UUID) : UUID? {
+        throw NotImplementedError("Ikke implementert")
+    }
 }

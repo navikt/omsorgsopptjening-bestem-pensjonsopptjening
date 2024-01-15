@@ -52,24 +52,20 @@ class BarnetrygdWebApi(
     }
 
     @PostMapping("/bestem/stopp-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun stoppMeldinger(@RequestParam("uuidliste") meldingerString: String): ResponseEntity<String> {
+    fun stoppMeldinger(@RequestParam("uuidliste") meldingerString: String,
+                       @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
         return ResponseEntity.ok("Ikke implementert: stopp-flere")
     }
 
     @PostMapping("/bestem/avslutt-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun avsluttMeldinger(@RequestParam("uuidliste") meldingerString: String): ResponseEntity<String> {
+    fun avsluttMeldinger(@RequestParam("uuidliste") meldingerString: String,
+                         @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
         return ResponseEntity.ok("Ikke implementert: avslutt-flere")
     }
 
-    @GetMapping("/bestem/avslutt-alle", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun avsluttAlleFeilede(): ResponseEntity<String> {
-        log.info("""Avsluttet behandling av alle feilede meldinger for innlesning""")
-        // TODO: Implementere denne
-        throw NotImplementedError("Avslutting acv alle meldinger er ikke implementert")
-    }
-
     @PostMapping("/bestem/restart-oppgaver", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun restartOppgaver(@RequestParam("uuidliste") oppgaverString: String): ResponseEntity<String> {
+    fun restartOppgaver(@RequestParam("uuidliste") oppgaverString: String,
+                        @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
 
         val oppgaver = try {
             parseUUIDListe(oppgaverString)
@@ -95,8 +91,37 @@ class BarnetrygdWebApi(
         }
     }
 
+    @PostMapping("/bestem/kanseller-oppgaver", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    fun kansellerOppgaver(@RequestParam("uuidliste") oppgaverString: String,
+                          @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+
+        val oppgaver = try {
+            parseUUIDListe(oppgaverString)
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        try {
+            val responsStrenger =
+                oppgaver.map { id ->
+                    try {
+                        val nyId = oppgaveService.kanseller(id)
+                        val status = nyId?.let { "Restartet" } ?: { "Fant ikke oppgaven" }
+                        "$id $status"
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError().body("Feil ved prosessering: $ex")
+        }
+    }
+
     @PostMapping("/bestem/restart-brev", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun restartBrev(@RequestParam("uuidliste") oppgaverString: String): ResponseEntity<String> {
+    fun restartBrev(@RequestParam("uuidliste") oppgaverString: String,
+                    @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
 
         val brev = try {
             parseUUIDListe(oppgaverString)

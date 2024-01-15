@@ -21,21 +21,40 @@
                 document.getElementById("mainForm_submit").textContent = text
             }
 
+            function setBeskrivelseEnabled(enabled) {
+                let begrunnelse = document.getElementById("begrunnelse");
+                begrunnelse.disabled = !enabled
+                if (enabled) {
+                    begrunnelse.style.backgroundColor = null
+                } else {
+                    begrunnelse.style.backgroundColor = "lightgrey"
+                }
+            }
+
             switch (tjeneste) {
                 case "rekjor_meldinger":
                     setActionAndText("/bestem/rekjor-flere", "Rekjør meldinger")
+                    setBeskrivelseEnabled(true)
                     break;
                 case "stopp_meldinger":
                     setActionAndText("/bestem/stopp-flere", "Stopp meldinger")
+                    setBeskrivelseEnabled(true)
                     break;
                 case "avslutt_meldinger":
                     setActionAndText("/bestem/avslutt-flere", "Avslutt meldinger")
+                    setBeskrivelseEnabled(true)
                     break;
                 case "restart_oppgaver":
-                    setActionAndText("/bestem/restart-oppgaver/", "Restart oppgaver")
+                    setActionAndText("/bestem/restart-oppgaver", "Restart oppgaver")
+                    setBeskrivelseEnabled(false)
+                    break;
+                case "kanseller_oppgaver":
+                    setActionAndText("/bestem/kanseller-oppgaver", "Restart oppgaver")
+                    setBeskrivelseEnabled(true)
                     break;
                 case "restart_brev":
-                    setActionAndText("/bestem/restart-brev/", "Restart brev")
+                    setActionAndText("/bestem/restart-brev", "Restart brev")
+                    setBeskrivelseEnabled(false)
                     break;
                 default:
                     setActionAndText("INVALID", "Feil: ukjent tjeneste: " + tjeneste)
@@ -69,7 +88,7 @@
                     break;
                 default:
                     setColor("yellow","black")
-                    setText("ukjent location: "+document.location.hostname)
+                    setText("ukjent domene: "+document.location.hostname)
             }
         }
 
@@ -103,6 +122,7 @@
         <option value="stopp_meldinger">Stopp meldinger (stopper også oppgaver og brev)</option>
         <option value="avslutt_meldinger">Avslutt meldinger (marker som ferdige)</option>
         <option value="restart_oppgaver">Restart oppgaver (begynn prosessering igjen fra klar)</option>
+        <option value="kanseller_oppgaver">Kanseller (trekk tilbake) oppgaver</option>
         <option value="restart_brev">Restart brev (begynn prosessering igjen fra klar)</option>
     </select>
 </form>
