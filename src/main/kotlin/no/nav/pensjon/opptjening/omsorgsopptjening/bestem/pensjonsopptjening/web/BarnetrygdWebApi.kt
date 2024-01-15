@@ -24,13 +24,15 @@ class BarnetrygdWebApi(
 
     @PostMapping("/bestem/rekjor-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
     fun rekjørMeldinger(@RequestParam("uuidliste") meldingerString: String,
-                        ): ResponseEntity<String> {
+                        @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
 
         val meldinger = try {
             parseUUIDListe(meldingerString)
         } catch (ex: Throwable) {
             return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
         }
+
+        log.info("rekjør flere: begrunnelse: $begrunnelse")
 
         try {
             val responsStrenger =

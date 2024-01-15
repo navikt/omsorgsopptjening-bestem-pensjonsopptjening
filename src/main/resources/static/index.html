@@ -10,6 +10,7 @@
                 document.getElementById("tjeneste").value = "rekjor_meldinger"
             }
             oppdater_tjeneste()
+            oppdater_miljo()
         }
 
         function oppdater_tjeneste() {
@@ -39,10 +40,41 @@
                 default:
                     setActionAndText("INVALID", "Feil: ukjent tjeneste: " + tjeneste)
             }
+
+        }
+
+        function oppdater_miljo() {
+            let env = document.getElementById("environmentLabel")
+            function setColor(bgColor, textColor) {
+                env.style.backgroundColor = bgColor
+                env.style.color = textColor
+            }
+
+            function setText(text) {
+                env.textContent = text
+            }
+
+            switch (document.location.hostname) {
+                case "localhost":
+                    setColor("darkblue","white")
+                    setText("Localhost")
+                    break;
+                case "https://omsorgsopptjening-bestem-pensjonsopptjening.intern.dev.nav.no/":
+                    setColor("lightgreen","black")
+                    setText("Test")
+                    break;
+                case "https://omsorgsopptjening-bestem-pensjonsopptjening.intern.dev.nav.no/":
+                    setColor("red","yellow")
+                    setText("PRODUKSJON")
+                    break;
+                default:
+                    setColor("yellow","black")
+                    setText("ukjent location: "+document.location.hostname)
+            }
         }
 
         function velg_tjeneste() {
-            var tjeneste = document.getElementById("tjeneste").value
+            let tjeneste = document.getElementById("tjeneste").value;
             localStorage.setItem("tjeneste", tjeneste)
             oppdater_tjeneste()
         }
@@ -50,6 +82,11 @@
 </head>
 <body onload="init()">
 <h1>Omsorgsopptjening - Administrasjon av meldinger</h1>
+
+<p>
+<div id="environmentLabel">
+    Ikke initalisert. Fiks javascript.
+</div>
 
 <p>
     Send inn en liste med gyldige meldingsid'er. Det må være én per linje, uten quotes eller kommaer.
