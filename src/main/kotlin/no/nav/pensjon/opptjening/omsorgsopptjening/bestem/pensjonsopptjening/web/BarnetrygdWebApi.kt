@@ -5,8 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE
-import org.springframework.http.MediaType.TEXT_PLAIN_VALUE
+import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -21,17 +20,12 @@ class BarnetrygdWebApi(
         private val log: Logger = LoggerFactory.getLogger(BarnetrygdWebApi::class.java)
     }
 
-    @GetMapping("/bestem/rekjor/{meldingId}")
-    fun rekjørMelding(@PathVariable meldingId: UUID): ResponseEntity<String> {
-        persongrunnlagMeldingService.stoppOgOpprettKopiAvMelding(meldingId)
-        return ResponseEntity.ok("Melding avsluttet: $meldingId")
-    }
-
     @PostMapping("/bestem/rekjor-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun rekjørMeldinger(@RequestParam("uuidliste") meldingerString: String): ResponseEntity<String> {
+    fun rekjørMeldinger(@RequestParam("uuidliste") meldingerString: String,
+                        ): ResponseEntity<String> {
 
         val meldinger = try {
-            meldingerString.lines().map { UUID.fromString(it.trim()) }
+            parseUUIDListe(meldingerString)
         } catch (ex: Throwable) {
             return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
         }
@@ -63,31 +57,18 @@ class BarnetrygdWebApi(
         return ResponseEntity.ok("Ikke implementert: avslutt-flere")
     }
 
-    @GetMapping("/bestem/rekjor/avslutt-alle/")
-    fun rekjørAlleFeilede(@PathVariable meldingId: UUID): ResponseEntity<String> {
-        log.info("""Avsluttet behandling av: $meldingId feilede rader for innlesning""")
-        throw NotImplementedError()
-    }
-
-    @GetMapping("/bestem/avslutt/{meldingId}")
-    fun avsluttMelding(@PathVariable meldingId: UUID): ResponseEntity<String> {
-        log.info("""Avsluttet behandling av: $meldingId feilede rader for innlesning""")
-        persongrunnlagMeldingService.avsluttMelding(meldingId)
-        return ResponseEntity.ok("Melding avsluttet")
-    }
-
-    @GetMapping("/bestem/avslutt-alle/")
+    @GetMapping("/bestem/avslutt-alle", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
     fun avsluttAlleFeilede(): ResponseEntity<String> {
         log.info("""Avsluttet behandling av alle feilede meldinger for innlesning""")
         // TODO: Implementere denne
         throw NotImplementedError("Avslutting acv alle meldinger er ikke implementert")
     }
 
-    @PostMapping("/bestem/restart-oppgaver/")
+    @PostMapping("/bestem/restart-oppgaver", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
     fun restartOppgaver(@RequestParam("uuidliste") oppgaverString: String): ResponseEntity<String> {
 
         val oppgaver = try {
-            oppgaverString.lines().map { UUID.fromString(it.trim()) }
+            parseUUIDListe(oppgaverString)
         } catch (ex: Throwable) {
             return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
         }
@@ -110,4 +91,37 @@ class BarnetrygdWebApi(
         }
     }
 
+    @PostMapping("/bestem/restart-brev", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    fun restartBrev(@RequestParam("uuidliste") oppgaverString: String): ResponseEntity<String> {
+
+        val brev = try {
+            parseUUIDListe(oppgaverString)
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        try {
+            val responsStrenger =
+                brev.map { id ->
+                    try {
+                        throw NotImplementedError("Ikke implementert")
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError()
+                .contentType(TEXT_PLAIN)
+                .body("Feil ved prosessering: $ex")
+        }
+    }
+
+    private fun parseUUIDListe(meldingerString: String) : List<UUID> {
+        return meldingerString.lines()
+            .map { it.replace("[^0-9a-f]".toRegex(),"") }
+            .filter { it.isNotEmpty() }
+            .map { UUID.fromString(it.trim()) }
+    }
 }

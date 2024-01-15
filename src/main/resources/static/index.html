@@ -3,36 +3,41 @@
     <meta charset="utf8">
     <script>
         function init() {
-            var tjeneste = localStorage.getItem("tjeneste")
+            let tjeneste = localStorage.getItem("tjeneste");
             if (tjeneste) {
                 document.getElementById("tjeneste").value = tjeneste
-                oppdater_tjeneste()
             } else {
-                alert("tjeneste ikke satt")
+                document.getElementById("tjeneste").value = "rekjor_meldinger"
             }
+            oppdater_tjeneste()
         }
 
         function oppdater_tjeneste() {
-            var tjeneste = document.getElementById("tjeneste").value
-            function setActionAndText(action,text) {
+            let tjeneste = document.getElementById("tjeneste").value;
+
+            function setActionAndText(action, text) {
                 document.getElementById("mainForm").action = action
                 document.getElementById("mainForm_submit").textContent = text
             }
+
             switch (tjeneste) {
                 case "rekjor_meldinger":
-                    setActionAndText("/bestem/rekjor-flere","Rekjør meldinger")
+                    setActionAndText("/bestem/rekjor-flere", "Rekjør meldinger")
                     break;
                 case "stopp_meldinger":
-                    setActionAndText("/bestem/stopp-flere","Stopp meldinger")
+                    setActionAndText("/bestem/stopp-flere", "Stopp meldinger")
                     break;
                 case "avslutt_meldinger":
-                    setActionAndText("/bestem/avslutt-flere","Avslutt meldinger")
+                    setActionAndText("/bestem/avslutt-flere", "Avslutt meldinger")
                     break;
                 case "restart_oppgaver":
-                    setActionAndText("/bestem/restart-oppgaver/","Restart oppgaver")
+                    setActionAndText("/bestem/restart-oppgaver/", "Restart oppgaver")
+                    break;
+                case "restart_brev":
+                    setActionAndText("/bestem/restart-brev/", "Restart brev")
                     break;
                 default:
-                    setActionAndText("INVALID", "Feil: ukjent tjeneste: "+tjeneste)
+                    setActionAndText("INVALID", "Feil: ukjent tjeneste: " + tjeneste)
             }
         }
 
@@ -61,6 +66,7 @@
         <option value="stopp_meldinger">Stopp meldinger (stopper også oppgaver og brev)</option>
         <option value="avslutt_meldinger">Avslutt meldinger (marker som ferdige)</option>
         <option value="restart_oppgaver">Restart oppgaver (begynn prosessering igjen fra klar)</option>
+        <option value="restart_brev">Restart brev (begynn prosessering igjen fra klar)</option>
     </select>
 </form>
 
