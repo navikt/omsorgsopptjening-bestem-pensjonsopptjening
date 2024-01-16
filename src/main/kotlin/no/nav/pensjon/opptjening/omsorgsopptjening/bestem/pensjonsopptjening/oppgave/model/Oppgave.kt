@@ -126,6 +126,14 @@ sealed class Oppgave {
         @JsonTypeName("Stoppet")
         data class Stoppet(
             val tidspunkt: Instant = Instant.now(),
+            val begrunnelse: String? = null,
+        ) : Status()
+
+        @JsonTypeName("Kansellert")
+        data class Kansellert(
+            val tidspunkt: Instant = Instant.now(),
+            val begrunnelse: String,
+            val kanselleringsResultat: KanselleringsResultat,
         ) : Status()
 
         @JsonTypeName("Retry")
@@ -181,5 +189,14 @@ sealed class Oppgave {
                 return Klar()
             }
         }
+    }
+
+    enum class KanselleringsResultat {
+        OPPGAVEN_ER_KANSELLERT,
+        OPPGAVEN_VAR_ALLEREDE_KANSELLERT,
+        FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING,
+        FANT_IKKE_OPPGAVEN,
+        OPPGAVEN_ER_FERDIGBEHANDLET,
+        OPPDATERING_FEILET
     }
 }

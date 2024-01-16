@@ -6,7 +6,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveStatus
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.KanselleringsResultat.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
@@ -177,8 +178,12 @@ class OppgaveService(
         }
     }
 
+    fun settKansellertStatus(oppgave: Oppgave) {
+        oppgave.status
+    }
+
     fun kanseller(oppgaveId: UUID): KanselleringsResultat {
-        val oppgaveInfo = oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
+        oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
             return Mdc.scopedMdc(oppgave.correlationId) {
                 Mdc.scopedMdc(oppgave.innlesingId) {
                     kansellerOppgave(oppgave)
@@ -188,12 +193,5 @@ class OppgaveService(
         return FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING
     }
 
-    enum class KanselleringsResultat {
-        OPPGAVEN_ER_KANSELLERT,
-        OPPGAVEN_VAR_ALLEREDE_KANSELLERT,
-        FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING,
-        FANT_IKKE_OPPGAVEN,
-        OPPGAVEN_ER_FERDIGBEHANDLET,
-        OPPDATERING_FEILET
-    }
+
 }

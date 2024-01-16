@@ -27,6 +27,7 @@ class OppgaveRepo(
             is Oppgave.Status.Klar -> "Klar"
             is Oppgave.Status.Retry -> "Retry"
             is Oppgave.Status.Stoppet -> "Stoppet"
+            is Oppgave.Status.Kansellert -> "Kansellert"
         }
     }
 
