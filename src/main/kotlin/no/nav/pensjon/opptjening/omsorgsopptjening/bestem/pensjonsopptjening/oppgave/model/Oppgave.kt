@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.Instant
@@ -62,8 +63,12 @@ sealed class Oppgave {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 
-        fun restart() : Persistent {
+        fun restart(): Persistent {
             return copy(statushistorikk = statushistorikk + status.klar())
+        }
+
+        fun kansellert(begrunnelse: String, kanselleringsResultat: KanselleringsResultat): Persistent {
+            return copy(statushistorikk = statushistorikk + status.kansellert(begrunnelse, kanselleringsResultat))
         }
     }
 
@@ -88,6 +93,10 @@ sealed class Oppgave {
 
         open fun klar(): Status {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Klar")
+        }
+
+        open fun kansellert(begrunnelse: String, kanselleringsResultat: KanselleringsResultat): Status {
+            throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Kansellert")
         }
 
 
@@ -120,6 +129,10 @@ sealed class Oppgave {
         ) : Status() {
             override fun stoppet(): Stoppet {
                 return Stoppet()
+            }
+
+            override fun kansellert(begrunnelse: String, kanselleringsResultat: KanselleringsResultat): Status {
+                return Kansellert(begrunnelse = begrunnelse, kanselleringsResultat = kanselleringsResultat)
             }
         }
 
@@ -167,6 +180,7 @@ sealed class Oppgave {
                     }
                 }
             }
+
             override fun stoppet(): Stoppet {
                 return Stoppet()
             }

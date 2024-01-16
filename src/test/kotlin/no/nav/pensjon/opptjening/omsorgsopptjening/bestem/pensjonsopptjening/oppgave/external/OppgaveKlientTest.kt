@@ -9,6 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -99,6 +100,51 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
                         beskrivelse = "ferri",
                         tildeltEnhetsnr = "ludus"
                     )
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `henter info for oppgave`() {
+        val oppgaveId = 1234;
+        Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
+            Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
+                wiremock.givenThat(
+                    WireMock.get(WireMock.urlPathEqualTo("$OPPGAVE_PATH/$oppgaveId"))
+                        .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer test.token.test"))
+                        .withHeader(HttpHeaders.ACCEPT, equalTo("application/json"))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
+                        .withHeader("x-correlation-id", equalTo(correlationId.toString()))
+                        .withHeader("X-Correlation-ID", equalTo(correlationId.toString()))
+                        .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
+                        .willReturn(
+                            WireMock.ok()
+                                .withBody(                                """
+                            {
+                                "id":"1234",
+                                "versjon":"2",
+                                "saksreferanse":"habitasse",
+                                "beskrivelse":"ferri",
+                                "tildeltEnhetsnr":"ludus",
+                                "tema":"PEN",
+                                "behandlingstema":"ab0341",
+                                "oppgavetype":"KRA",
+                                "opprettetAvEnhetsnr":"9999",
+                                "aktivDato": "${LocalDate.now().format(DateTimeFormatter.ISO_DATE)}",
+                                "fristFerdigstillelse": "${
+                                    LocalDate.now().plusDays(30).format(DateTimeFormatter.ISO_DATE)
+                                }",
+                                "status":"OPPRETTET",
+                                "prioritet":"LAV"
+                            }
+                        """.trimIndent())
+                                .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                        )
+                )
+
+                assertThat(client.hentOppgaveInfo("1234"))
+                    .isEqualTo(OppgaveInfo("1234",2, OppgaveStatus.OPPRETTET)
                 )
             }
         }

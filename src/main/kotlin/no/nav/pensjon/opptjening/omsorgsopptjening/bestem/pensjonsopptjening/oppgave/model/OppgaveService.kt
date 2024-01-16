@@ -192,6 +192,4 @@ class OppgaveService(
         }
         return FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING
     }
-
-
 }
