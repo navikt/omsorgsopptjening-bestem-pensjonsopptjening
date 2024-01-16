@@ -27,7 +27,11 @@ class OppgaveKlient(
     @Value("\${OPPGAVE_URL}") private val oppgaveUrl: String,
     @Qualifier("oppgaveTokenProvider") private val tokenProvider: TokenProvider,
 ) {
-    private val log = LoggerFactory.getLogger(OppgaveKlient::class.java)
+    companion object {
+        private val log = LoggerFactory.getLogger(OppgaveKlient::class.java)
+        private val secureLog = LoggerFactory.getLogger("secure")
+    }
+
     private val restTemplate = RestTemplateBuilder().build()
 
     fun opprettOppgave(
@@ -61,6 +65,7 @@ class OppgaveKlient(
         } catch (ex: Exception) {
             """Feil ved kall til $oppgaveUrl, feil: ${ex::class.qualifiedName}""".let {
                 log.warn(it)
+                secureLog.warn(it, ex)
                 throw OppgaveKlientException(it, ex)
             }
         }
@@ -83,10 +88,11 @@ class OppgaveKlient(
             val response =
                 restTemplate.exchange(oppgaveUrl, HttpMethod.GET, requestEntity, HentOppgaveResponse::class.java)
                     .body!!
-            OppgaveInfo(response.id,response.versjon,response.status)
+            OppgaveInfo(response.id, response.versjon, response.status)
         } catch (ex: Exception) {
             """Feil ved kall til $oppgaveUrl, feil: ${ex::class.qualifiedName}""".let {
                 log.warn(it)
+                secureLog.warn(it, ex)
                 throw OppgaveKlientException(it, ex)
             }
         }
@@ -94,8 +100,9 @@ class OppgaveKlient(
 
     fun kansellerOppgave(
         oppgaveId: String,
-    ): String {
-        val kansellerRequest = KansellerOppgaveRequest(1)
+        versjon: Int,
+    ): Boolean {
+        val kansellerRequest = KansellerOppgaveRequest(versjon)
         val requestBody = serialize(kansellerRequest)
         val httpEntity = HttpEntity(
             requestBody,
@@ -112,10 +119,12 @@ class OppgaveKlient(
         return try {
             val response =
                 restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OpprettOppgaveResponse::class.java)
-            response.body!!.id.toString()
+            log.info("kanseller oppgave: respons: ${response.statusCode}")
+            response.statusCode.value() == 200
         } catch (ex: Exception) {
             """Feil ved kall til $oppgaveUrl, feil: ${ex::class.qualifiedName}""".let {
                 log.warn(it)
+                secureLog.warn(it, ex)
                 throw OppgaveKlientException(it, ex)
             }
         }
@@ -179,9 +188,7 @@ private data class HentOppgaveResponse(
 
 class OppgaveKlientException(message: String, throwable: Throwable) : RuntimeException(message, throwable)
 
-data class OppgaveInfo(val id: String, val versjon: Int, val status: OppgaveStatus) {
-
-}
+data class OppgaveInfo(val id: String, val versjon: Int, val status: OppgaveStatus)
 
 enum class OppgaveStatus {
     OPPRETTET, AAPNET, UNDER_BEHANDLING, FERDIGSTILT, FEILREGISTRERT

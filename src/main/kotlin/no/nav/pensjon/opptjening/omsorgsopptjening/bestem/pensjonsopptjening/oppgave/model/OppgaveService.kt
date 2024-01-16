@@ -5,6 +5,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlient
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveStatus
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.KanselleringsResultat.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
@@ -130,7 +132,7 @@ class OppgaveService(
         }
     }
 
-    fun restart(oppgaveId: UUID) : UUID? {
+    fun restart(oppgaveId: UUID): UUID? {
         return transactionTemplate.execute {
             oppgaveRepo.tryFind(oppgaveId)?.restart()?.let { oppgave ->
                 oppgaveRepo.updateStatus(oppgave)
@@ -139,18 +141,7 @@ class OppgaveService(
         }
     }
 
-    fun kanseller(oppgaveId: UUID) : UUID? {
-        when (val status = oppgaveRepo.tryFind(oppgaveId)?.status) {
-            is Oppgave.Status.Ferdig -> status.oppgaveId
-            else -> null
-        }?.let {
-            oppgaveKlient.kansellerOppgave(it)
-        }
-        throw NotImplementedError("Ikke implementert")
-    }
-
-    // TODO: fjern denne når ferdig med den
-    fun hentOppgaveInfo(oppgaveId: UUID) : OppgaveInfo? {
+    fun hentOppgaveInfo(oppgaveId: UUID): OppgaveInfo? {
         return oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
             Mdc.scopedMdc(oppgave.correlationId) {
                 Mdc.scopedMdc(oppgave.innlesingId) {
@@ -163,5 +154,46 @@ class OppgaveService(
                 }
             }
         }
+    }
+
+    private fun kansellerOppgave(oppgave: Oppgave.Persistent): KanselleringsResultat {
+        val oppgaveInfo = when (val status = oppgave.status) {
+            is Oppgave.Status.Ferdig -> status.oppgaveId
+            else -> null
+        }?.let { id ->
+            oppgaveKlient.hentOppgaveInfo(id)
+        }
+        return when (oppgaveInfo?.status) {
+            null -> FANT_IKKE_OPPGAVEN
+            OppgaveStatus.FERDIGSTILT -> OPPGAVEN_ER_FERDIGBEHANDLET
+            OppgaveStatus.FEILREGISTRERT -> OPPGAVEN_VAR_ALLEREDE_KANSELLERT
+            else -> {
+                if (oppgaveKlient.kansellerOppgave(oppgaveInfo.id, oppgaveInfo.versjon)) {
+                    OPPGAVEN_ER_KANSELLERT
+                } else {
+                    OPPDATERING_FEILET
+                }
+            }
+        }
+    }
+
+    fun kanseller(oppgaveId: UUID): KanselleringsResultat {
+        val oppgaveInfo = oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
+            return Mdc.scopedMdc(oppgave.correlationId) {
+                Mdc.scopedMdc(oppgave.innlesingId) {
+                    kansellerOppgave(oppgave)
+                }
+            }
+        }
+        return FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING
+    }
+
+    enum class KanselleringsResultat {
+        OPPGAVEN_ER_KANSELLERT,
+        OPPGAVEN_VAR_ALLEREDE_KANSELLERT,
+        FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING,
+        FANT_IKKE_OPPGAVEN,
+        OPPGAVEN_ER_FERDIGBEHANDLET,
+        OPPDATERING_FEILET
     }
 }
