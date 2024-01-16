@@ -181,9 +181,9 @@ class BarnetrygdWebApi(
         }
     }
 
-    private fun parseUUIDListe(meldingerString: String) : List<UUID> {
+    fun parseUUIDListe(meldingerString: String) : List<UUID> {
         return meldingerString.lines()
-            .map { it.replace("[^0-9a-f]".toRegex(),"") }
+            .map { it.replace("[^0-9a-f-]".toRegex(),"") }
             .filter { it.isNotEmpty() }
             .map { UUID.fromString(it.trim()) }
     }
