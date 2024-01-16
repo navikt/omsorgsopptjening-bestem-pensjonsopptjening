@@ -78,7 +78,7 @@ class OppgaveKlient(
                 contentType = MediaType.APPLICATION_JSON
                 setBearerAuth(tokenProvider.getToken())
             })
-        val oppgaveUrl = "oppgaveUrl/$oppgaveId"
+        val oppgaveUrl = "$oppgaveUrl/$oppgaveId"
         return try {
             val response =
                 restTemplate.exchange(oppgaveUrl, HttpMethod.GET, requestEntity, HentOppgaveResponse::class.java)
