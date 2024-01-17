@@ -120,6 +120,10 @@ sealed class Oppgave {
                 return Klar()
             }
 
+            override fun kansellert(begrunnelse: String, kanselleringsResultat: KanselleringsResultat): Status {
+                return Kansellert(begrunnelse = begrunnelse, kanselleringsResultat = kanselleringsResultat)
+            }
+
         }
 
         @JsonTypeName("Ferdig")
@@ -189,6 +193,11 @@ sealed class Oppgave {
                 return Klar()
             }
 
+            override fun kansellert(begrunnelse: String, kanselleringsResultat: KanselleringsResultat): Status {
+                return Kansellert(begrunnelse = begrunnelse, kanselleringsResultat = kanselleringsResultat)
+            }
+
+
         }
 
         @JsonTypeName("Feilet")
@@ -211,6 +220,7 @@ sealed class Oppgave {
         FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING,
         FANT_IKKE_OPPGAVEN,
         OPPGAVEN_ER_FERDIGBEHANDLET,
-        OPPDATERING_FEILET
+        OPPDATERING_FEILET,
+        KANSELLERING_IKKE_NODVENDIG,
     }
 }

@@ -187,6 +187,7 @@ class OppgaveService(
                 FANT_IKKE_OPPGAVEN -> oppgave.kansellert(begrunnelse, resultat)
                 OPPGAVEN_ER_FERDIGBEHANDLET -> oppgave.kansellert(begrunnelse, resultat)
                 OPPDATERING_FEILET -> oppgave
+                KANSELLERING_IKKE_NODVENDIG -> oppgave.kansellert(begrunnelse, resultat)
             }
         }.let { oppgave ->
             oppgaveRepo.updateStatus(oppgave)
@@ -199,9 +200,17 @@ class OppgaveService(
             oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
                 Mdc.scopedMdc(oppgave.correlationId) {
                     Mdc.scopedMdc(oppgave.innlesingId) {
-                        val resultat = kansellerOppgave(oppgave)
-                        oppdaterKansellertStatus(oppgaveId, resultat, begrunnelse)
-                        resultat
+                        when (oppgave.status) {
+                            is Oppgave.Status.Ferdig -> {
+                                val resultat = kansellerOppgave(oppgave)
+                                oppdaterKansellertStatus(oppgaveId, resultat, begrunnelse)
+                                resultat
+                            }
+                            else -> {
+                                oppdaterKansellertStatus(oppgaveId,KANSELLERING_IKKE_NODVENDIG,begrunnelse)
+                                KANSELLERING_IKKE_NODVENDIG
+                            }
+                        }
                     }
                 }
             } ?: FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING

@@ -12,9 +12,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlientTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.OPPGAVEN_ER_KANSELLERT
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
@@ -28,7 +27,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -468,6 +466,87 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
         assertThat(oppgaveRepo.find(oppgave.id).status).isInstanceOf(Oppgave.Status.Ferdig::class.java)
         val resultat = oppgaveService.kanseller(oppgave.id, begrunnelse)
         assertThat(resultat).isEqualTo(OPPGAVEN_ER_KANSELLERT)
+        (oppgaveRepo.find(oppgave.id).status).let { status ->
+            assertThat(status).isInstanceOf(Oppgave.Status.Kansellert::class.java)
+            assertThat((status as Oppgave.Status.Kansellert).begrunnelse).isEqualTo(begrunnelse)
+        }
+    }
+
+    @Test
+    fun `kansellerer ikke en ferdigstilt oppgave`() {
+
+        val begrunnelse = "Fordi jeg vil!"
+        val oppgaveId = "1234"
+
+        val oppgave = lagreOgProsesserMeldingSomGirOppgave().let { meldingId ->
+            oppgaveRepo.findForMelding(meldingId).single()
+        }.ferdig("1234").let { oppgave ->
+            oppgaveRepo.updateStatus(oppgave)
+            oppgave
+        }
+        val correlationId = oppgave.correlationId
+        val innlesingId = oppgave.innlesingId
+
+
+        wiremock.givenThat(
+            WireMock.get(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
+                .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
+                .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
+                .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))
+                .withHeader("x-correlation-id", WireMock.equalTo(correlationId.toString()))
+                .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
+                .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
+                .willReturn(
+                    WireMock.ok()
+                        .withBody(
+                            """
+                            {
+                                "id":"$oppgaveId",
+                                "versjon":"2",
+                                "saksreferanse":"habitasse",
+                                "beskrivelse":"ferri",
+                                "tildeltEnhetsnr":"ludus",
+                                "tema":"PEN",
+                                "behandlingstema":"ab0341",
+                                "oppgavetype":"KRA",
+                                "opprettetAvEnhetsnr":"9999",
+                                "aktivDato": "${LocalDate.now().format(DateTimeFormatter.ISO_DATE)}",
+                                "fristFerdigstillelse": "${
+                                LocalDate.now().plusDays(30).format(DateTimeFormatter.ISO_DATE)
+                            }",
+                                "status":"FERDIGSTILT",
+                                "prioritet":"LAV"
+                            }
+                        """.trimIndent()
+                        )
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                )
+        )
+        println("wiremock ${wiremock.port}")
+        assertThat(oppgaveRepo.find(oppgave.id).status).isInstanceOf(Oppgave.Status.Ferdig::class.java)
+        val resultat = oppgaveService.kanseller(oppgave.id, begrunnelse)
+        assertThat(resultat).isEqualTo(OPPGAVEN_ER_FERDIGBEHANDLET)
+        (oppgaveRepo.find(oppgave.id).status).let { status ->
+            assertThat(status).isInstanceOf(Oppgave.Status.Kansellert::class.java)
+            assertThat((status as Oppgave.Status.Kansellert).begrunnelse).isEqualTo(begrunnelse)
+        }
+    }
+
+    @Test
+    fun `kansellerer ikke en oppgave som ikke er ferdig`() {
+
+        val begrunnelse = "Fordi jeg vil!"
+
+        val oppgave = lagreOgProsesserMeldingSomGirOppgave().let { meldingId ->
+            oppgaveRepo.findForMelding(meldingId).single()
+        }.retry("retry").let { oppgave ->
+            oppgaveRepo.updateStatus(oppgave)
+            oppgave
+        }
+
+        assertThat(oppgaveRepo.find(oppgave.id).status).isInstanceOf(Oppgave.Status.Retry::class.java)
+        val resultat = oppgaveService.kanseller(oppgave.id, begrunnelse)
+        assertThat(resultat).isEqualTo(KANSELLERING_IKKE_NODVENDIG)
         (oppgaveRepo.find(oppgave.id).status).let { status ->
             assertThat(status).isInstanceOf(Oppgave.Status.Kansellert::class.java)
             assertThat((status as Oppgave.Status.Kansellert).begrunnelse).isEqualTo(begrunnelse)
