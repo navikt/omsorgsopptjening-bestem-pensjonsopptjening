@@ -118,9 +118,11 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
                         .withHeader("x-correlation-id", equalTo(correlationId.toString()))
                         .withHeader("X-Correlation-ID", equalTo(correlationId.toString()))
                         .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
+
                         .willReturn(
                             WireMock.ok()
-                                .withBody(                                """
+                                .withBody(
+                                    """
                             {
                                 "id":"1234",
                                 "versjon":"2",
@@ -133,19 +135,55 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
                                 "opprettetAvEnhetsnr":"9999",
                                 "aktivDato": "${LocalDate.now().format(DateTimeFormatter.ISO_DATE)}",
                                 "fristFerdigstillelse": "${
-                                    LocalDate.now().plusDays(30).format(DateTimeFormatter.ISO_DATE)
-                                }",
+                                        LocalDate.now().plusDays(30).format(DateTimeFormatter.ISO_DATE)
+                                    }",
                                 "status":"OPPRETTET",
                                 "prioritet":"LAV"
                             }
-                        """.trimIndent())
+                        """.trimIndent()
+                                )
                                 .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                         )
                 )
 
                 assertThat(client.hentOppgaveInfo("1234"))
-                    .isEqualTo(OppgaveInfo("1234",2, OppgaveStatus.OPPRETTET)
+                    .isEqualTo(
+                        OppgaveInfo("1234", 2, OppgaveStatus.OPPRETTET)
+                    )
+            }
+        }
+    }
+
+    @Test
+    fun `kansellere en oppgave som finnes`() {
+        val oppgaveId = 1234;
+        Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
+            Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
+                wiremock.givenThat(
+                    WireMock.post(WireMock.urlPathEqualTo("$OPPGAVE_PATH/$oppgaveId"))
+                        .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer test.token.test"))
+                        .withHeader(HttpHeaders.ACCEPT, equalTo("application/json"))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
+                        .withHeader("x-correlation-id", equalTo(correlationId.toString()))
+                        .withHeader("X-Correlation-ID", equalTo(correlationId.toString()))
+                        .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
+                        .withRequestBody(
+                            equalToJson(
+                                """
+                            {
+                                "versjon":2,
+                                "status":"FEILREGISTRERT"
+                            }
+                        """.trimIndent()
+                            )
+                        )
+                        .willReturn(
+                            WireMock.ok()
+                                .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                        )
+
                 )
+                assertThat(client.kansellerOppgave("1234", 2)).isTrue()
             }
         }
     }
