@@ -28,6 +28,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -393,6 +394,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kansellere en oppgave`() {
 
+        val begrunnelse = "Fordi jeg vil!"
         val oppgaveId = "1234"
 
         val oppgave = lagreOgProsesserMeldingSomGirOppgave().let { meldingId ->
@@ -464,7 +466,11 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
         )
         println("wiremock ${wiremock.port}")
         assertThat(oppgaveRepo.find(oppgave.id).status).isInstanceOf(Oppgave.Status.Ferdig::class.java)
-        val resultat = oppgaveService.kanseller(oppgave.id, "Fordi jeg vil!")
+        val resultat = oppgaveService.kanseller(oppgave.id, begrunnelse)
         assertThat(resultat).isEqualTo(OPPGAVEN_ER_KANSELLERT)
+        (oppgaveRepo.find(oppgave.id).status).let { status ->
+            assertThat(status).isInstanceOf(Oppgave.Status.Kansellert::class.java)
+            assertThat((status as Oppgave.Status.Kansellert).begrunnelse).isEqualTo(begrunnelse)
+        }
     }
 }
