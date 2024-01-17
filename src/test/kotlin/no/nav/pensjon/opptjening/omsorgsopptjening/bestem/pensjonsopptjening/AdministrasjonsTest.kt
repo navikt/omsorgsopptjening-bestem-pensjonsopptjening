@@ -552,4 +552,86 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
             assertThat((status as Oppgave.Status.Kansellert).begrunnelse).isEqualTo(begrunnelse)
         }
     }
+
+    @Test
+    fun `kansellering av en allerede oppdatert oppgave`() {
+
+        val begrunnelse = "Fordi jeg vil!"
+        val oppgaveId = "1234"
+
+        val oppgave = lagreOgProsesserMeldingSomGirOppgave().let { meldingId ->
+            oppgaveRepo.findForMelding(meldingId).single()
+        }.ferdig("1234").let { oppgave ->
+            oppgaveRepo.updateStatus(oppgave)
+            oppgave
+        }
+        val correlationId = oppgave.correlationId
+        val innlesingId = oppgave.innlesingId
+
+        wiremock.givenThat(
+            WireMock.post(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
+                .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
+                .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
+                .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))
+                .withHeader("x-correlation-id", WireMock.equalTo(correlationId.toString()))
+                .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
+                .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
+                .withRequestBody(
+                    WireMock.equalToJson(
+                        """
+                            {
+                                "versjon":2,
+                                "status":"FEILREGISTRERT"
+                            }
+                        """.trimIndent()
+                    )
+                )
+                .willReturn(
+                    WireMock.status(409)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                )
+
+        )
+        wiremock.givenThat(
+            WireMock.get(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
+                .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
+                .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
+                .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))
+                .withHeader("x-correlation-id", WireMock.equalTo(correlationId.toString()))
+                .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
+                .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
+                .willReturn(
+                    WireMock.ok()
+                        .withBody(
+                            """
+                            {
+                                "id":"$oppgaveId",
+                                "versjon":"2",
+                                "saksreferanse":"habitasse",
+                                "beskrivelse":"ferri",
+                                "tildeltEnhetsnr":"ludus",
+                                "tema":"PEN",
+                                "behandlingstema":"ab0341",
+                                "oppgavetype":"KRA",
+                                "opprettetAvEnhetsnr":"9999",
+                                "aktivDato": "${LocalDate.now().format(DateTimeFormatter.ISO_DATE)}",
+                                "fristFerdigstillelse": "${
+                                LocalDate.now().plusDays(30).format(DateTimeFormatter.ISO_DATE)
+                            }",
+                                "status":"OPPRETTET",
+                                "prioritet":"LAV"
+                            }
+                        """.trimIndent()
+                        )
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                )
+        )
+        println("wiremock ${wiremock.port}")
+        assertThat(oppgaveRepo.find(oppgave.id).status).isInstanceOf(Oppgave.Status.Ferdig::class.java)
+        val resultat = oppgaveService.kanseller(oppgave.id, begrunnelse)
+        assertThat(resultat).isEqualTo(OPPGAVENG_ER_ENDRET_I_PARALLELL)
+        (oppgaveRepo.find(oppgave.id).status).let { status ->
+            assertThat(status).isInstanceOf(Oppgave.Status.Ferdig::class.java)
+        }
+    }
 }

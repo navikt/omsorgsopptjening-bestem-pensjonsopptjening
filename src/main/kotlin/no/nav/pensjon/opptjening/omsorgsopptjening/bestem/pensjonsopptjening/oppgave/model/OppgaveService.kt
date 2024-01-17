@@ -2,10 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlient
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveStatus
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -169,10 +166,9 @@ class OppgaveService(
             OppgaveStatus.FERDIGSTILT -> OPPGAVEN_ER_FERDIGBEHANDLET
             OppgaveStatus.FEILREGISTRERT -> OPPGAVEN_VAR_ALLEREDE_KANSELLERT
             else -> {
-                if (oppgaveKlient.kansellerOppgave(oppgaveInfo.id, oppgaveInfo.versjon)) {
-                    OPPGAVEN_ER_KANSELLERT
-                } else {
-                    OPPDATERING_FEILET
+                when (oppgaveKlient.kansellerOppgave(oppgaveInfo.id, oppgaveInfo.versjon)) {
+                    KansellerOppgaveRespons.OPPDATERT_OK -> OPPGAVEN_ER_KANSELLERT
+                    KansellerOppgaveRespons.OPPGAVE_OPPDATERT_I_PARALLELL -> OPPGAVENG_ER_ENDRET_I_PARALLELL
                 }
             }
         }
@@ -188,11 +184,11 @@ class OppgaveService(
                 OPPGAVEN_ER_FERDIGBEHANDLET -> oppgave.kansellert(begrunnelse, resultat)
                 OPPDATERING_FEILET -> oppgave
                 KANSELLERING_IKKE_NODVENDIG -> oppgave.kansellert(begrunnelse, resultat)
+                OPPGAVENG_ER_ENDRET_I_PARALLELL -> oppgave
             }
         }.let { oppgave ->
             oppgaveRepo.updateStatus(oppgave)
         }
-
     }
 
     fun kanseller(oppgaveId: UUID, begrunnelse: String): KanselleringsResultat {
@@ -206,8 +202,9 @@ class OppgaveService(
                                 oppdaterKansellertStatus(oppgaveId, resultat, begrunnelse)
                                 resultat
                             }
+
                             else -> {
-                                oppdaterKansellertStatus(oppgaveId,KANSELLERING_IKKE_NODVENDIG,begrunnelse)
+                                oppdaterKansellertStatus(oppgaveId, KANSELLERING_IKKE_NODVENDIG, begrunnelse)
                                 KANSELLERING_IKKE_NODVENDIG
                             }
                         }

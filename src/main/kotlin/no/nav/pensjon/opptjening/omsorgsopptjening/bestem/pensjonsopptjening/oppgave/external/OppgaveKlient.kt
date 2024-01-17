@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpClientErrorException
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -101,7 +102,7 @@ class OppgaveKlient(
     fun kansellerOppgave(
         oppgaveId: String,
         versjon: Int,
-    ): Boolean {
+    ): KansellerOppgaveRespons {
         val kansellerRequest = KansellerOppgaveRequest(versjon)
         val requestBody = serialize(kansellerRequest)
         val httpEntity = HttpEntity(
@@ -120,7 +121,13 @@ class OppgaveKlient(
             val response =
                 restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OpprettOppgaveResponse::class.java)
             log.info("kanseller oppgave: respons: ${response.statusCode}")
-            response.statusCode.value() == 200
+            if (response.statusCode.value() == 200) {
+                KansellerOppgaveRespons.OPPDATERT_OK
+            } else {
+                throw RuntimeException("Kall lykkes med ukjent responskode: ${response.statusCode}")
+            }
+        } catch (ex: HttpClientErrorException.Conflict) {
+            KansellerOppgaveRespons.OPPGAVE_OPPDATERT_I_PARALLELL
         } catch (ex: Exception) {
             """Feil ved kall til $oppgaveUrl, feil: ${ex::class.qualifiedName}""".let {
                 log.warn(it)
@@ -192,4 +199,9 @@ data class OppgaveInfo(val id: String, val versjon: Int, val status: OppgaveStat
 
 enum class OppgaveStatus {
     OPPRETTET, AAPNET, UNDER_BEHANDLING, FERDIGSTILT, FEILREGISTRERT
+}
+
+enum class KansellerOppgaveRespons {
+    OPPDATERT_OK,
+    OPPGAVE_OPPDATERT_I_PARALLELL,
 }

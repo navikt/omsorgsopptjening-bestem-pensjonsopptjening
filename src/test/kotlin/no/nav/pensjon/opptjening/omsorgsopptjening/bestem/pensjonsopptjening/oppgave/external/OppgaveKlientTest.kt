@@ -183,7 +183,8 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
                         )
 
                 )
-                assertThat(client.kansellerOppgave("1234", 2)).isTrue()
+                assertThat(client.kansellerOppgave("1234", 2))
+                    .isEqualTo(KansellerOppgaveRespons.OPPDATERT_OK)
             }
         }
     }
