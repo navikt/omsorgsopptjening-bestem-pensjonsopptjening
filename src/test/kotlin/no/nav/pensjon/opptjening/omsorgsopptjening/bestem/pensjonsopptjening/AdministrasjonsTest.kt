@@ -12,7 +12,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlientTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.OPPGAVEN_ER_KANSELLERT
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
@@ -33,8 +35,11 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.http.HttpHeaders
+import java.time.LocalDate
 import java.time.Month.*
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class AdministrasjonsTest : SpringContextTest.NoKafka() {
@@ -233,7 +238,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     fun `stoppet melding har lagret beskrivelse`() {
         val begrunnelse = "Fordi jeg vil!"
         val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
-        handler.stoppMelding(meldingsId,begrunnelse)
+        handler.stoppMelding(meldingsId, begrunnelse)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
             (melding.status as PersongrunnlagMelding.Status.Stoppet).let {
@@ -383,5 +388,83 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
             assertThat(brev.status).isInstanceOf(Brev.Status.Klar::class.java)
             assertThat(brev.status.retry("etter start")).isInstanceOf(Brev.Status.Retry::class.java)
         }
+    }
+
+    @Test
+    fun `kan kansellere en oppgave`() {
+
+        val oppgaveId = "1234"
+
+        val oppgave = lagreOgProsesserMeldingSomGirOppgave().let { meldingId ->
+            oppgaveRepo.findForMelding(meldingId).single()
+        }.ferdig("1234").let { oppgave ->
+            oppgaveRepo.updateStatus(oppgave)
+            oppgave
+        }
+        val correlationId = oppgave.correlationId
+        val innlesingId = oppgave.innlesingId
+
+        wiremock.givenThat(
+            WireMock.post(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
+                .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
+                .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
+                .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))
+                .withHeader("x-correlation-id", WireMock.equalTo(correlationId.toString()))
+                .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
+                .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
+                .withRequestBody(
+                    WireMock.equalToJson(
+                        """
+                            {
+                                "versjon":2,
+                                "status":"FEILREGISTRERT"
+                            }
+                        """.trimIndent()
+                    )
+                )
+                .willReturn(
+                    WireMock.ok()
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                )
+
+        )
+        wiremock.givenThat(
+            WireMock.get(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
+                .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
+                .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
+                .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))
+                .withHeader("x-correlation-id", WireMock.equalTo(correlationId.toString()))
+                .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
+                .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
+                .willReturn(
+                    WireMock.ok()
+                        .withBody(
+                            """
+                            {
+                                "id":"$oppgaveId",
+                                "versjon":"2",
+                                "saksreferanse":"habitasse",
+                                "beskrivelse":"ferri",
+                                "tildeltEnhetsnr":"ludus",
+                                "tema":"PEN",
+                                "behandlingstema":"ab0341",
+                                "oppgavetype":"KRA",
+                                "opprettetAvEnhetsnr":"9999",
+                                "aktivDato": "${LocalDate.now().format(DateTimeFormatter.ISO_DATE)}",
+                                "fristFerdigstillelse": "${
+                                LocalDate.now().plusDays(30).format(DateTimeFormatter.ISO_DATE)
+                            }",
+                                "status":"OPPRETTET",
+                                "prioritet":"LAV"
+                            }
+                        """.trimIndent()
+                        )
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                )
+        )
+        println("wiremock ${wiremock.port}")
+        assertThat(oppgaveRepo.find(oppgave.id).status).isInstanceOf(Oppgave.Status.Ferdig::class.java)
+        val resultat = oppgaveService.kanseller(oppgave.id, "Fordi jeg vil!")
+        assertThat(resultat).isEqualTo(OPPGAVEN_ER_KANSELLERT)
     }
 }

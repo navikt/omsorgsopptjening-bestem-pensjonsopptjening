@@ -178,18 +178,33 @@ class OppgaveService(
         }
     }
 
-    fun settKansellertStatus(oppgave: Oppgave) {
-        oppgave.status
+    private fun oppdaterKansellertStatus(oppgaveId: UUID, resultat: KanselleringsResultat, begrunnelse: String) {
+        oppgaveRepo.find(oppgaveId).let { oppgave ->
+            when (resultat) {
+                OPPGAVEN_ER_KANSELLERT -> oppgave.kansellert(begrunnelse, resultat)
+                OPPGAVEN_VAR_ALLEREDE_KANSELLERT -> oppgave // tar ikke vare på info om dette forsøket
+                FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING -> throw RuntimeException("Intern feil")
+                FANT_IKKE_OPPGAVEN -> oppgave.kansellert(begrunnelse, resultat)
+                OPPGAVEN_ER_FERDIGBEHANDLET -> oppgave.kansellert(begrunnelse, resultat)
+                OPPDATERING_FEILET -> oppgave
+            }
+        }.let { oppgave ->
+            oppgaveRepo.updateStatus(oppgave)
+        }
+
     }
 
-    fun kanseller(oppgaveId: UUID): KanselleringsResultat {
-        oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
-            return Mdc.scopedMdc(oppgave.correlationId) {
-                Mdc.scopedMdc(oppgave.innlesingId) {
-                    kansellerOppgave(oppgave)
+    fun kanseller(oppgaveId: UUID, begrunnelse: String): KanselleringsResultat {
+        return transactionTemplate.execute {
+            oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
+                Mdc.scopedMdc(oppgave.correlationId) {
+                    Mdc.scopedMdc(oppgave.innlesingId) {
+                        val resultat = kansellerOppgave(oppgave)
+                        oppdaterKansellertStatus(oppgaveId, resultat, begrunnelse)
+                        resultat
+                    }
                 }
-            }
-        }
-        return FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING
+            } ?: FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING
+        }!!
     }
 }

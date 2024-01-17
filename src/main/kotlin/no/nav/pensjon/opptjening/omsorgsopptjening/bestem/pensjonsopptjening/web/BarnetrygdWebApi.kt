@@ -105,7 +105,7 @@ class BarnetrygdWebApi(
             val responsStrenger =
                 oppgaver.map { id ->
                     try {
-                        val nyId = oppgaveService.kanseller(id)
+                        val nyId = oppgaveService.kanseller(id,"Fordi jeg vil!")
                         val status = nyId?.let { "Restartet" } ?: { "Fant ikke oppgaven" }
                         "$id $status"
                     } catch (ex: Throwable) {
