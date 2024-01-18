@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfoRespons.OppgaveInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -75,7 +74,7 @@ class OppgaveKlient(
 
     fun hentOppgaveInfo(
         oppgaveId: String,
-    ): OppgaveInfoRespons {
+    ): OppgaveInfo? {
         val requestEntity = HttpEntity<Any>(
             HttpHeaders().apply {
                 add(CorrelationId.identifier, Mdc.getCorrelationId())
@@ -93,7 +92,7 @@ class OppgaveKlient(
             OppgaveInfo(response.id, response.versjon, response.status)
         } catch (ex: HttpClientErrorException) {
             when (ex.statusCode.value()) {
-                404 -> OppgaveInfoRespons.IkkeFunnet
+                404 -> null
                 else -> throw OppgaveKlientException("henting av oppgaveinfo feilet", ex)
             }
         } catch (ex: Exception) {
@@ -201,10 +200,7 @@ private data class HentOppgaveResponse(
 
 class OppgaveKlientException(message: String, throwable: Throwable) : RuntimeException(message, throwable)
 
-abstract sealed class OppgaveInfoRespons {
-    data class OppgaveInfo(val id: String, val versjon: Int, val status: OppgaveStatus) : OppgaveInfoRespons()
-    data object IkkeFunnet : OppgaveInfoRespons()
-}
+data class OppgaveInfo(val id: String, val versjon: Int, val status: OppgaveStatus)
 
 enum class OppgaveStatus {
     OPPRETTET, AAPNET, UNDER_BEHANDLING, FERDIGSTILT, FEILREGISTRERT
@@ -214,4 +210,3 @@ enum class KansellerOppgaveRespons {
     OPPDATERT_OK,
     OPPGAVE_OPPDATERT_I_PARALLELL,
 }
-

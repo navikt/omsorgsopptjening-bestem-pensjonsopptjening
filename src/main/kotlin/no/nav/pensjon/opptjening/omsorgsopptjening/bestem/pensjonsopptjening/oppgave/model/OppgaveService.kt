@@ -3,7 +3,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.*
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfoRespons.OppgaveInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -140,19 +139,21 @@ class OppgaveService(
         }
     }
 
-    fun hentOppgaveInfo(oppgaveId: UUID): OppgaveInfoRespons? {
+    fun hentOppgaveInfo(oppgaveId: UUID): OppgaveInfoResult {
         return oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
             Mdc.scopedMdc(oppgave.correlationId) {
                 Mdc.scopedMdc(oppgave.innlesingId) {
-                    when (val status = oppgaveRepo.tryFind(oppgaveId)?.status) {
+                    when (val status = oppgave.status) {
                         is Oppgave.Status.Ferdig -> status.oppgaveId
                         else -> null
                     }?.let { id ->
-                        oppgaveKlient.hentOppgaveInfo(id)
+                        oppgaveKlient.hentOppgaveInfo(id)?.let {
+                            OppgaveInfoResult.Info(it)
+                        }?:OppgaveInfoResult.FantIkkeOppgavenRemote
                     }
                 }
             }
-        }
+        }?:OppgaveInfoResult.FantIkkeOppgavenLokalt
     }
 
     private fun kansellerOppgave(oppgave: Oppgave.Persistent): KanselleringsResultat {
@@ -218,5 +219,11 @@ class OppgaveService(
                 }
             } ?: FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING
         }!!
+    }
+
+    sealed class OppgaveInfoResult {
+        class Info(val info: OppgaveInfo) : OppgaveInfoResult()
+        data object FantIkkeOppgavenLokalt : OppgaveInfoResult()
+        data object FantIkkeOppgavenRemote : OppgaveInfoResult()
     }
 }

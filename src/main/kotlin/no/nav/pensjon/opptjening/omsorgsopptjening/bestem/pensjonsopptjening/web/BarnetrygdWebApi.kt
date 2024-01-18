@@ -1,9 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfoRespons
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfoRespons.OppgaveInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult.FantIkkeOppgavenLokalt
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult.FantIkkeOppgavenRemote
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.Logger
@@ -162,9 +163,11 @@ class BarnetrygdWebApi(
                 uuids.map { id ->
                     try {
                         when (val info = oppgaveService.hentOppgaveInfo(id)) {
-                            null -> "$id: Fant ikke oppgaven (lokalt)"
-                            is OppgaveInfoRespons.IkkeFunnet -> "$id: Fant ikke oppgaven (remote)"
-                            is OppgaveInfo -> "$id: ${info.status} (versjon: ${info.versjon})"
+                            is FantIkkeOppgavenRemote -> "$id: Fant ikke oppgaven (remote)"
+                            is FantIkkeOppgavenLokalt -> "$id: Fant ikke oppgaven (remote)"
+                            is OppgaveInfoResult.Info -> {
+                                "$id: ${info.info.status} (versjon: ${info.info.versjon})"
+                            }
                         }
                     } catch (ex: Throwable) {
                         "$id: Feilet, ${ex::class.simpleName}"
