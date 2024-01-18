@@ -91,34 +91,6 @@ class BarnetrygdWebApi(
         }
     }
 
-    @PostMapping("/bestem/kanseller-oppgaver", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun kansellerOppgaver(@RequestParam("uuidliste") oppgaverString: String,
-                          @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
-
-        val oppgaver = try {
-            parseUUIDListe(oppgaverString)
-        } catch (ex: Throwable) {
-            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
-        }
-
-        try {
-            val responsStrenger =
-                oppgaver.map { id ->
-                    try {
-                        val nyId = oppgaveService.kanseller(id,"Fordi jeg vil!")
-                        val status = nyId?.let { "Restartet" } ?: { "Fant ikke oppgaven" }
-                        "$id $status"
-                    } catch (ex: Throwable) {
-                        "$id: Feilet, ${ex::class.simpleName}"
-                    }
-                }
-            val respons = responsStrenger.joinToString("\n")
-            return ResponseEntity.ok(respons)
-        } catch (ex: Throwable) {
-            return ResponseEntity.internalServerError().body("Feil ved prosessering: $ex")
-        }
-    }
-
     @PostMapping("/bestem/restart-brev", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
     fun restartBrev(@RequestParam("uuidliste") oppgaverString: String,
                     @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
@@ -168,6 +140,35 @@ class BarnetrygdWebApi(
                     try {
                         val oppgaveInfo = oppgaveService.hentOppgaveInfo(id)
                         oppgaveInfo.toString()
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError()
+                .contentType(TEXT_PLAIN)
+                .body("Feil ved prosessering: $ex")
+        }
+    }
+
+    @PostMapping("/bestem/kanseller-oppgaver", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+
+    fun kansellerOppgaver(@RequestParam("uuidliste") oppgaverString: String,
+                         @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+        val uuids = try {
+            parseUUIDListe(oppgaverString)
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        try {
+            val responsStrenger =
+                uuids.map { id ->
+                    try {
+                        val resultat = oppgaveService.kanseller(id, begrunnelse?:"Ingen begrunnelse oppgitt")
+                        resultat.toString()
                     } catch (ex: Throwable) {
                         "$id: Feilet, ${ex::class.simpleName}"
                     }
