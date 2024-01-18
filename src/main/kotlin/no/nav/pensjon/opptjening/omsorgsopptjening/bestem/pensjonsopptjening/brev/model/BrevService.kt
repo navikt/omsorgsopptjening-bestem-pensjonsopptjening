@@ -99,9 +99,15 @@ class BrevService(
 
     fun stoppForMelding(meldingsId: UUID) {
         brevRepository.findForMelding(meldingsId).forEach { brev ->
-            log.info("Stopper brev: ${brev.id}")
-            brev.stoppet().let {
-                brevRepository.updateStatus(it)
+            when (brev.status) {
+                is Brev.Status.Ferdig -> Unit
+                is Brev.Status.Stoppet -> Unit
+                else -> {
+                    log.info("Stopper brev: ${brev.id}")
+                    brev.stoppet().let {
+                        brevRepository.updateStatus(it)
+                    }
+                }
             }
         }
     }

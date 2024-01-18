@@ -106,13 +106,9 @@ sealed class Brev {
             val tidspunkt: Instant = Instant.now(),
             val journalpost: String,
         ) : Status() {
-            override fun stoppet(): Status {
-                return Stoppet()
-            }
             override fun restart() : Status {
                 return Klar()
             }
-
         }
 
         @JsonTypeName("Stoppet")
