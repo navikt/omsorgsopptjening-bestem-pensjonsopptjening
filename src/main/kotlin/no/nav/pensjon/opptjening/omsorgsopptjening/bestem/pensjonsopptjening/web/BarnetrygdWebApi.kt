@@ -20,11 +20,14 @@ class BarnetrygdWebApi(
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(BarnetrygdWebApi::class.java)
+        private val secureLog: Logger = LoggerFactory.getLogger("secure")
     }
 
     @PostMapping("/bestem/rekjor-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun rekjørMeldinger(@RequestParam("uuidliste") meldingerString: String,
-                        @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+    fun rekjørMeldinger(
+        @RequestParam("uuidliste") meldingerString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
 
         val meldinger = try {
             parseUUIDListe(meldingerString)
@@ -52,20 +55,30 @@ class BarnetrygdWebApi(
     }
 
     @PostMapping("/bestem/stopp-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun stoppMeldinger(@RequestParam("uuidliste") meldingerString: String,
-                       @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+    fun stoppMeldinger(
+        @RequestParam("uuidliste") meldingerString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
         return ResponseEntity.ok("Ikke implementert: stopp-flere")
     }
 
     @PostMapping("/bestem/avslutt-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun avsluttMeldinger(@RequestParam("uuidliste") meldingerString: String,
-                         @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+    fun avsluttMeldinger(
+        @RequestParam("uuidliste") meldingerString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
         return ResponseEntity.ok("Ikke implementert: avslutt-flere")
     }
 
-    @PostMapping("/bestem/restart-oppgaver", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun restartOppgaver(@RequestParam("uuidliste") oppgaverString: String,
-                        @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+    @PostMapping(
+        "/bestem/restart-oppgaver",
+        consumes = [APPLICATION_FORM_URLENCODED_VALUE],
+        produces = [TEXT_PLAIN_VALUE]
+    )
+    fun restartOppgaver(
+        @RequestParam("uuidliste") oppgaverString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
 
         val oppgaver = try {
             parseUUIDListe(oppgaverString)
@@ -92,8 +105,10 @@ class BarnetrygdWebApi(
     }
 
     @PostMapping("/bestem/restart-brev", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun restartBrev(@RequestParam("uuidliste") oppgaverString: String,
-                    @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+    fun restartBrev(
+        @RequestParam("uuidliste") oppgaverString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
 
         val brev = try {
             parseUUIDListe(oppgaverString)
@@ -106,7 +121,7 @@ class BarnetrygdWebApi(
                 brev.map { id ->
                     try {
                         val retId = brevService.restart(id)
-                        if (retId ==null) {
+                        if (retId == null) {
                             "$id: Fant ikke brevet"
                         } else {
                             "$id: Restartet"
@@ -124,9 +139,15 @@ class BarnetrygdWebApi(
         }
     }
 
-    @PostMapping("/bestem/test", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
-    fun testkall(@RequestParam("uuidliste") oppgaverString: String,
-                    @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+    @PostMapping(
+        "/bestem/hent-oppgavestatus",
+        consumes = [APPLICATION_FORM_URLENCODED_VALUE],
+        produces = [TEXT_PLAIN_VALUE]
+    )
+    fun testkall(
+        @RequestParam("uuidliste") oppgaverString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
 
         val uuids = try {
             parseUUIDListe(oppgaverString)
@@ -139,7 +160,11 @@ class BarnetrygdWebApi(
                 uuids.map { id ->
                     try {
                         val oppgaveInfo = oppgaveService.hentOppgaveInfo(id)
-                        oppgaveInfo.toString()
+                        if (oppgaveInfo == null) {
+                            "$id: Fant ikke oppgaven"
+                        } else {
+                            "$id: ${oppgaveInfo.status} (versjon: ${oppgaveInfo.versjon})"
+                        }
                     } catch (ex: Throwable) {
                         "$id: Feilet, ${ex::class.simpleName}"
                     }
@@ -153,10 +178,16 @@ class BarnetrygdWebApi(
         }
     }
 
-    @PostMapping("/bestem/kanseller-oppgaver", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    @PostMapping(
+        "/bestem/kanseller-oppgaver",
+        consumes = [APPLICATION_FORM_URLENCODED_VALUE],
+        produces = [TEXT_PLAIN_VALUE]
+    )
 
-    fun kansellerOppgaver(@RequestParam("uuidliste") oppgaverString: String,
-                         @RequestParam("begrunnelse") begrunnelse: String? = null): ResponseEntity<String> {
+    fun kansellerOppgaver(
+        @RequestParam("uuidliste") oppgaverString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
         val uuids = try {
             parseUUIDListe(oppgaverString)
         } catch (ex: Throwable) {
@@ -167,9 +198,10 @@ class BarnetrygdWebApi(
             val responsStrenger =
                 uuids.map { id ->
                     try {
-                        val resultat = oppgaveService.kanseller(id, begrunnelse?:"Ingen begrunnelse oppgitt")
+                        val resultat = oppgaveService.kanseller(id, begrunnelse ?: "Ingen begrunnelse oppgitt")
                         resultat.toString()
                     } catch (ex: Throwable) {
+                        secureLog.info("Fikk exception under kansellering av oppgave", ex)
                         "$id: Feilet, ${ex::class.simpleName}"
                     }
                 }
@@ -182,9 +214,9 @@ class BarnetrygdWebApi(
         }
     }
 
-    fun parseUUIDListe(meldingerString: String) : List<UUID> {
+    fun parseUUIDListe(meldingerString: String): List<UUID> {
         return meldingerString.lines()
-            .map { it.replace("[^0-9a-f-]".toRegex(),"") }
+            .map { it.replace("[^0-9a-f-]".toRegex(), "") }
             .filter { it.isNotEmpty() }
             .map { UUID.fromString(it.trim()) }
     }

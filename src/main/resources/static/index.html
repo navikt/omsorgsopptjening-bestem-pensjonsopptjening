@@ -60,6 +60,10 @@
                     setActionAndText("/bestem/kanseller-oppgaver", "Kanseller oppgaver")
                     setBeskrivelseEnabled(false)
                     break;
+                case "hent_oppgavestatus":
+                    setActionAndText("/bestem/hent-oppgavestatus", "Hent oppgave-status")
+                    setBeskrivelseEnabled(false)
+                    break;
                 case "test":
                     setActionAndText("/bestem/test","TEST")
                     setBeskrivelseEnabled(true)
@@ -131,8 +135,9 @@
         <option value="avslutt_meldinger">Avslutt meldinger (marker som ferdige)</option>
         <option value="restart_oppgaver">Restart oppgaver (begynn prosessering igjen fra klar)</option>
         <option value="kanseller_oppgaver">Kanseller (trekk tilbake) oppgaver</option>
+        <option value="hent_oppgavestatus">Hent status på oppgave</option>
         <option value="restart_brev">Restart brev (begynn prosessering igjen fra klar)</option>
-        <option value="test">TEST (intern, midlertidig)</option>
+        <!-- option value="test">TEST (intern, midlertidig)</option -->
     </select>
 </form>
 
