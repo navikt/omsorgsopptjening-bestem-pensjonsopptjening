@@ -405,7 +405,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
         val innlesingId = oppgave.innlesingId
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
+            WireMock.patch(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
                 .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
                 .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
                 .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))
@@ -569,7 +569,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
         val innlesingId = oppgave.innlesingId
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
+            WireMock.patch(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
                 .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
                 .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
                 .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))

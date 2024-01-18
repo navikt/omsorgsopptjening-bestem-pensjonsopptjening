@@ -119,7 +119,7 @@ class OppgaveKlient(
         val oppgaveUrl = "$oppgaveUrl/$oppgaveId"
         return try {
             val response =
-                restTemplate.exchange(oppgaveUrl, HttpMethod.POST, httpEntity, OpprettOppgaveResponse::class.java)
+                restTemplate.exchange(oppgaveUrl, HttpMethod.PATCH, httpEntity, OpprettOppgaveResponse::class.java)
             log.info("kanseller oppgave: respons: ${response.statusCode}")
             if (response.statusCode.value() == 200) {
                 KansellerOppgaveRespons.OPPDATERT_OK

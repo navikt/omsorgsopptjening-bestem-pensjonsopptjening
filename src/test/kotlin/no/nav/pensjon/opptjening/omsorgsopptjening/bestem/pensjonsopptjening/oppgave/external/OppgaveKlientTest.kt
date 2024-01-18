@@ -160,7 +160,7 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
                 wiremock.givenThat(
-                    WireMock.post(WireMock.urlPathEqualTo("$OPPGAVE_PATH/$oppgaveId"))
+                    WireMock.patch(WireMock.urlPathEqualTo("$OPPGAVE_PATH/$oppgaveId"))
                         .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer test.token.test"))
                         .withHeader(HttpHeaders.ACCEPT, equalTo("application/json"))
                         .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
