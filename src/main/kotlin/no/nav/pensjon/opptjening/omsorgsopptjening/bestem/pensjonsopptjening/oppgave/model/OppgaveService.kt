@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfoRespons.OppgaveInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -139,7 +140,7 @@ class OppgaveService(
         }
     }
 
-    fun hentOppgaveInfo(oppgaveId: UUID): OppgaveInfo? {
+    fun hentOppgaveInfo(oppgaveId: UUID): OppgaveInfoRespons? {
         return oppgaveRepo.tryFind(oppgaveId)?.let { oppgave ->
             Mdc.scopedMdc(oppgave.correlationId) {
                 Mdc.scopedMdc(oppgave.innlesingId) {
@@ -160,6 +161,11 @@ class OppgaveService(
             else -> null
         }?.let { id ->
             oppgaveKlient.hentOppgaveInfo(id)
+        }?.let { response ->
+            when (val response = response) {
+                is OppgaveInfo -> response
+                else -> null
+            }
         }
         return when (oppgaveInfo?.status) {
             null -> FANT_IKKE_OPPGAVEN

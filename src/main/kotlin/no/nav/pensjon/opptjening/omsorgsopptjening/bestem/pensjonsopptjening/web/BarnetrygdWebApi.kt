@@ -1,6 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfoRespons
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfoRespons.OppgaveInfo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.security.token.support.core.api.Protected
@@ -159,11 +161,10 @@ class BarnetrygdWebApi(
             val responsStrenger =
                 uuids.map { id ->
                     try {
-                        val oppgaveInfo = oppgaveService.hentOppgaveInfo(id)
-                        if (oppgaveInfo == null) {
-                            "$id: Fant ikke oppgaven"
-                        } else {
-                            "$id: ${oppgaveInfo.status} (versjon: ${oppgaveInfo.versjon})"
+                        when (val info = oppgaveService.hentOppgaveInfo(id)) {
+                            null -> "$id: Fant ikke oppgaven (lokalt)"
+                            is OppgaveInfoRespons.IkkeFunnet -> "$id: Fant ikke oppgaven (remote)"
+                            is OppgaveInfo -> "$id: ${info.status} (versjon: ${info.versjon})"
                         }
                     } catch (ex: Throwable) {
                         "$id: Feilet, ${ex::class.simpleName}"

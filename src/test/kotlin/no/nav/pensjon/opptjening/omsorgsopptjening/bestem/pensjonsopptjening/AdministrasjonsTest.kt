@@ -634,4 +634,69 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
             assertThat(status).isInstanceOf(Oppgave.Status.Ferdig::class.java)
         }
     }
+
+    @Test
+    fun `kansellering av en oppgave som ikke er registrert`() {
+
+        val begrunnelse = "Fordi jeg vil!"
+        val oppgaveId = "1234"
+
+        val oppgave = lagreOgProsesserMeldingSomGirOppgave().let { meldingId ->
+            oppgaveRepo.findForMelding(meldingId).single()
+        }.ferdig("1234").let { oppgave ->
+            oppgaveRepo.updateStatus(oppgave)
+            oppgave
+        }
+        val correlationId = oppgave.correlationId
+        val innlesingId = oppgave.innlesingId
+
+        wiremock.givenThat(
+            WireMock.patch(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
+                .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
+                .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
+                .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))
+                .withHeader("x-correlation-id", WireMock.equalTo(correlationId.toString()))
+                .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
+                .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
+                .withRequestBody(
+                    WireMock.equalToJson(
+                        """
+                            {
+                                "versjon":2,
+                                "status":"FEILREGISTRERT"
+                            }
+                        """.trimIndent()
+                    )
+                )
+                .willReturn(
+                    WireMock.status(409)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                )
+
+        )
+        wiremock.givenThat(
+            WireMock.get(WireMock.urlPathEqualTo("$OPPGAVE_PATH/${oppgaveId}"))
+                .withHeader(HttpHeaders.AUTHORIZATION, WireMock.equalTo("Bearer test.token.test"))
+                .withHeader(HttpHeaders.ACCEPT, WireMock.equalTo("application/json"))
+                .withHeader(HttpHeaders.CONTENT_TYPE, WireMock.equalTo("application/json"))
+                .withHeader("x-correlation-id", WireMock.equalTo(correlationId.toString()))
+                .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
+                .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
+                .willReturn(
+                    WireMock.notFound()
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                )
+        )
+        println("wiremock ${wiremock.port}")
+        assertThat(oppgaveRepo.find(oppgave.id).status).isInstanceOf(Oppgave.Status.Ferdig::class.java)
+        val resultat = oppgaveService.kanseller(oppgave.id, begrunnelse)
+        assertThat(resultat).isEqualTo(FANT_IKKE_OPPGAVEN)
+        (oppgaveRepo.find(oppgave.id).status).let { status ->
+            assertThat(status).isInstanceOf(Oppgave.Status.Kansellert::class.java)
+            (status as Oppgave.Status.Kansellert).let { status ->
+                assertThat(status.begrunnelse).isEqualTo(begrunnelse)
+                assertThat(status.kanselleringsResultat).isEqualTo(FANT_IKKE_OPPGAVEN)
+            }
+        }
+    }
 }
