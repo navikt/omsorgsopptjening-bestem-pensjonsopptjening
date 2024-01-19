@@ -1,6 +1,12 @@
 <html>
 <head>
     <meta charset="utf8">
+    <style>
+        .hjelpetekst {
+            background-color: white;
+            border: 1px solid lightgrey;
+        }
+    </style>
     <script>
         function init() {
             let tjeneste = localStorage.getItem("tjeneste");
@@ -135,10 +141,11 @@
     Ikke initalisert. Fiks javascript.
 </div>
 
-<button id="hjelpetekst_toggle" class="hjelpetekst" onclick="toggleHjelpetekst()">Skjul hjelpetekst</button>
+<button id="hjelpetekst_toggle" onclick="toggleHjelpetekst()">Skjul hjelpetekst</button>
+<br>
 <br>
 
-<div id="hjelpetekst">
+<div id="hjelpetekst" class="hjelpetekst" >
 <p>
     <ul>
     <li>Begrunnelse har ingen funksjonell betydning, men tas vare på i databasen som dokumentasjon</li>
