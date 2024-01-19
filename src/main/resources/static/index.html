@@ -4,6 +4,7 @@
     <script>
         function init() {
             let tjeneste = localStorage.getItem("tjeneste");
+            let hjelpetekst_skjult = localStorage.getItem("hjelpetekst") == "hidden"
             if (tjeneste) {
                 document.getElementById("tjeneste").value = tjeneste
             } else {
@@ -11,6 +12,7 @@
             }
             oppdater_tjeneste()
             oppdater_miljo()
+            if (hjelpetekst_skjult) toggleHjelpetekst()
         }
 
         function oppdater_tjeneste() {
@@ -109,6 +111,20 @@
             localStorage.setItem("tjeneste", tjeneste)
             oppdater_tjeneste()
         }
+
+        function toggleHjelpetekst() {
+            let button = document.getElementById("hjelpetekst_toggle");
+            let hjelpetekst = document.getElementById("hjelpetekst");
+
+            if (hjelpetekst.hidden) {
+                hjelpetekst.hidden = false
+                button.textContent = "Skjul hjelpetekst"
+            } else {
+                hjelpetekst.hidden = true
+                button.textContent = "Vis hjelpetekst"
+            }
+            localStorage.setItem("hjelpetekst", hjelpetekst.hidden?"hidden":"shown")
+        }
     </script>
 </head>
 <body onload="init()">
@@ -119,17 +135,44 @@
     Ikke initalisert. Fiks javascript.
 </div>
 
+<button id="hjelpetekst_toggle" class="hjelpetekst" onclick="toggleHjelpetekst()">Skjul hjelpetekst</button>
+<br>
+
+<div id="hjelpetekst">
 <p>
-    Send inn en liste med gyldige meldingsid'er. Det må være én per linje, uten quotes eller kommaer.
+    <ul>
+    <li>Begrunnelse har ingen funksjonell betydning, men tas vare på i databasen som dokumentasjon</li>
+    <li>Hver UUID vil behandles i separate transaksjoner, og resultatet (inkludert feil pga exceptions) vil returneres tilbake per uuid</li>
+    <li>For UUID'ene vil tegn som ikke er gyldige i en UUID fjernes, og blanke linjer ignoreres. Hver UUID må være på en separat linje.</li>
+    </ul>
+    <ul>
+        <li>Stopping av meldinger vil både stoppe meldingene og all underliggende prosessering (oppgaver, brev).
+            For oppgaver og brev vil de kun stoppes dersom de ikke allerede er prosessert. Oppgaver som er
+            registrert vil ikke bli trukket tilbake (dette må gjøres via kansellering). En stoppet melding vil
+            bli ignorert av prosessering og overvåking, og kan derfor medføre alarmer</li>
+        <li>Rekjøring av meldinger vil først stoppe meldingene, og deretter lagre en ny kopi av samme melding i starttilstanden</li>
+        <li>Avslutting av melding vil markere en melding som avsluttet. Underliggende strukturer vil ikke bli rørt</li>
+        <li>Restart oppgaver vil sette oppgaver som ikke har blitt registrert tilbake til prosessering (med antall retry-forsøk satt tilbake til 0)</li>
+        <li>Restart brev vil sette en brev tilbake til prosessering (med antall retry-forsøk satt tilbake til 0)</li>
+        <li>kanseller oppgaver vil kansellere registrerte oppgaver. Oppgaver som er ferdigbehandlet vil ikke bli rørt, mens oppgaver som er nye eller påstartet av en saksbehandler vil bli lukket (med status "feilregistrert")</li>
+        <li>hent status på oppgave vil hente behandlingsstatus for en registrert oppgave</li>
+    </ul>
+    <p>
+        oppgaver som har blitt kansellert/markert som feilregistrert vil se ut som de ikke finnes
+    </p>
+
 </p>
 <p>
     Prosessering av disse meldingene vil bli stoppet, men allerede videresendt informasjon (brev, oppgaver,
     godskriving) vil ikke bli kansellert/tilbakekalt.
 </p>
+</div>
+
+<br>
 
 <form>
     <label for="tjeneste">Velg funksjon</label>
-    <select id="tjeneste" onchange="javascript:velg_tjeneste()">
+    <select id="tjeneste" onchange="velg_tjeneste()">
         <option value="rekjor_meldinger">Rekjør meldinger (stopp og opprett ny kopi)</option>
         <option value="stopp_meldinger">Stopp meldinger (stopper også oppgaver og brev)</option>
         <option value="avslutt_meldinger">Avslutt meldinger (marker som ferdige)</option>
