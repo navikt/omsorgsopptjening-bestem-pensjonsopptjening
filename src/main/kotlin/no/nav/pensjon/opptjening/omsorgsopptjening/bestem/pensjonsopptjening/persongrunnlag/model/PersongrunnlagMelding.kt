@@ -143,7 +143,11 @@ sealed class PersongrunnlagMelding {
         data class Stoppet(
             val tidspunkt: Instant = now(),
             val begrunnelse: String? = null,
-        ) : Status()
+        ) : Status() {
+            override fun avsluttet(melding: String): Avsluttet {
+                return Avsluttet(melding = melding)
+            }
+        }
 
         @JsonTypeName("Retry")
         data class Retry(
