@@ -187,10 +187,10 @@ class PersongrunnlagMeldingService(
         )
     }
 
-    fun avsluttMelding(id: UUID): UUID? {
+    fun avsluttMelding(id: UUID, melding: String): UUID? {
         try {
             return transactionTemplate.execute {
-                persongrunnlagRepo.find(id).avsluttet().let {
+                persongrunnlagRepo.find(id).avsluttet(melding = melding).let {
                     persongrunnlagRepo.updateStatus(it)
                     id
                 }

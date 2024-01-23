@@ -23,12 +23,12 @@ sealed class PersongrunnlagMelding {
     data class Lest(
         override val innhold: PersongrunnlagMeldingKafka,
         override val opprettet: Instant = now(),
-        val kopiertFra : Mottatt? = null,
+        val kopiertFra: Mottatt? = null,
     ) : PersongrunnlagMelding() {
         override val statushistorikk: List<Status> =
             when (kopiertFra) {
                 null -> listOf(Status.Klar())
-                else -> listOf(Status.Kopiert(kopiertFra.id),Status.Klar())
+                else -> listOf(Status.Kopiert(kopiertFra.id), Status.Klar())
             }
         override val id: UUID? = null
     }
@@ -47,8 +47,8 @@ sealed class PersongrunnlagMelding {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 
-        fun avsluttet(): Mottatt {
-            return copy(statushistorikk = statushistorikk + status.avsluttet())
+        fun avsluttet(melding: String): Mottatt {
+            return copy(statushistorikk = statushistorikk + status.avsluttet(melding))
         }
 
         fun stoppet(begrunnelse: String? = null): Mottatt {
@@ -86,7 +86,7 @@ sealed class PersongrunnlagMelding {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Retry")
         }
 
-        open fun avsluttet(): Avsluttet {
+        open fun avsluttet(melding: String): Avsluttet {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Avsluttet")
         }
 
@@ -106,11 +106,11 @@ sealed class PersongrunnlagMelding {
                 return Retry(melding = melding)
             }
 
-            override fun avsluttet() : Avsluttet {
-                return Avsluttet()
+            override fun avsluttet(melding: String): Avsluttet {
+                return Avsluttet(melding = melding)
             }
 
-            override fun stoppet(begrunnelse: String?) : Stoppet {
+            override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)
             }
         }
@@ -119,12 +119,12 @@ sealed class PersongrunnlagMelding {
         data class Ferdig(
             val tidspunkt: Instant = now(),
 
-        ) : Status() {
-            override fun avsluttet() : Avsluttet {
-                return Avsluttet()
+            ) : Status() {
+            override fun avsluttet(melding: String): Avsluttet {
+                return Avsluttet(melding = melding)
             }
 
-            override fun stoppet(begrunnelse: String?) : Stoppet {
+            override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)
             }
         }
@@ -132,8 +132,9 @@ sealed class PersongrunnlagMelding {
         @JsonTypeName("Avsluttet")
         data class Avsluttet(
             val tidspunkt: Instant = now(),
+            val melding: String
         ) : Status() {
-            override fun stoppet(begrunnelse: String?) : Stoppet {
+            override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)
             }
         }
@@ -156,8 +157,8 @@ sealed class PersongrunnlagMelding {
                 return Ferdig()
             }
 
-            override fun avsluttet(): Avsluttet {
-                return Avsluttet()
+            override fun avsluttet(melding: String): Avsluttet {
+                return Avsluttet(melding = melding)
             }
 
             override fun retry(melding: String): Status {
@@ -180,7 +181,7 @@ sealed class PersongrunnlagMelding {
                 }
             }
 
-            override fun stoppet(begrunnelse: String?) : Stoppet {
+            override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)
             }
 
@@ -188,19 +189,19 @@ sealed class PersongrunnlagMelding {
 
         // TODO: riktig måte å håndtere dette på? Inngår ikke i mormal flyt, er bare her for å ta vare på info
         data class Kopiert(
-            val kopiertFra : UUID
+            val kopiertFra: UUID
         ) : Status()
 
         @JsonTypeName("Feilet")
         data class Feilet(
             val tidspunkt: Instant = now(),
         ) : Status() {
-            override fun stoppet(begrunnelse: String?) : Stoppet {
+            override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)
             }
 
-            override fun avsluttet(): Avsluttet {
-                return Avsluttet()
+            override fun avsluttet(melding: String): Avsluttet {
+                return Avsluttet(melding = melding)
             }
         }
     }

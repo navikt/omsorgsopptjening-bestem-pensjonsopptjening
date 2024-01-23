@@ -16,13 +16,13 @@ import java.util.*
 
 @RestController
 @Protected
-class BarnetrygdWebApi(
+class AdminWebApi(
     private val persongrunnlagMeldingService: PersongrunnlagMeldingService,
     private val oppgaveService: OppgaveService,
     private val brevService: BrevService,
 ) {
     companion object {
-        private val log: Logger = LoggerFactory.getLogger(BarnetrygdWebApi::class.java)
+        private val log: Logger = LoggerFactory.getLogger(AdminWebApi::class.java)
         private val secureLog: Logger = LoggerFactory.getLogger("secure")
     }
 
@@ -70,7 +70,29 @@ class BarnetrygdWebApi(
         @RequestParam("uuidliste") meldingerString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
-        return ResponseEntity.ok("Ikke implementert: avslutt-flere")
+        val meldinger = try {
+            parseUUIDListe(meldingerString)
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        log.info("rekjør flere: begrunnelse: $begrunnelse")
+
+        try {
+            val responsStrenger =
+                meldinger.map { id ->
+                    try {
+                        val nyId = persongrunnlagMeldingService.avsluttMelding(id, begrunnelse ?: "")
+                        "$id OK, erstattet av: $nyId"
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError().body("Feil ved prosessering: $ex")
+        }
     }
 
     @PostMapping(
