@@ -112,7 +112,23 @@ class BrevService(
         }
     }
 
-    fun restart(brevId: UUID) : UUID? {
+    fun stopp(id: UUID): UUID? {
+        return brevRepository.tryFind(id)?.let { brev ->
+            when (brev.status) {
+                is Brev.Status.Ferdig -> brev.id
+                is Brev.Status.Stoppet -> brev.id
+                else -> {
+                    log.info("Stopper brev: ${brev.id}")
+                    brev.stoppet().let {
+                        brevRepository.updateStatus(it)
+                        it.id
+                    }
+                }
+            }
+        }
+    }
+
+    fun restart(brevId: UUID): UUID? {
         return transactionTemplate.execute {
             brevRepository.find(brevId).let {
                 it.restart()

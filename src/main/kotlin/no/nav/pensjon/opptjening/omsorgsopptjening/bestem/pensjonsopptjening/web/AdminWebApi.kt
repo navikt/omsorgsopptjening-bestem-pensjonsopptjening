@@ -186,6 +186,43 @@ class AdminWebApi(
         }
     }
 
+    @PostMapping("/bestem/stopp-brev", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    fun stoppBrev(
+        @RequestParam("uuidliste") oppgaverString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
+
+        val brev = try {
+            parseUUIDListe(oppgaverString)
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        try {
+            val responsStrenger =
+                brev.map { id ->
+                    try {
+                        val retId = brevService.stopp(id)
+                        if (retId == null) {
+                            "$id: Fant ikke brevet"
+                        } else {
+                            "$id: Restartet"
+                        }
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError()
+                .contentType(TEXT_PLAIN)
+                .body("Feil ved prosessering: $ex")
+        }
+    }
+
+
+
     @PostMapping(
         "/bestem/hent-oppgavestatus",
         consumes = [APPLICATION_FORM_URLENCODED_VALUE],

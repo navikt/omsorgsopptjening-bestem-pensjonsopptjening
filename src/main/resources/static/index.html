@@ -64,6 +64,10 @@
                     setActionAndText("/bestem/restart-brev", "Restart brev")
                     setBeskrivelseEnabled(false)
                     break;
+                case "restart_brev":
+                    setActionAndText("/bestem/stopp-brev", "Stopp brev")
+                    setBeskrivelseEnabled(false)
+                    break;
                 case "kanseller_oppgaver":
                     setActionAndText("/bestem/kanseller-oppgaver", "Kanseller oppgaver")
                     setBeskrivelseEnabled(false)
@@ -73,7 +77,7 @@
                     setBeskrivelseEnabled(false)
                     break;
                 case "test":
-                    setActionAndText("/bestem/test","TEST")
+                    setActionAndText("/bestem/test", "TEST")
                     setBeskrivelseEnabled(true)
                     break;
                 default:
@@ -84,6 +88,7 @@
 
         function oppdater_miljo() {
             let env = document.getElementById("environmentLabel")
+
             function setColor(bgColor, textColor) {
                 env.style.backgroundColor = bgColor
                 env.style.color = textColor
@@ -95,20 +100,20 @@
 
             switch (document.location.hostname) {
                 case "localhost":
-                    setColor("darkblue","white")
+                    setColor("darkblue", "white")
                     setText("Localhost")
                     break;
                 case "omsorgsopptjening-bestem-pensjonsopptjening.intern.dev.nav.no":
-                    setColor("lightgreen","black")
+                    setColor("lightgreen", "black")
                     setText("Test")
                     break;
                 case "omsorgsopptjening-bestem-pensjonsopptjening.intern.nav.no":
-                    setColor("red","yellow")
+                    setColor("red", "yellow")
                     setText("PRODUKSJON")
                     break;
                 default:
-                    setColor("yellow","black")
-                    setText("ukjent domene: "+document.location.hostname)
+                    setColor("yellow", "black")
+                    setText("ukjent domene: " + document.location.hostname)
             }
         }
 
@@ -129,7 +134,7 @@
                 hjelpetekst.hidden = true
                 button.textContent = "Vis hjelpetekst"
             }
-            localStorage.setItem("hjelpetekst", hjelpetekst.hidden?"hidden":"shown")
+            localStorage.setItem("hjelpetekst", hjelpetekst.hidden ? "hidden" : "shown")
         }
     </script>
 </head>
@@ -145,34 +150,46 @@
 <br>
 <br>
 
-<div id="hjelpetekst" class="hjelpetekst" >
-<p>
+<div id="hjelpetekst" class="hjelpetekst">
+    <p>
     <ul>
-    <li>Begrunnelse har ingen funksjonell betydning, men tas vare på i databasen som dokumentasjon</li>
-    <li>Hver UUID vil behandles i separate transaksjoner, og resultatet (inkludert feil pga exceptions) vil returneres tilbake per uuid</li>
-    <li>For UUID'ene vil tegn som ikke er gyldige i en UUID fjernes, og blanke linjer ignoreres. Hver UUID må være på en separat linje.</li>
+        <li>Begrunnelse har ingen funksjonell betydning, men tas vare på i databasen som dokumentasjon</li>
+        <li>Hver UUID vil behandles i separate transaksjoner, og resultatet (inkludert feil pga exceptions) vil
+            returneres tilbake per uuid
+        </li>
+        <li>For UUID'ene vil tegn som ikke er gyldige i en UUID fjernes, og blanke linjer ignoreres. Hver UUID må være
+            på en separat linje.
+        </li>
     </ul>
     <ul>
         <li>Stopping av meldinger vil både stoppe meldingene og all underliggende prosessering (oppgaver, brev).
             For oppgaver og brev vil de kun stoppes dersom de ikke allerede er prosessert. Oppgaver som er
             registrert vil ikke bli trukket tilbake (dette må gjøres via kansellering). En stoppet melding vil
-            bli ignorert av prosessering og overvåking, og kan derfor medføre alarmer</li>
-        <li>Rekjøring av meldinger vil først stoppe meldingene, og deretter lagre en ny kopi av samme melding i starttilstanden</li>
+            bli ignorert av prosessering og overvåking, og kan derfor medføre alarmer
+        </li>
+        <li>Rekjøring av meldinger vil først stoppe meldingene, og deretter lagre en ny kopi av samme melding i
+            starttilstanden
+        </li>
         <li>Avslutting av melding vil markere en melding som avsluttet. Underliggende strukturer vil ikke bli rørt</li>
-        <li>Restart oppgaver vil sette oppgaver som ikke har blitt registrert tilbake til prosessering (med antall retry-forsøk satt tilbake til 0)</li>
+        <li>Restart oppgaver vil sette oppgaver som ikke har blitt registrert tilbake til prosessering (med antall
+            retry-forsøk satt tilbake til 0)
+        </li>
         <li>Restart brev vil sette en brev tilbake til prosessering (med antall retry-forsøk satt tilbake til 0)</li>
-        <li>kanseller oppgaver vil kansellere registrerte oppgaver. Oppgaver som er ferdigbehandlet vil ikke bli rørt, mens oppgaver som er nye eller påstartet av en saksbehandler vil bli lukket (med status "feilregistrert")</li>
+        <li>kanseller oppgaver vil kansellere registrerte oppgaver. Oppgaver som er ferdigbehandlet vil ikke bli rørt,
+            mens oppgaver som er nye eller påstartet av en saksbehandler vil bli lukket (med status "feilregistrert")
+        </li>
         <li>hent status på oppgave vil hente behandlingsstatus for en registrert oppgave</li>
     </ul>
     <p>
-        oppgaver som har blitt kansellert/markert som feilregistrert vil se ut som de ikke finnes
+        <li>oppgaver som har blitt kansellert/markert som feilregistrert vil se ut som de ikke finnes</li>
+        <li>Forsøk på å avslutte en stoppet melding som har blitt rekjørt vil feile (pga unik-indeks)</li>
     </p>
 
-</p>
-<p>
-    Prosessering av disse meldingene vil bli stoppet, men allerede videresendt informasjon (brev, oppgaver,
-    godskriving) vil ikke bli kansellert/tilbakekalt.
-</p>
+    </p>
+    <p>
+        Prosessering av disse meldingene vil bli stoppet, men allerede videresendt informasjon (brev, oppgaver,
+        godskriving) vil ikke bli kansellert/tilbakekalt.
+    </p>
 </div>
 
 <br>
@@ -187,6 +204,7 @@
         <option value="kanseller_oppgaver">Kanseller (trekk tilbake) oppgaver</option>
         <option value="hent_oppgavestatus">Hent status på oppgave</option>
         <option value="restart_brev">Restart brev (begynn prosessering igjen fra klar)</option>
+        <option value="stopp_brev">Restart brev (begynn prosessering igjen fra klar)</option>
         <!-- option value="test">TEST (intern, midlertidig)</option -->
     </select>
 </form>
