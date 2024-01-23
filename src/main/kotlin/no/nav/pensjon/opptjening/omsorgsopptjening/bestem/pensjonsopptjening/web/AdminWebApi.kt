@@ -62,7 +62,29 @@ class AdminWebApi(
         @RequestParam("uuidliste") meldingerString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
-        return ResponseEntity.ok("Ikke implementert: stopp-flere")
+        val meldinger = try {
+            parseUUIDListe(meldingerString)
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        log.info("stopp flere")
+
+        try {
+            val responsStrenger =
+                meldinger.map { id ->
+                    try {
+                        val nyId = persongrunnlagMeldingService.stoppMelding(id, begrunnelse ?: "")
+                        "$id Stoppet"
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError().body("Feil ved prosessering: $ex")
+        }
     }
 
     @PostMapping("/bestem/avslutt-flere", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
@@ -76,14 +98,14 @@ class AdminWebApi(
             return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
         }
 
-        log.info("rekjør flere: begrunnelse: $begrunnelse")
+        log.info("avslutt flere (antall: ${meldinger.size})")
 
         try {
             val responsStrenger =
                 meldinger.map { id ->
                     try {
                         val nyId = persongrunnlagMeldingService.avsluttMelding(id, begrunnelse ?: "")
-                        "$id OK, erstattet av: $nyId"
+                        "$id: Avsluttet"
                     } catch (ex: Throwable) {
                         "$id: Feilet, ${ex::class.simpleName}"
                     }

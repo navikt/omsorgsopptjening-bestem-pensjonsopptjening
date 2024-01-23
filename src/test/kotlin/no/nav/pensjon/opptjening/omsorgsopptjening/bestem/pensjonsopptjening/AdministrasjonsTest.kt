@@ -212,10 +212,13 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `kan avslutte en transaksjon`() {
+        val begrunnelse = "Fordi jeg vil!";
         val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
-        handler.avsluttMelding(meldingsId, "Fordi jeg vil!")
+        handler.avsluttMelding(meldingsId, begrunnelse)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Avsluttet::class.java)
+            val status = melding.status as PersongrunnlagMelding.Status.Avsluttet
+            assertThat(status.melding).isEqualTo(begrunnelse)
         }
     }
 
