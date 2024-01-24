@@ -88,4 +88,12 @@ class GodskrivOpptjeningService(
             }
         }
     }
+
+    fun stopp(id: UUID): UUID? {
+        log.info("Stopper godkjenning: $id")
+        return godskrivOpptjeningRepo.tryFind(id)?.stoppet()?.let {
+            godskrivOpptjeningRepo.updateStatus(it)
+            id
+        }
+    }
 }

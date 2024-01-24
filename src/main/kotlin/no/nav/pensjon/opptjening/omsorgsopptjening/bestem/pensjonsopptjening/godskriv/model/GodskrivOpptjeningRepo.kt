@@ -90,6 +90,20 @@ class GodskrivOpptjeningRepo(
         ).single()
     }
 
+    fun tryFind(id: UUID): GodskrivOpptjening.Persistent? {
+        return jdbcTemplate.query(
+            """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 
+                |from godskriv_opptjening o 
+                |join behandling b on b.id = o.behandlingId 
+                |join melding m on m.id = b.kafkaMeldingId 
+                |where o.id = :id""".trimMargin(),
+            mapOf<String, Any>(
+                "id" to id
+            ),
+            GodskrivOpptjeningMapper()
+        ).singleOrNull()
+    }
+
     fun findForMelding(id: UUID): List<GodskrivOpptjening.Persistent> {
         return jdbcTemplate.query(
             """select o.*, m.id as meldingid, m.correlation_id, m.innlesing_id, b.omsorgsyter 

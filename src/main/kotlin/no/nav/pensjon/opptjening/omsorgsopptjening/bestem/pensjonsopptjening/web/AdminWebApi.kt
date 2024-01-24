@@ -1,6 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult.FantIkkeOppgavenLokalt
@@ -20,6 +22,7 @@ class AdminWebApi(
     private val persongrunnlagMeldingService: PersongrunnlagMeldingService,
     private val oppgaveService: OppgaveService,
     private val brevService: BrevService,
+    private val godskrivOpptjeningService: GodskrivOpptjeningService
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(AdminWebApi::class.java)
@@ -222,6 +225,40 @@ class AdminWebApi(
     }
 
 
+    @PostMapping("/bestem/stopp-godskriving", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    fun stoppGodskriving(
+        @RequestParam("uuidliste") oppgaverString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
+
+        val uuider = try {
+            parseUUIDListe(oppgaverString)
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        try {
+            val responsStrenger =
+                uuider.map { id ->
+                    try {
+                        val retId = godskrivOpptjeningService.stopp(id)
+                        if (retId == null) {
+                            "$id: Fant ikke godskrivingen"
+                        } else {
+                            "$id: Stoppet"
+                        }
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError()
+                .contentType(TEXT_PLAIN)
+                .body("Feil ved prosessering: $ex")
+        }
+    }
 
     @PostMapping(
         "/bestem/hent-oppgavestatus",
