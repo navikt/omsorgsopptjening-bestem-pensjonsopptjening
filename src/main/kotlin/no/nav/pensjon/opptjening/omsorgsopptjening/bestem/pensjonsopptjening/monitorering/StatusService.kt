@@ -34,21 +34,25 @@ class StatusService(
             return ApplicationStatus.IkkeKjort
         } else {
             if (meldingErForGammel(sisteMelding)) {
+                log.warn("Monitoring: Siste melding er for gammel")
                 return ApplicationStatus.Feil("Siste melding er for gammel")
             }
             if (feiledeMeldinger()) {
+                log.warn("Det finnes feilede persongrunnlagmeldinger")
                 return ApplicationStatus.Feil("Det finnes feilede persongrunnlagmeldinger")
             }
             if (forGammelSomIkkeErFerdig(eldsteUbehandlede)) {
+                log.warn("Det finnes gamle meldinger som ikke er ferdig behandlet")
                 return ApplicationStatus.Feil("Det finnes gamle meldinger som ikke er ferdig behandlet")
             }
             if (gamleOppgaverSomIkkeErFerdig()) {
-//                return ApplicationStatus.Feil("Det finnes gamle oppgaver som ikke er ferdig behandlet")
-                return ApplicationStatus.OK // Ingen synkronisering/sjekk, så oppgaver blir aldri ferdig
+                return ApplicationStatus.OK
             }
             if (ubehandledGodskrivOpptjening()) {
+                log.warn("Det finnes gamle godskrivinger som ikke er ferdig behandlet")
                 return ApplicationStatus.Feil("Det finnes gamle godskrivinger som ikke er ferdig behandlet")
             }
+            // TODO: implementere overvåking for brev (tilsvarende som for oppgaver)
         }
         return ApplicationStatus.OK
     }

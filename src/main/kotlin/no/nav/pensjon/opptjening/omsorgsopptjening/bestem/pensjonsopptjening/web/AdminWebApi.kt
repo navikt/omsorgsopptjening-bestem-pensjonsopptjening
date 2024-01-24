@@ -206,7 +206,7 @@ class AdminWebApi(
                         if (retId == null) {
                             "$id: Fant ikke brevet"
                         } else {
-                            "$id: Restartet"
+                            "$id: Stoppet"
                         }
                     } catch (ex: Throwable) {
                         "$id: Feilet, ${ex::class.simpleName}"
