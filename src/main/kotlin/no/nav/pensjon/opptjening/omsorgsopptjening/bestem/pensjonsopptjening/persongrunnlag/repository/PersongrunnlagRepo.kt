@@ -234,7 +234,7 @@ class PersongrunnlagRepo(
     fun finnEldsteSomIkkeErFerdig(): PersongrunnlagMelding? {
         return jdbcTemplate.query(
             """select * from melding
-                | where status <> 'Ferdig' AND status <> 'Stoppet'
+                | where status not in ('Ferdig','Stoppet','Avsluttet')
                 | order by opprettet asc limit 1""".trimMargin(),
             emptyMap<String,Any>(),
             PersongrunnlagMeldingMapper()

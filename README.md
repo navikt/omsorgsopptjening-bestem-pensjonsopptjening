@@ -139,3 +139,28 @@ oppdateres, og den aktuelle raden vil havne i karantene for videre prosessering 
 blokkerer prosesseringen av andre rader). Etter at karantenetiden er utløpt, vil raden forsøkes på nytt x
 antall ganger opp til et maksimum - når maksimum er nådd uten at raden er prosessert ferdig, vil statusen settes til `Feilet`
 og det vil være behov for manuell intervensjon.
+
+#### Manuell feilhåndtering
+
+Applikasjonen har et enkelt administrasjonsgrensesnitt tilgjengelig 
+I produksjon ligger dette på:
+https://omsorgsopptjening-bestem-pensjonsopptjening.intern.navn.no/
+I test på 
+https://omsorgsopptjening-bestem-pensjonsopptjening.intern.dev.nav.no/
+
+Dette tillater å gjøre vedlikeholdsoperasjoner i databasen.
+
+Grensesnittet har selv dokumentert de ulike operasjonene, men basisoperasjonene og statusene er som følger:
+* Å stoppe en melding vil avbryte videre prosessering og markere både meldingen og alle underementer som Stoppet. 
+* Stoppet er en status for videre manuell håndtering. En stoppet melding vil ikke behandles verken som feilet/uferdig
+  eller som ferdigstilt.
+* Stoppede meldinger er unntatt duplikatkontroll (for å muliggjøre rekjøring)
+* Rekjøring av en melding foregår ved at man først stopper meldingen (og dermed også alle underliggende elementer).
+  Deretter kopieres meldingen som en ny melding, som da vil prosesseres fra start.
+* Avslutting av en melding brukes når en melding har feilet permanent, og man ikke ønsker å gjøre noe videre med  
+  meldingen. En avsluttet melding behandles likt som en ferdig melding.
+* Avslutting av en melding vil ikke oppdatere underliggende elementer
+
+
+
+
