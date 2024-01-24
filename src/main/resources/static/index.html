@@ -72,6 +72,10 @@
                     setActionAndText("/bestem/stopp-godskriving", "Stopp godskriving")
                     setBeskrivelseEnabled(false)
                     break;
+                case "restart_godskriving":
+                    setActionAndText("/bestem/restart-godskriving", "Restart godskriving")
+                    setBeskrivelseEnabled(false)
+                    break;
                 case "kanseller_oppgaver":
                     setActionAndText("/bestem/kanseller-oppgaver", "Kanseller oppgaver")
                     setBeskrivelseEnabled(false)
@@ -210,6 +214,7 @@
         <option value="restart_brev">Restart brev (begynn prosessering igjen fra klar)</option>
         <option value="stopp_brev">Stopp brev</option>
         <option value="stopp_godskriving">Stopp godskriving</option>
+        <option value="restart_godskriving">Stopp godskriving</option>
         <!-- option value="test">TEST (intern, midlertidig)</option -->
     </select>
 </form>

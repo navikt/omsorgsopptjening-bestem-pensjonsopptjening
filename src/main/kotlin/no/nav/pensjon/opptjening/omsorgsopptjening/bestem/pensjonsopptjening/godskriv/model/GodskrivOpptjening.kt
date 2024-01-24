@@ -48,6 +48,14 @@ sealed class GodskrivOpptjening {
             return copy(statushistorikk = statushistorikk + status.stoppet())
         }
 
+        fun klar(): Persistent {
+            return if (status is Status.Klar) {
+                this
+            } else {
+                return copy(statushistorikk = statushistorikk + status.klar())
+            }
+        }
+
         fun opprettOppgave(): Oppgave.Transient? {
             return if (status is Status.Feilet) {
                 Oppgave.Transient(
@@ -83,6 +91,10 @@ sealed class GodskrivOpptjening {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
         }
 
+        open fun klar(): Status {
+            throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Klar")
+        }
+
         @JsonTypeName("Klar")
         data class Klar(
             val tidspunkt: Instant = Instant.now()
@@ -112,7 +124,11 @@ sealed class GodskrivOpptjening {
         @JsonTypeName("Stoppet")
         data class Stoppet(
             val tidspunkt: Instant = Instant.now()
-        ) : Status()
+        ) : Status() {
+            override fun klar(): Status {
+                return Klar()
+            }
+        }
 
         @JsonTypeName("Retry")
         data class Retry(
@@ -124,6 +140,10 @@ sealed class GodskrivOpptjening {
         ) : Status() {
             override fun ferdig(): Ferdig {
                 return Ferdig()
+            }
+
+            override fun klar(): Status {
+                return Klar()
             }
 
             override fun retry(melding: String): Status {
@@ -157,6 +177,10 @@ sealed class GodskrivOpptjening {
         ) : Status() {
             override fun stoppet(): Stoppet {
                 return Stoppet()
+            }
+
+            override fun klar(): Status {
+                return Klar()
             }
         }
     }

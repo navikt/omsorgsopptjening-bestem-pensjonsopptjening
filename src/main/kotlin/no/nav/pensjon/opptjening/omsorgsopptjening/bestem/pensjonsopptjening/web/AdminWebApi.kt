@@ -1,7 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.web
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult
@@ -246,6 +245,41 @@ class AdminWebApi(
                             "$id: Fant ikke godskrivingen"
                         } else {
                             "$id: Stoppet"
+                        }
+                    } catch (ex: Throwable) {
+                        "$id: Feilet, ${ex::class.simpleName}"
+                    }
+                }
+            val respons = responsStrenger.joinToString("\n")
+            return ResponseEntity.ok(respons)
+        } catch (ex: Throwable) {
+            return ResponseEntity.internalServerError()
+                .contentType(TEXT_PLAIN)
+                .body("Feil ved prosessering: $ex")
+        }
+    }
+
+    @PostMapping("/bestem/restart-godskriving", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    fun restartGodskriving(
+        @RequestParam("uuidliste") oppgaverString: String,
+        @RequestParam("begrunnelse") begrunnelse: String? = null
+    ): ResponseEntity<String> {
+
+        val uuider = try {
+            parseUUIDListe(oppgaverString)
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene")
+        }
+
+        try {
+            val responsStrenger =
+                uuider.map { id ->
+                    try {
+                        val retId = godskrivOpptjeningService.restart(id)
+                        if (retId == null) {
+                            "$id: Fant ikke godskrivingen"
+                        } else {
+                            "$id: Restartet"
                         }
                     } catch (ex: Throwable) {
                         "$id: Feilet, ${ex::class.simpleName}"
