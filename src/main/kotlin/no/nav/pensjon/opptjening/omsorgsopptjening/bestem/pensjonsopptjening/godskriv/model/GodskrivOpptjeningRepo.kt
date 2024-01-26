@@ -154,9 +154,9 @@ class GodskrivOpptjeningRepo(
         )
     }
 
-    fun frigiGamleLåser() {
+    fun frigiGamleLåser() : Int {
         val oneHourAgo = Instant.now(clock).minus(1.hours.toJavaDuration()).toString()
-        jdbcTemplate.update(
+        return jdbcTemplate.update(
             """update godskriv_opptjening set lockId = null, lockTime = null 
             |where lockId is not null and lockTime < :oneHourAgo::timestamptz""".trimMargin(),
             mapOf<String, Any>(

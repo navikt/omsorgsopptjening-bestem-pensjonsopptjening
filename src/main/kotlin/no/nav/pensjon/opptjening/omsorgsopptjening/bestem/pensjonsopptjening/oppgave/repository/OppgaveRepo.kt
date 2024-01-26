@@ -183,9 +183,9 @@ class OppgaveRepo(
         )
     }
 
-    fun frigiGamleLåser() {
+    fun frigiGamleLåser() : Int {
         val oneHourAgo = Instant.now(clock).minus(1.hours.toJavaDuration()).toString()
-        jdbcTemplate.update("""update oppgave set lockId = null, lockTime = null 
+        return jdbcTemplate.update("""update oppgave set lockId = null, lockTime = null 
             |where lockId is not null and lockTime < :oneHourAgo::timestamptz""".trimMargin(),
             mapOf<String,Any> (
                 "oneHourAgo" to oneHourAgo

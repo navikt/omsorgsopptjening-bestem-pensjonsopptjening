@@ -18,14 +18,16 @@ class FrigiLaserTask(
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
-    @Scheduled(cron = "*/15 * * * * *")
+    @Scheduled(cron = "0 * * * * *")
     fun run() {
         try {
-            log.info("Frigir gamle låser")
-            meldingRepo.frigiGamleLåser()
-            oppgaveRepo.frigiGamleLåser()
-            brevRepo.frigiGamleLåser()
-            godskrivOpptjeningRepo.frigiGamleLåser()
+            val antallMeldinger = meldingRepo.frigiGamleLåser()
+            val antallOppgaver = oppgaveRepo.frigiGamleLåser()
+            val antallBrev = brevRepo.frigiGamleLåser()
+            val antallGodskrivinger = godskrivOpptjeningRepo.frigiGamleLåser()
+            if (antallMeldinger + antallOppgaver + antallBrev + antallGodskrivinger > 0) {
+                log.info("Frigjorde gamle låser: meldinger:$antallMeldinger oppgaver:$antallOppgaver brev:$antallBrev godskrivinger:$antallGodskrivinger")
+            }
         } catch(ex: Throwable) {
             log.error("Feil ved frigiving av gamle låser", ex)
         }
