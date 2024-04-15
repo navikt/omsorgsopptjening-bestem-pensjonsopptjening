@@ -12,10 +12,20 @@ import java.time.LocalDateTime
 
 internal data class PdlResponse(
     val data: PdlData,
-    private val errors: List<PdlError>? = null
+    private val errors: List<PdlError>? = null,
+    private val extensions: Extensions? = null,
 ) {
     val error: PdlError? = errors?.firstOrNull()
+    val warnings: List<Extension>? = extensions?.warnings
 }
+
+internal data class Extensions(
+    val warnings: List<Extension>? = null
+)
+
+internal data class Extension(
+    val code: String
+)
 
 internal data class PdlData(
     val hentPerson: HentPersonQueryResponse?
