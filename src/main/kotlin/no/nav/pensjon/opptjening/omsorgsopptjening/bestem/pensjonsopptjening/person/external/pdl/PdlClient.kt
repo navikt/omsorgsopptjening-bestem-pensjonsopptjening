@@ -4,6 +4,8 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
@@ -26,6 +28,10 @@ internal class PdlClient(
     registry: MeterRegistry,
     private val graphqlQuery: GraphqlQuery,
 ) {
+    companion object {
+        private val log: Logger = LoggerFactory.getLogger(this::class.java)
+    }
+
     private val antallPersonerHentet = registry.counter("personer", "antall", "hentet")
     private val antallAktoridHentet = registry.counter("aktorid", "antall", "hentet")
     private val restTemplate = RestTemplateBuilder().build()
@@ -38,16 +44,7 @@ internal class PdlClient(
     fun hentPerson(fnr: String): PdlResponse? {
         val entity = RequestEntity<PdlQuery>(
             PdlQuery(graphqlQuery.hentPersonQuery(), FnrVariables(ident = fnr)),
-            HttpHeaders().apply {
-                add("Nav-Call-Id", Mdc.getCorrelationId())
-                add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
-                add("Tema", "PEN")
-                add(CorrelationId.identifier, Mdc.getCorrelationId())
-                add(InnlesingId.identifier, Mdc.getInnlesingId())
-                accept = listOf(MediaType.APPLICATION_JSON)
-                contentType = MediaType.APPLICATION_JSON
-                setBearerAuth(tokenProvider.getToken())
-            },
+            headers(),
             HttpMethod.POST,
             URI.create(pdlUrl)
         )
@@ -60,6 +57,8 @@ internal class PdlClient(
         response?.error?.extensions?.code?.also {
             if (it == PdlErrorCode.SERVER_ERROR) throw PdlException(response.error)
         }
+        response?.warnings?.let { log.warn(it.toString()) }
+
         antallPersonerHentet.increment()
         return response
     }
@@ -67,16 +66,7 @@ internal class PdlClient(
     internal fun hentAktorId(fnr: String): IdenterResponse? {
         val entity = RequestEntity<PdlQuery>(
             PdlQuery(graphqlQuery.hentAktørIdQuery(), FnrVariables(ident = fnr)),
-            HttpHeaders().apply {
-                add("Nav-Call-Id", Mdc.getCorrelationId())
-                add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
-                add("Tema", "PEN")
-                add(CorrelationId.identifier, Mdc.getCorrelationId())
-                add(InnlesingId.identifier, Mdc.getInnlesingId())
-                accept = listOf(MediaType.APPLICATION_JSON)
-                contentType = MediaType.APPLICATION_JSON
-                setBearerAuth(tokenProvider.getToken())
-            },
+            headers(),
             HttpMethod.POST,
             URI.create(pdlUrl)
         )
@@ -91,6 +81,20 @@ internal class PdlClient(
         }
         antallAktoridHentet.increment()
         return response
+    }
+
+    private fun headers(): HttpHeaders {
+        return HttpHeaders().apply {
+            add("Nav-Call-Id", Mdc.getCorrelationId())
+            add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
+            add("Tema", "PEN")
+            add("behandlingsnummer", "B300")
+            add(CorrelationId.identifier, Mdc.getCorrelationId())
+            add(InnlesingId.identifier, Mdc.getInnlesingId())
+            accept = listOf(MediaType.APPLICATION_JSON)
+            contentType = MediaType.APPLICATION_JSON
+            setBearerAuth(tokenProvider.getToken())
+        }
     }
 }
 
