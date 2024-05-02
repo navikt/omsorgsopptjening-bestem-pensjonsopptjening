@@ -34,7 +34,7 @@ class PENBrevClient(
 
     companion object {
         fun sendBrevUrl(baseUrl: String, sakId: String): String {
-            return "$baseUrl/springapi/brev/sak/$sakId/PE_OMSORG_HJELPESTOENAD_AUTO"
+            return "$baseUrl/api/brev/sak/$sakId/PE_OMSORG_HJELPESTOENAD_AUTO"
         }
 
         private val log = LoggerFactory.getLogger(this::class.java)
