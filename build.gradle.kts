@@ -1,36 +1,37 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val domeneVersion = "1.0.65"
+val domeneVersion = "1.0.69"
 val azureAdClient = "0.0.7"
-val jacksonVersion = "2.15.3"
+val jacksonVersion = "2.17.1"
 val logbackEncoderVersion = "7.4"
-val postgresqlVersion = "42.7.1"
+val postgresqlVersion = "42.7.3"
 val flywayCoreVersion = "9.22.3" // 10.x krever nyere postgres-database
-val springKafkaTestVersion = "3.1.1"
+val springKafkaTestVersion = "3.2.0"
 val springCloudContractVersion = "4.0.4"
-val testcontainersVersion = "1.19.3"
-val mockkVersion = "1.13.9"
-val assertJVersion = "3.25.1"
+val testcontainersVersion = "1.19.8"
+val mockkVersion = "1.13.11"
+val assertJVersion = "3.26.0"
 val jsonAssertVersion = "1.5.1"
-val wiremockVersion = "2.35.1"
-val mockitoVersion = "5.2.1"
-val unleashVersion = "9.2.0"
-val navTokenSupportVersion = "4.0.3"
+val wiremockVersion = "3.6.0"
+val mockitoVersion = "5.3.1"
+val unleashVersion = "9.2.2"
+val navTokenSupportVersion = "4.1.8"
 val hibernateValidatorVersion = "8.0.1.Final"
 
 
 val snakeYamlVersion = "2.2"
 val snappyJavaVersion = "1.1.10.5"
-val httpClient5Version = "5.3"
+val httpClient5Version = "5.3.1"
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {
-    val kotlinVersion = "1.9.22"
+    val kotlinVersion = "2.0.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.2.1"
-    id("com.github.ben-manes.versions") version "0.50.0"
+    id("org.springframework.boot") version "3.3.0"
+    id("com.github.ben-manes.versions") version "0.51.0"
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -92,12 +93,12 @@ dependencies {
     testImplementation("org.skyscreamer:jsonassert:$jsonAssertVersion")
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoVersion")
     testImplementation("io.mockk:mockk:${mockkVersion}")
-    testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:$wiremockVersion")
+    testImplementation("org.wiremock:wiremock-jetty12:$wiremockVersion")
     testImplementation("org.assertj:assertj-core:$assertJVersion")
     testImplementation("no.nav.security:token-validation-spring-test:$navTokenSupportVersion")
 
-
-
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
 }
 
 tasks.test {
@@ -105,9 +106,9 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
+    compilerOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "21"
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 

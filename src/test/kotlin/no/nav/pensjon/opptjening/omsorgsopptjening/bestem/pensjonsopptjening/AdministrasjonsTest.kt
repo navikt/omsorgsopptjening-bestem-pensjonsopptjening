@@ -293,7 +293,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetmeldingId)
-        val stoppetOppgave = oppgaveRepo.findForMelding(stoppetmeldingId)!!.single()
+        val stoppetOppgave = oppgaveRepo.findForMelding(stoppetmeldingId).single()
 
         val behandling = handler.process()!!.single()
         val nyOppgave = oppgaveRepo.findForBehandling(behandling.alle().single().id).single()
@@ -315,7 +315,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetMeldingId)
-        val stoppetBrev = brevRepository.findForMelding(stoppetMeldingId)!!.single()
+        val stoppetBrev = brevRepository.findForMelding(stoppetMeldingId).single()
 
         val behandling = handler.process()!!.single()
 
@@ -338,7 +338,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetMeldingId)
-        val stoppetGodskriv = godskrivOpptjeningRepo.findForMelding(stoppetMeldingId)!!.single()
+        val stoppetGodskriv = godskrivOpptjeningRepo.findForMelding(stoppetMeldingId).single()
 
         val behandling = handler.process()!!.single()
 
