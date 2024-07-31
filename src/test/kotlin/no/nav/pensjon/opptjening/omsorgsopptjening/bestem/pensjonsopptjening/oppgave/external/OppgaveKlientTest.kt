@@ -107,7 +107,7 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `henter info for oppgave`() {
-        val oppgaveId = 1234;
+        val oppgaveId = 1234
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
                 wiremock.givenThat(
@@ -156,7 +156,7 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `kansellere en oppgave som finnes`() {
-        val oppgaveId = 1234;
+        val oppgaveId = 1234
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
                 wiremock.givenThat(

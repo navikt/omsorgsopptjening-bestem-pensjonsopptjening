@@ -212,7 +212,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `kan avslutte en transaksjon`() {
-        val begrunnelse = "Fordi jeg vil!";
+        val begrunnelse = "Fordi jeg vil!"
         val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
         handler.avsluttMelding(meldingsId, begrunnelse)
         repo.find(meldingsId).let { melding ->
