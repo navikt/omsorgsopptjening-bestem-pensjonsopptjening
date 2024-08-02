@@ -75,15 +75,19 @@ internal class PoppClient(
     }
 
     override fun hentPensjonspoengForOmsorgstype(fnr: String, år: Int, type: DomainOmsorgstype): Pensjonspoeng.Omsorg {
-        val url = "$baseUrl/pensjonspoeng?fomAr=$år&tomAr=$år&pensjonspoengType=${PoppOmsorgType.from(type)}"
+        val url = "$baseUrl/pensjonspoeng/hent"
         try {
             return restTemplate.exchange(
                 url,
-                HttpMethod.GET,
+                HttpMethod.POST,
                 HttpEntity(
-                    null,
+                    HentPensjonspoengListeRequest(
+                        fnr = fnr,
+                        fomAr = år,
+                        tomAr = år,
+                        pensjonspoengType = PoppOmsorgType.from(type).toString(),
+                    ),
                     HttpHeaders().apply {
-                        add("fnr", fnr)
                         add("Nav-Call-Id", Mdc.getCorrelationId())
                         add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
                         add(CorrelationId.identifier, Mdc.getCorrelationId())
@@ -112,15 +116,19 @@ internal class PoppClient(
     }
 
     override fun hentPensjonspoengForInntekt(fnr: String, år: Int): Pensjonspoeng.Inntekt {
-        val url = "$baseUrl/pensjonspoeng?fomAr=$år&tomAr=$år&pensjonspoengType=${PoppOmsorgType.PPI}"
+        val url = "$baseUrl/pensjonspoeng/hent"
         try {
             return restTemplate.exchange(
                 url,
-                HttpMethod.GET,
+                HttpMethod.POST,
                 HttpEntity(
-                    null,
+                    HentPensjonspoengListeRequest(
+                        fnr = fnr,
+                        fomAr = år,
+                        tomAr = år,
+                        pensjonspoengType = "PPI",
+                    ),
                     HttpHeaders().apply {
-                        add("fnr", fnr)
                         add("Nav-Call-Id", Mdc.getCorrelationId())
                         add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
                         add(CorrelationId.identifier, Mdc.getCorrelationId())
