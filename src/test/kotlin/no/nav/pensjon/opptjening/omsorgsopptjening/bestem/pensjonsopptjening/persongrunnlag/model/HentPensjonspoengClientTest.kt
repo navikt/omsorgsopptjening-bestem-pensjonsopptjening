@@ -1,11 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
-import com.github.tomakehurst.wiremock.client.WireMock.aResponse
-import com.github.tomakehurst.wiremock.client.WireMock.equalTo
-import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
-import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
-import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
@@ -40,7 +35,7 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innsendingId ->
                 wiremock.givenThat(
-                    get(urlPathEqualTo(POPP_PENSJONSPOENG_PATH)).willReturn(
+                    post(urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent")).willReturn(
                         aResponse()
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -133,8 +128,16 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
                 )
 
                 wiremock.verify(
-                    getRequestedFor(urlEqualTo("/api/pensjonspoeng?fomAr=2022&tomAr=2022&pensjonspoengType=OBO6H"))
-                        .withHeader("fnr", equalTo("12345"))
+                    postRequestedFor(urlEqualTo("/api/pensjonspoeng/hent"))
+                        .withRequestBody(equalToJson(
+                            """
+                            {
+                                "fnr" : "12345",
+                                "fomAr": 2022,
+                                "tomAr": 2022,
+                                "pensjonspoengType": "OBO6H"
+                            }
+                        """.trimIndent()))
                         .withHeader("Nav-Call-Id", equalTo(correlationId.toString()))
                         .withHeader("Nav-Consumer-Id", equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
                         .withHeader("x-correlation-id", equalTo(correlationId.toString()))
@@ -145,8 +148,16 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
                 )
 
                 wiremock.verify(
-                    getRequestedFor(urlEqualTo("/api/pensjonspoeng?fomAr=2023&tomAr=2023&pensjonspoengType=PPI"))
-                        .withHeader("fnr", equalTo("12345"))
+                    postRequestedFor(urlEqualTo("/api/pensjonspoeng/hent"))
+                        .withRequestBody(equalToJson(
+                            """
+                            {
+                                "fnr" : "12345",
+                                "fomAr": 2023,
+                                "tomAr": 2023,
+                                "pensjonspoengType": "PPI"
+                            }
+                        """.trimIndent()))
                         .withHeader("Nav-Call-Id", equalTo(correlationId.toString()))
                         .withHeader("Nav-Consumer-Id", equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
                         .withHeader("x-correlation-id", equalTo(correlationId.toString()))
@@ -164,15 +175,15 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
                 wiremock.givenThat(
-                    get(urlPathEqualTo(POPP_PENSJONSPOENG_PATH)).willReturn(
+                    post(urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent")).willReturn(
                         aResponse()
                             .withHeader("Content-Type", "application/json")
                             .withBody(
                                 """
-                        {
-                            "pensjonspoeng": null
-                        }
-                    """.trimIndent()
+                                    {
+                                        "pensjonspoeng": null
+                                    }
+                                """.trimIndent()
                             )
                     )
                 )
@@ -242,7 +253,7 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
                 wiremock.givenThat(
-                    get(urlPathEqualTo(POPP_PENSJONSPOENG_PATH)).willReturn(
+                    post(urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent")).willReturn(
                         aResponse()
                             .withHeader("Content-Type", "application/json")
                             .withBody(

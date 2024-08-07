@@ -12,13 +12,14 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
-import java.net.URL
+import java.net.URI
 import java.time.Year
 import kotlin.test.Test
 
@@ -53,7 +54,7 @@ class PENBrevClientTest(
     fun `kaster exception dersom kall ikke gikk bra`() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
-                val path = URL(PENBrevClient.sendBrevUrl(baseUrl,"42")).path
+                val path = URI(PENBrevClient.sendBrevUrl(baseUrl,"42")).toURL().path
                 wiremock.givenThat(
                     post(urlPathEqualTo(path))
                         .willReturn(serverError())
@@ -73,7 +74,7 @@ class PENBrevClientTest(
     @Test
     fun `returnerer id for opprettet brev hvis kall går bra`() {
         val sakId = "42"
-        val path = URL(PENBrevClient.sendBrevUrl(baseUrl, sakId)).path
+        val path = URI(PENBrevClient.sendBrevUrl(baseUrl, sakId)).toURL().path
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
                 wiremock.givenThat(
@@ -107,7 +108,7 @@ class PENBrevClientTest(
     @Test
     fun `returnerer ikke funnet hvis vedtak ikke finnes`() {
         val sakId = "42"
-        val path = URL(PENBrevClient.sendBrevUrl(baseUrl, sakId)).path
+        val path = URI(PENBrevClient.sendBrevUrl(baseUrl, sakId)).toURL().path
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
                 wiremock.givenThat(
@@ -141,7 +142,7 @@ class PENBrevClientTest(
     @Test
     fun `returnerer feilårsak dersom opprettelse av brev feilet`() {
         val sakId = "42"
-        val path = URL(PENBrevClient.sendBrevUrl(baseUrl, sakId)).path
+        val path = URI(PENBrevClient.sendBrevUrl(baseUrl, sakId)).toURL().path
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
                 wiremock.givenThat(
@@ -177,7 +178,7 @@ class PENBrevClientTest(
     @Test
     fun `returnerer feilårsak dersom opprettelse av brev lykkes men med feilmelding`() {
         val sakId = "42"
-        val path = URL(PENBrevClient.sendBrevUrl(baseUrl, sakId)).path
+        val path = URI(PENBrevClient.sendBrevUrl(baseUrl, sakId)).toURL().path
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
                 wiremock.givenThat(

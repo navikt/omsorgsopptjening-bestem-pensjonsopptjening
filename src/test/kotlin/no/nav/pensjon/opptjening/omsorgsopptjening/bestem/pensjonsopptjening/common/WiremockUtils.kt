@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.common.FileSource
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.extension.Parameters
@@ -11,6 +12,7 @@ import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer
 import com.github.tomakehurst.wiremock.http.Request
 import com.github.tomakehurst.wiremock.http.ResponseDefinition
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.POPP_PENSJONSPOENG_PATH
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 
 /**
@@ -80,8 +82,12 @@ fun WireMockExtension.stubForPdlTransformer() {
 
 fun WireMockExtension.ingenPensjonspoeng(fnr: String){
     this.stubFor(
-        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.POPP_PENSJONSPOENG_PATH))
-            .withHeader("fnr", WireMock.equalTo(fnr))
+        WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+            .withRequestBody(equalToJson("""
+                {
+                  "fnr" : "$fnr"
+                }
+            """.trimIndent(), true, true))
             .willReturn(
                 WireMock.aResponse()
                     .withHeader("Content-Type", "application/json")

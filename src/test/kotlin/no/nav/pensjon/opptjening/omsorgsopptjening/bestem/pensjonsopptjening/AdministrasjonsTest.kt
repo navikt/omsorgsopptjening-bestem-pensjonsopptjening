@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
@@ -86,8 +87,16 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     fun lagreOgProsesserMeldingSomGirBrev(): UUID {
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.givenThat(
-            WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", WireMock.equalTo("04010012797")) //far
+            WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(
+                    equalToJson(
+                        """{ 
+                                  "fnr": "04010012797"
+                            }                       
+                              """.trimIndent(),
+                        true, false,
+                    )
+                )
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -212,7 +221,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `kan avslutte en transaksjon`() {
-        val begrunnelse = "Fordi jeg vil!";
+        val begrunnelse = "Fordi jeg vil!"
         val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
         handler.avsluttMelding(meldingsId, begrunnelse)
         repo.find(meldingsId).let { melding ->
@@ -293,7 +302,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetmeldingId)
-        val stoppetOppgave = oppgaveRepo.findForMelding(stoppetmeldingId)!!.single()
+        val stoppetOppgave = oppgaveRepo.findForMelding(stoppetmeldingId).single()
 
         val behandling = handler.process()!!.single()
         val nyOppgave = oppgaveRepo.findForBehandling(behandling.alle().single().id).single()
@@ -315,7 +324,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetMeldingId)
-        val stoppetBrev = brevRepository.findForMelding(stoppetMeldingId)!!.single()
+        val stoppetBrev = brevRepository.findForMelding(stoppetMeldingId).single()
 
         val behandling = handler.process()!!.single()
 
@@ -338,7 +347,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetMeldingId)
-        val stoppetGodskriv = godskrivOpptjeningRepo.findForMelding(stoppetMeldingId)!!.single()
+        val stoppetGodskriv = godskrivOpptjeningRepo.findForMelding(stoppetMeldingId).single()
 
         val behandling = handler.process()!!.single()
 
@@ -416,7 +425,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                 .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
                 .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
                 .withRequestBody(
-                    WireMock.equalToJson(
+                    equalToJson(
                         """
                             {
                                 "versjon":2,
@@ -580,7 +589,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                 .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
                 .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
                 .withRequestBody(
-                    WireMock.equalToJson(
+                    equalToJson(
                         """
                             {
                                 "versjon":2,
@@ -662,7 +671,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                 .withHeader("X-Correlation-ID", WireMock.equalTo(correlationId.toString()))
                 .withHeader("x-innlesing-id", WireMock.equalTo(innlesingId.toString()))
                 .withRequestBody(
-                    WireMock.equalToJson(
+                    equalToJson(
                         """
                             {
                                 "versjon":2,

@@ -43,20 +43,24 @@ object StatusServiceTest {
 
     @BeforeAll
     fun beforeAll() {
-        dataSource = PostgresqlTestContainer.createInstance("test-status")
-        val flyway =
-            Flyway.configure()
-                .dataSource(dataSource)
-                .locations("classpath:db/migration")
-                .load()
-        flyway.migrate()
+        try {
+            dataSource = PostgresqlTestContainer.createInstance("test-status")
+            val flyway =
+                Flyway.configure()
+                    .dataSource(dataSource)
+                    .locations("classpath:db/migration")
+                    .load()
+            flyway.migrate()
 
-        jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
-        oppgaveRepo = OppgaveRepo(jdbcTemplate)
-        personGrunnlagRepo = PersongrunnlagRepo(jdbcTemplate)
-        behandlingRepo = BehandlingRepo(jdbcTemplate)
-        godskrivOpptjeningRepo = GodskrivOpptjeningRepo(jdbcTemplate)
-        statusService = StatusService(oppgaveRepo, behandlingRepo, personGrunnlagRepo, godskrivOpptjeningRepo)
+            jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
+            oppgaveRepo = OppgaveRepo(jdbcTemplate)
+            personGrunnlagRepo = PersongrunnlagRepo(jdbcTemplate)
+            behandlingRepo = BehandlingRepo(jdbcTemplate)
+            godskrivOpptjeningRepo = GodskrivOpptjeningRepo(jdbcTemplate)
+            statusService = StatusService(oppgaveRepo, behandlingRepo, personGrunnlagRepo, godskrivOpptjeningRepo)
+        } catch(ex: Exception) {
+            ex.printStackTrace()
+        }
     }
 
     @BeforeEach

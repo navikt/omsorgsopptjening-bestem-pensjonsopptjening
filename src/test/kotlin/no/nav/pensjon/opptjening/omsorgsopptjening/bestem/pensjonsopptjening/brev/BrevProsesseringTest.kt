@@ -4,12 +4,9 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external.PENBrevClient.Companion.sendBrevUrl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.*
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
@@ -31,13 +28,12 @@ import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.mock.mockito.MockBean
-import java.net.URL
+import java.net.URI
 import java.time.Clock
 import java.time.Instant
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
-import kotlin.test.assertContains
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 
@@ -77,7 +73,7 @@ class BrevProsesseringTest(
         wiremock.ingenPensjonspoeng("04010012797") //far
         wiremock.bestemSakOk()
 
-        val sendBrevPath = URL(sendBrevUrl(baseUrl, "12345")).path
+        val sendBrevPath = URI(sendBrevUrl(baseUrl, "12345")).toURL().path
 
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo(sendBrevPath))
@@ -199,7 +195,7 @@ class BrevProsesseringTest(
 
     @Test
     fun `gitt at en melding har blitt prosessert på nytt uten hell maks antall ganger skal det opprettes en oppgave`() {
-        val sendBrevPath = URL(sendBrevUrl(baseUrl, "42")).path
+        val sendBrevPath = URI(sendBrevUrl(baseUrl, "42")).toURL().path
 
         wiremock.stubForPdlTransformer()
         wiremock.ingenPensjonspoeng("12345678910") //mor

@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
@@ -62,8 +63,12 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     fun `innvilget omsorgsopptjening for barn over 6 år skal sende brev dersom omsorgsyter ikke mottok omsorgspoeng i året før omsorgsåret`() {
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.givenThat(
-            WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", WireMock.equalTo("04010012797")) //far
+            WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(equalToJson("""
+                    {
+                        "fnr" : "04010012797"
+                    }
+                """.trimIndent(), false, true))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -131,9 +136,13 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     @Test
     fun `innvilget omsorgsopptjening for barn over 6 år skal sende brev dersom omsorgsyters omsorgspoeng som godskrives er høyere enn annen forelders pensjonspoeng for inntekt i omsorgsåret`() {
         wiremock.givenThat(
-            WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", WireMock.equalTo("12345678910")) //mor
-                .withQueryParam("fomAr", WireMock.equalTo("2019"))
+            WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(equalToJson("""
+                    {
+                       "fnr": "12345678910",
+                       "fomAr": 2019
+                    }
+                """.trimIndent(), false, true))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -154,8 +163,12 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", WireMock.equalTo("04010012797")) //far
+            WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(equalToJson("""
+                    {
+                        "fnr" : "04010012797"
+                    }
+                """.trimIndent(), false, true))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -217,9 +230,13 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     @Test
     fun `innvilget omsorgsopptjening for barn over 6 år skal ikke sende brev dersom omsorgsyters omsorgspoeng som godskrives er lavere enn annen forelders pensjonspoeng for inntekt i omsorgsåret`() {
         wiremock.givenThat(
-            WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", WireMock.equalTo("12345678910")) //mor
-                .withQueryParam("fomAr", WireMock.equalTo("2019"))
+            WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(equalToJson("""
+                    {
+                        "fnr" : "12345678910",
+                        "fomAr": 2019
+                    }
+                """.trimIndent(), false, true))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -240,8 +257,12 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", WireMock.equalTo("04010012797")) //far
+            WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(equalToJson("""
+                    {
+                        "fnr" : "04010012797"
+                    }
+                """.trimIndent(), false, true))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -307,8 +328,12 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     fun `innvilget omsorgsopptjening for barn over 6 år skal bare sende 1 brev`() {
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.givenThat(
-            WireMock.get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", WireMock.equalTo("04010012797")) //far
+            WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(equalToJson("""
+                    {
+                        "fnr" : "04010012797"
+                    }
+                """.trimIndent(), false, true))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")

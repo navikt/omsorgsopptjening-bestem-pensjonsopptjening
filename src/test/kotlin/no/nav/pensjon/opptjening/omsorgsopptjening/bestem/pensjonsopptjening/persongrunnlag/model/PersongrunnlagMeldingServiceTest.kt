@@ -2,10 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.aResponse
-import com.github.tomakehurst.wiremock.client.WireMock.containing
-import com.github.tomakehurst.wiremock.client.WireMock.equalTo
-import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
@@ -1250,9 +1247,17 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     @Test
     fun `en omsorgsyter som mottar barnetrygd for en omsorgsmottaker over 6 år med hjelpestønad skal innvilges omsorgsopptjening dersom barnetrygd og hjelpestønad har et halvt år eller mer overlappende måneder`() {
         wiremock.givenThat(
-            get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", equalTo("12345678910")) //mor
-                .withQueryParam("fomAr", equalTo("2019"))
+            post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(
+                    equalToJson(
+                        """
+                            {
+                                "fnr" : "12345678910",
+                                "fomAr": 2019
+                            }
+                        """.trimIndent(), false, true
+                    )
+                )
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -1273,9 +1278,17 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", equalTo("12345678910")) //mor
-                .withQueryParam("fomAr", equalTo("2020"))
+            post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(
+                    equalToJson(
+                        """
+                    {
+                        "fnr" : "12345678910",
+                        "fomAr" : 2020
+                    }
+                """, false, true
+                    )
+                )
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -1296,8 +1309,16 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            get(WireMock.urlPathEqualTo(POPP_PENSJONSPOENG_PATH))
-                .withHeader("fnr", equalTo("04010012797")) //far
+            post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
+                .withRequestBody(
+                    equalToJson(
+                        """
+                    {
+                        "fnr" : "04010012797"
+                    }
+                """.trimIndent(), false, true
+                    )
+                )
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -1790,7 +1811,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsyterNyttFnr
             )
             assertThat(behandling.grunnlag.grunnlag.persongrunnlag.flatMap { it.omsorgsmottakere().map { it.fnr } }
-                           .single()).isEqualTo(
+                .single()).isEqualTo(
                 omsorgsmottakerNyttFnr
             )
         }
