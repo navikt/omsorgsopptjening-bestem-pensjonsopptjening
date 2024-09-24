@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsgrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåned
@@ -56,6 +57,7 @@ data class Persongrunnlag(
     val omsorgsyter: Person,
     val omsorgsperioder: List<Omsorgsperiode>,
     val hjelpestønadperioder: List<Hjelpestønadperiode>,
+    val medlemskapsgrunnlag: Medlemskapsgrunnlag,
 ) {
     fun omsorgsmottakere(): Set<Person> {
         return (omsorgsperioder.map { it.omsorgsmottaker } + hjelpestønadperioder.map { it.omsorgsmottaker }).distinct().toSet()

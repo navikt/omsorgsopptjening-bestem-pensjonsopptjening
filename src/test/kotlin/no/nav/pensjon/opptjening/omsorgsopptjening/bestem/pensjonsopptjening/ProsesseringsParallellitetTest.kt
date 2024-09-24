@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.medlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
@@ -27,7 +28,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.Month
 import java.time.YearMonth
-import java.util.*
+import java.util.UUID
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
@@ -61,6 +62,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
+        wiremock.medlemIFolketrygden()
     }
 
     @Nested

@@ -6,7 +6,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.bre
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.bestemSakOk
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.medlemIFolketrygden
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
@@ -72,6 +77,7 @@ class BrevProsesseringTest(
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.ingenPensjonspoeng("04010012797") //far
         wiremock.bestemSakOk()
+        wiremock.medlemIFolketrygden()
 
         val sendBrevPath = URI(sendBrevUrl(baseUrl, "12345")).toURL().path
 
@@ -201,6 +207,7 @@ class BrevProsesseringTest(
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.ingenPensjonspoeng("04010012797") //far
         wiremock.bestemSakOk()
+        wiremock.medlemIFolketrygden()
 
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo(sendBrevPath))

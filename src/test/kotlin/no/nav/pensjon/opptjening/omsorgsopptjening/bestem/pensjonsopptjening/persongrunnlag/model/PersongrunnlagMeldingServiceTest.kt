@@ -2,23 +2,32 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.containing
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
+import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ikkeMedlemIFolketrygden
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.medlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AntallMånederRegel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsgrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarGyldigOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erEnesteAvslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnAlleAvslatte
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
@@ -70,6 +79,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
+        wiremock.medlemIFolketrygden()
     }
 
     @Test
@@ -1811,7 +1821,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                 omsorgsyterNyttFnr
             )
             assertThat(behandling.grunnlag.grunnlag.persongrunnlag.flatMap { it.omsorgsmottakere().map { it.fnr } }
-                .single()).isEqualTo(
+                           .single()).isEqualTo(
                 omsorgsmottakerNyttFnr
             )
         }
@@ -1864,7 +1874,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+            post(urlEqualTo(PDL_PATH))
                 .withRequestBody(containing(omsorgsmottakerFnr))
                 .willReturn(
                     aResponse()
@@ -1948,7 +1958,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         )
 
         wiremock.givenThat(
-            WireMock.post(WireMock.urlEqualTo(PDL_PATH))
+            post(urlEqualTo(PDL_PATH))
                 .withRequestBody(containing(omsorgsmottakerFnr))
                 .willReturn(
                     aResponse()
@@ -2012,6 +2022,57 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             assertThat(behandling.grunnlag.grunnlag.persongrunnlag.map { it.omsorgsyter.fnr }.single()).isEqualTo(
                 omsorgsyterNyttFnr
             )
+        }
+    }
+
+    @Test
+    fun `omsorgsyter som ikke er medlem i folketrygden gir avslag`() {
+        wiremock.ikkeMedlemIFolketrygden()
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2018, Month.SEPTEMBER),
+                                    tom = YearMonth.of(2025, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        handler.process()!!.first().single().also { behandling ->
+            behandling.assertAvslag(
+                omsorgsyter = "12345678910",
+                omsorgsmottaker = "07081812345"
+            )
+            assertTrue(behandling.vilkårsvurdering.erEnesteAvslag<OmsorgsyterErMedlemIFolketrygden.Vurdering>())
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErMedlemIFolketrygden.Vurdering>()
+                .also { vurdering ->
+                    assertInstanceOf(VilkårsvurderingUtfall.Avslag::class.java, vurdering.utfall)
+                    assertInstanceOf(
+                        OmsorgsyterErMedlemIFolketrygden.Grunnlag::class.java,
+                        vurdering.grunnlag
+                    ).also {
+                        assertThat(it.loveMEVurdering).isEqualTo(Medlemskapsgrunnlag.LoveMeVurdering.IKKE_MEDLEM_I_FOLKETRYGDEN)
+                    }
+                }
         }
     }
 
