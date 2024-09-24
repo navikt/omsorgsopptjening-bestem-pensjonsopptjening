@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.medlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -49,6 +50,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     fun `gitt to omsorgsytere med like mange omsorgsmåneder for samme barn i samme omsorgsår skal det opprettes oppgave for den som mottok i desember`() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
+        wiremock.medlemIFolketrygden()
 
         repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -162,6 +164,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     fun `gitt to omsorgsytere med like mange omsorgsmåneder for samme barn i samme omsorgsår kan det opprettes oppgave for begge dersom en av foreldrene inngår i en annen familiekonstellasjon hvor oppgave også skal opprettes`() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
+        wiremock.medlemIFolketrygden()
 
         repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -318,6 +321,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     fun `gitt to omsorgsytere med like mange omsorgsmåneder for samme barn i samme omsorgsår skal det opprettes oppgave for den som mottok i desember - hvis begge mottok i desember opprettes det for en av partene`() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
+        wiremock.medlemIFolketrygden()
 
         repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -430,6 +434,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     fun `gitt at to omsorgsytere har like mange omsorgsmåneder for flere barn innenfor samme omsorgsår opprettes det bare oppgave for det eldste barnet`() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
+        wiremock.medlemIFolketrygden()
 
         repo.lagre(
             PersongrunnlagMelding.Lest(

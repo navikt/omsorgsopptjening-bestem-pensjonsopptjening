@@ -63,7 +63,8 @@ data class Behandling(
             vurderVilkår.OmsorgsyterHarGyldigOmsorgsarbeid(),
             vurderVilkår.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(),
-            vurderVilkår.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr()
+            vurderVilkår.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr(),
+            vurderVilkår.OmsorgsyterErMedlemIFolketrygden(),
         )
     }
 

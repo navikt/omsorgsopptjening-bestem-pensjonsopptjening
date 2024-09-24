@@ -9,6 +9,7 @@ UNLEASH_SERVER_API_URL: http://localhost:9991/api
 UNLEASH_SERVER_API_TOKEN: "bogus"
 OMSORGSOPPTJENING_TOPIC: "pensjonopptjening.omsorgsopptjening"
 OMSORGSOPPTJENING_CONSUMER_GROUP: "omsorgsopptjening-bestem-pensjonsopptjening-test"
+MEDLEMSKAP_URL: http://localhost:9991/medlemskap
 GYLDIG_OPPTJENINGSAR: "2020"
 
 spring.datasource:

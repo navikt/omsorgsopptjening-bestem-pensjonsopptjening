@@ -105,6 +105,13 @@ sealed class OmsorgsopptjeningGrunnlag {
         )
     }
 
+    fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
+        return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            loveMEVurdering = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag.vurderingFraLoveME,
+            omsorgstype = omsorgstype
+        )
+    }
+
     fun forGyldigOmsorgsarbeidPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
         return grunnlag.persongrunnlag.associate {
             it.omsorgsyter to forGyldigOmsorgsarbeid(it.omsorgsyter)

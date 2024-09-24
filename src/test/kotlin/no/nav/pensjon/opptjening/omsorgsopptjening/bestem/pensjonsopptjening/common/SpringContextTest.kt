@@ -46,6 +46,7 @@ sealed class SpringContextTest {
         const val OPPGAVE_PATH = "/api/v1/oppgaver"
         const val POPP_OMSORG_PATH = "/api/omsorg"
         const val POPP_PENSJONSPOENG_PATH = "/api/pensjonspoeng"
+        const val MEDLEMSKAP_PATH = "/medlemskap"
     }
 
 

@@ -11,6 +11,9 @@ class TokenProviderConfig {
     @Bean("pdlTokenProvider")
     fun pdlTokenProvider(): TokenProvider = MockTokenProvider(MOCK_TOKEN)
 
+    @Bean("medlemskapTokenProvider")
+    fun medlemskapTokenProvider(): TokenProvider = MockTokenProvider(MOCK_TOKEN)
+
     @Bean("poppTokenProvider")
     fun poppTokenProvider(): TokenProvider = MockTokenProvider(MOCK_TOKEN)
 

@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.JuridiskHenvisning
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsgrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForBarnetrygd
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarGyldigOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
@@ -100,6 +102,12 @@ sealed class VilkårsvurderingDb {
         val grunnlag: GrunnlagVilkårsvurderingDb.GyldigOmsorgsarbeid,
         val utfall: VilkårsvurderingUtfallDb,
     ) : VilkårsvurderingDb()
+
+    @JsonTypeName("OmsorgsyterErMedlemIFolketrygden")
+    internal data class OmsorgsyterErMedlemIFolketrygden(
+        val grunnlag: GrunnlagVilkårsvurderingDb.MedlemIFolketrygden,
+        val utfall: VilkårsvurderingUtfallDb,
+    ) : VilkårsvurderingDb()
 }
 
 internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
@@ -186,6 +194,13 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
 
         is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> {
             VilkårsvurderingDb.OmsorgsyterHarGyldigOmsorgsarbeid(
+                grunnlag = grunnlag.toDb(),
+                utfall = utfall.toDb()
+            )
+        }
+
+        is OmsorgsyterErMedlemIFolketrygden.Vurdering -> {
+            VilkårsvurderingDb.OmsorgsyterErMedlemIFolketrygden(
                 grunnlag = grunnlag.toDb(),
                 utfall = utfall.toDb()
             )
@@ -359,6 +374,13 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
                 utfall = utfall.toDomain(),
             )
         }
+
+        is VilkårsvurderingDb.OmsorgsyterErMedlemIFolketrygden -> {
+            OmsorgsyterErMedlemIFolketrygden.Vurdering(
+                grunnlag = grunnlag.toDomain(),
+                utfall = utfall.toDomain(),
+            )
+        }
     }
 }
 
@@ -393,5 +415,33 @@ internal fun OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.toDb(): GrunnlagVilkårs
         omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder.måneder.map { it.toDb() }.toSet(),
         omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDb(),
         antallMånederRegel = antallMånederRegel.toDb(),
+    )
+}
+
+internal fun GrunnlagVilkårsvurderingDb.MedlemIFolketrygden.toDomain(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
+    return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+        loveMEVurdering = medlemskapsvurdering.toDomain(),
+        omsorgstype = omsorgstype.toDomain()
+    )
+}
+
+internal fun OmsorgsyterErMedlemIFolketrygden.Grunnlag.toDb(): GrunnlagVilkårsvurderingDb.MedlemIFolketrygden {
+    return GrunnlagVilkårsvurderingDb.MedlemIFolketrygden(
+        medlemskapsvurdering = loveMEVurdering.toDb(),
+        omsorgstype = omsorgstype.toDb()
+    )
+}
+
+internal fun Medlemskapsgrunnlag.toDb(): MedlemskapsgrunnlagDb {
+    return MedlemskapsgrunnlagDb(
+        vurderingFraOppslag = vurderingFraLoveME.toDb(),
+        rådata = rådata,
+    )
+}
+
+internal fun MedlemskapsgrunnlagDb.toDomain(): Medlemskapsgrunnlag {
+    return Medlemskapsgrunnlag(
+        vurderingFraLoveME = vurderingFraOppslag.toDomain(),
+        rådata = rådata,
     )
 }

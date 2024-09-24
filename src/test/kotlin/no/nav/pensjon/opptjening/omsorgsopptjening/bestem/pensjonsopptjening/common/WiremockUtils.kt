@@ -80,6 +80,42 @@ fun WireMockExtension.stubForPdlTransformer() {
     )
 }
 
+fun WireMockExtension.medlemIFolketrygden() {
+    this.stubFor(
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withBody("""{"resultat": {"svar":"JA"}}""")
+                    .withHeader("Content-Type", "application/json")
+            )
+    )
+}
+
+fun WireMockExtension.usikkertMedlemIFolketrygden() {
+    this.stubFor(
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withBody("""{"resultat": {"svar":"USIKKER"}}""")
+                    .withHeader("Content-Type", "application/json")
+            )
+    )
+}
+
+fun WireMockExtension.ikkeMedlemIFolketrygden() {
+    this.stubFor(
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withBody("""{"resultat": {"svar":"NEI"}}""")
+                    .withHeader("Content-Type", "application/json")
+            )
+    )
+}
+
 fun WireMockExtension.ingenPensjonspoeng(fnr: String){
     this.stubFor(
         WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
