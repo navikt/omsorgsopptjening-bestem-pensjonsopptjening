@@ -8,7 +8,7 @@ import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
 
-class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
+class OmsorgsyterHarTilstrekkeligOmsorgsarbeidDbTest {
 
     @Test
     fun `Gitt en mottaker født utenfor omsorgsår når det er minst seks måneder full omsorg så invilget`() {

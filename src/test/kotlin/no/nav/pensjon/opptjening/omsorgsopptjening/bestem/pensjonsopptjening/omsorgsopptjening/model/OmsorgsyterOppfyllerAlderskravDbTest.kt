@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.Month
 
-class OmsorgsyterOppfyllerAlderskravTest {
+class OmsorgsyterOppfyllerAlderskravDbTest {
 
     private val fnr = "01058512345"
     private val fødselsår = LocalDate.of(2000, Month.JANUARY, 1)
