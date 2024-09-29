@@ -14,8 +14,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.willAnswer
@@ -95,9 +94,9 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.first().single().also { behandling ->
-            assertFalse(behandling.erInnvilget())
-            assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForMelding(behandling.meldingId))
-            assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
+            assertThat(behandling.erInnvilget()).isFalse()
+            assertThat(oppgaveRepo.findForMelding(behandling.meldingId)).isEmpty()
+            assertThat(oppgaveRepo.findForBehandling(behandling.id)).isEmpty()
         }
 
         repo.lagre(
@@ -144,11 +143,13 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.first().single().also { behandling ->
-            assertFalse(behandling.erInnvilget())
+            assertThat(behandling.erInnvilget()).isFalse()
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
-                assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                assertEquals(
-                    oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                assertThat(oppgaveRepo.findForBehandling(behandling.id)).containsOnly(oppgave)
+                assertThat(
+                    oppgave.detaljer
+                ).isEqualTo(
+                    OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "04010012797",
                         oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 12345678910 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.""")
                     )
@@ -215,11 +216,13 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.first().single().also { behandling ->
-            assertFalse(behandling.erInnvilget())
+            assertThat(behandling.erInnvilget()).isFalse()
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
-                assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                assertEquals(
-                    oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                assertThat(oppgaveRepo.findForBehandling(behandling.id)).containsOnly(oppgave)
+                assertThat(
+                    oppgave.detaljer
+                ).isEqualTo(
+                    OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "12345678910",
                         oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.""")
                     )
@@ -295,12 +298,14 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.first().also { behandlinger ->
-            assertEquals(2, behandlinger.antallBehandlinger())
+            assertThat(behandlinger.antallBehandlinger()).isEqualTo(2)
             oppgaveRepo.findForMelding(behandlinger.alle()[0].meldingId).single().also { oppgave ->
-                assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId()[0]))
-                assertEquals(oppgave, oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId()[1]).single())
-                assertEquals(
-                    oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                assertThat(oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId()[0])).isEmpty()
+                assertThat(oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId()[1])).containsOnly(oppgave)
+                assertThat(
+                    oppgave.detaljer
+                ).isEqualTo(
+                    OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "04010012797",
                         oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01052012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene.""")
                     )
@@ -358,11 +363,13 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.first().single().also { behandling ->
-            assertFalse(behandling.erInnvilget())
+            assertThat(behandling.erInnvilget()).isFalse()
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
-                assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                assertEquals(
-                    oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                assertThat(oppgaveRepo.findForBehandling(behandling.id)).containsOnly(oppgave)
+                assertThat(
+                    oppgave.detaljer
+                ).isEqualTo(
+                    OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "12345678910",
                         oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.""")
                     )
@@ -413,9 +420,9 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
         handler.process()!!.first().single().also { behandling ->
-            assertFalse(behandling.erInnvilget())
-            assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForMelding(behandling.meldingId))
-            assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
+            assertThat(behandling.erInnvilget()).isFalse()
+            assertThat(oppgaveRepo.findForMelding(behandling.meldingId)).isEmpty()
+            assertThat(oppgaveRepo.findForBehandling(behandling.id)).isEmpty()
         }
     }
 
@@ -486,13 +493,15 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         )
 
         handler.process()!!.first().let { result ->
-            assertEquals(2, result.antallBehandlinger())
+            assertThat(result.antallBehandlinger()).isEqualTo(2)
             result.alle().first().also { behandling ->
-                assertFalse(behandling.erInnvilget())
+                assertThat(behandling.erInnvilget()).isFalse()
                 oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
-                    assertEquals(oppgave, oppgaveRepo.findForBehandling(behandling.id).single())
-                    assertEquals(
-                        oppgave.detaljer, OppgaveDetaljer.MottakerOgTekst(
+                    assertThat(oppgaveRepo.findForBehandling(behandling.id)).containsOnly(oppgave)
+                    assertThat(
+                        oppgave.detaljer
+                    ).isEqualTo(
+                        OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "12345678910",
                             oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.""")
                         )
@@ -500,9 +509,9 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 }
             }
             result.alle().last().also { behandling ->
-                assertFalse(behandling.erInnvilget())
-                assertEquals(emptyList<Oppgave>(), oppgaveRepo.findForBehandling(behandling.id))
-                assertEquals(1, oppgaveRepo.findForMelding(behandling.meldingId).count())
+                assertThat(behandling.erInnvilget()).isFalse()
+                assertThat(oppgaveRepo.findForBehandling(behandling.id)).isEmpty()
+                assertThat(oppgaveRepo.findForMelding(behandling.meldingId)).hasSize(1)
             }
         }
     }

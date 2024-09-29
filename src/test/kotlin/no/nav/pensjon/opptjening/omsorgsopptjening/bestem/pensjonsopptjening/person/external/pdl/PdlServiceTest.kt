@@ -22,6 +22,8 @@ import kotlin.test.assertNotNull
 
 internal class PdlServiceTest : SpringContextTest.NoKafka() {
 
+    private val UUID_REGEX = "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"
+
     @Autowired
     lateinit var pdlService: PdlService
 
@@ -101,11 +103,11 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
                         .withHeader("Tema", WireMock.equalTo("PEN"))
                         .withHeader(
                             "x-correlation-id",
-                            WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$")
+                            WireMock.matching(UUID_REGEX)
                         )
                         .withHeader(
                             "Nav-Call-Id",
-                            WireMock.matching("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$")
+                            WireMock.matching(UUID_REGEX)
                         )
                 )
             }
