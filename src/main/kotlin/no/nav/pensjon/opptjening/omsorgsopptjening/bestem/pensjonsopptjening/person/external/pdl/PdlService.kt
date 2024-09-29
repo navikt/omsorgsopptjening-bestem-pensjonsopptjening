@@ -36,8 +36,6 @@ internal class PdlService(
     }
 }
 
-internal data class PdlFnr(val fnr: String, val gjeldende: Boolean)
-
 internal class PdlException(pdlError: PdlError?) : RuntimeException(pdlError?.message ?: "Unknown error from PDL") {
     val code: PdlErrorCode? = pdlError?.extensions?.code
 }
