@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import java.time.YearMonth
 
@@ -15,10 +16,10 @@ sealed class Omsorgsmåneder {
         return alle().count()
     }
 
-    fun omsorgstype(): DomainOmsorgstype {
+    fun omsorgstype(): DomainOmsorgskategori {
         return when (this) {
-            is Barnetrygd -> DomainOmsorgstype.BARNETRYGD
-            is Hjelpestønad -> DomainOmsorgstype.HJELPESTØNAD
+            is Barnetrygd -> DomainOmsorgskategori.BARNETRYGD
+            is Hjelpestønad -> DomainOmsorgskategori.HJELPESTØNAD
         }
     }
 
@@ -30,6 +31,13 @@ sealed class Omsorgsmåneder {
         }
 
         companion object {
+            fun of(måned: YearMonth, omsorgstype: DomainOmsorgstype.Barnetrygd): Barnetrygd {
+                return when (omsorgstype) {
+                    DomainOmsorgstype.Barnetrygd.Delt -> none()
+                    DomainOmsorgstype.Barnetrygd.Full -> Barnetrygd(setOf(måned))
+                }
+            }
+
             fun none(): Barnetrygd {
                 return Barnetrygd(emptySet())
             }

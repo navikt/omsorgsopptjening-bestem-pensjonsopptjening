@@ -15,7 +15,7 @@ import java.time.YearMonth
 internal data class BeriketOmsorgsperiodeDb(
     val fom: String,
     val tom: String,
-    val omsorgstype: String,
+    val omsorgstype: OmsorgstypeDb,
     val omsorgsmottaker: PersonDb,
     val kilde: KildeDb,
     val utbetalt: Int,
@@ -26,7 +26,7 @@ internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
     return BeriketOmsorgsperiodeDb(
         fom = fom.toString(),
         tom = tom.toString(),
-        omsorgstype = omsorgstype.toString(),
+        omsorgstype = omsorgstype.toDb(),
         omsorgsmottaker = omsorgsmottaker.toDb(),
         kilde = kilde.toDb(),
         utbetalt = utbetalt,
@@ -38,7 +38,7 @@ internal fun BeriketOmsorgsperiodeDb.toDomain(): Omsorgsperiode {
     return Omsorgsperiode(
         fom = YearMonth.parse(fom),
         tom = YearMonth.parse(tom),
-        omsorgstype = DomainOmsorgstype.valueOf(omsorgstype),
+        omsorgstype = omsorgstype.toDomain() as DomainOmsorgstype.Barnetrygd,
         omsorgsmottaker = omsorgsmottaker.toDomain(),
         kilde = kilde.toDomain(),
         utbetalt = utbetalt,

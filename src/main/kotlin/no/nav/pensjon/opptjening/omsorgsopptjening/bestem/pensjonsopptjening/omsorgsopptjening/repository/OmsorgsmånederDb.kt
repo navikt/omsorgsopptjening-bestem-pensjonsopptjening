@@ -5,24 +5,24 @@ import java.time.YearMonth
 
 internal data class OmsorgsmånederDb(
     val omsorgsmåneder: Set<YearMonth>,
-    val type: OmsorgstypeDb,
+    val type: OmsorgskategoriDb,
 )
 
 internal fun Omsorgsmåneder.toDb(): OmsorgsmånederDb {
     return when (this) {
         is Omsorgsmåneder.Barnetrygd -> {
-            OmsorgsmånederDb(this.alle(), OmsorgstypeDb.BARNETRYGD)
+            OmsorgsmånederDb(this.alle(), OmsorgskategoriDb.BARNETRYGD)
         }
 
         is Omsorgsmåneder.Hjelpestønad -> {
-            OmsorgsmånederDb(this.alle(), OmsorgstypeDb.HJELPESTØNAD)
+            OmsorgsmånederDb(this.alle(), OmsorgskategoriDb.HJELPESTØNAD)
         }
     }
 }
 
 internal fun OmsorgsmånederDb.toDomain(): Omsorgsmåneder {
     return when (this.type) {
-        OmsorgstypeDb.BARNETRYGD -> Omsorgsmåneder.Barnetrygd(this.omsorgsmåneder)
-        OmsorgstypeDb.HJELPESTØNAD -> Omsorgsmåneder.Hjelpestønad(this.omsorgsmåneder)
+        OmsorgskategoriDb.BARNETRYGD -> Omsorgsmåneder.Barnetrygd(this.omsorgsmåneder)
+        OmsorgskategoriDb.HJELPESTØNAD -> Omsorgsmåneder.Hjelpestønad(this.omsorgsmåneder)
     }
 }

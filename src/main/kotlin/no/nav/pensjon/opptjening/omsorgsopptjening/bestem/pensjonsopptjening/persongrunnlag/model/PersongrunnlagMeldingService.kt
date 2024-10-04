@@ -170,7 +170,7 @@ class PersongrunnlagMeldingService(
                             Omsorgsperiode(
                                 fom = omsorgVedtakPeriode.fom,
                                 tom = omsorgVedtakPeriode.tom,
-                                omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain(),
+                                omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain() as DomainOmsorgstype.Barnetrygd,
                                 omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
                                 kilde = omsorgVedtakPeriode.kilde.toDomain(),
                                 utbetalt = omsorgVedtakPeriode.utbetalt,
@@ -181,7 +181,7 @@ class PersongrunnlagMeldingService(
                             Hjelpestønadperiode(
                                 fom = hjelpestønadperiode.fom,
                                 tom = hjelpestønadperiode.tom,
-                                omsorgstype = hjelpestønadperiode.omsorgstype.toDomain(),
+                                omsorgstype = hjelpestønadperiode.omsorgstype.toDomain() as DomainOmsorgstype.Hjelpestønad,
                                 omsorgsmottaker = persondata.finnPerson(hjelpestønadperiode.omsorgsmottaker),
                                 kilde = hjelpestønadperiode.kilde.toDomain()
                             )

@@ -1,24 +1,24 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Pensjonspoeng
 
 data class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
-    private val hentPensjonspoengForOmsorgsopptjening: (fnr: String, år: Int, type: DomainOmsorgstype) -> Pensjonspoeng.Omsorg,
+    private val hentPensjonspoengForOmsorgsopptjening: (fnr: String, år: Int, type: DomainOmsorgskategori) -> Pensjonspoeng.Omsorg,
     private val hentPensjonspoengForInntekt: (fnr: String, år: Int) -> Pensjonspoeng.Inntekt,
 ) {
     fun get(
         omsorgsyter: Person,
         omsorgsmottaker: Person,
-        omsorgstype: DomainOmsorgstype,
+        omsorgstype: DomainOmsorgskategori,
         omsorgsAr: Int,
     ): Brevopplysninger {
         return when (omsorgstype) {
-            DomainOmsorgstype.BARNETRYGD -> {
+            DomainOmsorgskategori.BARNETRYGD -> {
                 Brevopplysninger.Ingen
             }
 
-            DomainOmsorgstype.HJELPESTØNAD -> {
+            DomainOmsorgskategori.HJELPESTØNAD -> {
                 hentPensjonspoengForOmsorgsopptjening(
                     omsorgsyter.fnr,
                     omsorgsAr - 1,

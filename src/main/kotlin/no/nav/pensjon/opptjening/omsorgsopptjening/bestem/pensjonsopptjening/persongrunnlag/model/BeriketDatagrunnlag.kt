@@ -60,7 +60,8 @@ data class Persongrunnlag(
     val medlemskapsgrunnlag: Medlemskapsgrunnlag,
 ) {
     fun omsorgsmottakere(): Set<Person> {
-        return (omsorgsperioder.map { it.omsorgsmottaker } + hjelpestønadperioder.map { it.omsorgsmottaker }).distinct().toSet()
+        return (omsorgsperioder.map { it.omsorgsmottaker } + hjelpestønadperioder.map { it.omsorgsmottaker }).distinct()
+            .toSet()
     }
 
     fun omsorgsår(): Set<Int> {
@@ -79,7 +80,7 @@ data class Persongrunnlag(
 data class Omsorgsperiode(
     val fom: YearMonth,
     val tom: YearMonth,
-    val omsorgstype: DomainOmsorgstype,
+    val omsorgstype: DomainOmsorgstype.Barnetrygd,
     val omsorgsmottaker: Person,
     val kilde: DomainKilde,
     val utbetalt: Int,
@@ -92,7 +93,7 @@ data class Omsorgsperiode(
     }
 
     fun utbetalingsmåneder(): Utbetalingsmåneder {
-        return Utbetalingsmåneder(periode.alleMåneder()
+        return Utbetalingsmåneder(alleMåneder()
                                       .map { Triple(it, utbetalt, landstilknytning) }
                                       .mapNotNull { (mnd, utb, land) -> Utbetalingsmåned.of(mnd, utb, land) }
                                       .toSet()
@@ -100,7 +101,10 @@ data class Omsorgsperiode(
     }
 
     fun omsorgsmåneder(): Omsorgsmåneder.Barnetrygd {
-        return Omsorgsmåneder.Barnetrygd(alleMåneder())
+        return alleMåneder()
+            .map { it to omsorgstype }
+            .map { (mnd, type) -> Omsorgsmåneder.Barnetrygd.of(mnd, type) }
+            .reduce { acc, barnetrygd -> acc.merge(barnetrygd) }
     }
 
     companion object {
@@ -123,7 +127,7 @@ data class Omsorgsperiode(
 data class Hjelpestønadperiode(
     val fom: YearMonth,
     val tom: YearMonth,
-    val omsorgstype: DomainOmsorgstype,
+    val omsorgstype: DomainOmsorgstype.Hjelpestønad,
     val omsorgsmottaker: Person,
     val kilde: DomainKilde,
 ) {

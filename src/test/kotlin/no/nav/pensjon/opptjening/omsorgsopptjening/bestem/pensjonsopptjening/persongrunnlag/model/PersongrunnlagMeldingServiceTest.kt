@@ -447,7 +447,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                         vurdering.grunnlag
                     ).also {
                         assertEquals(
-                            Periode(YearMonth.of(2020, Month.JANUARY), YearMonth.of(2020, Month.MAY)).alleMåneder(),
+                            emptySet<YearMonth>(),
                             it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alle()
                         )
                         assertEquals(
@@ -466,104 +466,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         }
     }
 
-    @Test
-    fun `gitt at flere omsorgytere har ytt omsorg for samme barn, innvilges opptjening til omsorgsyter med flest gyldige måneder omsorg i opptjeningsåret - innvilget for omsorgsyter under behandling`() {
-        repo.lagre(
-            PersongrunnlagMelding.Lest(
-                innhold = PersongrunnlagMeldingKafka(
-                    omsorgsyter = "12345678910",
-                    persongrunnlag = listOf(
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "12345678910",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.MAY),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                ),
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JUNE),
-                                    tom = YearMonth.of(2020, Month.AUGUST),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "04010012797",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.MAY),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                ),
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.SEPTEMBER),
-                                    tom = YearMonth.of(2020, Month.OCTOBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "01019212345",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.NOVEMBER),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                    ),
-                    rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
-                )
-            ),
-        )
 
-        handler.process()!!.first().single().also { behandling ->
-            behandling.assertInnvilget(
-                omsorgsyter = "12345678910",
-                omsorgsmottaker = "07081812345"
-            )
-            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()
-                .let { vurdering ->
-                    assertTrue(vurdering.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
-                    assertFalse(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
-                    assertEquals(
-                        mapOf(
-                            "12345678910" to 8,
-                            "04010012797" to 7,
-                            "01019212345" to 2,
-                        ),
-                        vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
-                    )
-                }
-        }
-    }
 
     @Test
     fun `gitt at flere omsorgytere har ytt omsorg for samme barn, innvilges opptjening til omsorgsyter med flest gyldige måneder, selv om andre har flere måneder med ugyldig barnetrygd`() {
@@ -578,7 +481,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.JUNE),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
@@ -602,7 +505,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JUNE),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 0,
@@ -631,110 +534,10 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                     assertEquals(
                         mapOf(
                             "12345678910" to 6,
-                            "04010012797" to 5,
+                            "04010012797" to 0,
                         ),
                         vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                     )
-                }
-        }
-    }
-
-    @Test
-    fun `gitt at flere omsorgytere har ytt omsorg for samme barn, innvilges opptjening til omsorgsyter med flest måneder omsorg i opptjeningsåret - avslag for omsorgsyter under behandling`() {
-        repo.lagre(
-            PersongrunnlagMelding.Lest(
-                innhold = PersongrunnlagMeldingKafka(
-                    omsorgsyter = "12345678910",
-                    persongrunnlag = listOf(
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "12345678910",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.MAY),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                ),
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.SEPTEMBER),
-                                    tom = YearMonth.of(2020, Month.OCTOBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "04010012797",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.MAY),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                ),
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JUNE),
-                                    tom = YearMonth.of(2020, Month.AUGUST),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "01019212345",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.NOVEMBER),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                    ),
-                    rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
-                )
-            ),
-        )
-
-        handler.process()!!.first().single().also { behandling ->
-            behandling.assertAvslag(
-                omsorgsyter = "12345678910",
-                omsorgsmottaker = "07081812345"
-            )
-            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>()
-                .let { vurdering ->
-                    assertFalse(vurdering.grunnlag.omsorgsyterHarFlestOmsorgsmåneder())
-                    assertFalse(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
-                    assertEquals(
-                        mapOf(
-                            "04010012797" to 8,
-                            "12345678910" to 7,
-                            "01019212345" to 2,
-                        ),
-                        vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
-                    )
-                    assertTrue(vurdering.erEnesteAvslag<OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering>())
                 }
         }
     }
@@ -825,7 +628,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
                                     tom = YearMonth.of(2021, Month.FEBRUARY),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
@@ -878,7 +681,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                     assertFalse(vurdering.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder())
                     assertEquals(
                         mapOf(
-                            "04010012797" to 5,
+                            "04010012797" to 3,
                             "12345678910" to 2,
                         ),
                         vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
@@ -1090,7 +893,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                         mapOf(
                             "12345678910" to 7,
                             "04010012797" to 7,
-                            "01019212345" to 7,
+                            "01019212345" to 0,
                         ),
                         vurdering.grunnlag.data.associate { it.omsorgsyter to it.antall() }
                     )
@@ -1382,7 +1185,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "03041212345",
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
             )
         }
     }
@@ -1430,7 +1233,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.assertAvslag(
                 omsorgsyter = "01019212345",
                 omsorgsmottaker = "03041212345",
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
             ).also {
                 assertTrue(it.vilkårsvurdering.erEnesteAvslag<OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering>())
             }
@@ -1479,7 +1282,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "03041212345",
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
             )
         }
     }
@@ -1526,7 +1329,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "03041212345",
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
             )
         }
     }
@@ -1573,7 +1376,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345",
-                omsorgstype = DomainOmsorgstype.BARNETRYGD,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD,
             )
         }
     }
@@ -1612,7 +1415,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01052012345",
-                omsorgstype = DomainOmsorgstype.BARNETRYGD,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD,
             )
             assertEquals(
                 listOf(
@@ -1657,7 +1460,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01052012345",
-                omsorgstype = DomainOmsorgstype.BARNETRYGD,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD,
             )
         }
     }
@@ -1723,7 +1526,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345",
-                omsorgstype = DomainOmsorgstype.BARNETRYGD,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD,
             )
             assertEquals(
                 listOf(
@@ -2080,7 +1883,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         omsorgsyter: String,
         omsorgsmottaker: String,
         år: Int = OPPTJENINGSÅR,
-        omsorgstype: DomainOmsorgstype = DomainOmsorgstype.BARNETRYGD,
+        omsorgstype: DomainOmsorgskategori = DomainOmsorgskategori.BARNETRYGD,
     ): FullførtBehandling {
         assertEquals(år, this.omsorgsAr)
         assertEquals(omsorgsyter, this.omsorgsyter)
@@ -2093,7 +1896,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     private fun FullførtBehandling.assertAvslag(
         omsorgsyter: String,
         omsorgsmottaker: String,
-        omsorgstype: DomainOmsorgstype = DomainOmsorgstype.BARNETRYGD,
+        omsorgstype: DomainOmsorgskategori = DomainOmsorgskategori.BARNETRYGD,
     ): FullførtBehandling {
         assertEquals(OPPTJENINGSÅR, this.omsorgsAr)
         assertEquals(omsorgsyter, this.omsorgsyter)
@@ -2106,7 +1909,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
     private fun FullførtBehandling.assertManuell(
         omsorgsyter: String,
         omsorgsmottaker: String,
-        omsorgstype: DomainOmsorgstype = DomainOmsorgstype.BARNETRYGD,
+        omsorgstype: DomainOmsorgskategori = DomainOmsorgskategori.BARNETRYGD,
     ): FullførtBehandling {
         assertEquals(OPPTJENINGSÅR, this.omsorgsAr)
         assertEquals(omsorgsyter, this.omsorgsyter)

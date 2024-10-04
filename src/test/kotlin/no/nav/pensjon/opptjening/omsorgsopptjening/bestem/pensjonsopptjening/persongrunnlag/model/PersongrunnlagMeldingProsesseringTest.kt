@@ -166,7 +166,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(2020, it.omsorgsAr)
                 assertEquals("12345678910", it.omsorgsyter)
                 assertEquals("07081812345", it.omsorgsmottaker)
-                assertEquals(DomainOmsorgstype.BARNETRYGD, it.omsorgstype)
+                assertEquals(DomainOmsorgskategori.BARNETRYGD, it.omsorgstype)
                 assertInstanceOf(BehandlingUtfall.Innvilget::class.java, it.utfall)
                 assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
                 assertEquals(1, godskrivOpptjeningRepo.findForBehandling(it.id).count())

@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.BeriketDatagrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainKilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Hjelpestønadperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -27,10 +27,10 @@ sealed class OmsorgsopptjeningGrunnlag {
     val correlationId: CorrelationId
         get() = grunnlag.correlationId
 
-    val omsorgstype: DomainOmsorgstype by lazy {
+    val omsorgstype: DomainOmsorgskategori by lazy {
         when (forAldersvurderingOmsorgsmottaker().erOppfylltFor(OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.ALDERSINTERVALL_BARNETRYGD)) {
-            true -> DomainOmsorgstype.BARNETRYGD
-            false -> DomainOmsorgstype.HJELPESTØNAD
+            true -> DomainOmsorgskategori.BARNETRYGD
+            false -> DomainOmsorgskategori.HJELPESTØNAD
         }
     }
 
@@ -42,11 +42,11 @@ sealed class OmsorgsopptjeningGrunnlag {
             (bt.keys + hs.keys).distinct().associate { p ->
                 Triple(p, bt[p]!!, hs[p]!!).let { (person, barnetrygd, hjelpestønad) ->
                     when (omsorgstype) {
-                        DomainOmsorgstype.BARNETRYGD -> {
+                        DomainOmsorgskategori.BARNETRYGD -> {
                             person to barnetrygd
                         }
 
-                        DomainOmsorgstype.HJELPESTØNAD -> {
+                        DomainOmsorgskategori.HJELPESTØNAD -> {
                             person to hjelpestønad
                         }
                     }

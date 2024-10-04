@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import java.util.UUID
 
 /**
@@ -30,11 +30,11 @@ data class Behandling(
         return og(
             vilkårsvurderOmsorgsyter(),
             when (omsorgstype()) {
-                DomainOmsorgstype.BARNETRYGD -> {
+                DomainOmsorgskategori.BARNETRYGD -> {
                     vilkårsvurderBarnetrygd()
                 }
 
-                DomainOmsorgstype.HJELPESTØNAD -> {
+                DomainOmsorgskategori.HJELPESTØNAD -> {
                     vilkårsurderHjelpestønad()
                 }
             }

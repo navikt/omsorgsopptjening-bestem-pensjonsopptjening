@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Pensjonspoeng
 import java.time.Instant
 import java.util.UUID
@@ -12,7 +12,7 @@ data class FullførtBehandling(
     val omsorgsAr: Int,
     val omsorgsyter: String,
     val omsorgsmottaker: String,
-    val omsorgstype: DomainOmsorgstype,
+    val omsorgstype: DomainOmsorgskategori,
     val grunnlag: OmsorgsopptjeningGrunnlag,
     val utfall: BehandlingUtfall,
     val vilkårsvurdering: VilkarsVurdering<*>,
@@ -53,7 +53,7 @@ data class FullførtBehandling(
     }
 
     fun hentBrevopplysninger(
-        hentPensjonspoengForOmsorgsopptjening: (fnr: String, år: Int, type: DomainOmsorgstype) -> Pensjonspoeng.Omsorg,
+        hentPensjonspoengForOmsorgsopptjening: (fnr: String, år: Int, type: DomainOmsorgskategori) -> Pensjonspoeng.Omsorg,
         hentPensjonspoengForInntekt: (fnr: String, år: Int) -> Pensjonspoeng.Inntekt,
     ): Brevopplysninger {
         require(utfall is BehandlingUtfall.Innvilget) { " Kan kun opprette brev for innvilget behandling" }

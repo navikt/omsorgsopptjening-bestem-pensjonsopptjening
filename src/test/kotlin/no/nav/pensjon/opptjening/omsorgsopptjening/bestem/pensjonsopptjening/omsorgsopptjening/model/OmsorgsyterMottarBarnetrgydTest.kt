@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.april
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.februar
@@ -20,7 +20,7 @@ class OmsorgsyterMottarBarnetrgydTest {
             grunnlag = OmsorgsyterMottarBarnetrgyd.Grunnlag(
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(emptySet()),
                 antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår,
-                omsorgstype = DomainOmsorgstype.BARNETRYGD
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, it.utfall).also {
@@ -35,7 +35,7 @@ class OmsorgsyterMottarBarnetrgydTest {
             grunnlag = OmsorgsyterMottarBarnetrgyd.Grunnlag(
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(emptySet()),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
-                omsorgstype = DomainOmsorgstype.BARNETRYGD
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, it.utfall).also {
@@ -50,7 +50,7 @@ class OmsorgsyterMottarBarnetrgydTest {
             grunnlag = OmsorgsyterMottarBarnetrgyd.Grunnlag(
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(emptySet()),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, it.utfall).also {
@@ -65,7 +65,7 @@ class OmsorgsyterMottarBarnetrgydTest {
             grunnlag = OmsorgsyterMottarBarnetrgyd.Grunnlag(
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(emptySet()),
                 antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår,
-                omsorgstype = DomainOmsorgstype.BARNETRYGD
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
             )
         ).also {
             assertThat(it.utfall).isInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java)
@@ -75,7 +75,7 @@ class OmsorgsyterMottarBarnetrgydTest {
             grunnlag = OmsorgsyterMottarBarnetrgyd.Grunnlag(
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(emptySet()),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
-                omsorgstype = DomainOmsorgstype.BARNETRYGD
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
             )
         ).also {
             assertThat(it.utfall).isInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java)
@@ -96,7 +96,7 @@ class OmsorgsyterMottarBarnetrgydTest {
                     )
                 ),
                 antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår,
-                omsorgstype = DomainOmsorgstype.BARNETRYGD
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
             )
         ).also {
             assertThat(it.utfall).isInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java)
@@ -119,7 +119,7 @@ class OmsorgsyterMottarBarnetrgydTest {
                     }.toSet()
                 ),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
-                omsorgstype = DomainOmsorgstype.BARNETRYGD
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
             )
         ).also {
             assertThat(it.utfall).isInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java)
@@ -142,7 +142,7 @@ class OmsorgsyterMottarBarnetrgydTest {
                     }.toSet()
                 ),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
-                omsorgstype = DomainOmsorgstype.BARNETRYGD
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
             )
         ).also {
             assertThat(it.utfall).isInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java)

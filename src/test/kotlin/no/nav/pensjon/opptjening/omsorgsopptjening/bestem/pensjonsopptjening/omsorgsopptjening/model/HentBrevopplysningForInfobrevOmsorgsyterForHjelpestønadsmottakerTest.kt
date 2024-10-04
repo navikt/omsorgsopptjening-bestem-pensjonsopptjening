@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Pensjonspoeng
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -14,7 +14,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
         assertThat(
             HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
                 hentPensjonspoengForOmsorgsopptjening = { _,_,_ ->
-                    Pensjonspoeng.Omsorg(omsorgsår, 0.0, DomainOmsorgstype.BARNETRYGD)
+                    Pensjonspoeng.Omsorg(omsorgsår, 0.0, DomainOmsorgskategori.BARNETRYGD)
                 },
                 hentPensjonspoengForInntekt = { _,_ ->
                     Pensjonspoeng.Inntekt(omsorgsår, 0.0)
@@ -22,7 +22,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
             ).get(
                 omsorgsyter = far,
                 omsorgsmottaker = omsorgsmottaker,
-                omsorgstype = DomainOmsorgstype.BARNETRYGD,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD,
                 omsorgsAr = omsorgsår
             )
         ).isEqualTo(Brevopplysninger.Ingen)
@@ -33,7 +33,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
         assertThat(
             HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
                 hentPensjonspoengForOmsorgsopptjening = { _,_,_ ->
-                    Pensjonspoeng.Omsorg(omsorgsår - 1, 0.0, DomainOmsorgstype.HJELPESTØNAD)
+                    Pensjonspoeng.Omsorg(omsorgsår - 1, 0.0, DomainOmsorgskategori.HJELPESTØNAD)
                 },
                 hentPensjonspoengForInntekt = { _,_ ->
                     Pensjonspoeng.Inntekt(omsorgsår, 0.0)
@@ -41,7 +41,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
             ).get(
                 omsorgsyter = far,
                 omsorgsmottaker = omsorgsmottaker,
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
                 omsorgsAr = omsorgsår
             )
         ).isEqualTo(Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker(BrevÅrsak.OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR))
@@ -52,7 +52,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
         assertThat(
             HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
                 hentPensjonspoengForOmsorgsopptjening = { _,_,_ ->
-                    Pensjonspoeng.Omsorg(omsorgsår - 1, 3.5, DomainOmsorgstype.HJELPESTØNAD)
+                    Pensjonspoeng.Omsorg(omsorgsår - 1, 3.5, DomainOmsorgskategori.HJELPESTØNAD)
                 },
                 hentPensjonspoengForInntekt = { _,_ ->
                     Pensjonspoeng.Inntekt(omsorgsår, 0.0)
@@ -60,7 +60,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
             ).get(
                 omsorgsyter = onkel,
                 omsorgsmottaker = omsorgsmottaker,
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
                 omsorgsAr = omsorgsår
             )
         ).isEqualTo(Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker(BrevÅrsak.OMSORGSYTER_IKKE_FORELDER_AV_OMSORGSMOTTAKER))
@@ -71,7 +71,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
         assertThat(
             HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
                 hentPensjonspoengForOmsorgsopptjening = { _,_,_ ->
-                    Pensjonspoeng.Omsorg(omsorgsår - 1, 3.5, DomainOmsorgstype.HJELPESTØNAD)
+                    Pensjonspoeng.Omsorg(omsorgsår - 1, 3.5, DomainOmsorgskategori.HJELPESTØNAD)
                 },
                 hentPensjonspoengForInntekt = { _,_ ->
                     Pensjonspoeng.Inntekt(omsorgsår, 2.8)
@@ -79,7 +79,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
             ).get(
                 omsorgsyter = far,
                 omsorgsmottaker = omsorgsmottaker,
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
                 omsorgsAr = omsorgsår
             )
         ).isEqualTo(Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker(BrevÅrsak.ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG))
@@ -90,7 +90,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
         assertThat(
             HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
                 hentPensjonspoengForOmsorgsopptjening = { _,_,_ ->
-                    Pensjonspoeng.Omsorg(omsorgsår - 1, 3.5, DomainOmsorgstype.HJELPESTØNAD)
+                    Pensjonspoeng.Omsorg(omsorgsår - 1, 3.5, DomainOmsorgskategori.HJELPESTØNAD)
                 },
                 hentPensjonspoengForInntekt = { _,_ ->
                     Pensjonspoeng.Inntekt(omsorgsår, 2.8)
@@ -98,7 +98,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
             ).get(
                 omsorgsyter = mor,
                 omsorgsmottaker = omsorgsmottaker,
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
                 omsorgsAr = omsorgsår
             )
         ).isEqualTo(Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker(BrevÅrsak.ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG))
@@ -109,7 +109,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
         assertThat(
             HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottaker(
                 hentPensjonspoengForOmsorgsopptjening = { _,_,_ ->
-                    Pensjonspoeng.Omsorg(omsorgsår - 1, 3.5, DomainOmsorgstype.HJELPESTØNAD)
+                    Pensjonspoeng.Omsorg(omsorgsår - 1, 3.5, DomainOmsorgskategori.HJELPESTØNAD)
                 },
                 hentPensjonspoengForInntekt = { _,_ ->
                     Pensjonspoeng.Inntekt(omsorgsår, 2.8)
@@ -117,7 +117,7 @@ class HentBrevopplysningForInfobrevOmsorgsyterForHjelpestønadsmottakerTest {
             ).get(
                 omsorgsyter = onkel,
                 omsorgsmottaker = omsorgsmottakerUkjenteForeldre,
-                omsorgstype = DomainOmsorgstype.HJELPESTØNAD,
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
                 omsorgsAr = omsorgsår
             )
         ).isEqualTo(Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker(BrevÅrsak.FORELDRE_ER_UKJENT))

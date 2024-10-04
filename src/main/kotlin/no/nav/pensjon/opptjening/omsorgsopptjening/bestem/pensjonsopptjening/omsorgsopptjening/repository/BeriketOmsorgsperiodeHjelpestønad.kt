@@ -9,7 +9,7 @@ import java.time.YearMonth
 internal data class BeriketOmsorgsperiodeHjelpestønad(
     val fom: String,
     val tom: String,
-    val omsorgstype: String,
+    val omsorgstype: OmsorgstypeDb,
     val omsorgsmottaker: PersonDb,
     val kilde: KildeDb,
 )
@@ -18,7 +18,7 @@ internal fun Hjelpestønadperiode.toDb(): BeriketOmsorgsperiodeHjelpestønad {
     return BeriketOmsorgsperiodeHjelpestønad(
         fom = fom.toString(),
         tom = tom.toString(),
-        omsorgstype = omsorgstype.toString(),
+        omsorgstype = omsorgstype.toDb(),
         omsorgsmottaker = omsorgsmottaker.toDb(),
         kilde = kilde.toDb(),
     )
@@ -28,7 +28,7 @@ internal fun BeriketOmsorgsperiodeHjelpestønad.toDomain(): Hjelpestønadperiode
     return Hjelpestønadperiode(
         fom = YearMonth.parse(fom),
         tom = YearMonth.parse(tom),
-        omsorgstype = DomainOmsorgstype.valueOf(omsorgstype),
+        omsorgstype = omsorgstype.toDomain() as DomainOmsorgstype.Hjelpestønad,
         omsorgsmottaker = omsorgsmottaker.toDomain(),
         kilde = kilde.toDomain(),
     )

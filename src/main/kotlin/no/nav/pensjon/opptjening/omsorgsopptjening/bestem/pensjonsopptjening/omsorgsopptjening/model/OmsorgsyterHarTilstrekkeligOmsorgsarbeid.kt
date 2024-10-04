@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 
 object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag>() {
     override fun vilkarsVurder(grunnlag: Grunnlag): Vurdering {
@@ -27,13 +27,13 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
             AntallMånederRegel.FødtUtenforOmsorgsår -> {
                 when (grunnlag.omsorgstype()) {
-                    DomainOmsorgstype.BARNETRYGD -> {
+                    DomainOmsorgskategori.BARNETRYGD -> {
                         setOf(
                             Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
                         )
                     }
 
-                    DomainOmsorgstype.HJELPESTØNAD -> {
+                    DomainOmsorgskategori.HJELPESTØNAD -> {
                         setOf(
                             Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
                         )
@@ -64,7 +64,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
             return omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall() >= antallMånederRegel.antall
         }
 
-        fun omsorgstype(): DomainOmsorgstype {
+        fun omsorgstype(): DomainOmsorgskategori {
             return omsorgsytersOmsorgsmånederForOmsorgsmottaker.omsorgstype()
         }
     }
