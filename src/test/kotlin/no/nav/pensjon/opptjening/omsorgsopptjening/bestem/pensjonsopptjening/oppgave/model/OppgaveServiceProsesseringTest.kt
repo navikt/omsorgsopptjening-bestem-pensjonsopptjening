@@ -141,7 +141,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
@@ -156,7 +156,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
@@ -279,7 +279,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
@@ -294,7 +294,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
@@ -377,7 +377,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
@@ -392,7 +392,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,

@@ -28,7 +28,7 @@ internal fun OmsorgsyterMottarBarnetrygdDb.toDomain(): OmsorgsyterMottarBarnetrg
 internal data class MottarBarnetrygd(
     val omsorgsytersUtbetalingsmåneder: Set<UtbetalingsmånedDb>,
     val antallMånederRegel: AntallMånederRegelDb,
-    val omsorgstype: OmsorgstypeDb,
+    val omsorgstype: OmsorgskategoriDb,
 ) : GrunnlagVilkårsvurderingDb()
 
 

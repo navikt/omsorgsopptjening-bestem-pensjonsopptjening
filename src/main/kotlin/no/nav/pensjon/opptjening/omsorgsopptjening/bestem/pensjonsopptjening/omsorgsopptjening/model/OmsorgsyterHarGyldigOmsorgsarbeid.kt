@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 
 
 object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag>() {
@@ -28,14 +28,14 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
 
             AntallMånederRegel.FødtUtenforOmsorgsår -> {
                 when (grunnlag.omsorgstype()) {
-                    DomainOmsorgstype.BARNETRYGD -> {
+                    DomainOmsorgskategori.BARNETRYGD -> {
                         setOf(
                             Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
                             Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                         )
                     }
 
-                    DomainOmsorgstype.HJELPESTØNAD -> {
+                    DomainOmsorgskategori.HJELPESTØNAD -> {
                         setOf(
                             Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
                             Referanse.OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad
@@ -72,7 +72,7 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
             return gyldigeOmsorgsmåneder.alleMåneder().count() >= antallMånederRegel.antall
         }
 
-        fun omsorgstype(): DomainOmsorgstype {
+        fun omsorgstype(): DomainOmsorgskategori {
             return omsorgsytersOmsorgsmåneder.omsorgstype()
         }
     }

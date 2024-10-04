@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.stereotype.Component
 import java.sql.ResultSet
-import java.util.*
+import java.util.UUID
 
 @Component
 class BehandlingRepo(
@@ -106,7 +106,7 @@ internal class BehandlingRowMapper : RowMapper<BehandlingDb> {
             omsorgsAr = rs.getInt("omsorgs_ar"),
             omsorgsyter = rs.getString("omsorgsyter"),
             omsorgsmottaker = rs.getString("omsorgsmottaker"),
-            omsorgstype = OmsorgstypeDb.valueOf(rs.getString("omsorgstype")),
+            omsorgstype = OmsorgskategoriDb.valueOf(rs.getString("omsorgstype")),
             grunnlag = deserialize(rs.getString("grunnlag")),
             vilkårsvurdering = deserialize(rs.getString("vilkarsvurdering")),
             utfall = deserialize(rs.getString("utfall")),

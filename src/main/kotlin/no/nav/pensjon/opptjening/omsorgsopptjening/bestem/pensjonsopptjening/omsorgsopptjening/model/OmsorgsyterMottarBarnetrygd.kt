@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 
 
 object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd.Grunnlag>() {
@@ -27,13 +27,13 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
 
             AntallMånederRegel.FødtUtenforOmsorgsår -> {
                 when (grunnlag.omsorgstype) {
-                    DomainOmsorgstype.BARNETRYGD -> {
+                    DomainOmsorgskategori.BARNETRYGD -> {
                         setOf(
                             Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
                         )
                     }
 
-                    DomainOmsorgstype.HJELPESTØNAD -> {
+                    DomainOmsorgskategori.HJELPESTØNAD -> {
                         setOf(
                             Referanse.OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad
                         )
@@ -57,7 +57,7 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
     data class Grunnlag(
         val omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder,
         val antallMånederRegel: AntallMånederRegel,
-        val omsorgstype: DomainOmsorgstype,
+        val omsorgstype: DomainOmsorgskategori,
     ) : ParagrafGrunnlag() {
         fun erOppfyllt(): Boolean {
             return omsorgsytersUtbetalingsmåneder.antall() >= antallMånederRegel.antall

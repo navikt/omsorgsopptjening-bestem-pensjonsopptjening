@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClientException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Pensjonspoeng
@@ -32,7 +32,7 @@ internal class PoppClient(
     override fun godskriv(
         omsorgsyter: String,
         omsorgsÅr: Int,
-        omsorgstype: DomainOmsorgstype,
+        omsorgstype: DomainOmsorgskategori,
         omsorgsmottaker: String
     ) {
         val requestBody = serialize(
@@ -74,7 +74,7 @@ internal class PoppClient(
         }
     }
 
-    override fun hentPensjonspoengForOmsorgstype(fnr: String, år: Int, type: DomainOmsorgstype): Pensjonspoeng.Omsorg {
+    override fun hentPensjonspoengForOmsorgstype(fnr: String, år: Int, type: DomainOmsorgskategori): Pensjonspoeng.Omsorg {
         val url = "$baseUrl/pensjonspoeng/hent"
         try {
             return restTemplate.exchange(
@@ -220,20 +220,20 @@ private enum class PoppOmsorgType {
     /** Omsorg for barn under 6 år - eget vedtak  */
     OBU6;
 
-    fun toDomain(): DomainOmsorgstype {
+    fun toDomain(): DomainOmsorgskategori {
         return when (this) {
             OSFE -> throw NotImplementedError("Never mapped: OSFE")
-            OBO6H -> DomainOmsorgstype.HJELPESTØNAD
-            OBU6 -> DomainOmsorgstype.BARNETRYGD
+            OBO6H -> DomainOmsorgskategori.HJELPESTØNAD
+            OBU6 -> DomainOmsorgskategori.BARNETRYGD
             PPI -> throw NotImplementedError("Never mapped: PPI")
         }
     }
 
     companion object {
-        fun from(domainOmsorgstype: DomainOmsorgstype): PoppOmsorgType {
-            return when (domainOmsorgstype) {
-                DomainOmsorgstype.BARNETRYGD -> OBU6
-                DomainOmsorgstype.HJELPESTØNAD -> OBO6H
+        fun from(domainOmsorgskategori: DomainOmsorgskategori): PoppOmsorgType {
+            return when (domainOmsorgskategori) {
+                DomainOmsorgskategori.BARNETRYGD -> OBU6
+                DomainOmsorgskategori.HJELPESTØNAD -> OBO6H
             }
         }
     }

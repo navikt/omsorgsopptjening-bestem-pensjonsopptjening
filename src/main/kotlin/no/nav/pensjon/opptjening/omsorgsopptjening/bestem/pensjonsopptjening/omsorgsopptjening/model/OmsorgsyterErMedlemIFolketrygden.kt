@@ -1,6 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 
 
 object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFolketrygden.Grunnlag>() {
@@ -13,13 +13,13 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return when (grunnlag.omsorgstype) {
-            DomainOmsorgstype.BARNETRYGD -> {
+            DomainOmsorgskategori.BARNETRYGD -> {
                 setOf(
                     Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
                 )
             }
 
-            DomainOmsorgstype.HJELPESTØNAD -> {
+            DomainOmsorgskategori.HJELPESTØNAD -> {
                 setOf(
                     Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
                 )
@@ -41,7 +41,7 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
 
     data class Grunnlag(
         val loveMEVurdering: Medlemskapsgrunnlag.LoveMeVurdering,
-        val omsorgstype: DomainOmsorgstype,
+        val omsorgstype: DomainOmsorgskategori,
     ) : ParagrafGrunnlag() {
 
         fun erOppfyllt(): Boolean {

@@ -19,7 +19,7 @@ internal class BehandlingDb(
     val omsorgsAr: Int,
     val omsorgsyter: String,
     val omsorgsmottaker: String,
-    val omsorgstype: OmsorgstypeDb,
+    val omsorgstype: OmsorgskategoriDb,
     val grunnlag: OmsorgsopptjeningGrunnlagDb,
     val vilkårsvurdering: VilkårsvurderingDb,
     val utfall: BehandlingsutfallDb,

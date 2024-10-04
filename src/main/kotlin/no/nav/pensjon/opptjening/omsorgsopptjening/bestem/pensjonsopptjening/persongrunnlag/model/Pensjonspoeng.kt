@@ -15,7 +15,7 @@ sealed class Pensjonspoeng : Comparable<Pensjonspoeng> {
     data class Omsorg(
         override val år: Int,
         override val poeng: Double,
-        val type: DomainOmsorgstype
+        val type: DomainOmsorgskategori
     ) : Pensjonspoeng()
 
     data class Inntekt(
