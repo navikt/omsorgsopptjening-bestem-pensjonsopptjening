@@ -39,7 +39,7 @@ internal class PdlServiceTest {
 
     private val pdlService: PdlService = PdlService(
         PdlClient(
-            pdlUrl = "${wiremock.baseUrl()}/$PDL_PATH",
+            pdlUrl = "${wiremock.baseUrl()}$PDL_PATH",
             tokenProvider = mock { on { getToken() }.thenReturn(MOCK_TOKEN) },
             metrics = mock(),
             graphqlQuery = GraphqlQuery(
