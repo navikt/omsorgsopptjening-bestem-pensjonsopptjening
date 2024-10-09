@@ -40,12 +40,12 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
     ) : ParagrafVurdering<Grunnlag>()
 
     data class Grunnlag(
-        val loveMEVurdering: Medlemskapsgrunnlag.LoveMeVurdering,
+        val medlemskapsgrunnlag: Medlemskapsgrunnlag,
         val omsorgstype: DomainOmsorgskategori,
     ) : ParagrafGrunnlag() {
 
         fun erOppfyllt(): Boolean {
-            return loveMEVurdering != Medlemskapsgrunnlag.LoveMeVurdering.IKKE_MEDLEM_I_FOLKETRYGDEN
+            return medlemskapsgrunnlag.unntaksperioder.isEmpty() //TODO
         }
     }
 }

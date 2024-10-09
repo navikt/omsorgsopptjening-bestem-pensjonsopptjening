@@ -107,7 +107,7 @@ sealed class OmsorgsopptjeningGrunnlag {
 
     fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
         return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
-            loveMEVurdering = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag.vurderingFraLoveME,
+            medlemskapsgrunnlag = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag,
             omsorgstype = omsorgstype
         )
     }
@@ -337,7 +337,8 @@ private fun BeriketDatagrunnlag.`avgrens for omsorgsår`(): Map<Int, BeriketData
                                             kilde = hjelpestønadperiode.kilde
                                         )
                                     }
-                            }
+                            },
+                        medlemskapsgrunnlag = persongrunnlag.medlemskapsgrunnlag.avgrensForÅr(år)
                     )
                 })
         }

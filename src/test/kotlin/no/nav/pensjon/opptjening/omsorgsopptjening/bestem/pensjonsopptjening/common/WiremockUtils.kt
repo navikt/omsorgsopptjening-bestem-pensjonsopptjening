@@ -82,23 +82,11 @@ fun WireMockExtension.stubForPdlTransformer() {
 
 fun WireMockExtension.medlemIFolketrygden() {
     this.stubFor(
-        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)
-                    .withBody("""{"resultat": {"svar":"JA"}}""")
-                    .withHeader("Content-Type", "application/json")
-            )
-    )
-}
-
-fun WireMockExtension.usikkertMedlemIFolketrygden() {
-    this.stubFor(
-        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
-            .willReturn(
-                WireMock.aResponse()
-                    .withStatus(200)
-                    .withBody("""{"resultat": {"svar":"USIKKER"}}""")
+                    .withBody("""[]""")
                     .withHeader("Content-Type", "application/json")
             )
     )
@@ -106,24 +94,64 @@ fun WireMockExtension.usikkertMedlemIFolketrygden() {
 
 fun WireMockExtension.ikkeMedlemIFolketrygden() {
     this.stubFor(
-        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)
-                    .withBody("""{"resultat": {"svar":"NEI"}}""")
+                    .withBody(
+                        """
+                            [
+                              {
+                                "unntakId": 0,
+                                "ident": "04427625287",
+                                "fraOgMed": "2024-05-09",
+                                "tilOgMed": "2024-10-09",
+                                "status": "string",
+                                "statusaarsak": "string",
+                                "dekning": "string",
+                                "helsedel": true,
+                                "medlem": true,
+                                "lovvalgsland": "string",
+                                "lovvalg": "string",
+                                "grunnlag": "string",
+                                "sporingsinformasjon": {
+                                  "versjon": 0,
+                                  "registrert": "2024-10-09",
+                                  "besluttet": "2024-10-09",
+                                  "kilde": "string",
+                                  "kildedokument": "string",
+                                  "opprettet": "2024-10-09T10:53:14.596Z",
+                                  "opprettetAv": "string",
+                                  "sistEndret": "2024-10-09T10:53:14.596Z",
+                                  "sistEndretAv": "string"
+                                },
+                                "studieinformasjon": {
+                                  "statsborgerland": "string",
+                                  "studieland": "string",
+                                  "delstudie": true,
+                                  "soeknadInnvilget": true
+                                }
+                              }
+                            ]
+                    """.trimIndent()
+                    )
                     .withHeader("Content-Type", "application/json")
             )
     )
 }
 
-fun WireMockExtension.ingenPensjonspoeng(fnr: String){
+fun WireMockExtension.ingenPensjonspoeng(fnr: String) {
     this.stubFor(
         WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
-            .withRequestBody(equalToJson("""
+            .withRequestBody(
+                equalToJson(
+                    """
                 {
                   "fnr" : "$fnr"
                 }
-            """.trimIndent(), true, true))
+            """.trimIndent(), true, true
+                )
+            )
             .willReturn(
                 WireMock.aResponse()
                     .withHeader("Content-Type", "application/json")
@@ -138,7 +166,7 @@ fun WireMockExtension.ingenPensjonspoeng(fnr: String){
     )
 }
 
-fun WireMockExtension.bestemSakOk(){
+fun WireMockExtension.bestemSakOk() {
     this.stubFor(
         WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.BESTEM_SAK_PATH))
             .willReturn(

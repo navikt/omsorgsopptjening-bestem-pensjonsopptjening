@@ -164,29 +164,42 @@ class PersongrunnlagMeldingService(
             persongrunnlag = persongrunnlag.consolidate { persondata.finnPerson(it.omsorgsyter) }
                 .map { persongrunnlag ->
                     val omsorgsyter = persondata.finnPerson(persongrunnlag.omsorgsyter)
+
+                    val omsorgsperioder = persongrunnlag.omsorgsperioder.map { omsorgVedtakPeriode ->
+                        Omsorgsperiode(
+                            fom = omsorgVedtakPeriode.fom,
+                            tom = omsorgVedtakPeriode.tom,
+                            omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain() as DomainOmsorgstype.Barnetrygd,
+                            omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
+                            kilde = omsorgVedtakPeriode.kilde.toDomain(),
+                            utbetalt = omsorgVedtakPeriode.utbetalt,
+                            landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain()
+                        )
+                    }
+
+                    val hjelpestønadsperioder = persongrunnlag.hjelpestønadsperioder.map { hjelpestønadperiode ->
+                        Hjelpestønadperiode(
+                            fom = hjelpestønadperiode.fom,
+                            tom = hjelpestønadperiode.tom,
+                            omsorgstype = hjelpestønadperiode.omsorgstype.toDomain() as DomainOmsorgstype.Hjelpestønad,
+                            omsorgsmottaker = persondata.finnPerson(hjelpestønadperiode.omsorgsmottaker),
+                            kilde = hjelpestønadperiode.kilde.toDomain()
+                        )
+                    }
+
+                    val (første, siste) = omsorgsperioder.minOf { it.fom } to omsorgsperioder.maxOf { it.tom }
+
+                    val medlemskapsgrunnlag = medlemskapOppslag.hentMedlemskapsgrunnlag(
+                        fnr = omsorgsyter.fnr,
+                        fraOgMed = første,
+                        tilOgMed = siste,
+                    )
+
                     Persongrunnlag(
                         omsorgsyter = omsorgsyter,
-                        omsorgsperioder = persongrunnlag.omsorgsperioder.map { omsorgVedtakPeriode ->
-                            Omsorgsperiode(
-                                fom = omsorgVedtakPeriode.fom,
-                                tom = omsorgVedtakPeriode.tom,
-                                omsorgstype = omsorgVedtakPeriode.omsorgstype.toDomain() as DomainOmsorgstype.Barnetrygd,
-                                omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
-                                kilde = omsorgVedtakPeriode.kilde.toDomain(),
-                                utbetalt = omsorgVedtakPeriode.utbetalt,
-                                landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain()
-                            )
-                        },
-                        hjelpestønadperioder = persongrunnlag.hjelpestønadsperioder.map { hjelpestønadperiode ->
-                            Hjelpestønadperiode(
-                                fom = hjelpestønadperiode.fom,
-                                tom = hjelpestønadperiode.tom,
-                                omsorgstype = hjelpestønadperiode.omsorgstype.toDomain() as DomainOmsorgstype.Hjelpestønad,
-                                omsorgsmottaker = persondata.finnPerson(hjelpestønadperiode.omsorgsmottaker),
-                                kilde = hjelpestønadperiode.kilde.toDomain()
-                            )
-                        },
-                        medlemskapsgrunnlag = medlemskapOppslag.hentMedlemskapsgrunnlag(omsorgsyter.fnr)
+                        omsorgsperioder = omsorgsperioder,
+                        hjelpestønadperioder = hjelpestønadsperioder,
+                        medlemskapsgrunnlag = medlemskapsgrunnlag,
                     )
                 },
             innlesingId = innlesingId,

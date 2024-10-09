@@ -1,12 +1,33 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
+import java.time.YearMonth
+
 data class Medlemskapsgrunnlag(
-    val vurderingFraLoveME: LoveMeVurdering,
+    val unntaksperioder: List<Unntaksperiode>,
     val rådata: String,
 ) {
-    enum class LoveMeVurdering {
-        MEDLEM_I_FOLKETRYGDEN,
-        IKKE_MEDLEM_I_FOLKETRYGDEN,
-        UAVKLART_MEDLEMSKAP_I_FOLKETRYGDEN,
+    fun avgrensForÅr(år: Int): Medlemskapsgrunnlag {
+        return Medlemskapsgrunnlag(
+            unntaksperioder = unntaksperioder
+                .filter { it.periode.overlapper(år) }
+                .map { unntaksperiode ->
+                    unntaksperiode.periode.overlappendeMåneder(år)
+                        .let {
+                            Unntaksperiode(
+                                fraOgMed = it.min(),
+                                tilOgMed = it.max()
+                            )
+                        }
+                },
+            rådata = rådata,
+        )
+    }
+
+    data class Unntaksperiode(
+        val fraOgMed: YearMonth,
+        val tilOgMed: YearMonth,
+    ) {
+        val periode = Periode(fraOgMed, tilOgMed)
     }
 }

@@ -25,20 +25,20 @@ internal fun OmsorgsyterErMedlemIFolketrygdenDb.toDomain(): OmsorgsyterErMedlemI
 
 @JsonTypeName("MedlemIFolketrygden")
 internal data class MedlemIFolketrygden(
-    val medlemskapsvurdering: LoveMeVurderingDb,
+    val medlemskapsvurdering: MedlemskapsgrunnlagDb,
     val omsorgstype: OmsorgskategoriDb,
 ) : GrunnlagVilkårsvurderingDb()
 
 internal fun MedlemIFolketrygden.toDomain(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
     return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
-        loveMEVurdering = medlemskapsvurdering.toDomain(),
+        medlemskapsgrunnlag = medlemskapsvurdering.toDomain(),
         omsorgstype = omsorgstype.toDomain()
     )
 }
 
 internal fun OmsorgsyterErMedlemIFolketrygden.Grunnlag.toDb(): MedlemIFolketrygden {
     return MedlemIFolketrygden(
-        medlemskapsvurdering = loveMEVurdering.toDb(),
+        medlemskapsvurdering = medlemskapsgrunnlag.toDb(),
         omsorgstype = omsorgstype.toDb()
     )
 }
