@@ -1,9 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.monitorering
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.PostgresqlTestContainer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -13,60 +10,34 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
-import org.flywaydb.core.Flyway
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestMethodOrder
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import java.time.Instant
 import java.time.Instant.now
 import java.time.Month
 import java.time.YearMonth
-import java.util.*
-import javax.sql.DataSource
+import java.util.UUID
 import kotlin.time.Duration.Companion.days
 import kotlin.time.toJavaDuration
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-object StatusServiceTest {
+class StatusServiceTest : SpringContextTest.NoKafka() {
 
     private inline val Int.daysAgo: Instant get() = now().minus(this.days.toJavaDuration())
 
-    private lateinit var oppgaveRepo: OppgaveRepo
+    @Autowired
     private lateinit var personGrunnlagRepo: PersongrunnlagRepo
-    private lateinit var behandlingRepo: BehandlingRepo
-    private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
 
+    @Autowired
     private lateinit var statusService: StatusService
-    private lateinit var dataSource: DataSource
+
+    @Autowired
     private lateinit var jdbcTemplate: NamedParameterJdbcTemplate
-
-    @BeforeAll
-    fun beforeAll() {
-        try {
-            dataSource = PostgresqlTestContainer.createInstance("test-status")
-            val flyway =
-                Flyway.configure()
-                    .dataSource(dataSource)
-                    .locations("classpath:db/migration")
-                    .load()
-            flyway.migrate()
-
-            jdbcTemplate = NamedParameterJdbcTemplate(dataSource)
-            oppgaveRepo = OppgaveRepo(jdbcTemplate)
-            personGrunnlagRepo = PersongrunnlagRepo(jdbcTemplate)
-            behandlingRepo = BehandlingRepo(jdbcTemplate)
-            godskrivOpptjeningRepo = GodskrivOpptjeningRepo(jdbcTemplate)
-            statusService = StatusService(oppgaveRepo, behandlingRepo, personGrunnlagRepo, godskrivOpptjeningRepo)
-        } catch(ex: Exception) {
-            ex.printStackTrace()
-        }
-    }
-
-    @BeforeEach
-    fun beforeEach() {
-        PostgresqlTestContainer.removeDataFromDB(dataSource)
-    }
 
     private fun personGrunnlagMelding(opprettet: Instant): PersongrunnlagMelding.Lest {
         return PersongrunnlagMelding.Lest(
