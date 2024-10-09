@@ -5,24 +5,23 @@ import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.OPPGAVE_PATH
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.WIREMOCK_PORT
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.TokenProviderConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.springframework.beans.factory.annotation.Autowired
+import org.mockito.kotlin.mock
 import org.springframework.http.HttpHeaders
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class OppgaveKlientTest : SpringContextTest.NoKafka() {
-
-    @Autowired
-    private lateinit var client: OppgaveKlient
+class OppgaveKlientTest {
 
     companion object {
         @JvmField
@@ -31,6 +30,11 @@ class OppgaveKlientTest : SpringContextTest.NoKafka() {
             .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
             .build()!!
     }
+
+    private val client: OppgaveKlient = OppgaveKlient(
+        oppgaveUrl = "${wiremock.baseUrl()}/$OPPGAVE_PATH",
+        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) }
+    )
 
     @Test
     fun `kaster exception dersom kall ikke gikk bra`() {

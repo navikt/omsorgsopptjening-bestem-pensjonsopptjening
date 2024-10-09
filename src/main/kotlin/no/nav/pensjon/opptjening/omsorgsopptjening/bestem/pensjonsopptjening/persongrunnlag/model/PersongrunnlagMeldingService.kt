@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.med
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsgrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.tilOmsorgsopptjeningsgrunnlag
@@ -187,13 +188,16 @@ class PersongrunnlagMeldingService(
                         )
                     }
 
-                    val (første, siste) = omsorgsperioder.minOf { it.fom } to omsorgsperioder.maxOf { it.tom }
-
-                    val medlemskapsgrunnlag = medlemskapOppslag.hentMedlemskapsgrunnlag(
-                        fnr = omsorgsyter.fnr,
-                        fraOgMed = første,
-                        tilOgMed = siste,
-                    )
+                    val medlemskapsgrunnlag = if (omsorgsperioder.isNotEmpty()) {
+                        val (første, siste) = omsorgsperioder.minOf { it.fom } to omsorgsperioder.maxOf { it.tom }
+                        medlemskapOppslag.hentMedlemskapsgrunnlag(
+                            fnr = omsorgsyter.fnr,
+                            fraOgMed = første,
+                            tilOgMed = siste,
+                        )
+                    } else {
+                        Medlemskapsgrunnlag(emptyList(), "")
+                    }
 
                     Persongrunnlag(
                         omsorgsyter = omsorgsyter,

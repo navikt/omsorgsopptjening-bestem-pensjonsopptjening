@@ -2,7 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external.PENBrevClient.Companion.sendBrevUrl
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external.PENBrevClient.Companion.createPath
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
@@ -79,7 +79,7 @@ class BrevProsesseringTest(
         wiremock.bestemSakOk()
         wiremock.medlemIFolketrygden()
 
-        val sendBrevPath = URI(sendBrevUrl(baseUrl, "12345")).toURL().path
+        val sendBrevPath = URI(createPath(baseUrl, "12345")).toURL().path
 
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo(sendBrevPath))
@@ -201,7 +201,7 @@ class BrevProsesseringTest(
 
     @Test
     fun `gitt at en melding har blitt prosessert på nytt uten hell maks antall ganger skal det opprettes en oppgave`() {
-        val sendBrevPath = URI(sendBrevUrl(baseUrl, "42")).toURL().path
+        val sendBrevPath = URI(createPath(baseUrl, "42")).toURL().path
 
         wiremock.stubForPdlTransformer()
         wiremock.ingenPensjonspoeng("12345678910") //mor

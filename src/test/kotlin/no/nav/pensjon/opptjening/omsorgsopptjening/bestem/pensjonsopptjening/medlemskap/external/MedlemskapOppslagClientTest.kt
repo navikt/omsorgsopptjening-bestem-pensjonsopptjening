@@ -7,8 +7,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.WIREMOCK_PORT
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.TokenProviderConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsgrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.desember
@@ -19,15 +20,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.springframework.beans.factory.annotation.Autowired
+import org.mockito.kotlin.mock
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import kotlin.test.Test
 
-class MedlemskapOppslagClientTest : SpringContextTest.NoKafka() {
-
-    @Autowired
-    private lateinit var client: MedlemskapOppslagClient
+class MedlemskapOppslagClientTest {
 
     companion object {
         @JvmField
@@ -36,6 +34,11 @@ class MedlemskapOppslagClientTest : SpringContextTest.NoKafka() {
             .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
             .build()!!
     }
+
+    private val client: MedlemskapOppslag = MedlemskapOppslagClient(
+        url = wiremock.baseUrl(),
+        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) }
+    )
 
     @Test
     fun `kan slå opp informasjon om medlemskap`() {
@@ -76,7 +79,7 @@ class MedlemskapOppslagClientTest : SpringContextTest.NoKafka() {
         """.trimIndent()
 
         wiremock.givenThat(
-            get(urlPathEqualTo("$MEDLEMSKAP_PATH/api/v1/medlemskapsunntak"))
+            get(urlPathEqualTo("/api/v1/medlemskapsunntak"))
                 .willReturn(
                     aResponse()
                         .withStatus(200)
@@ -106,7 +109,7 @@ class MedlemskapOppslagClientTest : SpringContextTest.NoKafka() {
                     )
                 )
                 wiremock.verify(
-                    getRequestedFor(urlPathEqualTo("$MEDLEMSKAP_PATH/api/v1/medlemskapsunntak"))
+                    getRequestedFor(urlPathEqualTo("/api/v1/medlemskapsunntak"))
                         .withQueryParam("fraOgMed", equalTo("2024-01-01"))
                         .withQueryParam("tilOgMed", equalTo("2024-12-31"))
                         .withHeader("Nav-Personident", equalTo("04427625287"))

@@ -4,7 +4,8 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.PDL_PATH
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.WIREMOCK_PORT
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.TokenProviderConfig.Companion.MOCK_TOKEN
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslagException
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
@@ -15,17 +16,16 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.springframework.beans.factory.annotation.Autowired
+import org.mockito.kotlin.mock
+import org.springframework.core.io.ClassPathResource
 import org.springframework.web.client.RestClientException
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-internal class PdlServiceTest : SpringContextTest.NoKafka() {
+internal class PdlServiceTest {
 
-    private val UUID_REGEX = "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"
-
-    @Autowired
-    lateinit var pdlService: PdlService
+    private val UUID_REGEX =
+        "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"
 
     companion object {
         const val FNR = "11111111111"
@@ -36,6 +36,19 @@ internal class PdlServiceTest : SpringContextTest.NoKafka() {
             .options(wireMockConfig().port(WIREMOCK_PORT))
             .build()!!
     }
+
+    private val pdlService: PdlService = PdlService(
+        PdlClient(
+            pdlUrl = "${wiremock.baseUrl()}/$PDL_PATH",
+            tokenProvider = mock { on { getToken() }.thenReturn(MOCK_TOKEN) },
+            metrics = mock(),
+            graphqlQuery = GraphqlQuery(
+                hentPersonQuery = ClassPathResource("pdl/folkeregisteridentifikator.graphql"),
+                hentAktorIdQuery = ClassPathResource("pdl/hentAktorId.graphql")
+            )
+        )
+    )
+
 
     @Test
     fun `Given hentPerson then call pdl one time`() {

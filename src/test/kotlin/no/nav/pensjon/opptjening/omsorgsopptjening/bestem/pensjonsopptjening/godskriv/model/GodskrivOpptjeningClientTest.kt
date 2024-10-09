@@ -9,7 +9,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.serverError
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.WIREMOCK_PORT
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.TokenProviderConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClientExecption
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
@@ -20,15 +22,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
+import org.mockito.kotlin.mock
 import org.springframework.http.HttpHeaders
 
-class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
-
-    @Autowired
-    @Qualifier("godskrivOpptjening")
-    private lateinit var godskrivOpptjeningClient: GodskrivOpptjeningClient
+internal class GodskrivOpptjeningClientTest {
 
     companion object {
         @JvmField
@@ -38,12 +35,18 @@ class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
             .build()!!
     }
 
+    private val godskrivOpptjeningClient: GodskrivOpptjeningClient = PoppClient(
+        baseUrl = wiremock.baseUrl(),
+        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) }
+    )
+
+
     @Test
     fun `kaster exception med informasjon dersom kall svarer med server error`() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
                 wiremock.givenThat(
-                    post(urlPathEqualTo(POPP_OMSORG_PATH))
+                    post(urlPathEqualTo("/omsorg"))
                         .willReturn(serverError())
                 )
 
@@ -66,7 +69,7 @@ class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
                 wiremock.givenThat(
-                    post(urlPathEqualTo(POPP_OMSORG_PATH))
+                    post(urlPathEqualTo("/omsorg"))
                         .willReturn(
                             aResponse()
                                 .withStatus(512)
@@ -103,7 +106,7 @@ class GodskrivOpptjeningClientTest : SpringContextTest.NoKafka() {
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
                 wiremock.givenThat(
-                    post(urlPathEqualTo(POPP_OMSORG_PATH))
+                    post(urlPathEqualTo("/omsorg"))
                         .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer test.token.test"))
                         .withHeader(HttpHeaders.ACCEPT, equalTo("application/json"))
                         .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))

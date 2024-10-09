@@ -1,5 +1,6 @@
-package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external
+package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.spring
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
 import org.springframework.beans.factory.annotation.Qualifier
@@ -9,7 +10,7 @@ import org.springframework.context.annotation.Configuration
 import pensjon.opptjening.azure.ad.client.TokenProvider
 
 @Configuration
-internal class BeanConfig(
+internal class PoppClientConfig(
     @Value("\${POPP_URL}") private val baseUrl: String,
     @Qualifier("poppTokenProvider") private val tokenProvider: TokenProvider,
 ) {

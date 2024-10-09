@@ -1,46 +1,31 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.external.pdl
 
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
-import org.springframework.stereotype.Component
-import org.springframework.web.client.RestClientException
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.net.URI
 
-@Component
 internal class PdlClient(
-    @Value("\${PDL_URL}") private val pdlUrl: String,
-    @Qualifier("pdlTokenProvider") private val tokenProvider: TokenProvider,
-    registry: MeterRegistry,
+    private val pdlUrl: String,
+    private val tokenProvider: TokenProvider,
+    private val metrics: PdlClientMetrics,
     private val graphqlQuery: GraphqlQuery,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
 
-    private val antallPersonerHentet = registry.counter("personer", "antall", "hentet")
-    private val antallAktoridHentet = registry.counter("aktorid", "antall", "hentet")
     private val restTemplate = RestTemplateBuilder().build()
 
-    @Retryable(
-        maxAttempts = 4,
-        value = [RestClientException::class, PdlException::class],
-        backoff = Backoff(delay = 1500L, maxDelay = 30000L, multiplier = 2.5)
-    )
     fun hentPerson(fnr: String): PdlResponse? {
         val entity = RequestEntity<PdlQuery>(
             PdlQuery(graphqlQuery.hentPersonQuery(), FnrVariables(ident = fnr)),
@@ -59,7 +44,7 @@ internal class PdlClient(
         }
         response?.warnings?.let { log.warn(it.toString()) }
 
-        antallPersonerHentet.increment()
+        metrics.tellPersonHentet()
         return response
     }
 
@@ -79,7 +64,7 @@ internal class PdlClient(
         response?.error?.extensions?.code?.also {
             if (it == PdlErrorCode.SERVER_ERROR) throw PdlException(response.error)
         }
-        antallAktoridHentet.increment()
+        metrics.tellAktørIdHentet()
         return response
     }
 
@@ -98,11 +83,8 @@ internal class PdlClient(
     }
 }
 
-@Component
 internal class GraphqlQuery(
-    @Value("classpath:pdl/folkeregisteridentifikator.graphql")
     private val hentPersonQuery: Resource,
-    @Value("classpath:pdl/hentAktorId.graphql")
     private val hentAktorIdQuery: Resource
 ) {
     fun hentPersonQuery(): String {

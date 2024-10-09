@@ -6,26 +6,19 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
-import org.springframework.stereotype.Component
-import org.springframework.web.client.RestClientException
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.net.URI
 import java.time.LocalDate
 import java.time.YearMonth
 
-@Component
 internal class MedlemskapOppslagClient(
-    @Value("\${MEDLEMSKAP_URL}") private val url: String,
-    @Qualifier("medlemskapTokenProvider") private val tokenProvider: TokenProvider,
+    private val url: String,
+    private val tokenProvider: TokenProvider,
 ) : MedlemskapOppslag {
 
     private val restTemplate = RestTemplateBuilder().build()
@@ -38,11 +31,6 @@ internal class MedlemskapOppslagClient(
         return hent(fnr, fraOgMed, tilOgMed)
     }
 
-    @Retryable(
-        maxAttempts = 4,
-        value = [RestClientException::class],
-        backoff = Backoff(delay = 1500L, maxDelay = 30000L, multiplier = 2.5)
-    )
     private fun hent(
         fnr: String,
         fraOgMed: YearMonth,

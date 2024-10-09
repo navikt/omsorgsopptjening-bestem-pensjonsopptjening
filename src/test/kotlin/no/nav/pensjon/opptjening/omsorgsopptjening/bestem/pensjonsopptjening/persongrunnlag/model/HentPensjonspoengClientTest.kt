@@ -9,24 +9,21 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.POPP_PENSJONSPOENG_PATH
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.WIREMOCK_PORT
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.TokenProviderConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.external.PoppClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
+import org.mockito.kotlin.mock
 import kotlin.test.assertEquals
 
-class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
-
-    @Autowired
-    @Qualifier("hentPensjonspoeng")
-    private lateinit var hentPensjonspoengClient: HentPensjonspoengClient
+internal class HentPensjonspoengClientTest {
 
     companion object {
         @JvmField
@@ -35,6 +32,11 @@ class HentPensjonspoengClientTest : SpringContextTest.NoKafka() {
             .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
             .build()!!
     }
+
+    private val hentPensjonspoengClient: HentPensjonspoengClient = PoppClient(
+        baseUrl = "${wiremock.baseUrl()}/api",
+        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) }
+    )
 
     @Test
     fun `happy path`() {

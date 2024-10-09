@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -10,23 +9,18 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Component
 import pensjon.opptjening.azure.ad.client.TokenProvider
 
-@Component
 class BestemSakKlient(
-    @Value("\${PEN_BASE_URL}") private val bestemSakUrl: String,
-    @Qualifier("PENTokenProvider") private val tokenProvider: TokenProvider,
-    registry: MeterRegistry
+    private val bestemSakUrl: String,
+    private val tokenProvider: TokenProvider,
+    private val metrics: BestemSakMetrics,
 ) {
-    private val antallSakerHentet = registry.counter("saker", "antall", "hentet")
     private val log: Logger by lazy { LoggerFactory.getLogger(BestemSakKlient::class.java) }
     private val restTemplate = RestTemplateBuilder().build()
 
@@ -55,7 +49,7 @@ class BestemSakKlient(
                 ),
                 String::class.java
             )
-            antallSakerHentet.increment()
+            metrics.tellAntallSakerHentet()
             mapper.readValue(response.body, BestemSakResponse::class.java).omsorgssak.let {
                 Omsorgssak(
                     sakId = it.sakId,

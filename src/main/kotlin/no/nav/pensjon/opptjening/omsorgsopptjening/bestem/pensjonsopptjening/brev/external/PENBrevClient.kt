@@ -2,38 +2,35 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.metrics.PENBrevMetrikker
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClient
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevClientException
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevSpraak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.EksternReferanseId
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Journalpost
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.time.Year
 
-@Component
-class PENBrevClient(
-    @Value("\${PEN_BASE_URL}")
+internal class PENBrevClient(
     private val baseUrl: String,
-    @Qualifier("PENTokenProvider")
     private val tokenProvider: TokenProvider,
     private val penBrevMetricsMåling: PENBrevMetrikker,
-
-    ) : BrevClient {
+) : BrevClient {
     private val restTemplate = RestTemplateBuilder().build()
 
     companion object {
-        fun sendBrevUrl(baseUrl: String, sakId: String): String {
+        fun createPath(baseUrl: String, sakId: String): String {
             return "$baseUrl/api/brev/sak/$sakId/PE_OMSORG_HJELPESTOENAD_AUTO"
         }
 
@@ -46,57 +43,57 @@ class PENBrevClient(
         omsorgsår: Year,
         språk: BrevSpraak?
     ): Journalpost {
-        val url = sendBrevUrl(baseUrl, sakId)
+        val url = createPath(baseUrl, sakId)
         return try {
-            penBrevMetricsMåling.oppdater {
-                val response = restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    HttpEntity(
-                        serialize(
-                            SendBrevRequest(
-                                omsorgsår,
-                                eksternReferanseId.value,
-                                språk,
-                            )
-                        ),
-                        HttpHeaders().apply {
-                            add("Nav-Call-Id", Mdc.getCorrelationId())
-                            add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
-                            add(CorrelationId.identifier, Mdc.getCorrelationId())
-                            add(InnlesingId.identifier, Mdc.getInnlesingId())
-                            accept = listOf(MediaType.APPLICATION_JSON)
-                            contentType = MediaType.APPLICATION_JSON
-                            setBearerAuth(tokenProvider.getToken())
-                        }
+            val response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                HttpEntity(
+                    serialize(
+                        SendBrevRequest(
+                            omsorgsår,
+                            eksternReferanseId.value,
+                            språk,
+                        )
                     ),
-                    String::class.java
-                )
-                when (response.statusCode.value()) {
-                    200 -> {
+                    HttpHeaders().apply {
+                        add("Nav-Call-Id", Mdc.getCorrelationId())
+                        add("Nav-Consumer-Id", "omsorgsopptjening-bestem-pensjonsopptjening")
+                        add(CorrelationId.identifier, Mdc.getCorrelationId())
+                        add(InnlesingId.identifier, Mdc.getInnlesingId())
+                        accept = listOf(MediaType.APPLICATION_JSON)
+                        contentType = MediaType.APPLICATION_JSON
+                        setBearerAuth(tokenProvider.getToken())
+                    }
+                ),
+                String::class.java
+            )
+            when (response.statusCode.value()) {
+                200 -> {
+                    mapper.readValue(
+                        response.body,
+                        SendBrevResponse.JournalPostId::class.java
+                    ).let { response ->
+                        if (response.error != null) {
+                            throw BrevClientException("Brevtjenesten svarte ok, med journalId:${response.journalpostId} og feil, teknisk grunn:${response.error.tekniskgrunn} og beskrivelse: ${response.error.beskrivelse}")
+                        }
+                        Journalpost(response.journalpostId).also {
+                            penBrevMetricsMåling.oppdater { it }
+                        }
+                    }
+                }
+
+                404 -> throw BrevClientException("Vedtak eksisterer ikke (400 Not Found)")
+                400 -> {
+                    val feil =
                         mapper.readValue(
                             response.body,
-                            SendBrevResponse.JournalPostId::class.java
-                        ).let { response ->
-                            if (response.error != null) {
-                                throw BrevClientException("Brevtjenesten svarte ok, med journalId:${response.journalpostId} og feil, teknisk grunn:${response.error.tekniskgrunn} og beskrivelse: ${response.error.beskrivelse}")
-                            }
-                            Journalpost(response.journalpostId)
-                        }
-                    }
-
-                    404 -> throw BrevClientException("Vedtak eksisterer ikke (400 Not Found)")
-                    400 -> {
-                        val feil =
-                            mapper.readValue(
-                                response.body,
-                                SendBrevResponse.Feil::class.java
-                            )
-                        throw BrevClientException("${feil.error.tekniskgrunn} ${feil.error.beskrivelse ?: ""}}")
-                    }
-
-                    else -> throw BrevClientException("PEN Brev returnerte http ${response.statusCode.value()}")
+                            SendBrevResponse.Feil::class.java
+                        )
+                    throw BrevClientException("${feil.error.tekniskgrunn} ${feil.error.beskrivelse ?: ""}}")
                 }
+
+                else -> throw BrevClientException("PEN Brev returnerte http ${response.statusCode.value()}")
             }
         } catch (ex: HttpClientErrorException) {
             when (ex.statusCode.value()) {

@@ -3,7 +3,9 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.BESTEM_SAK_PATH
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.WIREMOCK_PORT
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.TokenProviderConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -11,14 +13,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.springframework.beans.factory.annotation.Autowired
+import org.mockito.kotlin.mock
 import org.springframework.http.HttpHeaders
 import kotlin.test.assertEquals
 
-class BestemSakKlientTest : SpringContextTest.NoKafka() {
-
-    @Autowired
-    private lateinit var client: BestemSakKlient
+class BestemSakKlientTest {
 
     companion object {
         @JvmField
@@ -27,6 +26,12 @@ class BestemSakKlientTest : SpringContextTest.NoKafka() {
             .options(WireMockConfiguration.wireMockConfig().port(WIREMOCK_PORT))
             .build()!!
     }
+
+    private val client: BestemSakKlient = BestemSakKlient(
+        bestemSakUrl = "${wiremock.baseUrl()}/pen",
+        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) },
+        metrics = mock()
+    )
 
     @Test
     fun `kaster exception dersom respons indikerer at noe er feil`() {

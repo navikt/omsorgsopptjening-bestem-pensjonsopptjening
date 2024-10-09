@@ -5,14 +5,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Component
 import org.springframework.web.client.HttpClientErrorException
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.time.LocalDate
@@ -23,10 +20,9 @@ import java.time.format.DateTimeFormatter
  * https://kodeverk-web.dev.intern.nav.no/kodeverksoversikt/kodeverk
  * https://github.com/navikt/kodeverksmapper/blob/master/web/src/main/resources/underkategori.csv
  */
-@Component
 class OppgaveKlient(
-    @Value("\${OPPGAVE_URL}") private val oppgaveUrl: String,
-    @Qualifier("oppgaveTokenProvider") private val tokenProvider: TokenProvider,
+    private val oppgaveUrl: String,
+    private val tokenProvider: TokenProvider,
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(OppgaveKlient::class.java)

@@ -104,8 +104,8 @@ fun WireMockExtension.ikkeMedlemIFolketrygden() {
                               {
                                 "unntakId": 0,
                                 "ident": "04427625287",
-                                "fraOgMed": "2024-05-09",
-                                "tilOgMed": "2024-10-09",
+                                "fraOgMed": "2020-05-09",
+                                "tilOgMed": "2020-10-09",
                                 "status": "string",
                                 "statusaarsak": "string",
                                 "dekning": "string",
