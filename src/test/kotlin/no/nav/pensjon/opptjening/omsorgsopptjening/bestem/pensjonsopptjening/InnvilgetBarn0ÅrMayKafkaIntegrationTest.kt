@@ -26,7 +26,7 @@ import java.time.YearMonth
 import kotlin.test.assertEquals
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
-
+@Disabled("feiler på gihub")
 class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
 
     @Autowired
@@ -45,7 +45,6 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
     }
 
     @Test
-    @Disabled("feiler på gihub")
     fun `consume, process and send innvilget child 0 years`() {
         wiremock.stubForPdlTransformer()
         wiremock.givenThat(
