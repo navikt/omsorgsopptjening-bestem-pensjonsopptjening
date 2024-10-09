@@ -25,6 +25,10 @@ spec:
       value: https://pensjon-popp-q2.dev-fss-pub.nais.io/popp/api
     - name: POPP_API_ID
       value: dev-fss.pensjonopptjening.pensjon-popp-q2
+    - name: MEDLEMSKAP_URL
+      value: https://medlemskap-medl-api.dev-fss-pub.nais.io
+    - name: MEDLEMSKAP_API_ID
+      value: dev-fss.team-rocket.medlemskap-medl-api
     - name: OMSORGSOPPTJENING_TOPIC
       value: pensjonopptjening.omsorgsopptjening
     - name: OMSORGSOPPTJENING_CONSUMER_GROUP
@@ -69,6 +73,7 @@ spec:
         - host: oppgave.dev-fss-pub.nais.io
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
+        - host: medlemskap-medl-api.dev-fss-pub.nais.io
   image: {{ image }}
   liveness:
     path: /actuator/health/liveness
