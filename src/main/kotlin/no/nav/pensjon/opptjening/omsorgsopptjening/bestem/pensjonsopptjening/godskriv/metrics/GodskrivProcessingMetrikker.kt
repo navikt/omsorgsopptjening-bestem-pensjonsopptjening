@@ -3,9 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.Metrikker
-import org.springframework.stereotype.Component
 
-@Component
 class GodskrivProcessingMetrikker(registry: MeterRegistry) : Metrikker<List<GodskrivOpptjening.Persistent>?> {
 
     private val godskrivProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "godskrivProsessert")

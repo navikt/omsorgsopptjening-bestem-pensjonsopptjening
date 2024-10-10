@@ -7,13 +7,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Profile
-import org.springframework.stereotype.Component
 
-@Component
-@Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
-class GodskrivOpptjeningProcessingThread(
-    private val service: GodskrivOpptjeningService,
+internal class GodskrivOpptjeningProcessingThread(
+    private val service: GodskrivOpptjeningProcessingService,
     private val unleash: Unleash,
     private val godskrivProcessingMetricsMåling: GodskrivProcessingMetrikker,
     private val godskrivProcessingMetricsFeilmåling: GodskrivProcessingMetricsFeilmåling,

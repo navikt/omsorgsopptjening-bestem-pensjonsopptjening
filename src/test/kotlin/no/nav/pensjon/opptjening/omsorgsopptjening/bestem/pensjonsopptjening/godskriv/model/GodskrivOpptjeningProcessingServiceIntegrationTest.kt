@@ -35,7 +35,7 @@ import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
-class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
+class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var repo: PersongrunnlagRepo
@@ -50,7 +50,7 @@ class GodskrivOpptjeningServiceTest : SpringContextTest.NoKafka() {
     private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
 
     @Autowired
-    private lateinit var godskrivOpptjeningService: GodskrivOpptjeningService
+    private lateinit var godskrivOpptjeningService: GodskrivOpptjeningProcessingService
 
     @MockBean
     private lateinit var clock: Clock
