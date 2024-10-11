@@ -8,9 +8,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ikkeMedlemIFolketrygden
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.medlemIFolketrygden
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.unntaksperioderUtenMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AntallMånederRegel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
@@ -78,7 +78,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
     }
 
     @Test
@@ -464,7 +464,6 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
             )
         }
     }
-
 
 
     @Test
@@ -1829,7 +1828,13 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `omsorgsyter som ikke er medlem i folketrygden gir avslag`() {
-        wiremock.ikkeMedlemIFolketrygden()
+        val fom = YearMonth.of(2018, Month.SEPTEMBER)
+        val tom = YearMonth.of(2025, Month.DECEMBER)
+
+        wiremock.unntaksperioderUtenMedlemskap(
+            fnr = "12345678910",
+            perioder = setOf(Periode(fom, tom))
+        )
 
         repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -1840,8 +1845,8 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2018, Month.SEPTEMBER),
-                                    tom = YearMonth.of(2025, Month.DECEMBER),
+                                    fom = fom,
+                                    tom = tom,
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -1872,7 +1877,7 @@ class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
                         OmsorgsyterErMedlemIFolketrygden.Grunnlag::class.java,
                         vurdering.grunnlag
                     ).also {
-                        assertThat(it.medlemskapsgrunnlag.unntaksperioder).isNotEmpty()
+                        assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.ikkeMedlem).isNotEmpty()
                     }
                 }
         }

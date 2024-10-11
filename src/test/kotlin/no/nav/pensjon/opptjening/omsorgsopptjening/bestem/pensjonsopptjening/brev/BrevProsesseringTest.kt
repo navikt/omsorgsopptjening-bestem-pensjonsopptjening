@@ -9,7 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.bre
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.bestemSakOk
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.medlemIFolketrygden
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
@@ -77,7 +77,7 @@ class BrevProsesseringTest(
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.ingenPensjonspoeng("04010012797") //far
         wiremock.bestemSakOk()
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         val sendBrevPath = URI(createPath(baseUrl, "12345")).toURL().path
 
@@ -207,7 +207,7 @@ class BrevProsesseringTest(
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.ingenPensjonspoeng("04010012797") //far
         wiremock.bestemSakOk()
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo(sendBrevPath))

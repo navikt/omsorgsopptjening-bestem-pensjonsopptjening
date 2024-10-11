@@ -1,11 +1,14 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.external
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsgrunnlag
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapsUnntakOppslag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsunntak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.MedlemskapsunntakPeriode
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
+import org.apache.commons.lang3.ObjectUtils.min
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -16,18 +19,18 @@ import java.net.URI
 import java.time.LocalDate
 import java.time.YearMonth
 
-internal class MedlemskapOppslagClient(
+internal class MedlemskapsUnntakOppslagClient(
     private val url: String,
     private val tokenProvider: TokenProvider,
-) : MedlemskapOppslag {
+) : MedlemskapsUnntakOppslag {
 
     private val restTemplate = RestTemplateBuilder().build()
 
-    override fun hentMedlemskapsgrunnlag(
+    override fun hentUnntaksperioder(
         fnr: String,
         fraOgMed: YearMonth,
         tilOgMed: YearMonth,
-    ): Medlemskapsgrunnlag {
+    ): Medlemskapsunntak {
         return hent(fnr, fraOgMed, tilOgMed)
     }
 
@@ -35,7 +38,7 @@ internal class MedlemskapOppslagClient(
         fnr: String,
         fraOgMed: YearMonth,
         tilOgMed: YearMonth,
-    ): Medlemskapsgrunnlag {
+    ): Medlemskapsunntak {
         val fomDato = fraOgMed.atDay(1)
         val tomDato = tilOgMed.atEndOfMonth()
 
@@ -55,27 +58,46 @@ internal class MedlemskapOppslagClient(
 
         val response = restTemplate.exchange(entity, String::class.java).body!!
 
-        val mapped = deserialize<List<Unntak>>(response)
+        val mapped = deserialize<List<ResponsePeriode>>(response)
+            .filter { setOf(PeriodestatusMedl.GYLD, PeriodestatusMedl.UAVK).contains(it.status) }
 
-        return Medlemskapsgrunnlag(
-            unntaksperioder = mapped.map {
-                Medlemskapsgrunnlag.Unntaksperiode(
-                    fraOgMed = YearMonth.of(it.fraOgMed.year, it.fraOgMed.month),
-                    tilOgMed = YearMonth.of(it.tilOgMed.year, it.tilOgMed.month)
-                )
-            },
+        return Medlemskapsunntak(
+            ikkeMedlem = mapped
+                .filter { !it.medlem }
+                .map {
+                    MedlemskapsunntakPeriode(
+                        fraOgMed = YearMonth.of(it.fraOgMed.year, it.fraOgMed.month),
+                        tilOgMed = min(
+                            YearMonth.of(it.tilOgMed.year, it.tilOgMed.month),
+                            tilOgMed
+                        ) //trunkerer pg default 9999-12-31 for åpne perioder
+                    )
+                }
+                .toSet(),
+            pliktigEllerFrivillig = mapped
+                .filter { it.medlem }
+                .map {
+                    MedlemskapsunntakPeriode(
+                        fraOgMed = YearMonth.of(it.fraOgMed.year, it.fraOgMed.month),
+                        tilOgMed = min(
+                            YearMonth.of(it.tilOgMed.year, it.tilOgMed.month),
+                            tilOgMed
+                        ) //trunkerer pg default 9999-12-31 for åpne perioder
+                    )
+                }
+                .toSet(),
             rådata = response
         )
     }
 }
 
-
-internal data class Unntak(
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class ResponsePeriode(
     val unntakId: Int,
     val ident: String,
     val fraOgMed: LocalDate,
-    val tilOgMed: LocalDate,
-    val status: String,
+    val tilOgMed: LocalDate, //alltid satt, 9999-12-31 tilsvarer null/åpen/ubestemt periode
+    val status: PeriodestatusMedl,
     val statusaarsak: String,
     val dekning: String,
     val helsedel: Boolean,
@@ -83,25 +105,10 @@ internal data class Unntak(
     val lovvalgsland: String,
     val lovvalg: String,
     val grunnlag: String,
-    val sporingsinformasjon: Sporingsinformasjon,
-    val studieinformasjon: Studieinformasjon
 )
 
-internal data class Sporingsinformasjon(
-    val versjon: Int,
-    val registrert: String,
-    val besluttet: String,
-    val kilde: String,
-    val kildedokument: String,
-    val opprettet: String,
-    val opprettetAv: String,
-    val sistEndret: String,
-    val sistEndretAv: String
-)
-
-internal data class Studieinformasjon(
-    val statsborgerland: String,
-    val studieland: String,
-    val delstudie: Boolean,
-    val soeknadInnvilget: Boolean
-)
+enum class PeriodestatusMedl {
+    AVST, //avvist
+    GYLD, //gyldig
+    UAVK, //uavklart
+}

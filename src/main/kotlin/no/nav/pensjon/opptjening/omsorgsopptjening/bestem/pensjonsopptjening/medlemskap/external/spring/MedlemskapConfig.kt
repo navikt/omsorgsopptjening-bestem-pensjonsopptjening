@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.external.spring
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.external.MedlemskapOppslagClient
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapsUnntakOppslag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.external.MedlemskapsUnntakOppslagClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -15,7 +15,7 @@ class MedlemskapConfig {
     fun medlemskapsClient(
         @Value("\${MEDLEMSKAP_URL}") url: String,
         @Qualifier("medlemskapTokenProvider") tokenProvider: TokenProvider,
-    ): MedlemskapOppslag {
-        return MedlemskapOppslagClient(url, tokenProvider)
+    ): MedlemskapsUnntakOppslag {
+        return MedlemskapsUnntakOppslagClient(url, tokenProvider)
     }
 }

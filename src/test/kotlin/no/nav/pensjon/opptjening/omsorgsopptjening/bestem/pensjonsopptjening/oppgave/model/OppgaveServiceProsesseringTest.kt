@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.medlemIFolketrygden
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -128,7 +128,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         )
 
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -266,7 +266,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         )
 
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -364,7 +364,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         )
 
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         val melding = repo.lagre(
             PersongrunnlagMelding.Lest(

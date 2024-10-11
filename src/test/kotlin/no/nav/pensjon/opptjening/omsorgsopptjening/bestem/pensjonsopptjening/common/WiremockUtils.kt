@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.common.FileSource
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
@@ -13,7 +14,9 @@ import com.github.tomakehurst.wiremock.http.Request
 import com.github.tomakehurst.wiremock.http.ResponseDefinition
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.POPP_PENSJONSPOENG_PATH
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
+import kotlin.random.Random
 
 /**
  * Velger body-fil basert på identen i requesten.
@@ -80,7 +83,7 @@ fun WireMockExtension.stubForPdlTransformer() {
     )
 }
 
-fun WireMockExtension.medlemIFolketrygden() {
+fun WireMockExtension.ingenUnntaksperioderForMedlemskap() {
     this.stubFor(
         WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
             .willReturn(
@@ -92,48 +95,104 @@ fun WireMockExtension.medlemIFolketrygden() {
     )
 }
 
-fun WireMockExtension.ikkeMedlemIFolketrygden() {
+fun WireMockExtension.unntaksperioderUtenMedlemskap(
+    fnr: String,
+    perioder: Set<Periode>
+) {
     this.stubFor(
         WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+            .withHeader("Nav-Personident", equalTo(fnr))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)
                     .withBody(
-                        """
-                            [
-                              {
-                                "unntakId": 0,
-                                "ident": "04427625287",
-                                "fraOgMed": "2020-05-09",
-                                "tilOgMed": "2020-10-09",
-                                "status": "string",
-                                "statusaarsak": "string",
-                                "dekning": "string",
-                                "helsedel": true,
-                                "medlem": true,
-                                "lovvalgsland": "string",
-                                "lovvalg": "string",
-                                "grunnlag": "string",
-                                "sporingsinformasjon": {
-                                  "versjon": 0,
-                                  "registrert": "2024-10-09",
-                                  "besluttet": "2024-10-09",
-                                  "kilde": "string",
-                                  "kildedokument": "string",
-                                  "opprettet": "2024-10-09T10:53:14.596Z",
-                                  "opprettetAv": "string",
-                                  "sistEndret": "2024-10-09T10:53:14.596Z",
-                                  "sistEndretAv": "string"
-                                },
-                                "studieinformasjon": {
-                                  "statsborgerland": "string",
-                                  "studieland": "string",
-                                  "delstudie": true,
-                                  "soeknadInnvilget": true
-                                }
-                              }
-                            ]
-                    """.trimIndent()
+                        perioder.map {
+                            """
+                            {
+                            "unntakId": ${Random.nextInt()},
+                            "ident": "$fnr",
+                            "fraOgMed": "${it.min().atDay(1)}",
+                            "tilOgMed": "${it.max().atEndOfMonth()}",
+                            "status": "GYLD",
+                            "statusaarsak": "string",
+                            "dekning": "string",
+                            "helsedel": true,
+                            "medlem": false,
+                            "lovvalgsland": "string",
+                            "lovvalg": "string",
+                            "grunnlag": "string",
+                            "sporingsinformasjon": {
+                              "versjon": 0,
+                              "registrert": "2024-05-09",
+                              "besluttet": "2024-10-09",
+                              "kilde": "string",
+                              "kildedokument": "string",
+                              "opprettet": "2024-10-09T10:53:14.596Z",
+                              "opprettetAv": "string",
+                              "sistEndret": "2024-10-09T10:53:14.596Z",
+                              "sistEndretAv": "string"
+                            },
+                            "studieinformasjon": {
+                              "statsborgerland": "string",
+                              "studieland": "string",
+                              "delstudie": true,
+                              "soeknadInnvilget": true
+                            }
+                          }
+                        """.trimIndent()
+                        }.toString()
+                    )
+                    .withHeader("Content-Type", "application/json")
+            )
+    )
+}
+
+fun WireMockExtension.unntaksperioderMedPliktigEllerFrivilligMedlemskap(
+    fnr: String,
+    perioder: Set<Periode>
+) {
+    this.stubFor(
+        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+            .withHeader("Nav-Personident", equalTo(fnr))
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withBody(
+                        perioder.map {
+                            """
+                            {
+                            "unntakId": ${Random.nextInt()},
+                            "ident": "$fnr",
+                            "fraOgMed": "${it.min().atDay(1)}",
+                            "tilOgMed": "${it.max().atEndOfMonth()}",
+                            "status": "GYLD",
+                            "statusaarsak": "string",
+                            "dekning": "string",
+                            "helsedel": true,
+                            "medlem": true,
+                            "lovvalgsland": "string",
+                            "lovvalg": "string",
+                            "grunnlag": "string",
+                            "sporingsinformasjon": {
+                              "versjon": 0,
+                              "registrert": "2024-05-09",
+                              "besluttet": "2024-10-09",
+                              "kilde": "string",
+                              "kildedokument": "string",
+                              "opprettet": "2024-10-09T10:53:14.596Z",
+                              "opprettetAv": "string",
+                              "sistEndret": "2024-10-09T10:53:14.596Z",
+                              "sistEndretAv": "string"
+                            },
+                            "studieinformasjon": {
+                              "statsborgerland": "string",
+                              "studieland": "string",
+                              "delstudie": true,
+                              "soeknadInnvilget": true
+                            }
+                          }
+                        """.trimIndent()
+                        }.toString()
                     )
                     .withHeader("Content-Type", "application/json")
             )

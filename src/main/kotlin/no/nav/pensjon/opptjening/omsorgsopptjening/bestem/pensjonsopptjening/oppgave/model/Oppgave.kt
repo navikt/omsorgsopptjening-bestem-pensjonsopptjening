@@ -6,7 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
 sealed class Oppgave {
     abstract val detaljer: OppgaveDetaljer
@@ -19,14 +19,21 @@ sealed class Oppgave {
     val oppgavetekst: Set<String> get() = detaljer.oppgavetekst()
 
     companion object Oppgavetekster {
-        fun flereOmsorgsytereMedLikeMyeOmsorgFødselsår(omsorgsmottaker: String): String =
-            """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr $omsorgsmottaker i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
+        fun flereOmsorgsytereMedLikeMyeOmsorgFødselsår(omsorgsmottaker: String): String {
+            return """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr $omsorgsmottaker i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
+        }
 
-        fun flereOmsorgsytereMedLikeMyeOmsorg(omsorgsmottaker: String, annenOmsorgsyter: String): String =
-            """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr $omsorgsmottaker. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr $annenOmsorgsyter mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+        fun flereOmsorgsytereMedLikeMyeOmsorg(omsorgsmottaker: String, annenOmsorgsyter: String): String {
+            return """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr $omsorgsmottaker. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr $annenOmsorgsyter mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+        }
 
-        fun kunneIkkeBehandlesAutomatisk(): String =
-            """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
+        fun kunneIkkeBehandlesAutomatisk(): String {
+            return """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
+        }
+
+        fun perioderMedPliktigEllerFrivilligMedlemskap(omsorgsmottaker: String): String {
+            return """Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: $omsorgsmottaker må vurderes manuelt pga perioder i MEDL"""
+        }
     }
 
     /**

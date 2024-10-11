@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.medlemIFolketrygden
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
@@ -80,7 +80,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                 .whenScenarioStateIs("ok")
                 .willReturn(WireMock.ok())
         )
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
@@ -178,7 +178,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
             Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
             Clock.systemUTC().instant().plus(6, ChronoUnit.HOURS), //karantenetid utløpt
         )
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
@@ -237,7 +237,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                 .willReturn(WireMock.serverError())
         )
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         /**
          * Stiller klokka litt fram i tid for å unngå at [GodskrivOpptjening.Status.Retry.karanteneTil] fører til at vi hopper over raden.

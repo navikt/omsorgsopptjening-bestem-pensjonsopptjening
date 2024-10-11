@@ -59,6 +59,10 @@ sealed class OmsorgsopptjeningGrunnlag {
         return grunnlag.utbetalingsmånederPerOmsorgsyter(omsorgsmottaker)
     }
 
+    private fun landstilknytningForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Landstilknytningmåneder> {
+        return grunnlag.landstilknytningMånederPerOmsorgsyter(omsorgsmottaker)
+    }
+
     fun forAldersvurderingOmsorgsyter(): AldersvurderingsGrunnlag {
         return AldersvurderingsGrunnlag(
             person = omsorgsyter,
@@ -108,7 +112,9 @@ sealed class OmsorgsopptjeningGrunnlag {
     fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
         return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
             medlemskapsgrunnlag = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag,
-            omsorgstype = omsorgstype
+            omsorgsytersOmsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            antallMånederRegel = antallMånederRegel(),
+            landstilknytningMåneder = landstilknytningForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!
         )
     }
 

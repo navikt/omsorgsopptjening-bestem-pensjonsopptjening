@@ -39,7 +39,7 @@ data class FullførtBehandling(
         return GodskrivOpptjening.Transient(behandlingId = id)
     }
 
-    private fun omsorgsmottakerFødtIOmsorgsår(): Boolean {
+    fun omsorgsmottakerFødtIOmsorgsår(): Boolean {
         return when (this.grunnlag) {
             is OmsorgsopptjeningGrunnlag.FødtIOmsorgsår.FødtDesember -> true
             is OmsorgsopptjeningGrunnlag.FødtIOmsorgsår.IkkeFødtDesember -> true
@@ -49,7 +49,7 @@ data class FullførtBehandling(
 
     fun hentOppgaveopplysninger(): List<Oppgaveopplysninger> {
         require(utfall is BehandlingUtfall.Manuell) { "Kan kun opprette oppgave for manuell behandling" }
-        return vilkårsvurdering.finnAlleUbestemte().map { it.hentOppgaveopplysninger(omsorgsmottakerFødtIOmsorgsår()) }
+        return vilkårsvurdering.finnAlleUbestemte().map { it.hentOppgaveopplysninger(this) }
     }
 
     fun hentBrevopplysninger(
@@ -67,19 +67,4 @@ data class FullførtBehandling(
             omsorgsAr = omsorgsAr,
         )
     }
-}
-
-sealed class Brevopplysninger {
-    data class InfobrevOmsorgsyterForHjelpestønadsmottaker(
-        val årsak: BrevÅrsak
-    ) : Brevopplysninger()
-
-    data object Ingen : Brevopplysninger()
-}
-
-enum class BrevÅrsak {
-    OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR,
-    OMSORGSYTER_IKKE_FORELDER_AV_OMSORGSMOTTAKER,
-    ANNEN_FORELDER_HAR_LAVERE_PENSJONSPOENG,
-    FORELDRE_ER_UKJENT
 }

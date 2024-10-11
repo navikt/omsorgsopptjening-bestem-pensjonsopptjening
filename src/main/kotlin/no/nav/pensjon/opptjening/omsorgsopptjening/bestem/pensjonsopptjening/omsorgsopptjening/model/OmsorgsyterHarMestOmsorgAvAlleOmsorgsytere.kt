@@ -30,11 +30,11 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>() {
 
-        override fun hentOppgaveopplysninger(omsorgsmottakerFødtOmsorgsår: Boolean): Oppgaveopplysninger {
+        override fun hentOppgaveopplysninger(behandling: FullførtBehandling): Oppgaveopplysninger {
             return InnholdsvalgForOppgavetekstHvisFlereOmsorgsytereMedLikeMyeOmsorg(grunnlag).let {
                 val oppgavemottaker = it.oppgaveGjelderFnr()
                 if (oppgavemottaker == grunnlag.omsorgsyter) {
-                    when (omsorgsmottakerFødtOmsorgsår) {
+                    when (behandling.omsorgsmottakerFødtIOmsorgsår()) {
                         true -> {
                             Oppgaveopplysninger.Generell(
                                 oppgavemottaker = oppgavemottaker,

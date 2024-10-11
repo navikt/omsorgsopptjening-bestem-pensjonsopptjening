@@ -2,11 +2,12 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapOppslag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapsUnntakOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsgrunnlag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsunntak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.tilOmsorgsopptjeningsgrunnlag
@@ -36,7 +37,7 @@ class PersongrunnlagMeldingService(
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
     private val transactionTemplate: TransactionTemplate,
     private val brevService: BrevService,
-    private val medlemskapOppslag: MedlemskapOppslag
+    private val medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -70,6 +71,8 @@ class PersongrunnlagMeldingService(
                             // TODO: SQLException og andre tekniske feil bør ikke medføre retry, kun rollback
                             transactionTemplate.execute {
                                 melding.retry(ex.stackTraceToString()).let { melding ->
+                                    log.warn("Exception ved prosessering av melding: ${ex::class.qualifiedName}")
+                                    secureLog.warn("Exception ved prosessering av melding", ex)
                                     melding.opprettOppgave()?.let {
                                         log.error("Gir opp videre prosessering av melding")
                                         oppgaveService.opprett(it)
@@ -86,6 +89,7 @@ class PersongrunnlagMeldingService(
             }
         } catch (ex: Throwable) {
             log.error("Fikk exception ved uthenting av meldinger: ${ex::class.qualifiedName}")
+            secureLog.error("Exception ved uthenting av meldinger: ", ex)
             return null // throw ex
         } finally {
             transactionTemplate.execute {
@@ -190,13 +194,21 @@ class PersongrunnlagMeldingService(
 
                     val medlemskapsgrunnlag = if (omsorgsperioder.isNotEmpty()) {
                         val (første, siste) = omsorgsperioder.minOf { it.fom } to omsorgsperioder.maxOf { it.tom }
-                        medlemskapOppslag.hentMedlemskapsgrunnlag(
-                            fnr = omsorgsyter.fnr,
-                            fraOgMed = første,
-                            tilOgMed = siste,
+                        Medlemskapsgrunnlag(
+                            medlemskapsunntak = medlemskapsUnntakOppslag.hentUnntaksperioder(
+                                fnr = omsorgsyter.fnr,
+                                fraOgMed = første,
+                                tilOgMed = siste,
+                            )
                         )
                     } else {
-                        Medlemskapsgrunnlag(emptyList(), "")
+                        Medlemskapsgrunnlag(
+                            medlemskapsunntak = Medlemskapsunntak(
+                                ikkeMedlem = emptySet(),
+                                pliktigEllerFrivillig = emptySet(),
+                                rådata = ""
+                            )
+                        )
                     }
 
                     Persongrunnlag(

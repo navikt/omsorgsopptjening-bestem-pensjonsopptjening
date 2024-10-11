@@ -3,7 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.medlemIFolketrygden
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
@@ -108,7 +108,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
          */
         given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -209,7 +209,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             Clock.systemUTC().instant().plus(10, ChronoUnit.HOURS), //karantenetid utløpt
         )
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-        wiremock.medlemIFolketrygden()
+        wiremock.ingenUnntaksperioderForMedlemskap()
 
         val melding = repo.lagre(
             PersongrunnlagMelding.Lest(

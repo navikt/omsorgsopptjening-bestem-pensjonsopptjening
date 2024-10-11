@@ -1,33 +1,21 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import java.time.YearMonth
 
 data class Medlemskapsgrunnlag(
-    val unntaksperioder: List<Unntaksperiode>,
-    val rådata: String,
+    val medlemskapsunntak: Medlemskapsunntak,
 ) {
-    fun avgrensForÅr(år: Int): Medlemskapsgrunnlag {
-        return Medlemskapsgrunnlag(
-            unntaksperioder = unntaksperioder
-                .filter { it.periode.overlapper(år) }
-                .map { unntaksperiode ->
-                    unntaksperiode.periode.overlappendeMåneder(år)
-                        .let {
-                            Unntaksperiode(
-                                fraOgMed = it.min(),
-                                tilOgMed = it.max()
-                            )
-                        }
-                },
-            rådata = rådata,
-        )
+    fun alleMånederUtenMedlemskap(): Set<YearMonth> {
+        return medlemskapsunntak.ikkeMedlem.flatMap { it.periode.alleMåneder() }.toSet()
     }
 
-    data class Unntaksperiode(
-        val fraOgMed: YearMonth,
-        val tilOgMed: YearMonth,
-    ) {
-        val periode = Periode(fraOgMed, tilOgMed)
+    fun alleMånederMedMedlemskap(): Set<YearMonth> {
+        return medlemskapsunntak.pliktigEllerFrivillig.flatMap { it.periode.alleMåneder() }.toSet()
+    }
+
+    fun avgrensForÅr(år: Int): Medlemskapsgrunnlag {
+        return Medlemskapsgrunnlag(
+            medlemskapsunntak = medlemskapsunntak.avgrensForÅr(år),
+        )
     }
 }

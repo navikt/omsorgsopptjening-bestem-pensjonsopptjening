@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
 import com.fasterxml.jackson.annotation.JsonTypeName
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Landstilknytningmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemIFolketrygden
 
 @JsonTypeName("OmsorgsyterErMedlemIFolketrygden")
@@ -26,19 +27,25 @@ internal fun OmsorgsyterErMedlemIFolketrygdenDb.toDomain(): OmsorgsyterErMedlemI
 @JsonTypeName("MedlemIFolketrygden")
 internal data class MedlemIFolketrygden(
     val medlemskapsvurdering: MedlemskapsgrunnlagDb,
-    val omsorgstype: OmsorgskategoriDb,
+    val omsorgsytersOmsorgsmåneder: OmsorgsmånederDb,
+    val antallMånederRegel: AntallMånederRegelDb,
+    val landstilknytningmåneder: Set<LandstilknytningMånedDb>
 ) : GrunnlagVilkårsvurderingDb()
 
 internal fun MedlemIFolketrygden.toDomain(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
     return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
         medlemskapsgrunnlag = medlemskapsvurdering.toDomain(),
-        omsorgstype = omsorgstype.toDomain()
+        omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),
+        antallMånederRegel = antallMånederRegel.toDomain(),
+        landstilknytningMåneder = Landstilknytningmåneder(landstilknytningmåneder.toDomain())
     )
 }
 
 internal fun OmsorgsyterErMedlemIFolketrygden.Grunnlag.toDb(): MedlemIFolketrygden {
     return MedlemIFolketrygden(
         medlemskapsvurdering = medlemskapsgrunnlag.toDb(),
-        omsorgstype = omsorgstype.toDb()
+        omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDb(),
+        antallMånederRegel = antallMånederRegel.toDb(),
+        landstilknytningmåneder = landstilknytningMåneder.toDb()
     )
 }
