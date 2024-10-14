@@ -10,6 +10,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
@@ -25,7 +26,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.transaction.support.TransactionTemplate
 import java.time.Month
 import java.time.YearMonth
 import java.util.UUID
@@ -46,7 +46,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
     private lateinit var oppgaveRepo: OppgaveRepo
 
     @Autowired
-    private lateinit var transactionTemplate: TransactionTemplate
+    private lateinit var transactionTemplate: NewTransactionTemplate
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår

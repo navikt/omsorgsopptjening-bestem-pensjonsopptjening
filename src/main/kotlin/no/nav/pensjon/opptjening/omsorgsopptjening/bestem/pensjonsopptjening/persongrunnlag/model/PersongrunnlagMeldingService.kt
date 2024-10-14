@@ -16,11 +16,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.KanSlåsSammen.Companion.slåSammenLike
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.springframework.transaction.support.TransactionTemplate
 import java.time.Instant
 import java.util.UUID
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
@@ -35,7 +35,7 @@ class PersongrunnlagMeldingService(
     private val oppgaveService: OppgaveService,
     private val personOppslag: PersonOppslag,
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
-    private val transactionTemplate: TransactionTemplate,
+    private val transactionTemplate: NewTransactionTemplate,
     private val brevService: BrevService,
     private val medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag
 ) {

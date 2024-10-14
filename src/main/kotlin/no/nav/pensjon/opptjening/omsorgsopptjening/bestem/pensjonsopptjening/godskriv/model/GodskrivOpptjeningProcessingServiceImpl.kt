@@ -1,14 +1,14 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.transaction.support.TransactionOperations
 import java.sql.SQLException
 
 class GodskrivOpptjeningProcessingServiceImpl(
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
-    private val transactionTemplate: TransactionOperations,
+    private val transactionTemplate: NewTransactionTemplate,
 ) : GodskrivOpptjeningProcessingService {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)

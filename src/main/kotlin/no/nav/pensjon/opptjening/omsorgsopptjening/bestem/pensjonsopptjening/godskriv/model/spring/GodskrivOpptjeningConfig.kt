@@ -14,11 +14,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
-import org.springframework.transaction.support.TransactionTemplate
 
 @Configuration
 class GodskrivOpptjeningConfig {
@@ -41,7 +41,7 @@ class GodskrivOpptjeningConfig {
     @Bean
     fun godskrivOpptjeningProcessingService(
         godskrivOpptjeningService: GodskrivOpptjeningService,
-        transactionTemplate: TransactionTemplate,
+        transactionTemplate: NewTransactionTemplate,
     ): GodskrivOpptjeningProcessingService {
         return GodskrivOpptjeningProcessingServiceImpl(
             godskrivOpptjeningService = godskrivOpptjeningService,
