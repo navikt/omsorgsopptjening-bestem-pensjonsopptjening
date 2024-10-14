@@ -56,12 +56,12 @@ import kotlin.test.assertFalse
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning as KafkaLandstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
-class PersongrunnlagMeldingServiceTest : SpringContextTest.NoKafka() {
+class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
     @Autowired
     private lateinit var repo: PersongrunnlagRepo
 
     @Autowired
-    private lateinit var handler: PersongrunnlagMeldingService
+    private lateinit var handler: PersongrunnlagMeldingProcessingService
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår

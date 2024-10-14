@@ -8,7 +8,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -37,7 +37,7 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
     private lateinit var persongrunnlagRepo: PersongrunnlagRepo
 
     @Autowired
-    private lateinit var persongrunnlagMeldingService: PersongrunnlagMeldingService
+    private lateinit var persongrunnlagMeldingService: PersongrunnlagMeldingProcessingService
 
     @Autowired
     private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo

@@ -24,6 +24,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -65,7 +66,10 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
 
     @Autowired
-    private lateinit var handler: PersongrunnlagMeldingService
+    private lateinit var processingService: PersongrunnlagMeldingProcessingService
+
+    @Autowired
+    private lateinit var service: PersongrunnlagMeldingService
 
     @Autowired
     private lateinit var oppgaveService: OppgaveService
@@ -161,7 +165,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        processingService.process()!!.first().single().also { behandling ->
             Assertions.assertTrue(behandling.erInnvilget())
 
             Assertions.assertInstanceOf(
@@ -219,7 +223,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().let { behandling ->
+        processingService.process()!!.first().single().let { behandling ->
             assertThat(behandling.utfall).isInstanceOf(BehandlingUtfall.Manuell::class.java)
             assertThat(
                 behandling.hentOppgaveopplysninger()
@@ -232,7 +236,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     fun `kan avslutte en transaksjon`() {
         val begrunnelse = "Fordi jeg vil!"
         val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
-        handler.avsluttMelding(meldingsId, begrunnelse)
+        service.avsluttMelding(meldingsId, begrunnelse)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Avsluttet::class.java)
             val status = melding.status as PersongrunnlagMelding.Status.Avsluttet
@@ -243,7 +247,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `stopping av melding stopper også oppgave`() {
         val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
-        handler.stoppMelding(meldingsId)
+        service.stoppMelding(meldingsId, null)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
         }
@@ -258,7 +262,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     fun `stoppet melding har lagret beskrivelse`() {
         val begrunnelse = "Fordi jeg vil!"
         val meldingsId = lagreOgProsesserMeldingSomGirOppgave()
-        handler.stoppMelding(meldingsId, begrunnelse)
+        service.stoppMelding(meldingsId, begrunnelse)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
             (melding.status as PersongrunnlagMelding.Status.Stoppet).let {
@@ -276,7 +280,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `stopping av melding stopper også brev`() {
         val meldingsId = lagreOgProsesserMeldingSomGirBrev()
-        handler.stoppMelding(meldingsId)
+        service.stoppMelding(meldingsId, null)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
         }
@@ -290,7 +294,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `stopping av melding stopper også godskriving`() {
         val meldingsId = lagreOgProsesserMeldingSomGirBrev()
-        handler.stoppMelding(meldingsId)
+        service.stoppMelding(meldingsId, null)
         repo.find(meldingsId).let { melding ->
             assertThat(melding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
         }
@@ -304,16 +308,16 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kopiere og rekjøre melding med oppgave`() {
         val stoppetmeldingId = lagreOgProsesserMeldingSomGirOppgave().let {
-            handler.stoppMelding(it)!!
+            service.stoppMelding(it, null)!!
         }
         val nyMelding =
-            handler.rekjørStoppetMelding(stoppetmeldingId)!!.let {
+            service.rekjørStoppetMelding(stoppetmeldingId)!!.let {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetmeldingId)
         val stoppetOppgave = oppgaveRepo.findForMelding(stoppetmeldingId).single()
 
-        val behandling = handler.process()!!.single()
+        val behandling = processingService.process()!!.single()
         val nyOppgave = oppgaveRepo.findForBehandling(behandling.alle().single().id).single()
 
         assertThat(stoppetMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
@@ -326,16 +330,16 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kopiere og rekjøre melding med brev`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
-            handler.stoppMelding(it)!!
+            service.stoppMelding(it, null)!!
         }
         val nyMelding =
-            handler.rekjørStoppetMelding(stoppetMeldingId)!!.let {
+            service.rekjørStoppetMelding(stoppetMeldingId)!!.let {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetMeldingId)
         val stoppetBrev = brevRepository.findForMelding(stoppetMeldingId).single()
 
-        val behandling = handler.process()!!.single()
+        val behandling = processingService.process()!!.single()
 
         val nyttBrev = brevRepository.findForBehandling(behandling.alle().single().id).single()
 
@@ -349,16 +353,16 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kopiere og rekjøre melding med godskriving`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
-            handler.stoppMelding(it)!!
+            service.stoppMelding(it, null)!!
         }
         val nyMelding =
-            handler.rekjørStoppetMelding(stoppetMeldingId)!!.let {
+            service.rekjørStoppetMelding(stoppetMeldingId)!!.let {
                 repo.find(it)
             }
         val stoppetMelding = repo.find(stoppetMeldingId)
         val stoppetGodskriv = godskrivOpptjeningRepo.findForMelding(stoppetMeldingId).single()
 
-        val behandling = handler.process()!!.single()
+        val behandling = processingService.process()!!.single()
 
         val nyGodskriv = godskrivOpptjeningRepo.findForBehandling(behandling.alle().single().id).single()
 

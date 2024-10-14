@@ -46,7 +46,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
     private lateinit var behandlingRepo: BehandlingRepo
 
     @Autowired
-    private lateinit var handler: PersongrunnlagMeldingService
+    private lateinit var handler: PersongrunnlagMeldingProcessingService
 
     @MockBean
     private lateinit var clock: Clock

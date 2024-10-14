@@ -10,10 +10,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
-@Component
-@Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
 class PersongrunnlagMeldingProcessingThread(
-    private val handler: PersongrunnlagMeldingService,
+    private val service: PersongrunnlagMeldingProcessingService,
     private val unleash: Unleash,
     private val omsorgsarbeidMetricsMåling: OmsorgsarbeidProcessingMetrikker,
     private val omsorgsarbeidMetricsFeilmåling: OmsorgsarbeidProcessingMetricsFeilmåling,
@@ -36,7 +34,7 @@ class PersongrunnlagMeldingProcessingThread(
             try {
                 if (unleash.isEnabled(NavUnleashConfig.Feature.BEHANDLING.toggleName) && datasourceReadinessCheck.isReady()) {
                     omsorgsarbeidMetricsMåling.oppdater {
-                        handler.process()?.let { null } ?: run {
+                        service.process()?.let { null } ?: run {
                             Thread.sleep(1000)
                             null
                         }

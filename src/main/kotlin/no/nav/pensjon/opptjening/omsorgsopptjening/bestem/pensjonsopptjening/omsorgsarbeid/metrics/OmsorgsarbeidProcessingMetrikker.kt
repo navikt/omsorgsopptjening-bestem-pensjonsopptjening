@@ -18,7 +18,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOppfyllerAlderskrav
 import org.springframework.stereotype.Component
 
-@Component
 class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List<FullførteBehandlinger?>?> {
 
     private val omsorgsarbeidProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "omsorgsarbeidProsessert")

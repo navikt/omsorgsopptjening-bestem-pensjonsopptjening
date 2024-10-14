@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.Metrikker
 import org.springframework.stereotype.Component
 
-@Component
 class OmsorgsarbeidProcessingMetricsFeilmåling(registry: MeterRegistry) : Metrikker<Unit> {
 
     private val omsorgsarbeidFeiletTidsbruk = registry.timer("prosessering", "tidsbruk", "omsorgsarbeidFeilet")
