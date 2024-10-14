@@ -11,6 +11,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.OmsorgsopptjeningsgrunnlagService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.OmsorgsopptjeningsgrunnlagServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingThread
@@ -35,18 +37,18 @@ class PersongrunnlagConfig {
         godskrivOpptjeningService: GodskrivOpptjeningService,
         transactionTemplate: NewTransactionTemplate,
         brevService: BrevService,
-        medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag
+        medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag,
+        omsorgsopptjeningsgrunnlagService: OmsorgsopptjeningsgrunnlagService,
     ): PersongrunnlagMeldingService {
         return PersongrunnlagMeldingServiceImpl(
             behandlingRepo = behandlingRepo,
             gyldigOpptjeningsår = gyldigOpptjeningsår,
             persongrunnlagRepo = persongrunnlagRepo,
             oppgaveService = oppgaveService,
-            personOppslag = personOppslag,
             godskrivOpptjeningService = godskrivOpptjeningService,
             transactionTemplate = transactionTemplate,
             brevService = brevService,
-            medlemskapsUnntakOppslag = medlemskapsUnntakOppslag
+            omsorgsopptjeningsgrunnlagService = omsorgsopptjeningsgrunnlagService
         )
     }
 
@@ -78,4 +80,16 @@ class PersongrunnlagConfig {
             datasourceReadinessCheck = datasourceReadinessCheck
         )
     }
+
+    @Bean
+    fun omsorgsopptjeningsgrunnlagService(
+        personOppslag: PersonOppslag,
+        medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag
+    ): OmsorgsopptjeningsgrunnlagService {
+        return OmsorgsopptjeningsgrunnlagServiceImpl(
+            personOppslag = personOppslag,
+            medlemskapsUnntakOppslag = medlemskapsUnntakOppslag
+        )
+    }
+
 }

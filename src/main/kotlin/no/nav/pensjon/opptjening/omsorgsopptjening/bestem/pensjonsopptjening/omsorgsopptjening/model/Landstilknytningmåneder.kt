@@ -6,6 +6,10 @@ import java.time.YearMonth
 data class Landstilknytningmåneder(
     val måneder: Set<LandstilknytningMåned>
 ) {
+    fun alle(): Set<YearMonth> {
+        return måneder.map { it.måned }.toSortedSet()
+    }
+
     infix fun merge(other: Landstilknytningmåneder): Landstilknytningmåneder {
         require(måneder.intersect(other.måneder).isEmpty()) { "Kan ikke merge overlappende måneder" }
         return Landstilknytningmåneder((måneder + other.måneder).toSet())
