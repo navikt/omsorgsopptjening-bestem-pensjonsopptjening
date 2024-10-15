@@ -11,12 +11,12 @@ object OmsorgsmottakerOppfyllerAlderskravForBarnetrygd : ParagrafVilkår<Aldersv
 
     override fun <T : Vilkar<AldersvurderingsGrunnlag>> T.bestemUtfall(grunnlag: AldersvurderingsGrunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsmottakerErIkkeFylt6FørUtgangAvOpptjeningsår
+            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
         ).let {
             if (grunnlag.erOppfylltFor(ALDERSINTERVALL_BARNETRYGD)) {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                VilkårsvurderingUtfall.Innvilget.Vilkår(it)
             } else {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                VilkårsvurderingUtfall.Avslag.Vilkår(it)
             }
         }
     }

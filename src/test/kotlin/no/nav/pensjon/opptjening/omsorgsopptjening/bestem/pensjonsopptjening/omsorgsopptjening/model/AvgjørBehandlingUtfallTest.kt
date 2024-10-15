@@ -19,7 +19,7 @@ class AvgjørBehandlingUtfallTest {
         )
     )
 
-    private val avslag = innvilget.copy(utfall = VilkårsvurderingUtfall.Avslag.Vilkår.from(emptySet()))
+    private val avslag = innvilget.copy(utfall = VilkårsvurderingUtfall.Avslag.Vilkår(emptySet()))
     private val manuell = innvilget.copy(utfall = VilkårsvurderingUtfall.Ubestemt(emptySet()))
 
 

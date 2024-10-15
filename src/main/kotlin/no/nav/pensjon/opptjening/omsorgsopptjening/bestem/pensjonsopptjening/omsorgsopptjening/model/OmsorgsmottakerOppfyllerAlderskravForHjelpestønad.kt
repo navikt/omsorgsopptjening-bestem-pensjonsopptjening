@@ -11,13 +11,13 @@ object OmsorgsmottakerOppfyllerAlderskravForHjelpestønad : ParagrafVilkår<Alde
 
     override fun <T : Vilkar<AldersvurderingsGrunnlag>> T.bestemUtfall(grunnlag: AldersvurderingsGrunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.HjelpestønadYtesTilMedlemUnder18,
-            Referanse.OmsorgsopptjeningGisTilOgMedKalenderårHjelpestønadFallerBort
+            JuridiskHenvisning.Folketrygdloven_Kap_6_Paragraf_5_Første_Ledd_Første_Punktum,
+            JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Tredje_Ledd_Første_Punktum
         ).let {
             if (grunnlag.erOppfylltFor(ALDERSINTERVALL_HJELPESTØNAD)) {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                VilkårsvurderingUtfall.Innvilget.Vilkår(it)
             } else {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                VilkårsvurderingUtfall.Avslag.Vilkår(it)
             }
         }
     }

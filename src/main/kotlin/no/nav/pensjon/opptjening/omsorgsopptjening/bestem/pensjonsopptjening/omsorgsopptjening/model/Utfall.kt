@@ -4,25 +4,11 @@ sealed class VilkårsvurderingUtfall {
 
     sealed class Innvilget : VilkårsvurderingUtfall() {
 
-        data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Innvilget() {
-
-            companion object {
-                fun from(referanser: Set<Referanse>): Vilkår {
-                    return Vilkår(referanser.map { it.henvisning }.toSet())
-                }
-            }
-        }
+        data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Innvilget()
     }
 
     sealed class Avslag : VilkårsvurderingUtfall() {
-        data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Avslag() {
-
-            companion object {
-                fun from(referanser: Set<Referanse>): Vilkår {
-                    return Vilkår(referanser.map { it.henvisning }.toSet())
-                }
-            }
-        }
+        data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Avslag()
     }
 
     data class Ubestemt(val henvisninger: Set<JuridiskHenvisning>) : VilkårsvurderingUtfall()

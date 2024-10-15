@@ -15,13 +15,13 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return if (grunnlag.omsorgsyterHarFlestOmsorgsmåneder()) {
-            VilkårsvurderingUtfall.Innvilget.Vilkår.from(emptySet()) // Har egentlig ikke noe godt å hekte dette på
+            VilkårsvurderingUtfall.Innvilget.Vilkår(emptySet()) // Har egentlig ikke noe godt å hekte dette på
         } else if (grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder()) {
             VilkårsvurderingUtfall.Ubestemt(
-                setOf(Referanse.OmsorgsopptjeningGisHvisOmsorgsyterHarFlestManeder).map { it.henvisning }.toSet()
+                setOf(JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd)
             )
         } else {
-            VilkårsvurderingUtfall.Avslag.Vilkår.from(emptySet()) // Har egentlig ikke noe godt å hekte dette på
+            VilkårsvurderingUtfall.Avslag.Vilkår(emptySet()) // Har egentlig ikke noe godt å hekte dette på
         }
     }
 

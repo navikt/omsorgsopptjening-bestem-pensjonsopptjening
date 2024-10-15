@@ -17,35 +17,35 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
         return when (grunnlag.omsorgsytersOmsorgsmåneder.omsorgstype()) {
             DomainOmsorgskategori.BARNETRYGD -> {
                 setOf(
-                    Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
+                    JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
                 )
             }
 
             DomainOmsorgskategori.HJELPESTØNAD -> {
                 setOf(
-                    Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
+                    JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_b_Første_Punktum
                 )
             }
         }.let {
             return when {
                 grunnlag.erInnvilet() -> {
-                    VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                    VilkårsvurderingUtfall.Innvilget.Vilkår(it)
                 }
 
                 grunnlag.erInnvilgetTilTrossForPerioderUtenMedlemskap() -> {
-                    VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                    VilkårsvurderingUtfall.Innvilget.Vilkår(it)
                 }
 
                 grunnlag.erInnvilgetTilTrossForPerioderMedFrivilligEllerPliktigMedlemskap() -> {
-                    VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                    VilkårsvurderingUtfall.Innvilget.Vilkår(it)
                 }
 
                 grunnlag.manuell() -> {
-                    VilkårsvurderingUtfall.Ubestemt(it.map { it.henvisning }.toSet())
+                    VilkårsvurderingUtfall.Ubestemt(it)
                 }
 
                 else -> {
-                    VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                    VilkårsvurderingUtfall.Avslag.Vilkår(it)
                 }
             }
         }

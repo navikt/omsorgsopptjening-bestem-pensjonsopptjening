@@ -15,13 +15,13 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
         return when (grunnlag.antallMånederRegel) {
             AntallMånederRegel.FødtIOmsorgsår -> {
                 setOf(
-                    Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
-                    Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd,
+                    JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Andre_Punktum,
+                    JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum
                 ).let {
                     if (grunnlag.erOppfyllt()) {
-                        VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                        VilkårsvurderingUtfall.Innvilget.Vilkår(it)
                     } else {
-                        VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                        VilkårsvurderingUtfall.Avslag.Vilkår(it)
                     }
                 }
             }
@@ -30,22 +30,22 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
                 when (grunnlag.omsorgstype()) {
                     DomainOmsorgskategori.BARNETRYGD -> {
                         setOf(
-                            Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
-                            Referanse.OmsorgsopptjeningGisTilMottakerAvBarnetrygd
+                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum,
+                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum
                         )
                     }
 
                     DomainOmsorgskategori.HJELPESTØNAD -> {
                         setOf(
-                            Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
-                            Referanse.OmsorgsopptjeningGisTilForelderSomMottarBarnetrygdForBarnMedForhøyetHjelpestønad
+                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_b_Første_Punktum,
+                            JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Andre_Ledd_Første_Punktum
                         )
                     }
                 }.let {
                     if (grunnlag.erOppfyllt()) {
-                        VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                        VilkårsvurderingUtfall.Innvilget.Vilkår(it)
                     } else {
-                        VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                        VilkårsvurderingUtfall.Avslag.Vilkår(it)
                     }
                 }
             }

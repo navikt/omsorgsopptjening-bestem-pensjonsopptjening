@@ -11,12 +11,12 @@ object OmsorgsyterOppfyllerAlderskrav : ParagrafVilkår<AldersvurderingsGrunnlag
 
     override fun <T : Vilkar<AldersvurderingsGrunnlag>> T.bestemUtfall(grunnlag: AldersvurderingsGrunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsopptjeningKanGodskrivesFraOgMedÅretManFyller17TilOgMedÅretManFyller69,
+            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Andre_Ledd
         ).let {
             if (grunnlag.erOppfylltFor(ALDERSINTERVALL_OMSORGSYTER)) {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                VilkårsvurderingUtfall.Innvilget.Vilkår(it)
             } else {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                VilkårsvurderingUtfall.Avslag.Vilkår(it)
             }
         }
     }

@@ -11,12 +11,12 @@ object OmsorgsyterErForelderTilMottakerAvHjelpestønad :
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.OmsorgsopptjeningGisTilForelderAvBarnMedForhøyetHjelpestønad,
+            JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_11_Første_Ledd
         ).let {
             if (grunnlag.erBarnOgForelder()) {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                VilkårsvurderingUtfall.Innvilget.Vilkår(it)
             } else {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                VilkårsvurderingUtfall.Avslag.Vilkår(it)
             }
         }
     }

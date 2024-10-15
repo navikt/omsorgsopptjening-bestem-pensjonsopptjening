@@ -13,12 +13,12 @@ object OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr :
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return setOf(
-            Referanse.`OpptjeningKanGodskrivesMed18,1ProsentAv4,5GHvertKalenderår`
+            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Innledning
         ).let { referanser ->
             if (grunnlag.behandlinger.none { it.erInnvilget && grunnlag.omsorgsår == it.omsorgsÅr }) {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(referanser)
+                VilkårsvurderingUtfall.Innvilget.Vilkår(referanser)
             } else {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(referanser)
+                VilkårsvurderingUtfall.Avslag.Vilkår(referanser)
             }
         }
     }

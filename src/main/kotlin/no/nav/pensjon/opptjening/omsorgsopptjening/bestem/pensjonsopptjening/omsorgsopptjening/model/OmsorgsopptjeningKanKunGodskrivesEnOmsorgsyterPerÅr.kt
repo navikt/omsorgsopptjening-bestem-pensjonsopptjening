@@ -13,12 +13,12 @@ object OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr :
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         setOf(
-            Referanse.OmsorgsopptjeningGisKunEnOmsorgsyterPerKalenderÅr,
+            JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum
         ).let { referanser ->
             return if (grunnlag.fullførteBehandlinger.none { it.erInnvilget && grunnlag.omsorgsår == it.omsorgsår }) {
-                VilkårsvurderingUtfall.Innvilget.Vilkår.from(referanser)
+                VilkårsvurderingUtfall.Innvilget.Vilkår(referanser)
             } else {
-                VilkårsvurderingUtfall.Avslag.Vilkår.from(referanser)
+                VilkårsvurderingUtfall.Avslag.Vilkår(referanser)
             }
         }
     }

@@ -15,12 +15,12 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         return when (grunnlag.antallMånederRegel) {
             AntallMånederRegel.FødtIOmsorgsår -> {
                 setOf(
-                    Referanse.UnntakFraMinstHalvtÅrMedOmsorgForFødselår,
+                    JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Andre_Punktum,
                 ).let {
                     if (grunnlag.erOppfyllt()) {
-                        VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                        VilkårsvurderingUtfall.Innvilget.Vilkår(it)
                     } else {
-                        VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                        VilkårsvurderingUtfall.Avslag.Vilkår(it)
                     }
                 }
             }
@@ -29,20 +29,20 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                 when (grunnlag.omsorgstype()) {
                     DomainOmsorgskategori.BARNETRYGD -> {
                         setOf(
-                            Referanse.MåHaMinstHalveÅretMedOmsorgForBarnUnder6,
+                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
                         )
                     }
 
                     DomainOmsorgskategori.HJELPESTØNAD -> {
                         setOf(
-                            Referanse.MåHaMinstHalveÅretMedOmsorgForSykFunksjonshemmetEllerEldre,
+                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_b_Første_Punktum
                         )
                     }
                 }.let {
                     if (grunnlag.erOppfyllt()) {
-                        VilkårsvurderingUtfall.Innvilget.Vilkår.from(it)
+                        VilkårsvurderingUtfall.Innvilget.Vilkår(it)
                     } else {
-                        VilkårsvurderingUtfall.Avslag.Vilkår.from(it)
+                        VilkårsvurderingUtfall.Avslag.Vilkår(it)
                     }
                 }
             }
