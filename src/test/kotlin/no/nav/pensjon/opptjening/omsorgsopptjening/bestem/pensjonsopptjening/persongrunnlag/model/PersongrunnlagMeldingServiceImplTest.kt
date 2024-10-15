@@ -21,6 +21,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemIFolketrygden
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErikkeOmsorgsmottaker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarGyldigOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
@@ -31,6 +32,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnAlleAvslatte
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.desember
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.januar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.år
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -1878,6 +1881,64 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                         vurdering.grunnlag
                     ).also {
                         assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.ikkeMedlem).isNotEmpty()
+                    }
+                }
+        }
+    }
+
+    @Test
+    fun `omsorgsyter med omsorg for seg selv får avslag - feks enslig mindreårige som mottar barnetrygd og hjelpestønad Pfor seg selv`() {
+        wiremock.ingenUnntaksperioderForMedlemskap()
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "12340378910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12340378910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "12340378910",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                ),
+                            ),
+                            hjelpestønadsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Hjelpestønadperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
+                                    omsorgsmottaker = "12340378910",
+                                    kilde = Kilde.INFOTRYGD,
+                                ),
+                            ),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        handler.process()!!.first().single().also { behandling ->
+            behandling.assertAvslag(
+                omsorgsyter = "12340378910",
+                omsorgsmottaker = "12340378910",
+                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
+            )
+            assertTrue(behandling.vilkårsvurdering.erEnesteAvslag<OmsorgsyterErikkeOmsorgsmottaker.Vurdering>())
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterErikkeOmsorgsmottaker.Vurdering>()
+                .also { vurdering ->
+                    assertInstanceOf(VilkårsvurderingUtfall.Avslag::class.java, vurdering.utfall)
+                    assertInstanceOf(OmsorgsyterErikkeOmsorgsmottaker.Grunnlag::class.java, vurdering.grunnlag).also {
+                        assertThat(it.omsorgsyter).isEqualTo("12340378910")
+                        assertThat(it.omsorgsmottaker).isEqualTo("12340378910")
                     }
                 }
         }

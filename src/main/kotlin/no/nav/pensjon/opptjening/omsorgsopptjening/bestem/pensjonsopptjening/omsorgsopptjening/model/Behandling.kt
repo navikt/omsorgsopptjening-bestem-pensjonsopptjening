@@ -65,6 +65,7 @@ data class Behandling(
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr(),
             vurderVilkår.OmsorgsyterErMedlemIFolketrygden(),
+            vurderVilkår.OmsorgsyterErIkkeOmsorgsmottaker()
         )
     }
 

@@ -1,0 +1,37 @@
+{
+  "data": {
+    "hentIdenter": {
+      "identer": [
+        {
+          "ident": "5564567891234",
+          "gruppe": "AKTORID"
+        }
+      ]
+    },
+    "hentPerson": {
+      "folkeregisteridentifikator": [
+        {
+          "identifikasjonsnummer": "12340378910",
+          "status": "I_BRUK",
+          "type": "FNR",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsaar": 2003,
+          "foedselsdato": "2003-04-17",
+          "metadata": {
+            "historisk": false,
+            "master": "FREG"
+          }
+        }
+      ],
+      "doedsfall": [],
+      "forelderBarnRelasjon": []
+    }
+  }
+}

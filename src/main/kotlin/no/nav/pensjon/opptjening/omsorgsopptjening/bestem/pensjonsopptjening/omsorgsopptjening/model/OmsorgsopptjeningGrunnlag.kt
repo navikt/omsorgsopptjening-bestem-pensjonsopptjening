@@ -116,6 +116,13 @@ sealed class OmsorgsopptjeningGrunnlag {
         )
     }
 
+    fun forOmsorgsyterErIkkeOmsorgsmottaker(): OmsorgsyterErikkeOmsorgsmottaker.Grunnlag {
+        return OmsorgsyterErikkeOmsorgsmottaker.Grunnlag(
+            omsorgsyter = omsorgsyter.fnr,
+            omsorgsmottaker = omsorgsmottaker.fnr
+        )
+    }
+
     fun forGyldigOmsorgsarbeidPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
         return grunnlag.persongrunnlag.associate {
             it.omsorgsyter to forGyldigOmsorgsarbeid(it.omsorgsyter)
