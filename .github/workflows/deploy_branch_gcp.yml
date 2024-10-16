@@ -1,0 +1,41 @@
+name: 'Bygg og deploy branch til dev-gcp'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_and_push:
+    permissions:
+      contents: "read"
+      id-token: "write"
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+      - name: 'Setup Java'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+          cache: 'gradle'
+      - name: 'Build code'
+        run: |
+          ./gradlew build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Build and push docker image'
+        uses: nais/docker-build-push@v0
+        id: docker-push
+        with:
+          team: pensjonopptjening
+          tag: ${{ github.sha }}-${{ github.ref_name }}
+          image_suffix: ${{ github.ref_name }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
+      - name: 'Deploy til dev-gcp'
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          RESOURCE: nais/dev-gcp.yml,nais/unleash-apitoken-dev-gcp.yml
+          CLUSTER: dev-gcp
+          IMAGE: ${{ steps.docker-push.outputs.image }}
+          TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
