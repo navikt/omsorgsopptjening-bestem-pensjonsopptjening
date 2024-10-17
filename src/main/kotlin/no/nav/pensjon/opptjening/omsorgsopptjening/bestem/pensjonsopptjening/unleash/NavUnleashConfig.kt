@@ -32,7 +32,8 @@ class NavUnleashConfig(
         OPPRETT_OPPGAVER("omsorgsopptjening-bestem-pensjonsopptjening-opprett-oppgaver"),
         GODSKRIV("omsorgsopptjening-bestem-pensjonsopptjening-godskriv"),
         BEHANDLING("omsorgsopptjening-bestem-pensjonsopptjening-behandling"),
-        BREV("omsorgsopptjening-bestem-pensjonsopptjening-brev")
+        BREV("omsorgsopptjening-bestem-pensjonsopptjening-brev"),
+        KONTROLL("omsorgsopptjening-bestem-pensjonsopptjening-kontroll")
     }
 }
 
