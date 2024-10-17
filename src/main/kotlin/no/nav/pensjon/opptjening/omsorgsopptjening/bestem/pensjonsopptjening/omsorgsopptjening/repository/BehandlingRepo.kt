@@ -2,17 +2,16 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandlingUtenJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
-import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.util.UUID
 
-@Component
 class BehandlingRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate
 ) {
@@ -110,6 +109,20 @@ internal class BehandlingRowMapper : RowMapper<BehandlingDb> {
             grunnlag = deserialize(rs.getString("grunnlag")),
             vilkårsvurdering = deserialize(rs.getString("vilkarsvurdering")),
             utfall = deserialize(rs.getString("utfall")),
+            meldingId = UUID.fromString(rs.getString("kafkaMeldingId"))
+        )
+    }
+}
+
+internal class BehandlingUtenJsonRowMapper : RowMapper<FullførtBehandlingUtenJson> {
+    override fun mapRow(rs: ResultSet, rowNum: Int): FullførtBehandlingUtenJson {
+        return FullførtBehandlingUtenJson(
+            id = UUID.fromString(rs.getString("id")),
+            opprettet = rs.getTimestamp("opprettet").toInstant(),
+            omsorgsAr = rs.getInt("omsorgs_ar"),
+            omsorgsyter = rs.getString("omsorgsyter"),
+            omsorgsmottaker = rs.getString("omsorgsmottaker"),
+            omsorgstype = OmsorgskategoriDb.valueOf(rs.getString("omsorgstype")).toDomain(),
             meldingId = UUID.fromString(rs.getString("kafkaMeldingId"))
         )
     }
