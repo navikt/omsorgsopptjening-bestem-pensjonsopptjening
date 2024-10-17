@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.spring
 
-import io.getunleash.Unleash
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
@@ -15,10 +14,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.OmsorgsopptjeningsgrunnlagServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingServiceImpl
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingThread
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingTask
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -67,18 +67,19 @@ class PersongrunnlagConfig {
     @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
     fun persongrunnlagProcessingThread(
         service: PersongrunnlagMeldingProcessingService,
-        unleash: Unleash,
+        unleash: UnleashWrapper,
         omsorgsarbeidMetricsMåling: OmsorgsarbeidProcessingMetrikker,
         omsorgsarbeidMetricsFeilmåling: OmsorgsarbeidProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,
-    ): Runnable {
-        return PersongrunnlagMeldingProcessingThread(
+    ): PersongrunnlagMeldingProcessingTask {
+        return PersongrunnlagMeldingProcessingTask(
             service = service,
             unleash = unleash,
             omsorgsarbeidMetricsMåling = omsorgsarbeidMetricsMåling,
             omsorgsarbeidMetricsFeilmåling = omsorgsarbeidMetricsFeilmåling,
             datasourceReadinessCheck = datasourceReadinessCheck
         )
+
     }
 
     @Bean

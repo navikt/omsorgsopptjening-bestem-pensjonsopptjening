@@ -51,8 +51,10 @@ class PostgresqlTestContainer private constructor(image: String) : PostgreSQLCon
                         DELETE FROM BREV;
                         DELETE FROM GODSKRIV_OPPTJENING;
                         DELETE FROM OPPGAVE;
+                        DELETE FROM KONTROLLBEHANDLING;
+                        DELETE FROM KONTROLLMELDING;
                         DELETE FROM BEHANDLING;
-                        DELETE FROM MELDING;
+                        DELETE FROM MELDING;                       
                     """
                 )
                 close()

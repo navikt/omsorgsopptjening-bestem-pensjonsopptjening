@@ -98,11 +98,11 @@ internal data class ResponsePeriode(
     val fraOgMed: LocalDate,
     val tilOgMed: LocalDate, //alltid satt, 9999-12-31 tilsvarer null/åpen/ubestemt periode
     val status: PeriodestatusMedl,
-    val statusaarsak: String,
-    val dekning: String,
+    val statusaarsak: String?,
+    val dekning: String?,
     val helsedel: Boolean,
     val medlem: Boolean,
-    val lovvalgsland: String,
+    val lovvalgsland: String?,
     val lovvalg: String,
     val grunnlag: String,
 )
