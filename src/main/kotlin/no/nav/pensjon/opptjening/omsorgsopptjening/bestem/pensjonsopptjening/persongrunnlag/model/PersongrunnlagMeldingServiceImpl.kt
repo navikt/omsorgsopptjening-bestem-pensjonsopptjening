@@ -69,7 +69,18 @@ internal class PersongrunnlagMeldingServiceImpl(
                             grunnlag = it,
                             vurderVilkår = VilkårsvurderingFactory(
                                 grunnlag = it,
-                                behandlingRepo = behandlingRepo
+                                finnForOmsorgsyterOgÅr = {
+                                    behandlingRepo.finnForOmsorgsyterOgAr(
+                                        it.omsorgsyter.fnr,
+                                        it.omsorgsAr
+                                    )
+                                },
+                                finnForOmsorgsmottakerOgÅr = {
+                                    behandlingRepo.finnForOmsorgsmottakerOgAr(
+                                        it.omsorgsmottaker.fnr,
+                                        it.omsorgsAr
+                                    )
+                                },
                             ),
                             meldingId = melding.id
                         )
