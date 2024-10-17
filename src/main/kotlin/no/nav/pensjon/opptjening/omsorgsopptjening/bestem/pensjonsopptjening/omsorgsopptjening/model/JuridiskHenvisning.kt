@@ -1,25 +1,25 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 sealed class JuridiskHenvisning(
-    val kortTittel: String? = null,
-    val dato: String? = null,
-    val kapittel: Int?,
-    val paragraf: Int?,
-    val ledd: Int?,
-    val bokstav: String? = null,
-    val punktum: Int? = null,
-    val tekst: String?
+    open val kortTittel: String? = null,
+    open val dato: String? = null,
+    open val kapittel: Int?,
+    open val paragraf: Int?,
+    open val ledd: Int?,
+    open val bokstav: String? = null,
+    open val punktum: Int? = null,
+    open val tekst: String?
 ) {
 
-    class Arkivert(
-        kortTittel: String?,
-        dato: String?,
-        kapittel: Int?,
-        paragraf: Int?,
-        ledd: Int?,
-        bokstav: String? = null,
-        punktum: Int? = null,
-        tekst: String?
+    data class Arkivert(
+        override val kortTittel: String? = null,
+        override val dato: String? = null,
+        override val kapittel: Int?,
+        override val paragraf: Int?,
+        override val ledd: Int?,
+        override val bokstav: String? = null,
+        override val punktum: Int? = null,
+        override val tekst: String?
     ) : JuridiskHenvisning(
         kortTittel = kortTittel,
         dato = dato,

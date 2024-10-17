@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapsUnntakOppslag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.time
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsgrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsunntak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
@@ -17,12 +18,12 @@ internal class OmsorgsopptjeningsgrunnlagServiceImpl(
 ) : OmsorgsopptjeningsgrunnlagService {
 
     override fun lagOmsorgsopptjeningsgrunnlag(melding: PersongrunnlagMelding.Mottatt): List<OmsorgsopptjeningGrunnlag> {
-        return melding.innhold.berikDatagrunnlag().tilOmsorgsopptjeningsgrunnlag()
+        return time("lagOmsorgsopptjeningsgrunnlag"){ melding.innhold.berikDatagrunnlag().tilOmsorgsopptjeningsgrunnlag() }
     }
 
     fun PersongrunnlagMeldingKafka.berikDatagrunnlag(): BeriketDatagrunnlag {
         val personer = hentPersoner()
-            .map { personOppslag.hentPerson(it) }
+            .map { time("personOppslag.hentPerson(it)"){ personOppslag.hentPerson(it) } }
             .toSet()
 
         return berikDatagrunnlag(personer)
@@ -68,12 +69,13 @@ internal class OmsorgsopptjeningsgrunnlagServiceImpl(
                     val medlemskapsgrunnlag = if (omsorgsperioder.isNotEmpty()) {
                         val (første, siste) = omsorgsperioder.minOf { it.fom } to omsorgsperioder.maxOf { it.tom }
                         Medlemskapsgrunnlag(
-                            medlemskapsunntak = medlemskapsUnntakOppslag.hentUnntaksperioder(
-                                fnr = omsorgsyter.fnr,
-                                fraOgMed = første,
-                                tilOgMed = siste,
-                            )
-                        )
+                            medlemskapsunntak = time("medlemskapsUnntakOppslag.hentUnntaksperioder") {
+                                medlemskapsUnntakOppslag.hentUnntaksperioder(
+                                    fnr = omsorgsyter.fnr,
+                                    fraOgMed = første,
+                                    tilOgMed = siste,
+                                )
+                            })
                     } else {
                         Medlemskapsgrunnlag(
                             medlemskapsunntak = Medlemskapsunntak(
