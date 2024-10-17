@@ -68,3 +68,13 @@ data class FullførtBehandling(
         )
     }
 }
+
+data class FullførtBehandlingUtenJson(
+    val id: UUID,
+    val opprettet: Instant,
+    val omsorgsAr: Int,
+    val omsorgsyter: String,
+    val omsorgsmottaker: String,
+    val omsorgstype: DomainOmsorgskategori,
+    val meldingId: UUID,
+)
