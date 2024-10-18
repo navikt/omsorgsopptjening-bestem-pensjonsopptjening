@@ -19,6 +19,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -67,7 +68,7 @@ class PersongrunnlagConfig {
     @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
     fun persongrunnlagProcessingThread(
         service: PersongrunnlagMeldingProcessingService,
-        unleash: Unleash,
+        unleash: UnleashWrapper,
         omsorgsarbeidMetricsMåling: OmsorgsarbeidProcessingMetrikker,
         omsorgsarbeidMetricsFeilmåling: OmsorgsarbeidProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,

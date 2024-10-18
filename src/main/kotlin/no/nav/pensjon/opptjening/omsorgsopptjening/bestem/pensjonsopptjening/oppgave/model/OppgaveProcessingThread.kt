@@ -1,16 +1,16 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model
 
-import io.getunleash.Unleash
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetricsFeilmåling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import org.slf4j.LoggerFactory
 
 
 class OppgaveProcessingThread(
     private val service: OppgaveService,
-    private val unleash: Unleash,
+    private val unleash: UnleashWrapper,
     private val oppgaveProcessingMetricsMåling: OppgaveProcessingMetrikker,
     private val oppgaveProcessingMetricsFeilmåling: OppgaveProcessingMetricsFeilmåling,
     private val datasourceReadinessCheck: DatasourceReadinessCheck,
@@ -27,7 +27,7 @@ class OppgaveProcessingThread(
     override fun run() {
         while (true) {
             try {
-                if (unleash.isEnabled(NavUnleashConfig.Feature.OPPRETT_OPPGAVER.toggleName) && datasourceReadinessCheck.isReady()) {
+                if (unleash.isEnabled(NavUnleashConfig.Feature.OPPRETT_OPPGAVER) && datasourceReadinessCheck.isReady()) {
                     oppgaveProcessingMetricsMåling.oppdater {
                         service.process()
                     }

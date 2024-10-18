@@ -9,22 +9,35 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import java.net.InetAddress
+import java.time.Clock
 
 @Configuration
 @Profile("dev-gcp", "prod-gcp")
 class NavUnleashConfig(
     @Value("\${UNLEASH_SERVER_API_URL}") private val unleash_url: String,
-    @Value("\${UNLEASH_SERVER_API_TOKEN}") private val unleash_api_key: String) {
+    @Value("\${UNLEASH_SERVER_API_TOKEN}") private val unleash_api_key: String
+) {
 
     @Bean
     fun unleashConfig(): Unleash {
-        return DefaultUnleash(UnleashConfig.builder()
-            .appName("omsorgsopptjening-bestem-pensjonsopptjening")
-            .instanceId(InetAddress.getLocalHost().hostName)
-            .unleashAPI("$unleash_url/api")
-            .apiKey(unleash_api_key)
-            .build(),
+        return DefaultUnleash(
+            UnleashConfig.builder()
+                .appName("omsorgsopptjening-bestem-pensjonsopptjening")
+                .instanceId(InetAddress.getLocalHost().hostName)
+                .unleashAPI("$unleash_url/api")
+                .apiKey(unleash_api_key)
+                .build(),
             DefaultStrategy()
+        )
+    }
+
+    @Bean
+    fun unleashWrapper(
+        unleash: Unleash
+    ): UnleashWrapper {
+        return UnleashWrapper(
+            unleash = unleash,
+            clock = Clock.systemUTC()
         )
     }
 

@@ -6,6 +6,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.bre
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevProcessingThread
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -17,7 +18,7 @@ class BrevConfig {
     @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
     fun brevProcessingThread(
         service: BrevService,
-        unleash: Unleash,
+        unleash: UnleashWrapper,
         brevProcessingMetricsMåling: BrevProcessingMetrikker,
         brevProcessingMetricsFeilmåling: BrevProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,

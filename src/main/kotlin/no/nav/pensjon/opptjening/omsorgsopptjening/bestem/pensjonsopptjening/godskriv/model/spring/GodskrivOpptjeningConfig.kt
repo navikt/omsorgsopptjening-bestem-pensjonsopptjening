@@ -14,6 +14,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -53,7 +54,7 @@ class GodskrivOpptjeningConfig {
     @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
     internal fun godskrivOpptjeningProcessingThread(
         service: GodskrivOpptjeningProcessingService,
-        unleash: Unleash,
+        unleash: UnleashWrapper,
         godskrivProcessingMetricsMåling: GodskrivProcessingMetrikker,
         godskrivProcessingMetricsFeilmåling: GodskrivProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,

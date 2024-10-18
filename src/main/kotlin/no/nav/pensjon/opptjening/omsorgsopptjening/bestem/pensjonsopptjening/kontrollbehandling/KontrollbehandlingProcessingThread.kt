@@ -1,13 +1,13 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling
 
-import io.getunleash.Unleash
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.NavUnleashConfig
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import org.slf4j.LoggerFactory
 
 class KontrollbehandlingProcessingThread(
     private val service: KontrollbehandlingProcessingService,
-    private val unleash: Unleash,
+    private val unleash: UnleashWrapper,
     private val datasourceReadinessCheck: DatasourceReadinessCheck,
 ) : Runnable {
 
@@ -23,7 +23,7 @@ class KontrollbehandlingProcessingThread(
     override fun run() {
         while (true) {
             try {
-                if (unleash.isEnabled(NavUnleashConfig.Feature.KONTROLL.toggleName) && datasourceReadinessCheck.isReady()) {
+                if (unleash.isEnabled(NavUnleashConfig.Feature.KONTROLL) && datasourceReadinessCheck.isReady()) {
                     service.process() ?: run {
                         Thread.sleep(1000)
                         null

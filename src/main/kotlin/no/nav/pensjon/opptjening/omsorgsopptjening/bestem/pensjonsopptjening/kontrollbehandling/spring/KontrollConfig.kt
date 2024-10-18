@@ -12,6 +12,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.OmsorgsopptjeningsgrunnlagService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -63,7 +64,7 @@ class KontrollConfig {
     @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
     fun kontrollProcessingThread(
         service: KontrollbehandlingProcessingService,
-        unleash: Unleash,
+        unleash: UnleashWrapper,
         datasourceReadinessCheck: DatasourceReadinessCheck,
     ): KontrollbehandlingProcessingThread {
         return KontrollbehandlingProcessingThread(
