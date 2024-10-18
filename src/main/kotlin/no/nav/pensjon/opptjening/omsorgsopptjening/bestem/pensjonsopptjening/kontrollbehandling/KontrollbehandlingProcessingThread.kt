@@ -12,11 +12,8 @@ class KontrollbehandlingProcessingThread(
 ) : Runnable {
 
     init {
-        val name = "prosesser-persongrunnlag-kontrollbehandling-thread"
-        log.info("Starting new thread:$name to process kontrollbehandlinger")
-        Thread(this, name).start()
+        log.info("Starting new thread to process kontrollbehandlinger")
     }
-
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)!!

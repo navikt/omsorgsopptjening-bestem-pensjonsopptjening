@@ -60,12 +60,12 @@ class KontrollConfig {
     }
 
     @Bean
-    @Profile("dev-gcp", "prod-gcp")
+    @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
     fun kontrollProcessingThread(
         service: KontrollbehandlingProcessingService,
         unleash: Unleash,
         datasourceReadinessCheck: DatasourceReadinessCheck,
-    ): Runnable {
+    ): KontrollbehandlingProcessingThread {
         return KontrollbehandlingProcessingThread(
             service = service,
             unleash = unleash,

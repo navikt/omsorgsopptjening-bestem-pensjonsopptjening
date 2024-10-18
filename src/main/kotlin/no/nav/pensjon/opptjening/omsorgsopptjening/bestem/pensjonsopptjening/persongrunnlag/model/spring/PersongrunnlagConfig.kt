@@ -71,7 +71,7 @@ class PersongrunnlagConfig {
         omsorgsarbeidMetricsMåling: OmsorgsarbeidProcessingMetrikker,
         omsorgsarbeidMetricsFeilmåling: OmsorgsarbeidProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,
-    ): Runnable {
+    ): PersongrunnlagMeldingProcessingThread {
         return PersongrunnlagMeldingProcessingThread(
             service = service,
             unleash = unleash,
@@ -79,6 +79,7 @@ class PersongrunnlagConfig {
             omsorgsarbeidMetricsFeilmåling = omsorgsarbeidMetricsFeilmåling,
             datasourceReadinessCheck = datasourceReadinessCheck
         )
+
     }
 
     @Bean

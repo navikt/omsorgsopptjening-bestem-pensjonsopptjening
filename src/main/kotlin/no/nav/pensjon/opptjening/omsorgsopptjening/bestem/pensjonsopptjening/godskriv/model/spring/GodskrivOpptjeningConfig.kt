@@ -51,13 +51,13 @@ class GodskrivOpptjeningConfig {
 
     @Bean
     @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
-    fun godskrivOpptjeningProcessingThread(
+    internal fun godskrivOpptjeningProcessingThread(
         service: GodskrivOpptjeningProcessingService,
         unleash: Unleash,
         godskrivProcessingMetricsMåling: GodskrivProcessingMetrikker,
         godskrivProcessingMetricsFeilmåling: GodskrivProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,
-    ): Runnable {
+    ): GodskrivOpptjeningProcessingThread {
         return GodskrivOpptjeningProcessingThread(
             service = service,
             unleash = unleash,
