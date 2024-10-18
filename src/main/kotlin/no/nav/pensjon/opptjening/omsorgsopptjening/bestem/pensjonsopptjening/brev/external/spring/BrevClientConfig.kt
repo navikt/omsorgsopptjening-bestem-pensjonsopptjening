@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration
 import pensjon.opptjening.azure.ad.client.TokenProvider
 
 @Configuration
-class BrevConfig {
+class BrevClientConfig {
 
     @Bean
     fun brevClient(

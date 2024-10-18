@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.monitorering.StatusCheckTask
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.monitorering.StatusRapporteringCachingAdapter
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -33,6 +34,9 @@ class ScheduledTasksConfig {
     @Autowired
     private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
 
+    @Autowired
+    private lateinit var kontrollbehandlingRepo: KontrollbehandlingRepo
+
     @Bean
     fun statusCheckTask(): StatusCheckTask {
         return StatusCheckTask(statusRapporteringsService)
@@ -40,6 +44,6 @@ class ScheduledTasksConfig {
 
     @Bean
     fun frigiLaserTask(): FrigiLaserTask {
-        return FrigiLaserTask(persongrunnlagRepo, oppgaveRepo, brevRepository, godskrivOpptjeningRepo)
+        return FrigiLaserTask(persongrunnlagRepo, oppgaveRepo, brevRepository, godskrivOpptjeningRepo, kontrollbehandlingRepo)
     }
 }

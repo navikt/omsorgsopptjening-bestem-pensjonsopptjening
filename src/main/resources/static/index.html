@@ -29,7 +29,7 @@
                 document.getElementById("mainForm_submit").textContent = text
             }
 
-            function setBeskrivelseEnabled(enabled) {
+            function setBegrunnelseEnabled(enabled) {
                 let begrunnelse = document.getElementById("begrunnelse");
                 begrunnelse.disabled = !enabled
                 if (enabled) {
@@ -39,50 +39,76 @@
                 }
             }
 
+            function setArEnabled(enabled) {
+                let ar = document.getElementById("ar");
+                ar.disabled = !enabled
+                if (enabled) {
+                    ar.style.backgroundColor = null
+                } else {
+                    ar.style.backgroundColor = "lightgrey"
+                }
+            }
+
             switch (tjeneste) {
                 case "rekjor_meldinger":
                     setActionAndText("/bestem/rekjor-flere", "Rekjør meldinger")
-                    setBeskrivelseEnabled(true)
+                    setBegrunnelseEnabled(true)
+                    setArEnabled(false)
                     break;
                 case "stopp_meldinger":
                     setActionAndText("/bestem/stopp-flere", "Stopp meldinger")
-                    setBeskrivelseEnabled(true)
+                    setBegrunnelseEnabled(true)
+                    setArEnabled(false)
                     break;
                 case "avslutt_meldinger":
                     setActionAndText("/bestem/avslutt-flere", "Avslutt meldinger")
-                    setBeskrivelseEnabled(true)
+                    setBegrunnelseEnabled(true)
+                    setArEnabled(false)
                     break;
                 case "restart_oppgaver":
                     setActionAndText("/bestem/restart-oppgaver", "Restart oppgaver")
-                    setBeskrivelseEnabled(false)
+                    setBegrunnelseEnabled(false)
+                    setArEnabled(false)
                     break;
                 case "kanseller_oppgaver":
                     setActionAndText("/bestem/kanseller-oppgaver", "Kanseller oppgaver")
-                    setBeskrivelseEnabled(true)
+                    setBegrunnelseEnabled(true)
+                    setArEnabled(false)
                     break;
                 case "restart_brev":
                     setActionAndText("/bestem/restart-brev", "Restart brev")
-                    setBeskrivelseEnabled(false)
+                    setBegrunnelseEnabled(false)
+                    setArEnabled(false)
                     break;
                 case "stopp_brev":
                     setActionAndText("/bestem/stopp-brev", "Stopp brev")
-                    setBeskrivelseEnabled(false)
+                    setBegrunnelseEnabled(false)
+                    setArEnabled(false)
                     break;
                 case "stopp_godskriving":
                     setActionAndText("/bestem/stopp-godskriving", "Stopp godskriving")
-                    setBeskrivelseEnabled(false)
+                    setBegrunnelseEnabled(false)
+                    setArEnabled(false)
                     break;
                 case "restart_godskriving":
                     setActionAndText("/bestem/restart-godskriving", "Restart godskriving")
-                    setBeskrivelseEnabled(false)
+                    setBegrunnelseEnabled(false)
+                    setArEnabled(false)
                     break;
                 case "hent_oppgavestatus":
                     setActionAndText("/bestem/hent-oppgavestatus", "Hent oppgave-status")
-                    setBeskrivelseEnabled(false)
+                    setBegrunnelseEnabled(false)
+                    setArEnabled(false)
+                    break;
+                case "kontrollbehandling":
+                    setActionAndText("/bestem/kontrollbehandling", "Kontrollbehandling")
+                    setBegrunnelseEnabled(true)
+                    setArEnabled(true)
                     break;
                 case "test":
                     setActionAndText("/bestem/test", "TEST")
-                    setBeskrivelseEnabled(true)
+                    setBegrunnelseEnabled(true)
+                    setArEnabled(false)
                     break;
                 default:
                     setActionAndText("INVALID", "Feil: ukjent tjeneste: " + tjeneste)
@@ -183,6 +209,15 @@
             mens oppgaver som er nye eller påstartet av en saksbehandler vil bli lukket (med status "feilregistrert")
         </li>
         <li>hent status på oppgave vil hente behandlingsstatus for en registrert oppgave</li>
+        <li>
+            Kontrollbehandling gjennomfører en ny vilkårsvurdering av grunnlaget til alle meldinger tilnyttet
+            angitt innlesingid. Behandlingen vil ikke godskrive opptjening, opprette brev og/eller oppgaver, men tar
+            vare på informasjon som forteller om dette ville skjedd eller ikke. Tiltenkt for kontroll og analyseformål,
+            f.eks for å identifisere historiske feil etter ny funksjonalitet er lagt til, vurdere konsekvens av regelendringer,
+            estimere behov for manuelt arbeid etc. Begrunnelse brukes som en referanse til en bestem kontrollkjøring,
+            slik at vi kan flere kontrollkjøringer kan gjennomføres uten at resultatene påvirker hverandre på tvers av
+            ulike kjøringer.
+        </li>
     </ul>
     <p>
         <li>oppgaver som har blitt kansellert/markert som feilregistrert vil se ut som de ikke finnes</li>
@@ -211,6 +246,7 @@
         <option value="stopp_brev">Stopp brev</option>
         <option value="stopp_godskriving">Stopp godskriving</option>
         <option value="restart_godskriving">Restart godskriving</option>
+        <option value="kontrollbehandling">Kontrollbehandling</option>
         <!-- option value="test">TEST (intern, midlertidig)</option -->
     </select>
 </form>
@@ -225,6 +261,16 @@
             <td>
                 <input type="text" id="begrunnelse" name="begrunnelse" size="50" maxlength="50"/>
             </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="ar">År</label>
+            </td>
+            <td>
+                <input type="number" id="ar" name="ar"/>
+            </td>
+        </tr>
+        <tr>
             <td>
                 <button type="submit" id="mainForm_submit">Velg tjeneste</button>
             </td>

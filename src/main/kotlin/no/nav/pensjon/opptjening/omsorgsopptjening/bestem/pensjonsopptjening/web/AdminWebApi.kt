@@ -2,11 +2,13 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.we
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult.FantIkkeOppgavenLokalt
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult.FantIkkeOppgavenRemote
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,7 +27,8 @@ class AdminWebApi(
     private val persongrunnlagMeldingService: PersongrunnlagMeldingService,
     private val oppgaveService: OppgaveService,
     private val brevService: BrevService,
-    private val godskrivOpptjeningService: GodskrivOpptjeningService
+    private val godskrivOpptjeningService: GodskrivOpptjeningService,
+    private val kontrollbehandlingService: KontrollbehandlingService,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(AdminWebApi::class.java)
@@ -228,7 +231,11 @@ class AdminWebApi(
     }
 
 
-    @PostMapping("/bestem/stopp-godskriving", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    @PostMapping(
+        "/bestem/stopp-godskriving",
+        consumes = [APPLICATION_FORM_URLENCODED_VALUE],
+        produces = [TEXT_PLAIN_VALUE]
+    )
     fun stoppGodskriving(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
@@ -263,7 +270,11 @@ class AdminWebApi(
         }
     }
 
-    @PostMapping("/bestem/restart-godskriving", consumes = [APPLICATION_FORM_URLENCODED_VALUE], produces = [TEXT_PLAIN_VALUE])
+    @PostMapping(
+        "/bestem/restart-godskriving",
+        consumes = [APPLICATION_FORM_URLENCODED_VALUE],
+        produces = [TEXT_PLAIN_VALUE]
+    )
     fun restartGodskriving(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
@@ -371,6 +382,33 @@ class AdminWebApi(
             return ResponseEntity.internalServerError()
                 .contentType(TEXT_PLAIN)
                 .body("Feil ved prosessering: $ex")
+        }
+    }
+
+    @PostMapping(
+        "/bestem/kontrollbehandling",
+        consumes = [APPLICATION_FORM_URLENCODED_VALUE],
+        produces = [TEXT_PLAIN_VALUE]
+    )
+    fun bestillKontroll(
+        @RequestParam("uuidliste") oppgaverString: String,
+        @RequestParam("begrunnelse") begrunnelse: String,
+        @RequestParam("ar") ar: Int
+    ): ResponseEntity<String> {
+        val uuid = try {
+            parseUUIDListe(oppgaverString).single()
+        } catch (ex: Throwable) {
+            return ResponseEntity.badRequest().body("Kunne ikke parse uuid'ene, godtar kun en enkelt UUID")
+        }
+
+        return try {
+            kontrollbehandlingService.kontrollbehandling(InnlesingId(uuid), begrunnelse, ar)
+            ResponseEntity.ok("Kontrollbehandling opprettet")
+        } catch (ex: Throwable) {
+            secureLog.info("Exception under opprettelse av kontrollbehandling", ex)
+            ResponseEntity.internalServerError()
+                .contentType(TEXT_PLAIN)
+                .body("Bestilling av kontrollbehandling for innlesing: $uuid feilet med exception: ${ex::class.simpleName}")
         }
     }
 
