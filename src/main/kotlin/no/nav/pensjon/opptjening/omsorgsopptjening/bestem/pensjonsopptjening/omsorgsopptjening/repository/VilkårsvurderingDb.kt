@@ -11,6 +11,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErikkeOmsorgsmottaker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarGyldigOmsorgsarbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarIkkeDødsdato
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
@@ -41,6 +42,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> toDb()
         is OmsorgsyterErMedlemIFolketrygden.Vurdering -> toDb()
         is OmsorgsyterErikkeOmsorgsmottaker.Vurdering -> toDb()
+        is OmsorgsyterHarIkkeDødsdato.Vurdering -> toDb()
     }
 }
 
@@ -75,5 +77,6 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         is OmsorgsyterHarGyldigOmsorgsarbeidDb -> toDomain()
         is OmsorgsyterErMedlemIFolketrygdenDb -> toDomain()
         is OmsorgsyterErIkkeOmsorgsmottakerDb -> toDomain()
+        is OmsorgsyterHarIkkeDødsdatoDb -> toDomain()
     }
 }
