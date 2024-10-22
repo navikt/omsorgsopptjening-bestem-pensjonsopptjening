@@ -123,6 +123,12 @@ sealed class OmsorgsopptjeningGrunnlag {
         )
     }
 
+    fun forOmsorgsyterHarIkkeDødsdato(): OmsorgsyterHarIkkeDødsdato.Grunnlag {
+        return OmsorgsyterHarIkkeDødsdato.Grunnlag(
+            dødsdato = omsorgsyter.dødsdato
+        )
+    }
+
     fun forGyldigOmsorgsarbeidPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
         return grunnlag.persongrunnlag.associate {
             it.omsorgsyter to forGyldigOmsorgsarbeid(it.omsorgsyter)

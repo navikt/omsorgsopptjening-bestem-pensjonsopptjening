@@ -13,6 +13,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErikkeOmsorgsmottaker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarGyldigOmsorgsarbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarIkkeDødsdato
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
@@ -48,6 +49,7 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List
         registry.counter("avslag", "antall", "OmsorgsyterErMedlemIFolketrygden")
     private val omsorgsyterErIkkeOmsorgsmottaker =
         registry.counter("avslag", "antall", "OmsorgsyterErikkeOmsorgsmottaker")
+    private val omsorgsyterHarDødsdato = registry.counter("avslag", "antall", "OmsorgsyterHarIkkeDodsdato")
 
 
     override fun oppdater(lambda: () -> List<FullførteBehandlinger?>?): List<FullførteBehandlinger?>? {
@@ -73,6 +75,7 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List
                         is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> omsorgsyterHarGyldigOmsorgsarbeid.increment()
                         is OmsorgsyterErMedlemIFolketrygden.Vurdering -> omsorgsyterErMedlemIFolketrygden.increment()
                         is OmsorgsyterErikkeOmsorgsmottaker.Vurdering -> omsorgsyterErIkkeOmsorgsmottaker.increment()
+                        is OmsorgsyterHarIkkeDødsdato.Vurdering -> omsorgsyterHarDødsdato.increment()
                     }
                 }
             }
