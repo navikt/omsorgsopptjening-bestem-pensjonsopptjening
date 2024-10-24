@@ -78,11 +78,11 @@ spec:
   liveness:
     path: /actuator/health/liveness
     port: 8080
-    initialDelay: 50
+    initialDelay: 120
   readiness:
     path: /actuator/health/readiness
     port: 8080
-    initialDelay: 50
+    initialDelay: 120
   prometheus:
     enabled: true
     path: /actuator/prometheus
@@ -99,5 +99,5 @@ spec:
       cpu: "1000m"
       memory: "1024Mi"
     requests:
-      cpu: "100m"
+      cpu: "200m"
       memory: "256Mi"
