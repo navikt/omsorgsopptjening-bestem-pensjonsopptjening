@@ -13,12 +13,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.slf4j.LoggerFactory
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.RestTemplate
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.time.Year
 
@@ -26,8 +26,8 @@ internal class PENBrevClient(
     private val baseUrl: String,
     private val tokenProvider: TokenProvider,
     private val penBrevMetricsMåling: PENBrevMetrikker,
+    private val restTemplate: RestTemplate,
 ) : BrevClient {
-    private val restTemplate = RestTemplateBuilder().build()
 
     companion object {
         fun createPath(baseUrl: String, sakId: String): String {

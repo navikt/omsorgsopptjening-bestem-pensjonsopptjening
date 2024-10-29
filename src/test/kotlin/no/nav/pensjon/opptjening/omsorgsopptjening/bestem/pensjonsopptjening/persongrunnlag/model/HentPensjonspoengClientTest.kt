@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
+import org.springframework.boot.web.client.RestTemplateBuilder
 import kotlin.test.assertEquals
 
 internal class HentPensjonspoengClientTest {
@@ -35,7 +36,8 @@ internal class HentPensjonspoengClientTest {
 
     private val hentPensjonspoengClient: HentPensjonspoengClient = PoppClient(
         baseUrl = "${wiremock.baseUrl()}/api",
-        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) }
+        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) },
+        restTemplate = RestTemplateBuilder().build()
     )
 
     @Test
@@ -137,15 +139,18 @@ internal class HentPensjonspoengClientTest {
 
                 wiremock.verify(
                     postRequestedFor(urlEqualTo("/api/pensjonspoeng/hent"))
-                        .withRequestBody(equalToJson(
-                            """
+                        .withRequestBody(
+                            equalToJson(
+                                """
                             {
                                 "fnr" : "12345",
                                 "fomAr": 2022,
                                 "tomAr": 2022,
                                 "pensjonspoengType": "OBO6H"
                             }
-                        """.trimIndent()))
+                        """.trimIndent()
+                            )
+                        )
                         .withHeader("Nav-Call-Id", equalTo(correlationId.toString()))
                         .withHeader("Nav-Consumer-Id", equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
                         .withHeader("x-correlation-id", equalTo(correlationId.toString()))
@@ -157,15 +162,18 @@ internal class HentPensjonspoengClientTest {
 
                 wiremock.verify(
                     postRequestedFor(urlEqualTo("/api/pensjonspoeng/hent"))
-                        .withRequestBody(equalToJson(
-                            """
+                        .withRequestBody(
+                            equalToJson(
+                                """
                             {
                                 "fnr" : "12345",
                                 "fomAr": 2023,
                                 "tomAr": 2023,
                                 "pensjonspoengType": "PPI"
                             }
-                        """.trimIndent()))
+                        """.trimIndent()
+                            )
+                        )
                         .withHeader("Nav-Call-Id", equalTo(correlationId.toString()))
                         .withHeader("Nav-Consumer-Id", equalTo("omsorgsopptjening-bestem-pensjonsopptjening"))
                         .withHeader("x-correlation-id", equalTo(correlationId.toString()))

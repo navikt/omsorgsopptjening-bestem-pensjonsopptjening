@@ -12,18 +12,18 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.web.client.RestTemplate
 import pensjon.opptjening.azure.ad.client.TokenProvider
 
 internal class PoppClient(
     private val baseUrl: String,
     private val tokenProvider: TokenProvider,
+    private val restTemplate: RestTemplate,
 ) : GodskrivOpptjeningClient, HentPensjonspoengClient {
-    private val restTemplate = RestTemplateBuilder().build()
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -74,7 +74,11 @@ internal class PoppClient(
         }
     }
 
-    override fun hentPensjonspoengForOmsorgstype(fnr: String, år: Int, type: DomainOmsorgskategori): Pensjonspoeng.Omsorg {
+    override fun hentPensjonspoengForOmsorgstype(
+        fnr: String,
+        år: Int,
+        type: DomainOmsorgskategori
+    ): Pensjonspoeng.Omsorg {
         val url = "$baseUrl/pensjonspoeng/hent"
         try {
             return restTemplate.exchange(

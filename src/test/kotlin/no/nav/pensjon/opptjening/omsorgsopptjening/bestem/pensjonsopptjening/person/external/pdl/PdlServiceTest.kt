@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.web.client.RestClientException
 import kotlin.test.assertEquals
@@ -45,7 +46,8 @@ internal class PdlServiceTest {
             graphqlQuery = GraphqlQuery(
                 hentPersonQuery = ClassPathResource("pdl/folkeregisteridentifikator.graphql"),
                 hentAktorIdQuery = ClassPathResource("pdl/hentAktorId.graphql")
-            )
+            ),
+            restTemplate = RestTemplateBuilder().build()
         )
     )
 

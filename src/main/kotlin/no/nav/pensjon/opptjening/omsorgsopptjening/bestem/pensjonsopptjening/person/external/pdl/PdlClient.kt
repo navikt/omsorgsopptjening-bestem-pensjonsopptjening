@@ -5,12 +5,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
+import org.springframework.web.client.RestTemplate
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.net.URI
 
@@ -19,12 +19,11 @@ internal class PdlClient(
     private val tokenProvider: TokenProvider,
     private val metrics: PdlClientMetrics,
     private val graphqlQuery: GraphqlQuery,
+    private val restTemplate: RestTemplate,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
     }
-
-    private val restTemplate = RestTemplateBuilder().build()
 
     fun hentPerson(fnr: String): PdlResponse? {
         val entity = RequestEntity<PdlQuery>(

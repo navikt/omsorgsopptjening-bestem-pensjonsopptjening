@@ -25,6 +25,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import java.net.URI
 import java.time.Year
@@ -43,7 +44,8 @@ internal class PENBrevClientTest {
     private val client: PENBrevClient = PENBrevClient(
         baseUrl = wiremock.baseUrl(),
         tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) },
-        penBrevMetricsMåling = mock()
+        penBrevMetricsMåling = mock(),
+        restTemplate = RestTemplateBuilder().build()
     )
 
     @Test

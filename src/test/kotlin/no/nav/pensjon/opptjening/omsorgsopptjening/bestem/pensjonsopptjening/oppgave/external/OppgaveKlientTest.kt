@@ -15,6 +15,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -33,7 +34,8 @@ class OppgaveKlientTest {
 
     private val client: OppgaveKlient = OppgaveKlient(
         oppgaveUrl = "${wiremock.baseUrl()}/$OPPGAVE_PATH",
-        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) }
+        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) },
+        restTemplate = RestTemplateBuilder().build()
     )
 
     @Test

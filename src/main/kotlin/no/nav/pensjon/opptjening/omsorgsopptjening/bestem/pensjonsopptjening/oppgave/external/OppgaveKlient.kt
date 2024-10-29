@@ -5,12 +5,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.slf4j.LoggerFactory
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.RestTemplate
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -23,13 +23,12 @@ import java.time.format.DateTimeFormatter
 class OppgaveKlient(
     private val oppgaveUrl: String,
     private val tokenProvider: TokenProvider,
+    private val restTemplate: RestTemplate,
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(OppgaveKlient::class.java)
         private val secureLog = LoggerFactory.getLogger("secure")
     }
-
-    private val restTemplate = RestTemplateBuilder().build()
 
     fun opprettOppgave(
         aktoerId: String,

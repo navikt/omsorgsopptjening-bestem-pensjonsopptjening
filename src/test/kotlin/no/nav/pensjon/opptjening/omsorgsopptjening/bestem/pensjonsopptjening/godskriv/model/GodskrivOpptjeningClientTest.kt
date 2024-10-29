@@ -24,6 +24,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.springframework.http.HttpHeaders
+import org.springframework.web.client.RestTemplate
 
 internal class GodskrivOpptjeningClientTest {
 
@@ -37,7 +38,8 @@ internal class GodskrivOpptjeningClientTest {
 
     private val godskrivOpptjeningClient: GodskrivOpptjeningClient = PoppClient(
         baseUrl = wiremock.baseUrl(),
-        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) }
+        tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) },
+        restTemplate = RestTemplate()
     )
 
 

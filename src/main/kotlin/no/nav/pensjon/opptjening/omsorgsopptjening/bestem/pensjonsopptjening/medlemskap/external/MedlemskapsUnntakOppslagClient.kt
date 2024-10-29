@@ -9,11 +9,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import org.apache.commons.lang3.ObjectUtils.min
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
+import org.springframework.web.client.RestTemplate
 import pensjon.opptjening.azure.ad.client.TokenProvider
 import java.net.URI
 import java.time.LocalDate
@@ -22,9 +22,8 @@ import java.time.YearMonth
 internal class MedlemskapsUnntakOppslagClient(
     private val url: String,
     private val tokenProvider: TokenProvider,
+    private val restTemplate: RestTemplate,
 ) : MedlemskapsUnntakOppslag {
-
-    private val restTemplate = RestTemplateBuilder().build()
 
     override fun hentUnntaksperioder(
         fnr: String,

@@ -9,20 +9,20 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.web.client.RestTemplate
 import pensjon.opptjening.azure.ad.client.TokenProvider
 
 class BestemSakKlient(
     private val bestemSakUrl: String,
     private val tokenProvider: TokenProvider,
     private val metrics: BestemSakMetrics,
+    private val restTemplate: RestTemplate,
 ) {
     private val log: Logger by lazy { LoggerFactory.getLogger(BestemSakKlient::class.java) }
-    private val restTemplate = RestTemplateBuilder().build()
 
     /**
      * Henter pesys sakID for en gitt aktørID og saktype

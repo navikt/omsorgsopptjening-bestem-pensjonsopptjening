@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.client.RestTemplate
 import pensjon.opptjening.azure.ad.client.TokenProvider
 
 @Configuration
@@ -17,11 +18,13 @@ class BestemSakKlientConfig {
         @Value("\${PEN_BASE_URL}") bestemSakUrl: String,
         @Qualifier("PENTokenProvider") tokenProvider: TokenProvider,
         bestemSakMetrics: BestemSakMetrics,
+        restTemplate: RestTemplate,
     ): BestemSakKlient {
         return BestemSakKlient(
             bestemSakUrl = bestemSakUrl,
             tokenProvider = tokenProvider,
             metrics = bestemSakMetrics,
+            restTemplate = restTemplate,
         )
     }
 
