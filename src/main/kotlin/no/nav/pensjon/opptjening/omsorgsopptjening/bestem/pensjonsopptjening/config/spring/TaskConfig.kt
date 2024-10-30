@@ -27,7 +27,7 @@ class TaskConfig {
             repeat(1) { executor.submit(oppgaveProcessingTask) }
             repeat(1) { executor.submit(brevProcessingTask) }
             repeat(4) { executor.submit(persongrunnlagMeldingProcessingTask) }
-            repeat(4) { executor.submit(kontrollbehandlingProcessingTask) }
+            repeat(16) { executor.submit(kontrollbehandlingProcessingTask) }
             repeat(1) { executor.submit(godskrivOpptjeningProcessingTask) }
         }
     }
