@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
@@ -38,6 +39,7 @@ class OppgaveService(
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
+        private val secureLog: Logger = LoggerFactory.getLogger("secure")
     }
 
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
@@ -88,47 +90,52 @@ class OppgaveService(
         }
     }
 
-    fun process(): List<Oppgave>? {
+    fun process(): Resultat<List<Oppgave.Persistent>> {
         val låsteOppgaver = oppgaveRepo.finnNesteUprosesserte(10)
+            .also { it.data.ifEmpty { return Resultat.FantIngenDataÅProsessere() } }
+
         return try {
-            transactionTemplate.execute {
-                låsteOppgaver.data.mapNotNull { oppgave ->
-                    Mdc.scopedMdc(oppgave.correlationId) {
-                        Mdc.scopedMdc(oppgave.innlesingId) {
-                            try {
-                                personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
-                                    sakKlient.bestemSak(
-                                        aktørId = aktørId
-                                    ).let { omsorgssak ->
-                                        oppgaveKlient.opprettOppgave(
-                                            aktoerId = aktørId,
-                                            sakId = omsorgssak.sakId,
-                                            beskrivelse = FlereOppgaveteksterFormatter.format(oppgave.oppgavetekst),
-                                            tildeltEnhetsnr = omsorgssak.enhet
-                                        ).let { oppgaveId ->
-                                            oppgave.ferdig(oppgaveId).also {
-                                                oppgaveRepo.updateStatus(it)
-                                                log.info("Oppgave opprettet")
+            Resultat.Prosessert(
+                transactionTemplate.execute {
+                    låsteOppgaver.data.mapNotNull { oppgave ->
+                        Mdc.scopedMdc(oppgave.correlationId) {
+                            Mdc.scopedMdc(oppgave.innlesingId) {
+                                try {
+                                    personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
+                                        sakKlient.bestemSak(
+                                            aktørId = aktørId
+                                        ).let { omsorgssak ->
+                                            oppgaveKlient.opprettOppgave(
+                                                aktoerId = aktørId,
+                                                sakId = omsorgssak.sakId,
+                                                beskrivelse = FlereOppgaveteksterFormatter.format(oppgave.oppgavetekst),
+                                                tildeltEnhetsnr = omsorgssak.enhet
+                                            ).let { oppgaveId ->
+                                                oppgave.ferdig(oppgaveId).also {
+                                                    oppgaveRepo.updateStatus(it)
+                                                    log.info("Oppgave opprettet")
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            } catch (ex: SQLException) {
-                                log.error("Feil ved prosessering av oppgaver", ex) // OK, sql exception is safe to log
-                                throw ex
-                            } catch (ex: Throwable) {
-                                oppgave.retry(ex.stackTraceToString()).let {
-                                    if (it.status is Oppgave.Status.Feilet) {
-                                        log.error("Gir opp videre prosessering av oppgave")
+                                } catch (ex: SQLException) {
+                                    throw ex
+                                } catch (ex: Throwable) {
+                                    log.warn("Exception ved prosessering av oppgave: ${ex::class.qualifiedName}")
+                                    secureLog.warn("Exception ved prosessering av oppgave", ex)
+                                    oppgave.retry(ex.stackTraceToString()).let {
+                                        if (it.status is Oppgave.Status.Feilet) {
+                                            log.error("Gir opp videre prosessering av oppgave")
+                                        }
+                                        oppgaveRepo.updateStatus(it)
+                                        null
                                     }
-                                    oppgaveRepo.updateStatus(it)
-                                    null
                                 }
                             }
                         }
                     }
-                }
-            }
+                }!!
+            )
         } finally {
             oppgaveRepo.frigi(låsteOppgaver)
         }
@@ -160,11 +167,11 @@ class OppgaveService(
                     }?.let { id ->
                         oppgaveKlient.hentOppgaveInfo(id)?.let {
                             OppgaveInfoResult.Info(it)
-                        }?:OppgaveInfoResult.FantIkkeOppgavenRemote
+                        } ?: OppgaveInfoResult.FantIkkeOppgavenRemote
                     }
                 }
             }
-        }?:OppgaveInfoResult.FantIkkeOppgavenLokalt
+        } ?: OppgaveInfoResult.FantIkkeOppgavenLokalt
     }
 
     private fun kansellerOppgave(oppgave: Oppgave.Persistent): KanselleringsResultat {

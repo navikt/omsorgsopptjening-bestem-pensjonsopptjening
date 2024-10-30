@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external.PENBrevClient.Companion.createPath
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
@@ -12,9 +13,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -23,6 +26,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -159,7 +163,7 @@ class BrevProsesseringTest(
                 )
             ),
         ).let {
-            persongrunnlagMeldingService.process()!!.first().single().let { behandling ->
+            persongrunnlagMeldingService.processAndExpectResult().first().single().let { behandling ->
                 Assertions.assertTrue(behandling.erInnvilget())
                 behandling to brevRepository.findForBehandling(behandling.id).singleOrNull()!!
             }
@@ -187,7 +191,7 @@ class BrevProsesseringTest(
             }
         }
 
-        brevService.process()!!.first().also { b ->
+        brevService.processAndExpectResult().first().also { b ->
             assertEquals(2020, b.omsorgsår)
             assertEquals("12345678910", b.omsorgsyter)
             assertEquals(behandling.id, b.behandlingId)
@@ -257,7 +261,7 @@ class BrevProsesseringTest(
                 )
             ),
         ).let {
-            persongrunnlagMeldingService.process()!!.first().single().let { behandling ->
+            persongrunnlagMeldingService.processAndExpectResult().first().single().let { behandling ->
                 Assertions.assertTrue(behandling.erInnvilget())
                 behandling to brevRepository.findForBehandling(behandling.id).singleOrNull()!!
             }
@@ -278,5 +282,12 @@ class BrevProsesseringTest(
             assertInstanceOf(Brev.Status.Feilet::class.java, b.status)
             assertEquals(1, brevRepository.findForBehandling(behandling.id).count())
         }
+    }
+}
+
+private fun BrevService.processAndExpectResult(): List<Brev.Persistent> {
+    return when(val result = this.process()){
+        is Resultat.FantIngenDataÅProsessere -> fail("Expecting result")
+        is Resultat.Prosessert -> result.data
     }
 }

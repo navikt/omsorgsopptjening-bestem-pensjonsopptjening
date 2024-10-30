@@ -9,6 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.januar
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -38,7 +39,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     private lateinit var repo: PersongrunnlagRepo
 
     @Autowired
-    private lateinit var handler: PersongrunnlagMeldingProcessingService
+    private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
@@ -101,7 +102,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             assertThat(behandling.erInnvilget()).isFalse()
             assertThat(oppgaveRepo.findForMelding(behandling.meldingId)).isEmpty()
             assertThat(oppgaveRepo.findForBehandling(behandling.id)).isEmpty()
@@ -150,7 +151,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             assertThat(behandling.erInnvilget()).isFalse()
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                 assertThat(oppgaveRepo.findForBehandling(behandling.id)).containsOnly(oppgave)
@@ -224,7 +225,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             assertThat(behandling.erInnvilget()).isFalse()
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                 assertThat(oppgaveRepo.findForBehandling(behandling.id)).containsOnly(oppgave)
@@ -306,7 +307,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().also { behandlinger ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().also { behandlinger ->
             assertThat(behandlinger.antallBehandlinger()).isEqualTo(2)
             oppgaveRepo.findForMelding(behandlinger.alle()[0].meldingId).single().also { oppgave ->
                 assertThat(oppgaveRepo.findForBehandling(behandlinger.finnBehandlingsId()[0])).isEmpty()
@@ -372,7 +373,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             assertThat(behandling.erInnvilget()).isFalse()
             oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
                 assertThat(oppgaveRepo.findForBehandling(behandling.id)).containsOnly(oppgave)
@@ -429,7 +430,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 )
             ),
         )
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             assertThat(behandling.erInnvilget()).isFalse()
             assertThat(oppgaveRepo.findForMelding(behandling.meldingId)).isEmpty()
             assertThat(oppgaveRepo.findForBehandling(behandling.id)).isEmpty()
@@ -503,7 +504,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().let { result ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().let { result ->
             assertThat(result.antallBehandlinger()).isEqualTo(2)
             result.alle().first().also { behandling ->
                 assertThat(behandling.erInnvilget()).isFalse()
@@ -564,7 +565,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.single().let { result ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().single().let { result ->
             result.alle().single().also { behandling ->
                 assertThat(behandling.erManuell()).isTrue()
                 oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->

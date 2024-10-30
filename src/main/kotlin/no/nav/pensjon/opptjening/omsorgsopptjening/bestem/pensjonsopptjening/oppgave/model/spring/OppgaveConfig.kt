@@ -27,7 +27,7 @@ class OppgaveConfig {
             unleash = unleash,
             oppgaveProcessingMetricsMåling = oppgaveProcessingMetricsMåling,
             oppgaveProcessingMetricsFeilmåling = oppgaveProcessingMetricsFeilmåling,
-            datasourceReadinessCheck = datasourceReadinessCheck
+            datasourceReadinessCheck = datasourceReadinessCheck,
         )
     }
 }

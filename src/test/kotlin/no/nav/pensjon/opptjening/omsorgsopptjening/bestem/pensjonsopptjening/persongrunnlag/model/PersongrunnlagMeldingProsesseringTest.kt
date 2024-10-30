@@ -2,12 +2,14 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
@@ -20,6 +22,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -46,7 +49,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
     private lateinit var behandlingRepo: BehandlingRepo
 
     @Autowired
-    private lateinit var handler: PersongrunnlagMeldingProcessingService
+    private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
 
     @MockBean
     private lateinit var clock: Clock
@@ -140,7 +143,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, repo.find(melding!!).status)
 
-        handler.process()
+        persongrunnlagMeldingProcessingService.processAndExpectResult()
 
         repo.find(melding).let { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, m.status).let {
@@ -150,7 +153,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         }
         assertEquals(emptyList<FullførtBehandling>(), behandlingRepo.finnForOmsorgsyter("12345678910"))
 
-        handler.process()
+        persongrunnlagMeldingProcessingService.processAndExpectResult()
 
         repo.find(melding).let { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, m.status).let {
@@ -161,7 +164,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 //        assertEquals(emptyList<FullførtBehandling>(),
         assertThat(behandlingRepo.finnForOmsorgsyter("12345678910")).isEmpty()
 
-        handler.process()!!.first().also { result ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().also { result ->
             result.single().also {
                 assertEquals(2020, it.omsorgsAr)
                 assertEquals("12345678910", it.omsorgsyter)
@@ -242,25 +245,25 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         assertThat(repo.find(melding!!).status)
             .isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
 
-        handler.process()
+        persongrunnlagMeldingProcessingService.processAndExpectResult()
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertEquals(1, it.antallForsøk)
         }
 
-        assertThat(handler.process()).isEmpty()
+        assertThat(persongrunnlagMeldingProcessingService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertThat(it.antallForsøk).isOne()
         }
 
-        assertThat(handler.process()).isEmpty()
+        assertThat(persongrunnlagMeldingProcessingService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertThat(it.antallForsøk).isEqualTo(1)
         }
 
-        assertThat(handler.process()!!.first().antallBehandlinger()).isEqualTo(1)
+        assertThat(persongrunnlagMeldingProcessingService.processAndExpectResult().first().antallBehandlinger()).isEqualTo(1)
 
         assertInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java, repo.find(melding).status)
     }
@@ -330,12 +333,12 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, repo.find(melding!!).status)
 
-        handler.process()
-        handler.process()
-        handler.process()
-        handler.process()
+        persongrunnlagMeldingProcessingService.processAndExpectResult()
+        persongrunnlagMeldingProcessingService.processAndExpectResult()
+        persongrunnlagMeldingProcessingService.processAndExpectResult()
+        persongrunnlagMeldingProcessingService.processAndExpectResult()
 
-        assertThat(handler.process()).isEmpty()
+        assertThat(persongrunnlagMeldingProcessingService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
 
         repo.find(melding).also { m ->
             assertInstanceOf(PersongrunnlagMelding.Status.Klar::class.java, m.statushistorikk[0])
@@ -385,5 +388,12 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             assertEquals(innlesingId, oppgave.innlesingId)
             assertInstanceOf(Oppgave.Status.Klar::class.java, oppgave.status)
         }
+    }
+}
+
+fun PersongrunnlagMeldingProcessingService.processAndExpectResult(): List<FullførteBehandlinger> {
+    return when (val result = this.process()) {
+        is Resultat.FantIngenDataÅProsessere -> fail("Expecting result")
+        is Resultat.Prosessert -> result.data
     }
 }

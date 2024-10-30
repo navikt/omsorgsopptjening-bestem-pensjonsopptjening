@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontroll
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenPensjonspoeng
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
@@ -8,11 +9,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -21,6 +24,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -74,11 +78,11 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
             innlesingId = innlesingId
         )
 
-        val behandling = persongrunnlagProcessingService.process()!!.single().single()
+        val behandling = persongrunnlagProcessingService.processAndExpectResult().single().single()
 
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "vil gjerne", 2020)
 
-        val kontrollbehandling = kontrollbehandlingProcessingService.process()!!.single().single()
+        val kontrollbehandling = kontrollbehandlingProcessingService.processAndExpectResult().single().single()
 
         assertThat(behandling.id).isNotEqualTo(kontrollbehandling.id)
         assertThat(behandling.opprettet).isNotEqualTo(kontrollbehandling.vilkårsvurdering)
@@ -106,7 +110,7 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
             innlesingId = innlesingId
         )
 
-        persongrunnlagProcessingService.process()!!.also {
+        persongrunnlagProcessingService.processAndExpectResult().also {
             assertThat(it).hasSize(2)
             //påvirker disse hverandre siden man her sjekker om det allerede er innvilget for omsorgsyter/omsorgsmottaker for gitt år
             val (innvilget, avslag) = it.first().single() to it.last().single()
@@ -118,7 +122,7 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
 
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "forventer samme resultat som normalt", 2020)
 
-        kontrollbehandlingProcessingService.process()!!.also {
+        kontrollbehandlingProcessingService.processAndExpectResult().also {
             assertThat(it).hasSize(2)
             //ved kontroll sjekker vi om det allerede er innvilget for omsorgsyter/omsorgsmottaker for gitt år innenfor samme referanse
             val (innvilget, avslag) = it.first().single() to it.last().single()
@@ -139,13 +143,13 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
             innlesingId = innlesingId
         )
 
-        persongrunnlagProcessingService.process()!!
+        persongrunnlagProcessingService.processAndExpectResult()
 
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "første", 2020)
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "andre", 2020)
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "tredje", 2020)
 
-        kontrollbehandlingProcessingService.process()!!.also {
+        kontrollbehandlingProcessingService.processAndExpectResult().also {
             assertThat(it).hasSize(3)
         }
     }
@@ -160,7 +164,7 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
             innlesingId = innlesingId
         )
 
-        persongrunnlagProcessingService.process()!!
+        persongrunnlagProcessingService.processAndExpectResult()
 
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "første", 2020)
         assertThrows<DuplicateKeyException> { kontrollbehandlingRepo.bestillKontroll(innlesingId, "første", 2020) }
@@ -182,7 +186,7 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
             innlesingId = annenInnlesingId
         )
 
-        persongrunnlagProcessingService.process()!!.also {
+        persongrunnlagProcessingService.processAndExpectResult().also {
             assertThat(it).hasSize(2)
             //påvirker disse hverandre siden man her sjekker om det allerede er innvilget for omsorgsyter/omsorgsmottaker for gitt år
             val (innvilget, avslag) = it.first().single() to it.last().single()
@@ -195,7 +199,7 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "forventer at denne innvilges", 2020)
         kontrollbehandlingRepo.bestillKontroll(annenInnlesingId, "forventer at denne også innvilges", 2020)
 
-        kontrollbehandlingProcessingService.process()!!.also {
+        kontrollbehandlingProcessingService.processAndExpectResult().also {
             assertThat(it).hasSize(2)
             //ved kontroll sjekker vi ikke om det allerede er innvilget for omsorgsyter/omsorgsmottaker for gitt år på tvers av flere referanser
             val (innvilget, innvilget2) = it.first().single() to it.last().single()
@@ -215,11 +219,11 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
             )
         }
 
-        val behandlinger = persongrunnlagProcessingService.process()!!
+        val behandlinger = persongrunnlagProcessingService.processAndExpectResult()
 
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "test", 2020)
 
-        kontrollbehandlingProcessingService.process().also {
+        kontrollbehandlingProcessingService.processAndExpectResult().also {
             assertThat(it).hasSize(3)
             assertThat(it).hasSize(behandlinger.count())
         }
@@ -236,11 +240,11 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
             )
         }
 
-        val behandlinger = persongrunnlagProcessingService.process()!!
+        val behandlinger = persongrunnlagProcessingService.processAndExpectResult()
 
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "test", 2020)
 
-        kontrollbehandlingProcessingService.process()!!.single().single().also {
+        kontrollbehandlingProcessingService.processAndExpectResult().single().single().also {
             val value = jdbcTemplate.query(
                 """select godskriv from kontrollbehandling where id = :id""",
                 MapSqlParameterSource(mapOf("id" to it.id)),
@@ -263,11 +267,11 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
             )
         }
 
-        persongrunnlagProcessingService.process()!!
+        persongrunnlagProcessingService.processAndExpectResult()
 
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "test", 2020)
 
-        kontrollbehandlingProcessingService.process()!!.single().single().also {
+        kontrollbehandlingProcessingService.processAndExpectResult().single().single().also {
             val value = jdbcTemplate.query(
                 """select brev from kontrollbehandling where id = :id""",
                 MapSqlParameterSource(mapOf("id" to it.id)),
@@ -291,11 +295,11 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
             )
         }
 
-        persongrunnlagProcessingService.process()!!
+        persongrunnlagProcessingService.processAndExpectResult()
 
         kontrollbehandlingRepo.bestillKontroll(innlesingId, "test", 2020)
 
-        kontrollbehandlingProcessingService.process()!!.single().single().also {
+        kontrollbehandlingProcessingService.processAndExpectResult().single().single().also {
             val value = jdbcTemplate.query(
                 """select oppgave from kontrollbehandling where id = :id""",
                 MapSqlParameterSource(mapOf("id" to it.id)),
@@ -429,5 +433,12 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                 )
             )
         )!!
+    }
+}
+
+fun KontrollbehandlingProcessingService.processAndExpectResult(): List<FullførteBehandlinger> {
+    return when (val result = this.process()) {
+        is Resultat.FantIngenDataÅProsessere -> fail("Expecting result")
+        is Resultat.Prosessert -> result.data
     }
 }

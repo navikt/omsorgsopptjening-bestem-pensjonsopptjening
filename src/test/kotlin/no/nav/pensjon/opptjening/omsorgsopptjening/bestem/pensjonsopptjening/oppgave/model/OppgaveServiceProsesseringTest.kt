@@ -2,10 +2,13 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.op
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingProcessingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
@@ -18,6 +21,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -190,7 +194,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                 assertContains(it.melding, "BAD_REQUEST")
             }
         }
-        oppgaveService.process()!!.first().also { oppgave ->
+        oppgaveService.processAndExpectResult().first().also { oppgave ->
             assertInstanceOf(Oppgave.Status.Ferdig::class.java, oppgave.status).also {
                 assertEquals("123", it.oppgaveId)
             }
@@ -311,7 +315,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!
+        handler.process()
 
         assertInstanceOf(Oppgave.Status.Klar::class.java, oppgaveRepo.findForMelding(melding!!).single().status)
 
@@ -324,9 +328,9 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             assertThat(it.antallForsøk).isEqualTo(1)
         }
 
-        assertThat(oppgaveService.process()).isNullOrEmpty()
-        assertThat(oppgaveService.process()).isNullOrEmpty()
-        assertThat(oppgaveService.process()).isNotEmpty()
+        assertThat(oppgaveService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+        assertThat(oppgaveService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+        assertThat(oppgaveService.processAndExpectResult()).isNotEmpty()
 
         assertInstanceOf(Oppgave::class.java, oppgaveRepo.findForMelding(melding).single())
             .also { oppgave ->
@@ -440,5 +444,12 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                 }
             assertInstanceOf(Oppgave.Status.Feilet::class.java, oppgave.status)
         }
+    }
+}
+
+fun OppgaveService.processAndExpectResult(): List<Oppgave.Persistent> {
+    return when (val result = this.process()) {
+        is Resultat.FantIngenDataÅProsessere -> fail("Expecting result")
+        is Resultat.Prosessert -> result.data
     }
 }
