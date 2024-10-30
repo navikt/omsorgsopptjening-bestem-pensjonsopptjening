@@ -3,9 +3,9 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 import com.zaxxer.hikari.HikariDataSource
 
 class DatasourceReadinessCheck(
-    private val hikariDataSource: HikariDataSource
+    private val datasource: HikariDataSource
 ) {
     fun isReady(): Boolean {
-        return !hikariDataSource.isClosed
+        return !datasource.isClosed
     }
 }

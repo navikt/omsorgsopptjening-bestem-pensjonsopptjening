@@ -14,6 +14,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.FANT_IKKE_OPPGAVEN
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.KANSELLERING_IKKE_NODVENDIG
@@ -26,6 +28,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -34,6 +37,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -165,7 +169,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        processingService.process()!!.first().single().also { behandling ->
+        processingService.processAndExpectResult().first().single().also { behandling ->
             Assertions.assertTrue(behandling.erInnvilget())
 
             Assertions.assertInstanceOf(
@@ -223,7 +227,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        processingService.process()!!.first().single().let { behandling ->
+        processingService.processAndExpectResult().first().single().let { behandling ->
             assertThat(behandling.utfall).isInstanceOf(BehandlingUtfall.Manuell::class.java)
             assertThat(
                 behandling.hentOppgaveopplysninger()
@@ -317,7 +321,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
         val stoppetMelding = repo.find(stoppetmeldingId)
         val stoppetOppgave = oppgaveRepo.findForMelding(stoppetmeldingId).single()
 
-        val behandling = processingService.process()!!.single()
+        val behandling = processingService.processAndExpectResult().single()
         val nyOppgave = oppgaveRepo.findForBehandling(behandling.alle().single().id).single()
 
         assertThat(stoppetMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
@@ -339,7 +343,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
         val stoppetMelding = repo.find(stoppetMeldingId)
         val stoppetBrev = brevRepository.findForMelding(stoppetMeldingId).single()
 
-        val behandling = processingService.process()!!.single()
+        val behandling = processingService.processAndExpectResult().single()
 
         val nyttBrev = brevRepository.findForBehandling(behandling.alle().single().id).single()
 
@@ -362,7 +366,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
         val stoppetMelding = repo.find(stoppetMeldingId)
         val stoppetGodskriv = godskrivOpptjeningRepo.findForMelding(stoppetMeldingId).single()
 
-        val behandling = processingService.process()!!.single()
+        val behandling = processingService.processAndExpectResult().single()
 
         val nyGodskriv = godskrivOpptjeningRepo.findForBehandling(behandling.alle().single().id).single()
 

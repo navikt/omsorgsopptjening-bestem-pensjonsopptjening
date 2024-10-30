@@ -13,6 +13,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -126,7 +127,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingService.processAndExpectResult().first().single().also { behandling ->
             assertTrue(behandling.erInnvilget())
 
             assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull()).also {
@@ -220,7 +221,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingService.processAndExpectResult().first().single().also { behandling ->
             assertTrue(behandling.erInnvilget())
 
             assertInstanceOf(Brev::class.java, brevRepository.findForBehandling(behandling.id).singleOrNull()).also {
@@ -320,7 +321,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingService.processAndExpectResult().first().single().also { behandling ->
             assertTrue(behandling.erInnvilget())
             assertTrue(brevRepository.findForBehandling(behandling.id).isEmpty())
         }
@@ -400,7 +401,7 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingService.process()!!.first().also { behandling ->
+        persongrunnlagMeldingService.processAndExpectResult().first().also { behandling ->
             behandling.alle().let { fullførteBehandlinger ->
                 fullførteBehandlinger[0].let {
                     assertThat(it.erInnvilget()).isTrue()

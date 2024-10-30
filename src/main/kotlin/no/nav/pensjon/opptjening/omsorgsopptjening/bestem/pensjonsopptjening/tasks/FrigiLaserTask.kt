@@ -29,7 +29,7 @@ class FrigiLaserTask(
             val antallGodskrivinger = godskrivOpptjeningRepo.frigiGamleLåser()
             val antallKontroll = kontrollbehandlingRepo.frigiGamleLåser()
             if (antallMeldinger + antallOppgaver + antallBrev + antallGodskrivinger + antallKontroll > 0) {
-                log.info("Frigjorde gamle låser: meldinger:$antallMeldinger oppgaver:$antallOppgaver brev:$antallBrev godskrivinger:$antallGodskrivinger")
+                log.info("Frigjorde gamle låser: meldinger:$antallMeldinger oppgaver:$antallOppgaver brev:$antallBrev godskrivinger:$antallGodskrivinger kontroll:$antallKontroll")
             }
         } catch (ex: Throwable) {
             log.error("Feil ved frigiving av gamle låser", ex)

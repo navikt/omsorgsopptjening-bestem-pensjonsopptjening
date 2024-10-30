@@ -11,9 +11,3 @@ OMSORGSOPPTJENING_TOPIC: "pensjonopptjening.omsorgsopptjening"
 OMSORGSOPPTJENING_CONSUMER_GROUP: "omsorgsopptjening-bestem-pensjonsopptjening-test"
 MEDLEMSKAP_URL: http://localhost:9991
 GYLDIG_OPPTJENINGSAR: "2020"
-
-spring.datasource:
-  driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-  url: jdbc:tc:postgresql:16:///test
-  username: test
-  password: test

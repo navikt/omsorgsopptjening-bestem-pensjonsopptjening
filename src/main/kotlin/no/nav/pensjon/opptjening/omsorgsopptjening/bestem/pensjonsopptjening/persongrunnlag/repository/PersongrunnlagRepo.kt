@@ -117,8 +117,7 @@ class PersongrunnlagRepo(
 
     fun finnNesteMeldingerForBehandling(antall: Int): Locked {
         val lockId = UUID.randomUUID()
-        val meldinger = finnNesteKlarTilProsessering(lockId, antall)
-            .ifEmpty { finnNesteKlarForRetry(lockId, antall) }
+        val meldinger = finnNesteKlarTilProsessering(lockId, antall).ifEmpty { finnNesteKlarForRetry(lockId, antall) }
         return Locked(lockId, meldinger.map { find(it) })
     }
 

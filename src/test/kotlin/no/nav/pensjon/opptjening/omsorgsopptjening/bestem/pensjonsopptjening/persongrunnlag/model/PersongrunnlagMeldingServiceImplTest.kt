@@ -64,7 +64,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
     private lateinit var repo: PersongrunnlagRepo
 
     @Autowired
-    private lateinit var handler: PersongrunnlagMeldingProcessingService
+    private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
@@ -114,7 +114,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01122012345"
@@ -168,7 +168,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                 )
             ),
         )
-        assertEquals(0, handler.process()!!.first().antallBehandlinger())
+        assertEquals(0, persongrunnlagMeldingProcessingService.processAndExpectResult().first().antallBehandlinger())
     }
 
     @Test
@@ -202,7 +202,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
         )
 
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01052012345"
@@ -261,7 +261,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
         )
 
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01052012345"
@@ -319,7 +319,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
@@ -374,7 +374,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
@@ -436,7 +436,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
@@ -523,7 +523,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
@@ -591,7 +591,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().also { behandlinger ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().also { behandlinger ->
             assertEquals(3, behandlinger.antallBehandlinger())
             behandlinger.alle()[0].also {
                 it.assertInnvilget(
@@ -670,7 +670,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01122012345"
@@ -721,7 +721,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().assertInnvilget(
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().assertInnvilget(
             omsorgsyter = "12345678910",
             omsorgsmottaker = "07081812345"
         )
@@ -754,7 +754,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "04010012797",
                 omsorgsmottaker = "07081812345",
@@ -803,7 +803,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
         )
 
 
-        handler.process()!!.first().also { behandlinger ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().also { behandlinger ->
             assertEquals(2, behandlinger.antallBehandlinger())
             behandlinger.alle().first().assertInnvilget(
                 omsorgsyter = "12345678910",
@@ -880,7 +880,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().let { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().let { behandling ->
             behandling.assertManuell(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
@@ -953,7 +953,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().let { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().let { behandling ->
             behandling.assertManuell(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01122012345"
@@ -1017,7 +1017,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
         )
 
 
-        handler.process()!!.first().single().assertInnvilget(
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().assertInnvilget(
             omsorgsyter = "12345678910",
             omsorgsmottaker = "07081812345",
             år = OPPTJENINGSÅR,
@@ -1051,7 +1051,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().assertInnvilget(
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().assertInnvilget(
             omsorgsyter = "04010012797",
             omsorgsmottaker = "07081812345",
             år = 2021,
@@ -1182,7 +1182,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "03041212345",
@@ -1230,7 +1230,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "01019212345",
                 omsorgsmottaker = "03041212345",
@@ -1279,7 +1279,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "03041212345",
@@ -1326,7 +1326,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "03041212345",
@@ -1373,7 +1373,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345",
@@ -1412,7 +1412,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01052012345",
@@ -1457,7 +1457,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "01052012345",
@@ -1523,7 +1523,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345",
@@ -1612,7 +1612,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = omsorgsyterNyttFnr,
                 omsorgsmottaker = omsorgsmottakerNyttFnr
@@ -1656,7 +1656,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        assertThat(handler.process()).isEqualTo(listOf(FullførteBehandlinger(emptyList())))
+        assertThat(persongrunnlagMeldingProcessingService.processAndExpectResult()).isEqualTo(listOf(FullførteBehandlinger(emptyList())))
         assertThat(repo.find(melding!!).status).isInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java)
     }
 
@@ -1730,7 +1730,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = omsorgsyterNyttFnr,
                 omsorgsmottaker = omsorgsmottakerFnr
@@ -1814,7 +1814,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertInnvilget(
                 omsorgsyter = omsorgsyterNyttFnr,
                 omsorgsmottaker = omsorgsmottakerFnr
@@ -1867,7 +1867,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "12345678910",
                 omsorgsmottaker = "07081812345"
@@ -1926,7 +1926,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             behandling.assertAvslag(
                 omsorgsyter = "12340378910",
                 omsorgsmottaker = "12340378910",

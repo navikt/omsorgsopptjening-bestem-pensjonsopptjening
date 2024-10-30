@@ -63,7 +63,7 @@ class GodskrivOpptjeningConfig {
             unleash = unleash,
             godskrivProcessingMetricsMåling = godskrivProcessingMetricsMåling,
             godskrivProcessingMetricsFeilmåling = godskrivProcessingMetricsFeilmåling,
-            datasourceReadinessCheck = datasourceReadinessCheck
+            datasourceReadinessCheck = datasourceReadinessCheck,
         )
     }
 

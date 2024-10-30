@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Brevopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
@@ -8,6 +9,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
@@ -26,7 +28,8 @@ class BrevService(
     private val hentPensjonspoeng: HentPensjonspoengClient,
 ) {
     companion object {
-        private val log = LoggerFactory.getLogger(this::class.java)!!
+        private val log: Logger = LoggerFactory.getLogger(this::class.java)
+        private val secureLog: Logger = LoggerFactory.getLogger("secure")
     }
 
     @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
@@ -52,46 +55,47 @@ class BrevService(
         }
     }
 
-    fun process(): List<Brev.Persistent>? {
+    fun process(): Resultat<List<Brev.Persistent>> {
         val låsteBrev = brevRepository.finnNesteUprosesserte(10)
-        try {
-            return låsteBrev.data.mapNotNull { brev ->
-                Mdc.scopedMdc(brev.correlationId) {
-                    Mdc.scopedMdc(brev.innlesingId) {
-                        try {
-                            transactionTemplate.execute {
-                                personOppslag.hentAktørId(brev.omsorgsyter).let { aktørId ->
-                                    bestemSak.bestemSak(aktørId).let { sak ->
-                                        brevClient.sendBrev(
-                                            sakId = sak.sakId,
-                                            eksternReferanseId = EksternReferanseId(brev.id.toString()),
-                                            omsorgsår = Year.of(brev.omsorgsår),
-                                        ).let { journalpost ->
-                                            brev.ferdig(journalpost).also {
-                                                brevRepository.updateStatus(it)
+            .also { it.data.ifEmpty { return Resultat.FantIngenDataÅProsessere() } }
+
+        return try {
+            Resultat.Prosessert(
+                låsteBrev.data.mapNotNull { brev ->
+                    Mdc.scopedMdc(brev.correlationId) {
+                        Mdc.scopedMdc(brev.innlesingId) {
+                            try {
+                                transactionTemplate.execute {
+                                    personOppslag.hentAktørId(brev.omsorgsyter).let { aktørId ->
+                                        bestemSak.bestemSak(aktørId).let { sak ->
+                                            brevClient.sendBrev(
+                                                sakId = sak.sakId,
+                                                eksternReferanseId = EksternReferanseId(brev.id.toString()),
+                                                omsorgsår = Year.of(brev.omsorgsår),
+                                            ).let { journalpost ->
+                                                brev.ferdig(journalpost).also {
+                                                    brevRepository.updateStatus(it)
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        } catch (ex: SQLException) {
-                            log.error("Feil ved prosessering av brev", ex)
-                            throw ex
-                        } catch (ex: Throwable) {
-                            try {
+                            } catch (ex: SQLException) {
+                                throw ex
+                            } catch (ex: Throwable) {
+                                log.warn("Exception ved prosessering av brev: ${ex::class.qualifiedName}")
+                                secureLog.warn("Exception ved prosessering av brev", ex)
                                 transactionTemplate.execute {
                                     brev.retry(ex.stackTraceToString()).also {
                                         brevRepository.updateStatus(it)
                                     }
                                 }
-                            } catch (ex: Throwable) {
-                                log.error("Feil ved setting av feil-status på brev: ${ex::class.qualifiedName}")
                                 null
                             }
                         }
                     }
                 }
-            }
+            )
         } finally {
             brevRepository.frigi(låsteBrev)
         }

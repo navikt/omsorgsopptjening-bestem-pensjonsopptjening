@@ -2,16 +2,19 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -20,6 +23,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
@@ -28,6 +32,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.xmlunit.diff.DifferenceEvaluators.first
 import java.time.Clock
 import java.time.Instant
 import java.time.Month
@@ -41,7 +46,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
     private lateinit var repo: PersongrunnlagRepo
 
     @Autowired
-    private lateinit var handler: PersongrunnlagMeldingProcessingService
+    private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
@@ -120,7 +125,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
             ),
         )
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             godskrivOpptjeningRepo.finnNesteUprosesserte(5).also { låsteGodskrivOpptjeninger ->
                 låsteGodskrivOpptjeninger.data.first().also {
                     assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
@@ -147,7 +152,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
 
             assertInstanceOf(
                 GodskrivOpptjening.Persistent::class.java,
-                godskrivOpptjeningService.process()?.first()
+                godskrivOpptjeningService.processAndExpectResult().first()
             ).also {
                 assertInstanceOf(GodskrivOpptjening.Status.Ferdig::class.java, it.status)
             }
@@ -211,12 +216,12 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         )
 
 
-        handler.process()!!.single().also {
-            godskrivOpptjeningService.process()
+        persongrunnlagMeldingProcessingService.processAndExpectResult().single().also {
+            godskrivOpptjeningService.processAndExpectResult()
 
-            assertThat(godskrivOpptjeningService.process()).isNullOrEmpty()
-            assertThat(godskrivOpptjeningService.process()).isNullOrEmpty()
-            assertThat(godskrivOpptjeningService.process()).isNotEmpty()
+            assertThat(godskrivOpptjeningService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+            assertThat(godskrivOpptjeningService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+            assertThat(godskrivOpptjeningService.processAndExpectResult()).isNotEmpty()
 
             assertInstanceOf(
                 GodskrivOpptjening.Persistent::class.java,
@@ -276,7 +281,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         )
 
 
-        handler.process()!!.first().single().also { behandling ->
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
             godskrivOpptjeningRepo.finnNesteUprosesserte(5).also { låsteGodskrivOpptjeninger ->
                 låsteGodskrivOpptjeninger.data.first().also {
                     assertInstanceOf(GodskrivOpptjening.Status.Klar::class.java, it.status)
@@ -322,5 +327,12 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                 }
             }
         }
+    }
+}
+
+fun GodskrivOpptjeningProcessingService.processAndExpectResult(): List<GodskrivOpptjening.Persistent> {
+    return when (val result = this.process()) {
+        is Resultat.FantIngenDataÅProsessere -> fail("Expecting result")
+        is Resultat.Prosessert -> result.data
     }
 }
