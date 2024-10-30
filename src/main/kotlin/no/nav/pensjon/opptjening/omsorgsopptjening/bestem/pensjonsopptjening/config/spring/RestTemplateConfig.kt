@@ -35,6 +35,7 @@ class RestTemplateConfig {
                 httpClient = HttpClients.custom()
                     .setDefaultRequestConfig(RequestConfig.DEFAULT)
                     .setConnectionManager(httpClientConnectionManager)
+                    .setConnectionManagerShared(true)
                     .build()
             }
         }
