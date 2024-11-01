@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 
 import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Application
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.TestKlokke
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.kafka.PersongrunnlagKafkaConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Topics
@@ -49,10 +50,16 @@ sealed class SpringContextTest {
         const val MEDLEMSKAP_PATH = "/api/v1/medlemskapsunntak"
     }
 
+    /**
+     * BEWARE: This instance is shared among tests when autowired.
+     */
+    @Autowired
+    protected lateinit var clock: TestKlokke
 
     @BeforeEach
     protected open fun beforeEach() {
         PostgresqlTestContainer.instance.removeDataFromDB()
+        clock.reset()
     }
 
     @SpringBootTest(classes = [Application::class])

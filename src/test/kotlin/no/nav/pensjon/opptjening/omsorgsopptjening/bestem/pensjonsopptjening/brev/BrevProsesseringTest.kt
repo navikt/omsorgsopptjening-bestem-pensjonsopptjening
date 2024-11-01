@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.br
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.TestKlokke
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.external.PENBrevClient.Companion.createPath
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
@@ -56,9 +57,6 @@ class BrevProsesseringTest(
 
     @Autowired
     private lateinit var persongrunnlagMeldingService: PersongrunnlagMeldingProcessingService
-
-    @MockBean
-    private lateinit var clock: Clock
 
     @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
@@ -125,7 +123,7 @@ class BrevProsesseringTest(
         /**
          * Stiller klokka litt fram i tid for å unngå at [Brev.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
-        given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
+        clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val (behandling, brev) = persongrunnlagRepo.lagre(
@@ -223,7 +221,7 @@ class BrevProsesseringTest(
         /**
          * Stiller klokka litt fram i tid for å unngå at [Brev.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
-        given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
+        clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val (behandling, brev) = persongrunnlagRepo.lagre(

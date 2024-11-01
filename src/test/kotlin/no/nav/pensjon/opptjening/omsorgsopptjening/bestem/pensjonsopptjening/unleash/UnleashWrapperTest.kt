@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash
 
 import io.getunleash.Unleash
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.TestKlokke
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.any
@@ -10,16 +11,24 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.Month
+import java.time.ZoneOffset
 
 class UnleashWrapperTest {
 
     private val unleash: Unleash = mock()
-    private val clock: Clock = mock()
+    private val clock: TestKlokke = TestKlokke(
+        Clock.fixed(
+            LocalDateTime.of(2024, Month.OCTOBER, 1, 12, 0, 0).toInstant(ZoneOffset.UTC),
+            ZoneOffset.UTC
+        )
+    )
+
 
     @Test
     fun `henter fra unleash hvis ingen cached`() {
         whenever(unleash.isEnabled(any())).thenReturn(true)
-        whenever(clock.instant()).thenReturn(Instant.now())
 
         val enabled = UnleashWrapper(
             unleash = unleash,
@@ -33,7 +42,6 @@ class UnleashWrapperTest {
     @Test
     fun `henter fra cache hvis verdi eksisterer og er gyldig`() {
         whenever(unleash.isEnabled(any())).thenReturn(true)
-        whenever(clock.instant()).thenReturn(Instant.now())
 
         val wrapper = UnleashWrapper(
             unleash = unleash,
@@ -53,9 +61,6 @@ class UnleashWrapperTest {
         whenever(unleash.isEnabled(any()))
             .thenReturn(true)
             .thenReturn(false)
-        whenever(clock.instant())
-            .thenReturn(Instant.now())
-            .thenReturn(Instant.now().plusSeconds(100))
 
         val wrapper = UnleashWrapper(
             unleash = unleash,
@@ -64,6 +69,7 @@ class UnleashWrapperTest {
 
         val enabled = wrapper.isEnabled(NavUnleashConfig.Feature.GODSKRIV)
         assertThat(enabled).isTrue()
+        clock.nesteTikk(clock.nåtid().plusSeconds(100))
         val notEnabled = wrapper.isEnabled(NavUnleashConfig.Feature.GODSKRIV)
         assertThat(notEnabled).isFalse()
         verify(unleash, times(2)).isEnabled(NavUnleashConfig.Feature.GODSKRIV.toggleName)

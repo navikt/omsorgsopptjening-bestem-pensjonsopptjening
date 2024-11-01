@@ -52,9 +52,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
     private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
 
     @MockBean
-    private lateinit var clock: Clock
-
-    @MockBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @Autowired
@@ -109,7 +106,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         /**
          * Stiller klokka litt fram i tid for å unngå at [PersongrunnlagMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
-        given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
+        clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
 
@@ -202,15 +199,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                         .withHeader("Content-Type", "application/json")
                 )
         )
-        given(clock.instant()).willReturn(
-            // TODO: Må finne en annen løsning på dette
-            Clock.systemUTC().instant(), //karantene
-            Clock.systemUTC().instant().plus(1, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(3, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(10, ChronoUnit.HOURS), //karantenetid utløpt
-        )
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
 
@@ -251,18 +239,21 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             assertEquals(1, it.antallForsøk)
         }
 
+        clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantene
         assertThat(persongrunnlagMeldingProcessingService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertThat(it.antallForsøk).isOne()
         }
 
+        clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantene
         assertThat(persongrunnlagMeldingProcessingService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
 
         assertInstanceOf(PersongrunnlagMelding.Status.Retry::class.java, repo.find(melding).status).also {
             assertThat(it.antallForsøk).isEqualTo(1)
         }
 
+        clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.HOURS)) //karantenetid utløpt
         assertThat(persongrunnlagMeldingProcessingService.processAndExpectResult().first().antallBehandlinger()).isEqualTo(1)
 
         assertInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java, repo.find(melding).status)
@@ -297,7 +288,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         /**
          * Stiller klokka litt fram i tid for å unngå at [PersongrunnlagMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
-        given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
+        clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val innlesingId = InnlesingId.generate()

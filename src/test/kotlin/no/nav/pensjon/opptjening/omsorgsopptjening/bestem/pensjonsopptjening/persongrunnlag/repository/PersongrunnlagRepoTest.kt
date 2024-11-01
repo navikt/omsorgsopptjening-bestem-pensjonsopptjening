@@ -20,12 +20,8 @@ import java.time.temporal.ChronoUnit
 
 class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
 
-
     @Autowired
     private lateinit var persongrunnlagRepo: PersongrunnlagRepo
-
-    @MockBean
-    private lateinit var clock: Clock
 
     @Test
     fun `kan lagre en persongrunnlagmelding`() {
@@ -62,13 +58,6 @@ class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
 
     @Test
     fun `gjenåpner låste persongrunnlagmeldinger etter en time`() {
-
-        BDDMockito.given(clock.instant()).willReturn(
-            Clock.systemUTC().instant(),
-            Clock.systemUTC().instant(),
-            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
-        )
-
         val innlesingId = InnlesingId.generate()
         val correlationId = CorrelationId.generate()
         val persongrunnlag = persongrunnlag(innlesingId, correlationId)
@@ -78,13 +67,14 @@ class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
         val meldinger1 = persongrunnlagRepo.finnNesteMeldingerForBehandling(5)
         persongrunnlagRepo.frigiGamleLåser()
         val meldinger2 = persongrunnlagRepo.finnNesteMeldingerForBehandling(5)
+        clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS))
         persongrunnlagRepo.frigiGamleLåser()
         val meldinger3 = persongrunnlagRepo.finnNesteMeldingerForBehandling(5)
         persongrunnlagRepo.frigi(meldinger3)
 
         assertThat(meldinger1.data).isNotEmpty()
         assertThat(meldinger2.data).isEmpty()
-        assertThat(meldinger3.data).isNotEmpty
+        assertThat(meldinger3.data).isNotEmpty()
     }
 
 

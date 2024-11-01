@@ -3,6 +3,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.TestKlokke
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
@@ -57,9 +58,6 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
     @Autowired
     private lateinit var godskrivOpptjeningService: GodskrivOpptjeningProcessingService
 
-    @MockBean
-    private lateinit var clock: Clock
-
     @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
 
@@ -92,7 +90,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         /**
          * Stiller klokka litt fram i tid for å unngå at [GodskrivOpptjening.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
-        given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
+        clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
 
         val innlesingId = InnlesingId.generate()
         val correlationId = CorrelationId.generate()
@@ -176,13 +174,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                 .whenScenarioStateIs("ok")
                 .willReturn(WireMock.ok())
         )
-        given(clock.instant()).willReturn(
-            Clock.systemUTC().instant(), //karantene -- handler kalles
-            Clock.systemUTC().instant(), //karantene
-            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(6, ChronoUnit.HOURS), //karantenetid utløpt
-        )
+
         wiremock.ingenUnntaksperioderForMedlemskap()
 
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
@@ -215,12 +207,14 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
             ),
         )
 
-
         persongrunnlagMeldingProcessingService.processAndExpectResult().single().also {
             godskrivOpptjeningService.processAndExpectResult()
 
+            clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantene
             assertThat(godskrivOpptjeningService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+            clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantene
             assertThat(godskrivOpptjeningService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+            clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantenetid utløpt
             assertThat(godskrivOpptjeningService.processAndExpectResult()).isNotEmpty()
 
             assertInstanceOf(
@@ -247,7 +241,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         /**
          * Stiller klokka litt fram i tid for å unngå at [GodskrivOpptjening.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
-        given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
+        clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
 
         val innlesingId = InnlesingId.generate()
         val correlationId = CorrelationId.generate()

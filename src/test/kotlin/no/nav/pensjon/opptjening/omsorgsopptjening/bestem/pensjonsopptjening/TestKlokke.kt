@@ -18,15 +18,26 @@ class TestKlokke(
 
     override fun instant(): Instant {
         return if (overstyrtNeste != null) {
-            overstyrtNeste!!
+            nextInstant = overstyrtNeste!!
+            nextInstant
         } else {
             nextInstant = nextInstant.plus(1, ChronoUnit.SECONDS)
             nextInstant
         }
+
+    }
+
+    fun nåtid(): Instant {
+        return nextInstant
     }
 
     fun nesteTikk(instant: Instant): TestKlokke {
         overstyrtNeste = instant
         return this
+    }
+
+    fun reset(){
+        nextInstant = initialClock.instant()
+        overstyrtNeste = null
     }
 }

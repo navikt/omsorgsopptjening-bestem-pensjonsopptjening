@@ -57,9 +57,6 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
     @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
 
-    @MockBean
-    private lateinit var clock: Clock
-
     companion object {
         @JvmField
         @RegisterExtension
@@ -72,7 +69,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         /**
          * Stiller klokka litt fram i tid for å unngå at [Oppgave.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
-        given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
+        clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
         wiremock.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(BESTEM_SAK_PATH))
                 .inScenario("retry")
@@ -204,13 +201,6 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt at prosesseringen ender med retry, havner den aktuelle raden i karantene før den forsøkes på nytt igjen`() {
         wiremock.stubForPdlTransformer()
-        given(clock.instant()).willReturn(
-            Clock.systemUTC().instant(), //karantene -- handler kalles
-            Clock.systemUTC().instant(), //karantene
-            Clock.systemUTC().instant().plus(2, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(4, ChronoUnit.HOURS), //karantene
-            Clock.systemUTC().instant().plus(6, ChronoUnit.HOURS), //karantenetid utløpt
-        )
         wiremock.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(BESTEM_SAK_PATH))
                 .inScenario("retry")
@@ -328,8 +318,11 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             assertThat(it.antallForsøk).isEqualTo(1)
         }
 
+        clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantene
         assertThat(oppgaveService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+        clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantene
         assertThat(oppgaveService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+        clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantenetid utløpt
         assertThat(oppgaveService.processAndExpectResult()).isNotEmpty()
 
         assertInstanceOf(Oppgave::class.java, oppgaveRepo.findForMelding(melding).single())
@@ -346,7 +339,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         /**
          * Stiller klokka litt fram i tid for å unngå at [Oppgave.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
-        given(clock.instant()).willReturn(Instant.now().plus(10, ChronoUnit.DAYS))
+        clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
         wiremock.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(BESTEM_SAK_PATH))
                 .willReturn(
