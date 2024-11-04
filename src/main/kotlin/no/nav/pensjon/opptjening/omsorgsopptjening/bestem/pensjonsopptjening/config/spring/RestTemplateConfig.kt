@@ -132,45 +132,56 @@ private class CustomPoolingHttpClientConnectionManagerMetrics(
     }
 
     private fun registerPerRouteMetrics() {
-        pool.routes.mapNotNull { route ->
-            Gauge.builder(
-                "httpcomponents.httpclient.pool.route.available",
-                pool
-            ) { connPoolControl: ConnPoolControl<HttpRoute?> ->
-                connPoolControl.getStats(route)
-                    .available
-                    .toDouble()
-            }
-                .description("The number of persistent and available connections for per route.")
-                .tag("state", "available")
-                .tag("route", route!!.targetHost.toURI())
-                .register(registry)
+        Gauge.builder(
+            "httpcomponents.httpclient.pool.route.initializer",
+            pool
+        ) { connPoolControl: ConnPoolControl<HttpRoute?> ->
 
-            Gauge.builder(
-                "httpcomponents.httpclient.pool.route.leased",
-                pool
-            ) { connPoolControl: ConnPoolControl<HttpRoute?> ->
-                connPoolControl.getStats(route)
-                    .leased
-                    .toDouble()
-            }
-                .description("The number of persistent and leased connections per route.")
-                .tag("state", "leased")
-                .tag("route", route.targetHost.toURI())
-                .register(registry)
+            pool.routes.mapNotNull { route ->
+                Gauge.builder(
+                    "httpcomponents.httpclient.pool.route.available",
+                    pool
+                ) { connPoolControl: ConnPoolControl<HttpRoute?> ->
+                    connPoolControl.getStats(route)
+                        .available
+                        .toDouble()
+                }
+                    .description("The number of persistent and available connections for per route.")
+                    .tag("state", "available")
+                    .tag("route", route.toString())
+                    .register(registry)
 
-            Gauge.builder(
-                "httpcomponents.httpclient.pool.route.pending",
-                pool
-            ) { connPoolControl: ConnPoolControl<HttpRoute?> ->
-                connPoolControl.getStats(route)
-                    .pending
-                    .toDouble()
+                Gauge.builder(
+                    "httpcomponents.httpclient.pool.route.leased",
+                    pool
+                ) { connPoolControl: ConnPoolControl<HttpRoute?> ->
+                    connPoolControl.getStats(route)
+                        .leased
+                        .toDouble()
+                }
+                    .description("The number of persistent and leased connections per route.")
+                    .tag("state", "leased")
+                    .tag("route", route.toString())
+                    .register(registry)
+
+                Gauge.builder(
+                    "httpcomponents.httpclient.pool.route.pending",
+                    pool
+                ) { connPoolControl: ConnPoolControl<HttpRoute?> ->
+                    connPoolControl.getStats(route)
+                        .pending
+                        .toDouble()
+                }
+                    .description("The number of connection requests being blocked awaiting a free connection per route.")
+                    .tag("state", "pending")
+                    .tag("route", route.toString())
+                    .register(registry)
             }
-                .description("The number of connection requests being blocked awaiting a free connection per route.")
-                .tag("state", "pending")
-                .tag("route", route.targetHost.toURI())
-                .register(registry)
+
+            connPoolControl.routes.count().toDouble()
         }
+            .description("Initialize stats for routes that does noe exist on startup")
+            .tag("state", "initialized")
+            .register(registry)
     }
 }
