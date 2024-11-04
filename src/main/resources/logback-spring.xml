@@ -16,7 +16,6 @@
         <logger name="no.nav.security" level="WARN"/>
         <logger name="no.nav.pensjon.opptjening" level="INFO"/>
         <logger name="no.nav.security.token.support.core.validation" level="WARN"/>
-        <logger name="org.apache.hc.client5.http.impl.io" level="DEBUG"/>
 
         <root level="info">
             <appender-ref ref="stdout_json"/>
