@@ -108,6 +108,17 @@ sealed class JuridiskHenvisning(
         tekst = "Forhøyet hjelpestønad ytes til et medlem under 18 år som har vesentlig større behov for tilsyn, pleie og annen hjelp enn det som hjelpestønad etter § 6-4 dekker"
     )
 
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_3_Første_Ledd_Første_Punktum :
+        JuridiskHenvisning(
+            kortTittel = "Forskrift om alderspensjon i folketrygden",
+            dato = "FOR-2009-12-22-1810",
+            kapittel = 3,
+            paragraf = 3,
+            ledd = 1,
+            punktum = 1,
+            tekst = "Med omsorgsyter menes en person som har den daglige omsorgen for barn og foreldreansvaret etter barneloven."
+        )
+
     data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Første_Ledd_Første_Punktum :
         JuridiskHenvisning(
             kortTittel = "Forskrift om alderspensjon i folketrygden",

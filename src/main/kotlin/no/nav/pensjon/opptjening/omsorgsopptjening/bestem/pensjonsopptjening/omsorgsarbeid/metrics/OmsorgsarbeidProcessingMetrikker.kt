@@ -7,6 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForBarnetrygd
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsmottakerOppfyllerAlderskravForHjelpestønad
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
@@ -53,6 +54,7 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List
     private val omsorgsyterHarDødsdato = registry.counter("avslag", "antall", "OmsorgsyterHarIkkeDodsdato")
     private val omsorgsyterMottarIkkePensjonEllerUføretrygdIEøs = registry.counter("avslag", "antall", "omsorgsyterMottarIkkePensjonEllerUføretrygdIEøs")
 
+    private val omsorgsytersBarnIkkeGodskrevetAndreOmsorgsytere = registry.counter("avslag", "antall", "OmsorgsyterHarIkkeBarnGodskrevetAndreOmsorgsytere")
 
 
     override fun oppdater(lambda: () -> List<FullførteBehandlinger?>?): List<FullførteBehandlinger?>? {
@@ -80,6 +82,7 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List
                         is OmsorgsyterErikkeOmsorgsmottaker.Vurdering -> omsorgsyterErIkkeOmsorgsmottaker.increment()
                         is OmsorgsyterHarIkkeDødsdato.Vurdering -> omsorgsyterHarDødsdato.increment()
                         is OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering -> omsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.increment()
+                        is OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering -> omsorgsytersBarnIkkeGodskrevetAndreOmsorgsytere.increment()
                     }
                 }
             }

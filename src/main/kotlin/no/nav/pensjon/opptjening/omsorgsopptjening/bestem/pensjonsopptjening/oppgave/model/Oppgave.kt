@@ -42,6 +42,15 @@ sealed class Oppgave {
         fun eøsSakMottarPensjonEllerUføretrygd(omsorgsmottaker: String): String {
             return """Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: $omsorgsmottaker må vurderes manuelt pga EØS-sak og mottar pensjon eller uføretrygd"""
         }
+
+        fun annenForelderInnvilgetOmsorgsopptjeningForAnnetFellesbarn(
+            omsorgsmottaker: String,
+            annenForelderOgBarn: Set<Pair<String, String>>
+        ): String {
+            val andreOmsorgsytere = annenForelderOgBarn.joinToString(separator = ",") { it.first }
+            val andreOmsorgsmottakere = annenForelderOgBarn.joinToString(separator = ",") { it.second }
+            return """Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: $omsorgsmottaker må vurderes manuelt pga at andre foreldre: $andreOmsorgsytere mottar barnetrygd for felles barn: $andreOmsorgsmottakere"""
+        }
     }
 
     /**

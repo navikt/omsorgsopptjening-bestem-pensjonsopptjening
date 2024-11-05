@@ -289,6 +289,24 @@ class KontrollbehandlingRepo(
         ).toDomain()
     }
 
+    fun finnForOmsorgsytersAndreBarn(
+        omsorgsyter: String,
+        ar: Int,
+        andreBarnEnnOmsorgsmottaker: List<String>,
+        referanse: String,
+    ): List<FullførtBehandling> {
+        return jdbcTemplate.query(
+            """select * from kontrollbehandling where omsorgsyter <> :omsorgsyter and omsorgs_ar = :ar and omsorgsmottaker in (:andrebarn) and referanse = :referanse""",
+            mapOf(
+                "omsorgsyter" to omsorgsyter,
+                "ar" to ar,
+                "andrebarn" to andreBarnEnnOmsorgsmottaker.ifEmpty { "('')" },
+                "referanse" to referanse,
+            ),
+            BehandlingRowMapper()
+        ).toDomain()
+    }
+
 
     internal class KontrollbehandlingRowMapper : RowMapper<Kontrollbehandling> {
         override fun mapRow(rs: ResultSet, rowNum: Int): Kontrollbehandling {

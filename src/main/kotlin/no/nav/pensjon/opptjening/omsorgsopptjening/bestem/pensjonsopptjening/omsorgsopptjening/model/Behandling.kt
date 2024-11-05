@@ -67,7 +67,8 @@ data class Behandling(
             vurderVilkår.OmsorgsyterErMedlemIFolketrygden(),
             vurderVilkår.OmsorgsyterErIkkeOmsorgsmottaker(),
             vurderVilkår.OmsorgsyterHarIkkeDødsdato(),
-            vurderVilkår.OmsorgsyterMottarPensjonEllerUføretrygdIEøs()
+            vurderVilkår.OmsorgsyterMottarPensjonEllerUføretrygdIEøs(),
+            vurderVilkår.OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn(),
         )
     }
 }

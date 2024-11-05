@@ -38,18 +38,27 @@ class KontrollbehandlingServiceImpl(
                                 grunnlag = it,
                                 finnForOmsorgsyterOgÅr = {
                                     kontrollbehandlingRepo.finnForOmsorgsyterOgAr(
-                                        it.omsorgsyter.fnr,
-                                        it.omsorgsAr,
-                                        kontrollbehandling.referanse,
+                                        fnr = it.omsorgsyter.fnr,
+                                        ar = it.omsorgsAr,
+                                        referanse = kontrollbehandling.referanse,
                                     )
                                 },
                                 finnForOmsorgsmottakerOgÅr = {
                                     kontrollbehandlingRepo.finnForOmsorgsmottakerOgAr(
-                                        it.omsorgsmottaker.fnr,
-                                        it.omsorgsAr,
-                                        kontrollbehandling.referanse,
+                                        omsorgsmottaker = it.omsorgsmottaker.fnr,
+                                        ar = it.omsorgsAr,
+                                        referanse = kontrollbehandling.referanse,
                                     )
                                 },
+                                finnForOmsorgsytersAndreBarnOgÅr = {
+                                    kontrollbehandlingRepo.finnForOmsorgsytersAndreBarn(
+                                        omsorgsyter = it.omsorgsyter.fnr,
+                                        ar = it.omsorgsAr,
+                                        andreBarnEnnOmsorgsmottaker = it.omsorgsyter.finnAndreBarnEnn(it.omsorgsmottaker.fnr)
+                                            .map { it.ident },
+                                        referanse = kontrollbehandling.referanse,
+                                    )
+                                }
                             ),
                             meldingId = kontrollbehandling.kontrollmeldingId
                         )
