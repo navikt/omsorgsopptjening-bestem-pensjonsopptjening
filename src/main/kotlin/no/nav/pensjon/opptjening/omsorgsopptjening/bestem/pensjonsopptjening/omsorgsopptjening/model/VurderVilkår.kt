@@ -15,12 +15,14 @@ interface VurderVilkår {
     fun OmsorgsyterErIkkeOmsorgsmottaker(): OmsorgsyterErikkeOmsorgsmottaker.Vurdering
     fun OmsorgsyterHarIkkeDødsdato(): OmsorgsyterHarIkkeDødsdato.Vurdering
     fun OmsorgsyterMottarPensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering
+    fun OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn(): OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering
 }
 
 internal class VilkårsvurderingFactory(
     private val grunnlag: OmsorgsopptjeningGrunnlag,
     private val finnForOmsorgsyterOgÅr: () -> List<FullførtBehandling>,
-    private val finnForOmsorgsmottakerOgÅr: () -> List<FullførtBehandling>
+    private val finnForOmsorgsmottakerOgÅr: () -> List<FullførtBehandling>,
+    private val finnForOmsorgsytersAndreBarnOgÅr: () -> List<FullførtBehandling>,
 ) : VurderVilkår {
     override fun OmsorgsyterOppfyllerAlderskrav(): OmsorgsyterOppfyllerAlderskrav.Vurdering {
         return OmsorgsyterOppfyllerAlderskrav.vilkarsVurder(grunnlag.forAldersvurderingOmsorgsyter())
@@ -84,6 +86,30 @@ internal class VilkårsvurderingFactory(
 
     override fun OmsorgsyterMottarPensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering {
         return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(grunnlag.forOmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs())
+    }
+
+    override fun OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn(): OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering {
+        return OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.vilkarsVurder(
+            finnForOmsorgsytersAndreBarnOgÅr().map {
+                require(it.omsorgsyter != grunnlag.omsorgsyter.fnr) { "Forventer kun behandlinger for andre omsorgsytere" }
+                require(it.omsorgsmottaker != grunnlag.omsorgsmottaker.fnr) { "Forventer kun behandlinger for andre omsorgsmottakere" }
+                OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Grunnlag.FullførtBehandlingForAnnenOmsorgsmottaker(
+                    behandlingsId = it.id,
+                    omsorgsyter = it.omsorgsyter,
+                    omsorgsmottaker = it.omsorgsmottaker,
+                    omsorgsår = it.omsorgsAr,
+                    erForelderTilOmsorgsmottaker = it.grunnlag.omsorgsyter.erForelderAv(grunnlag.omsorgsmottaker.fnr),
+                    utfall = it.utfall,
+                )
+            }.let {
+                OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Grunnlag(
+                    omsorgsmottaker = grunnlag.omsorgsmottaker.fnr,
+                    omsorgsår = grunnlag.omsorgsAr,
+                    behandlinger = it
+
+                )
+            }
+        )
     }
 
     override fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering {

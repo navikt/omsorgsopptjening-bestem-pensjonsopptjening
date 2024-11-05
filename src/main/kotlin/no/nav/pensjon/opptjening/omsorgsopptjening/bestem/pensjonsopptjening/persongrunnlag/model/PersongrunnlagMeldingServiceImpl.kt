@@ -63,7 +63,7 @@ internal class PersongrunnlagMeldingServiceImpl(
         return FullførteBehandlinger(
             behandlinger = omsorgsopptjeningsgrunnlagService.lagOmsorgsopptjeningsgrunnlag(melding)
                 .filter { grunnlag -> gyldigOpptjeningsår.erGyldig(grunnlag.omsorgsAr) }
-                .map {
+                .map { it ->
                     behandlingRepo.persist(
                         Behandling(
                             grunnlag = it,
@@ -71,16 +71,24 @@ internal class PersongrunnlagMeldingServiceImpl(
                                 grunnlag = it,
                                 finnForOmsorgsyterOgÅr = {
                                     behandlingRepo.finnForOmsorgsyterOgAr(
-                                        it.omsorgsyter.fnr,
-                                        it.omsorgsAr
+                                        fnr = it.omsorgsyter.fnr,
+                                        ar = it.omsorgsAr
                                     )
                                 },
                                 finnForOmsorgsmottakerOgÅr = {
                                     behandlingRepo.finnForOmsorgsmottakerOgAr(
-                                        it.omsorgsmottaker.fnr,
-                                        it.omsorgsAr
+                                        omsorgsmottaker = it.omsorgsmottaker.fnr,
+                                        ar = it.omsorgsAr
                                     )
                                 },
+                                finnForOmsorgsytersAndreBarnOgÅr = {
+                                    behandlingRepo.finnForOmsorgsytersAndreBarn(
+                                        omsorgsyter = it.omsorgsyter.fnr,
+                                        ar = it.omsorgsAr,
+                                        andreBarnEnnOmsorgsmottaker = it.omsorgsyter.finnAndreBarnEnn(it.omsorgsmottaker.fnr)
+                                            .map { it.ident }
+                                    )
+                                }
                             ),
                             meldingId = melding.id
                         )

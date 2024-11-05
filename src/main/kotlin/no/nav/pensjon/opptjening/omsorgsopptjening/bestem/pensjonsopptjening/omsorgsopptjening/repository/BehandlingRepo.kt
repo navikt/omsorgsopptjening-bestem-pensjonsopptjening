@@ -95,6 +95,22 @@ class BehandlingRepo(
             BehandlingRowMapper()
         ).toDomain()
     }
+
+    fun finnForOmsorgsytersAndreBarn(
+        omsorgsyter: String,
+        ar: Int,
+        andreBarnEnnOmsorgsmottaker: List<String>
+    ): List<FullførtBehandling> {
+        return jdbcTemplate.query(
+            """select * from behandling where omsorgsyter <> :omsorgsyter and omsorgs_ar = :ar and omsorgsmottaker in (:andrebarn)""",
+            mapOf(
+                "omsorgsyter" to omsorgsyter,
+                "ar" to ar,
+                "andrebarn" to andreBarnEnnOmsorgsmottaker.ifEmpty { "('')" }
+            ),
+            BehandlingRowMapper()
+        ).toDomain()
+    }
 }
 
 internal class BehandlingRowMapper : RowMapper<BehandlingDb> {

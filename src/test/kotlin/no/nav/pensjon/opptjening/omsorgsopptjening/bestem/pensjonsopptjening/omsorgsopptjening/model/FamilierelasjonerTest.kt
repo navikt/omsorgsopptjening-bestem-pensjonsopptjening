@@ -20,6 +20,14 @@ class FamilierelasjonerTest {
                     ident = Ident.FolkeregisterIdent.Gjeldende("barn"),
                     relasjon = Familierelasjon.Relasjon.BARN
                 ),
+                Familierelasjon(
+                    ident = Ident.FolkeregisterIdent.Gjeldende("barn2"),
+                    relasjon = Familierelasjon.Relasjon.BARN
+                ),
+                Familierelasjon(
+                    ident = Ident.IDENT_UKJENT,
+                    relasjon = Familierelasjon.Relasjon.BARN
+                ),
             )
         ).also {
             assertThat(it.erBarn("barn")).isTrue()
@@ -32,6 +40,19 @@ class FamilierelasjonerTest {
                 Foreldre.Identifisert(
                     farEllerMedmor = Ident.FolkeregisterIdent.Gjeldende(ident = "far"),
                     mor = Ident.FolkeregisterIdent.Gjeldende(ident = "mor")
+                )
+            )
+            assertThat(it.finnBarn()).isEqualTo(
+                listOf(
+                    Ident.FolkeregisterIdent.Gjeldende("barn"),
+                    Ident.FolkeregisterIdent.Gjeldende("barn2"),
+                    Ident.Ukjent,
+                )
+            )
+            assertThat(it.finnAndreBarnEnn("barn")).isEqualTo(
+                listOf(
+                    Ident.FolkeregisterIdent.Gjeldende("barn2"),
+                    Ident.Ukjent,
                 )
             )
         }
@@ -65,6 +86,11 @@ class FamilierelasjonerTest {
                 Foreldre.Identifisert(
                     farEllerMedmor = Ident.FolkeregisterIdent.Gjeldende(ident = "medmor"),
                     mor = Ident.FolkeregisterIdent.Gjeldende(ident = "mor")
+                )
+            )
+            assertThat(it.finnBarn()).isEqualTo(
+                listOf(
+                    Ident.FolkeregisterIdent.Gjeldende("barn")
                 )
             )
         }

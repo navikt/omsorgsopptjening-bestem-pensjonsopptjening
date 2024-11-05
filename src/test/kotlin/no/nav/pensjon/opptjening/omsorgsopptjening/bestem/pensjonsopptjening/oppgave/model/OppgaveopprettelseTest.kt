@@ -323,7 +323,10 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 ).isEqualTo(
                     OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "04010012797",
-                        oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01052012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene.""")
+                        oppgavetekst = setOf(
+                            "Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: 01052012345 må vurderes manuelt pga at andre foreldre: 12345678910 mottar barnetrygd for felles barn: 07081812345",
+                            "Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01052012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."
+                        )
                     )
                 )
             }
@@ -589,6 +592,89 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "12345678910",
                             oppgavetekst = setOf("""Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: 07081812345 må vurderes manuelt pga perioder i MEDL""")
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `manuell behandling med oppgave dersom det er innvilget opptjening for fellesbarn omsorgsyter ikke mottar barnetrygd for`() {
+        wiremock.stubForPdlTransformer()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
+        wiremock.ingenUnntaksperioderForMedlemskap()
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().single().let { result ->
+            result.alle().single().also { behandling -> assertThat(behandling.erInnvilget()).isTrue() }
+        }
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "04010012797",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "04010012797",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2021),
+                                    tom = desember(2021),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "01122012345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().single().let { result ->
+            result.alle().single().also { behandling ->
+                assertThat(behandling.erManuell()).isTrue()
+                oppgaveRepo.findForBehandling(behandling.id).single().also { oppgave ->
+                    assertThat(oppgave.detaljer).isEqualTo(
+                        OppgaveDetaljer.MottakerOgTekst(
+                            oppgavemottaker = "04010012797",
+                            oppgavetekst = setOf("""Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: 01122012345 må vurderes manuelt pga at andre foreldre: 12345678910 mottar barnetrygd for felles barn: 07081812345""")
                         )
                     )
                 }

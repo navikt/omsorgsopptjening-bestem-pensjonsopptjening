@@ -16,6 +16,14 @@ data class Familierelasjoner(
         return relasjoner.singleOrNull { it.ident.ident == fnr }?.erBarn() ?: false
     }
 
+    fun finnBarn(): List<Ident> {
+        return relasjoner.filter { it.erBarn() }.map { it.ident }
+    }
+
+    fun finnAndreBarnEnn(eksklusiv: String): List<Ident> {
+        return relasjoner.filter { it.erBarn() }.map { it.ident }.filterNot { it.ident == eksklusiv }
+    }
+
     fun finnForeldre(): Foreldre {
         val far = relasjoner.singleOrNull { it.erFar() }
         val mor = relasjoner.singleOrNull { it.erMor() }

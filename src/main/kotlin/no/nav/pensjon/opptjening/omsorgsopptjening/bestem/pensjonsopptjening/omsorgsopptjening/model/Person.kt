@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
-import java.lang.RuntimeException
 import java.time.LocalDate
 import java.time.Month
 
@@ -41,6 +40,14 @@ class Person(
 
     fun finnForeldre(): Foreldre {
         return familierelasjoner.finnForeldre()
+    }
+
+    fun finnBarn(): List<Ident> {
+        return familierelasjoner.finnBarn()
+    }
+
+    fun finnAndreBarnEnn(eksklusiv: String): List<Ident> {
+        return finnBarn().filterNot { it.ident == eksklusiv }
     }
 
     fun identifisertAv(fnr: String): Boolean {
