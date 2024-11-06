@@ -14,6 +14,7 @@ interface VurderVilkår {
     fun OmsorgsyterErMedlemIFolketrygden(): OmsorgsyterErMedlemIFolketrygden.Vurdering
     fun OmsorgsyterErIkkeOmsorgsmottaker(): OmsorgsyterErikkeOmsorgsmottaker.Vurdering
     fun OmsorgsyterHarIkkeDødsdato(): OmsorgsyterHarIkkeDødsdato.Vurdering
+    fun OmsorgsyterMottarPensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering
 }
 
 internal class VilkårsvurderingFactory(
@@ -79,6 +80,10 @@ internal class VilkårsvurderingFactory(
 
     override fun OmsorgsyterHarIkkeDødsdato(): OmsorgsyterHarIkkeDødsdato.Vurdering {
         return OmsorgsyterHarIkkeDødsdato.vilkarsVurder(grunnlag.forOmsorgsyterHarIkkeDødsdato())
+    }
+
+    override fun OmsorgsyterMottarPensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering {
+        return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(grunnlag.forOmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs())
     }
 
     override fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering {

@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
-import java.time.YearMonth
 
 
 object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFolketrygden.Grunnlag>() {
@@ -27,8 +26,8 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
                 )
             }
         }.let {
-            return when {
-                grunnlag.erInnvilet() -> {
+            when {
+                grunnlag.erInnvilget() -> {
                     VilkårsvurderingUtfall.Innvilget.Vilkår(it)
                 }
 
@@ -84,7 +83,7 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
          * Dersom personen ikke har noen unntaksperioder legger vi til grunn at disse vurderingene i tilstrekkelig
          * grad sannnsynliggjør medlemskap i folketrygden.
          */
-        fun erInnvilet(): Boolean {
+        fun erInnvilget(): Boolean {
             val antattMedlem = omsorgsmåneder.minus(ikkeMedlem).minus(medlem)
             return (ikkeMedlem.isEmpty() && medlem.isEmpty()) || antattMedlem.count() >= minimumAntallMånederAntattMedlem
         }
@@ -94,7 +93,7 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
          * antall omsorgsmåneder hvor vi antar at personen er medlem.
          */
         fun erInnvilgetTilTrossForPerioderUtenMedlemskap(): Boolean {
-            require(!erInnvilet()) { "Rekkefølgeavhengig" }
+            require(!erInnvilget()) { "Rekkefølgeavhengig" }
             val antattMedlem = omsorgsmåneder.minus(ikkeMedlem)
             return medlem.isEmpty() && antattMedlem.count() >= minimumAntallMånederAntattMedlem
         }
@@ -104,7 +103,7 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
          * antall omsorgsmåneder hvor vi antar at personen er medlem.
          */
         fun erInnvilgetTilTrossForPerioderMedFrivilligEllerPliktigMedlemskap(): Boolean {
-            require(!erInnvilet() && !erInnvilgetTilTrossForPerioderUtenMedlemskap()) { "Rekkefølgeavhengig" }
+            require(!erInnvilget() && !erInnvilgetTilTrossForPerioderUtenMedlemskap()) { "Rekkefølgeavhengig" }
             val antattMedlem = omsorgsmåneder.minus(medlem)
             return ikkeMedlem.isEmpty() && antattMedlem.count() >= minimumAntallMånederAntattMedlem
         }
@@ -116,13 +115,9 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
          * landstilknytning norge.
          */
         fun manuell(): Boolean {
-            require(!erInnvilet() && !erInnvilgetTilTrossForPerioderUtenMedlemskap() && !erInnvilgetTilTrossForPerioderMedFrivilligEllerPliktigMedlemskap()) { "Rekkefølgeavhengig" }
+            require(!erInnvilget() && !erInnvilgetTilTrossForPerioderUtenMedlemskap() && !erInnvilgetTilTrossForPerioderMedFrivilligEllerPliktigMedlemskap()) { "Rekkefølgeavhengig" }
             val antattMedlem = omsorgsmåneder.minus(ikkeMedlem).minus(medlem).plus(omsorgsmåneder.intersect(medlem))
-            return landstilknytningErNorge(antattMedlem) && antattMedlem.count() >= minimumAntallMånederAntattMedlem
-        }
-
-        fun landstilknytningErNorge(måneder: Set<YearMonth>): Boolean {
-            return landstilknytningMåneder.erNorge(måneder)
+            return landstilknytningMåneder.erNorge(antattMedlem) && antattMedlem.count() >= minimumAntallMånederAntattMedlem
         }
     }
 }

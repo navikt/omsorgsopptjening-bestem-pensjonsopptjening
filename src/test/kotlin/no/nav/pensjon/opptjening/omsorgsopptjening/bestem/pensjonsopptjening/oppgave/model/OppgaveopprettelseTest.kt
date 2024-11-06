@@ -1,6 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenLøpendeAlderspensjon
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenLøpendeUføretrgyd
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.unntaksperioderMedPliktigEllerFrivilligMedlemskap
@@ -58,6 +60,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
 
         repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -172,6 +176,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
 
         repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -329,6 +335,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
 
         repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -445,6 +453,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
 
         repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -539,6 +549,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             "12345678910",
             setOf(Periode(mars(2020), september(2020)))
         )
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
 
         repo.lagre(
             PersongrunnlagMelding.Lest(

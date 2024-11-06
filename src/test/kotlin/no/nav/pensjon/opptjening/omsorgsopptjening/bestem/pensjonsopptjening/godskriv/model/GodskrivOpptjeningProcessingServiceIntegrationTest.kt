@@ -3,12 +3,12 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.TestKlokke
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenLøpendeAlderspensjon
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenLøpendeUføretrgyd
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
@@ -29,13 +29,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.xmlunit.diff.DifferenceEvaluators.first
-import java.time.Clock
-import java.time.Instant
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
@@ -84,6 +80,8 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                 .willReturn(WireMock.ok())
         )
         wiremock.ingenUnntaksperioderForMedlemskap()
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
 
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
@@ -176,6 +174,8 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         )
 
         wiremock.ingenUnntaksperioderForMedlemskap()
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
 
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
@@ -237,6 +237,8 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         )
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
 
         /**
          * Stiller klokka litt fram i tid for å unngå at [GodskrivOpptjening.Status.Retry.karanteneTil] fører til at vi hopper over raden.

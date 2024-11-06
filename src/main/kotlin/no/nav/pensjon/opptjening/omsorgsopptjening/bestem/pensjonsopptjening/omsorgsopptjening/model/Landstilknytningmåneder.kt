@@ -19,12 +19,28 @@ data class Landstilknytningmåneder(
         return forMåned(måned) is Landstilknytning.Norge
     }
 
+    fun erEøs(måned: YearMonth): Boolean {
+        return forMåned(måned) is Landstilknytning.Eøs
+    }
+
     fun erNorge(måneder: Set<YearMonth>): Boolean {
         return måneder.all { erNorge(it) }
     }
 
+    fun erEøs(måneder: Set<YearMonth>): Boolean {
+        return måneder.all { erEøs(it) }
+    }
+
     fun forMåned(måned: YearMonth): Landstilknytning? {
         return måneder.singleOrNull { it.måned == måned }?.landstilknytning
+    }
+
+    fun eøsMåneder(): Set<LandstilknytningMåned> {
+        return måneder.filter { erEøs(it.måned) }.toSet()
+    }
+
+    fun alleEøsMåneder(): Set<YearMonth> {
+        return eøsMåneder().map { it.måned }.toSet()
     }
 
     companion object {

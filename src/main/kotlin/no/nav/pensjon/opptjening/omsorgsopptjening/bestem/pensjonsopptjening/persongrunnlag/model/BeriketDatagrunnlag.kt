@@ -34,7 +34,8 @@ data class BeriketDatagrunnlag(
 
     fun omsorgsmånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, Omsorgsmåneder.Barnetrygd> {
         return persongrunnlag.associate { pg ->
-            pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }.omsorgsmåneder()
+            pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }
+                .omsorgsmåneder()
         }
     }
 
@@ -47,7 +48,8 @@ data class BeriketDatagrunnlag(
 
     fun utbetalingsmånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, Utbetalingsmåneder> {
         return persongrunnlag.associate { pg ->
-            pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }.utbetalingsmåneder()
+            pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }
+                .utbetalingsmåneder()
         }
     }
 

@@ -20,6 +20,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ytelse.YtelseOppslag
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -85,11 +86,13 @@ class PersongrunnlagConfig {
     @Bean
     fun omsorgsopptjeningsgrunnlagService(
         personOppslag: PersonOppslag,
-        medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag
+        medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag,
+        ytelseOppslag: YtelseOppslag,
     ): OmsorgsopptjeningsgrunnlagService {
         return OmsorgsopptjeningsgrunnlagServiceImpl(
             personOppslag = personOppslag,
-            medlemskapsUnntakOppslag = medlemskapsUnntakOppslag
+            medlemskapsUnntakOppslag = medlemskapsUnntakOppslag,
+            ytelseOppslag = ytelseOppslag,
         )
     }
 

@@ -17,6 +17,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOppfyllerAlderskrav
 
 class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List<FullførteBehandlinger?>?> {
@@ -50,6 +51,8 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List
     private val omsorgsyterErIkkeOmsorgsmottaker =
         registry.counter("avslag", "antall", "OmsorgsyterErikkeOmsorgsmottaker")
     private val omsorgsyterHarDødsdato = registry.counter("avslag", "antall", "OmsorgsyterHarIkkeDodsdato")
+    private val omsorgsyterMottarIkkePensjonEllerUføretrygdIEøs = registry.counter("avslag", "antall", "omsorgsyterMottarIkkePensjonEllerUføretrygdIEøs")
+
 
 
     override fun oppdater(lambda: () -> List<FullførteBehandlinger?>?): List<FullførteBehandlinger?>? {
@@ -76,6 +79,7 @@ class OmsorgsarbeidProcessingMetrikker(registry: MeterRegistry) : Metrikker<List
                         is OmsorgsyterErMedlemIFolketrygden.Vurdering -> omsorgsyterErMedlemIFolketrygden.increment()
                         is OmsorgsyterErikkeOmsorgsmottaker.Vurdering -> omsorgsyterErIkkeOmsorgsmottaker.increment()
                         is OmsorgsyterHarIkkeDødsdato.Vurdering -> omsorgsyterHarDødsdato.increment()
+                        is OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering -> omsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.increment()
                     }
                 }
             }

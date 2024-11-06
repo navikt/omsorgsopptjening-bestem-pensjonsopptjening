@@ -61,6 +61,10 @@ sealed class OmsorgsopptjeningGrunnlag {
         return grunnlag.landstilknytningMånederPerOmsorgsyter(omsorgsmottaker)
     }
 
+    private fun omsorgsytersYtelsemåneder(): Ytelsemåneder {
+        return grunnlag.omsorgsytersPersongrunnlag.ytelsegrunnlag.ytelsesmåneder()
+    }
+
     fun forAldersvurderingOmsorgsyter(): AldersvurderingsGrunnlag {
         return AldersvurderingsGrunnlag(
             person = omsorgsyter,
@@ -143,6 +147,15 @@ sealed class OmsorgsopptjeningGrunnlag {
                 }.toSet()
             )
         }
+    }
+
+    fun forOmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag {
+        return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag(
+            omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            ytelsemåneder = omsorgsytersYtelsemåneder(),
+            landstilknytningmåneder = landstilknytningForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            antallMånederRegel = antallMånederRegel()
+        )
     }
 
     abstract fun antallMånederRegel(): AntallMånederRegel

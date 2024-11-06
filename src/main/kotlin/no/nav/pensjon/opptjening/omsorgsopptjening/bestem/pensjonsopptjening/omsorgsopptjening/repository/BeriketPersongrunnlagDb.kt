@@ -14,7 +14,8 @@ internal data class BeriketPersongrunnlagDb(
     val omsorgsyter: PersonDb,
     val omsorgVedtakPeriode: List<BeriketOmsorgsperiodeDb>,
     val hjelpestønadperioder: List<BeriketOmsorgsperiodeHjelpestønad>,
-    val medlemskapsgrunnlag: MedlemskapsgrunnlagDb
+    val medlemskapsgrunnlag: MedlemskapsgrunnlagDb,
+    val ytelsegrunnlag: YtelsegrunnlagDb,
 )
 
 internal fun Persongrunnlag.toDb(): BeriketPersongrunnlagDb {
@@ -22,7 +23,8 @@ internal fun Persongrunnlag.toDb(): BeriketPersongrunnlagDb {
         omsorgsyter = omsorgsyter.toDb(),
         omsorgVedtakPeriode = omsorgsperioder.map { it.toDb() },
         hjelpestønadperioder = hjelpestønadperioder.map { it.toDb() },
-        medlemskapsgrunnlag = medlemskapsgrunnlag.toDb()
+        medlemskapsgrunnlag = medlemskapsgrunnlag.toDb(),
+        ytelsegrunnlag = ytelsegrunnlag.toDb()
     )
 }
 
@@ -32,5 +34,6 @@ internal fun BeriketPersongrunnlagDb.toDomain(): Persongrunnlag {
         omsorgsperioder = omsorgVedtakPeriode.map { it.toDomain() },
         hjelpestønadperioder = hjelpestønadperioder.map { it.toDomain() },
         medlemskapsgrunnlag = medlemskapsgrunnlag.toDomain(),
+        ytelsegrunnlag = ytelsegrunnlag.toDomain()
     )
 }
