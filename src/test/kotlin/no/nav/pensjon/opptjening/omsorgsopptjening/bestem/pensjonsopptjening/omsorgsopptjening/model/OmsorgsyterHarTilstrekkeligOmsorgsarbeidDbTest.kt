@@ -112,6 +112,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidDbTest {
                 assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                     assertEquals(
                         setOf(
+                            JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Andre_Ledd,
                             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum,
                         ),
                         it.henvisninger
@@ -159,6 +160,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidDbTest {
             assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
                 assertEquals(
                     setOf(
+                        JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Andre_Ledd,
                         JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum,
                     ),
                     it.henvisninger
