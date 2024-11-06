@@ -15,6 +15,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         return when (grunnlag.antallMånederRegel) {
             AntallMånederRegel.FødtIOmsorgsår -> {
                 setOf(
+                    JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Andre_Ledd,
                     JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Andre_Punktum,
                 ).let {
                     if (grunnlag.erOppfyllt()) {
@@ -29,6 +30,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                 when (grunnlag.omsorgstype()) {
                     DomainOmsorgskategori.BARNETRYGD -> {
                         setOf(
+                            JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Andre_Ledd,
                             JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
                         )
                     }

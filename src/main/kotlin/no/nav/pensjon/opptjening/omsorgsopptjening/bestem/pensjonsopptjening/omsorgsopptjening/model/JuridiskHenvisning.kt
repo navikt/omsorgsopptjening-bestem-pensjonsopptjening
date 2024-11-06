@@ -119,6 +119,17 @@ sealed class JuridiskHenvisning(
             tekst = "Omsorgsopptjening på grunnlag av omsorgen for ett barn eller for flere barn som bor sammen, gis bare én omsorgsyter for det enkelte kalenderår."
         )
 
+    data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Andre_Ledd :
+        JuridiskHenvisning(
+            kortTittel = "Forskrift om alderspensjon i folketrygden",
+            dato = "FOR-2009-12-22-1810",
+            kapittel = 3,
+            paragraf = 4,
+            ledd = 2,
+            punktum = 1,
+            tekst = "En person som mottar barnetrygd for barnet alene gis omsorgsopptjening uten å sette fram krav om det."
+        )
+
     data object Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd : JuridiskHenvisning(
         kortTittel = "Forskrift om alderspensjon i folketrygden",
         dato = "FOR-2009-12-22-1810",
