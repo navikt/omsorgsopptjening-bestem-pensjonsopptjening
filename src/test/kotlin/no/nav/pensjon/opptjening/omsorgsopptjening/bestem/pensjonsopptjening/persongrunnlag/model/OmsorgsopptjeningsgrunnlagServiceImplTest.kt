@@ -8,11 +8,13 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsunntak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Ytelseinformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.april
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.desember
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.februar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.år
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ytelse.YtelseOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
@@ -45,10 +47,12 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
 
     private val personOppslag: PersonOppslag = mock()
     private val medlemskapsUnntaktOppslag: MedlemskapsUnntakOppslag = mock()
+    private val ytelseOppslag: YtelseOppslag = mock()
 
     private val service = OmsorgsopptjeningsgrunnlagServiceImpl(
         personOppslag = personOppslag,
         medlemskapsUnntakOppslag = medlemskapsUnntaktOppslag,
+        ytelseOppslag = ytelseOppslag,
     )
 
     @BeforeEach
@@ -85,6 +89,9 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                 ""
             )
         )
+
+        whenever(ytelseOppslag.hentLøpendeAlderspensjon(any(), any(), any())).thenReturn(Ytelseinformasjon(emptySet(), ""))
+        whenever(ytelseOppslag.hentLøpendeUføretrygd(any(), any(), any())).thenReturn(Ytelseinformasjon(emptySet(), ""))
     }
 
     @Test

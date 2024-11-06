@@ -262,7 +262,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                                 omsorgsår,
                                 monthsFullOmsorg
                             )
-                        ).alleMåneder()
+                        ).omsorgsmåneder(DomainOmsorgstype.Hjelpestønad)
                     ),
                     antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
                 )
@@ -291,7 +291,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                                 omsorgsår,
                                 monthsFullOmsorg
                             )
-                        ).alleMåneder()
+                        ).omsorgsmåneder(DomainOmsorgstype.Hjelpestønad)
                     ),
                     antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
                 )

@@ -5,7 +5,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Medlemskapsunntak
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Ytelsegrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ytelse.YtelseOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.KanSlåsSammen.Companion.slåSammenLike
 import java.time.Month
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
@@ -13,7 +15,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 
 internal class OmsorgsopptjeningsgrunnlagServiceImpl(
     private val personOppslag: PersonOppslag,
-    private val medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag
+    private val medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag,
+    private val ytelseOppslag: YtelseOppslag,
 ) : OmsorgsopptjeningsgrunnlagService {
 
     override fun lagOmsorgsopptjeningsgrunnlag(melding: PersongrunnlagMelding.Mottatt): List<OmsorgsopptjeningGrunnlag> {
@@ -84,11 +87,30 @@ internal class OmsorgsopptjeningsgrunnlagServiceImpl(
                         )
                     }
 
+
+                    val ytelsegrunnlag = if (omsorgsperioder.isNotEmpty()) {
+                        val (første, siste) = omsorgsperioder.minOf { it.fom } to omsorgsperioder.maxOf { it.tom }
+                        val alderspensjon = ytelseOppslag.hentLøpendeAlderspensjon(
+                            fnr = omsorgsyter.fnr,
+                            fraOgMed = første,
+                            tilOgMed = siste
+                        )
+                        val uføretrygd = ytelseOppslag.hentLøpendeUføretrygd(
+                            fnr = omsorgsyter.fnr,
+                            fraOgMed = første,
+                            tilOgMed = siste
+                        )
+                        Ytelsegrunnlag(setOf(alderspensjon, uføretrygd))
+                    } else {
+                        Ytelsegrunnlag(emptySet())
+                    }
+
                     Persongrunnlag(
                         omsorgsyter = omsorgsyter,
                         omsorgsperioder = omsorgsperioder,
                         hjelpestønadperioder = hjelpestønadsperioder,
                         medlemskapsgrunnlag = medlemskapsgrunnlag,
+                        ytelsegrunnlag = ytelsegrunnlag,
                     )
                 },
             innlesingId = innlesingId,
@@ -229,7 +251,8 @@ internal class OmsorgsopptjeningsgrunnlagServiceImpl(
                                             )
                                         }
                                 },
-                            medlemskapsgrunnlag = persongrunnlag.medlemskapsgrunnlag.avgrensForÅr(år)
+                            medlemskapsgrunnlag = persongrunnlag.medlemskapsgrunnlag.avgrensForÅr(år),
+                            ytelsegrunnlag = persongrunnlag.ytelsegrunnlag.avgrensForÅr(år)
                         )
                     })
             }

@@ -15,6 +15,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOppfyllerAlderskrav
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkarsVurdering
 import java.util.Queue
@@ -43,6 +44,7 @@ internal fun VilkarsVurdering<*>.toDb(): VilkårsvurderingDb {
         is OmsorgsyterErMedlemIFolketrygden.Vurdering -> toDb()
         is OmsorgsyterErikkeOmsorgsmottaker.Vurdering -> toDb()
         is OmsorgsyterHarIkkeDødsdato.Vurdering -> toDb()
+        is OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering -> toDb()
     }
 }
 
@@ -78,5 +80,6 @@ internal fun VilkårsvurderingDb.toDomain(): VilkarsVurdering<*> {
         is OmsorgsyterErMedlemIFolketrygdenDb -> toDomain()
         is OmsorgsyterErIkkeOmsorgsmottakerDb -> toDomain()
         is OmsorgsyterHarIkkeDødsdatoDb -> toDomain()
+        is OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsDb -> toDomain()
     }
 }

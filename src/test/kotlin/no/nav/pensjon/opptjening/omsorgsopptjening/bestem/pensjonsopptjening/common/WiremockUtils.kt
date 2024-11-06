@@ -13,6 +13,7 @@ import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer
 import com.github.tomakehurst.wiremock.http.Request
 import com.github.tomakehurst.wiremock.http.ResponseDefinition
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import com.github.tomakehurst.wiremock.matching.ContainsPattern
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.POPP_PENSJONSPOENG_PATH
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
@@ -195,6 +196,70 @@ fun WireMockExtension.unntaksperioderMedPliktigEllerFrivilligMedlemskap(
                         """.trimIndent()
                         }.toString()
                     )
+                    .withHeader("Content-Type", "application/json")
+            )
+    )
+}
+
+fun WireMockExtension.ingenLøpendeAlderspensjon() {
+    this.stubFor(
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.PEN_ALDERVEDTAK_PATH))
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withBody("""{"vedtakListe":[]}""")
+                    .withHeader("Content-Type", "application/json")
+            )
+    )
+}
+
+fun WireMockExtension.løpendeAlderspensjon(
+    fnr: String,
+    vararg perioder: Periode
+) {
+    val periodeJson = perioder.joinToString(",") {
+        """{"gjelderFomDato":"${it.min().atDay(1)}","gjelderTomDato":"${it.max().atEndOfMonth()}"}"""
+    }
+
+    this.stubFor(
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.PEN_ALDERVEDTAK_PATH))
+            .withRequestBody(ContainsPattern(fnr))
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withBody("""{"vedtakListe":[$periodeJson]}""")
+                    .withHeader("Content-Type", "application/json")
+            )
+    )
+}
+
+fun WireMockExtension.ingenLøpendeUføretrgyd() {
+    this.stubFor(
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.PEN_UFOREVEDTAK_PATH))
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withBody("""{"uforeperioder":[]}""")
+                    .withHeader("Content-Type", "application/json")
+            )
+    )
+}
+
+fun WireMockExtension.løpendeUføretrygd(
+    fnr: String,
+    vararg perioder: Periode
+) {
+    val periodeJson = perioder.joinToString(",") {
+        """{"fom":"${it.min().atDay(1)}","tom":"${it.max().atEndOfMonth()}"}"""
+    }
+
+    this.stubFor(
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.PEN_UFOREVEDTAK_PATH))
+            .withRequestBody(ContainsPattern(fnr))
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(200)
+                    .withBody("""{"uforeperioder": [$periodeJson]}""")
                     .withHeader("Content-Type", "application/json")
             )
     )
