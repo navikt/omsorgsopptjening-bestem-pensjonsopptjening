@@ -38,10 +38,12 @@ data class Omsorgsperiode(
     }
 
     fun omsorgsmåneder(): Omsorgsmåneder.Barnetrygd {
-        return alleMåneder()
-            .map { it to omsorgstype }
-            .map { (mnd, type) -> Omsorgsmåneder.Barnetrygd.of(mnd, type) }
-            .reduce { acc, barnetrygd -> acc.merge(barnetrygd) }
+        return Omsorgsmåneder.Barnetrygd(
+            alleMåneder()
+                .map { it to omsorgstype }
+                .map { (mnd, type) -> Omsorgsmåneder.Omsorgsmåned(mnd, type) }
+                .toSet()
+        )
     }
 
     companion object {

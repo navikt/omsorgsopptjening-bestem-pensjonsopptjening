@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 
 object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag>() {
@@ -18,10 +19,18 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                     JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Andre_Ledd,
                     JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Andre_Punktum,
                 ).let {
-                    if (grunnlag.erOppfyllt()) {
-                        VilkårsvurderingUtfall.Innvilget.Vilkår(it)
-                    } else {
-                        VilkårsvurderingUtfall.Avslag.Vilkår(it)
+                    when {
+                        grunnlag.erOppfyllt() -> {
+                            VilkårsvurderingUtfall.Innvilget.Vilkår(it)
+                        }
+
+                        grunnlag.erManuell() -> {
+                            VilkårsvurderingUtfall.Ubestemt(it)
+                        }
+
+                        else -> {
+                            VilkårsvurderingUtfall.Avslag.Vilkår(it)
+                        }
                     }
                 }
             }
@@ -42,10 +51,18 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                         )
                     }
                 }.let {
-                    if (grunnlag.erOppfyllt()) {
-                        VilkårsvurderingUtfall.Innvilget.Vilkår(it)
-                    } else {
-                        VilkårsvurderingUtfall.Avslag.Vilkår(it)
+                    when {
+                        grunnlag.erOppfyllt() -> {
+                            VilkårsvurderingUtfall.Innvilget.Vilkår(it)
+                        }
+
+                        grunnlag.erManuell() -> {
+                            VilkårsvurderingUtfall.Ubestemt(it)
+                        }
+
+                        else -> {
+                            VilkårsvurderingUtfall.Avslag.Vilkår(it)
+                        }
                     }
                 }
             }
@@ -55,7 +72,14 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
     data class Vurdering(
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall
-    ) : ParagrafVurdering<Grunnlag>()
+    ) : ParagrafVurdering<Grunnlag>() {
+        override fun hentOppgaveopplysninger(behandling: FullførtBehandling): Oppgaveopplysninger {
+            return Oppgaveopplysninger.Generell(
+                oppgavemottaker = behandling.omsorgsyter,
+                oppgaveTekst = Oppgave.kombinasjonAvFullOgDeltErTilstrekkelig(behandling.omsorgsmottaker)
+            )
+        }
+    }
 
 
     data class Grunnlag(
@@ -64,7 +88,30 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
     ) : ParagrafGrunnlag() {
 
         fun erOppfyllt(): Boolean {
-            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall() >= antallMånederRegel.antall
+            return when (omsorgsytersOmsorgsmånederForOmsorgsmottaker) {
+                is Omsorgsmåneder.Barnetrygd -> {
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallFull() >= antallMånederRegel.antall
+                }
+
+                is Omsorgsmåneder.Hjelpestønad -> {
+                    //TODO et hull her ift full vs delt barnetrygd
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall() >= antallMånederRegel.antall
+                }
+            }
+        }
+
+        fun erManuell(): Boolean {
+            require(!erOppfyllt()) { "Rekkefølgeavhengig" }
+            return when (omsorgsytersOmsorgsmånederForOmsorgsmottaker) {
+                is Omsorgsmåneder.Barnetrygd -> {
+                    (omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallFull() + omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallDelt()) >= antallMånederRegel.antall
+                }
+
+                is Omsorgsmåneder.Hjelpestønad -> {
+                    //TODO et hull her ift full vs delt barnetrygd
+                    false
+                }
+            }
         }
 
         fun omsorgstype(): DomainOmsorgskategori {

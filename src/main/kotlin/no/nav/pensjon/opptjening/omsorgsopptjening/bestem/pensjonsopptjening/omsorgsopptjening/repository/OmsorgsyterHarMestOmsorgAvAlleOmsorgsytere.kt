@@ -2,9 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.GyldigeOmsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
-import java.time.YearMonth
 
 @JsonTypeName("OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere")
 internal data class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereDb(
@@ -39,10 +37,10 @@ internal fun MestAvAlleOmsorgsytere.toDomain(): OmsorgsyterHarMestOmsorgAvAlleOm
             OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
                 omsorgsyter = it.omsorgsyter,
                 omsorgsmottaker = it.omsorgsmottaker,
-                omsorgsmåneder = GyldigeOmsorgsmåneder(it.omsorgsmåneder),
+                omsorgsmåneder = it.omsorgsmåneder.toDomain(),
                 omsorgsår = it.omsorgsår
             )
-        }
+        }.toSet()
     )
 }
 
@@ -53,7 +51,7 @@ internal fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag.toDb(): MestAvA
             OmsorgsyterMottakerAntallMånederDb(
                 omsorgsyter = it.omsorgsyter,
                 omsorgsmottaker = it.omsorgsmottaker,
-                omsorgsmåneder = it.omsorgsmåneder.alleMåneder(),
+                omsorgsmåneder = it.omsorgsmåneder.toDb(),
                 omsorgsår = it.omsorgsår
             )
         }
@@ -70,7 +68,7 @@ internal fun OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag.toDb(): MestAvA
 internal data class OmsorgsyterMottakerAntallMånederDb(
     val omsorgsyter: String,
     val omsorgsmottaker: String,
-    val omsorgsmåneder: Set<YearMonth>,
+    val omsorgsmåneder: OmsorgsmånederDb,
     val omsorgsår: Int,
 )
 

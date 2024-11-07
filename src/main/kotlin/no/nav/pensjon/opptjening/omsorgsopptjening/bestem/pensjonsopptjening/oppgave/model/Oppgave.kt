@@ -34,6 +34,10 @@ sealed class Oppgave {
         fun perioderMedPliktigEllerFrivilligMedlemskap(omsorgsmottaker: String): String {
             return """Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: $omsorgsmottaker må vurderes manuelt pga perioder i MEDL"""
         }
+
+        fun kombinasjonAvFullOgDeltErTilstrekkelig(omsorgsmottaker: String): String {
+            return """Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: $omsorgsmottaker. Vurder retten til omsorgsopptjening."""
+        }
     }
 
     /**

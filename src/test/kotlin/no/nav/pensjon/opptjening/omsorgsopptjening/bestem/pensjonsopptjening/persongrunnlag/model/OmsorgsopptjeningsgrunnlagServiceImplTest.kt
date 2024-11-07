@@ -244,19 +244,19 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                         DomainOmsorgskategori.BARNETRYGD
                     )
                 }
-                grl.forGyldigOmsorgsarbeidPerOmsorgsyter().also {
+                grl.forOmsorgsyterHarMestOmsorgAvAlleOmsorgsytere().also {
                     assertThat(it.omsorgsyter).isEqualTo(mor)
                     it.data.single { it.omsorgsyter == mor }.also {
                         assertThat(it.omsorgsyter).isEqualTo(mor)
                         assertThat(it.omsorgsmottaker).isEqualTo(jente)
                         assertThat(it.omsorgsår).isEqualTo(2020)
-                        assertThat(it.omsorgsmåneder.alleMåneder()).isEqualTo(år(2021).alleMåneder())
+                        assertThat(it.omsorgsmåneder.alle()).isEqualTo(år(2021).alleMåneder())
                     }
                     it.data.single { it.omsorgsyter == far }.also {
                         assertThat(it.omsorgsyter).isEqualTo(far)
                         assertThat(it.omsorgsmottaker).isEqualTo(jente)
                         assertThat(it.omsorgsår).isEqualTo(2020)
-                        assertThat(it.omsorgsmåneder.alleMåneder()).isEqualTo(år(2021).alleMåneder())
+                        assertThat(it.omsorgsmåneder.alle()).isEqualTo(år(2021).alleMåneder())
                     }
                 }
                 grl.forMedlemskapIFolketrygden().also {
@@ -330,26 +330,30 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                             mars(2021),
                             april(2021),
                             mai(2021),
+                            juni(2021),
+                            juli(2021),
                             desember(2021)
                         )
                     )
-                    assertThat(it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall()).isEqualTo(5)
+                    assertThat(it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall()).isEqualTo(7)
                     assertThat(it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.omsorgstype()).isEqualTo(
                         DomainOmsorgskategori.BARNETRYGD
                     )
                 }
-                grl.forGyldigOmsorgsarbeidPerOmsorgsyter().also {
+                grl.forOmsorgsyterHarMestOmsorgAvAlleOmsorgsytere().also {
                     assertThat(it.omsorgsyter).isEqualTo(mor)
                     it.data.single { it.omsorgsyter == mor }.also {
                         assertThat(it.omsorgsyter).isEqualTo(mor)
                         assertThat(it.omsorgsmottaker).isEqualTo(gutt)
                         assertThat(it.omsorgsår).isEqualTo(2021)
-                        assertThat(it.omsorgsmåneder.alleMåneder()).isEqualTo(
+                        assertThat(it.omsorgsmåneder.alle()).isEqualTo(
                             setOf(
                                 februar(2021),
                                 mars(2021),
                                 april(2021),
                                 mai(2021),
+                                juni(2021),
+                                juli(2021),
                                 desember(2021)
                             )
                         )
@@ -358,7 +362,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                         assertThat(it.omsorgsyter).isEqualTo(far)
                         assertThat(it.omsorgsmottaker).isEqualTo(gutt)
                         assertThat(it.omsorgsår).isEqualTo(2021)
-                        assertThat(it.omsorgsmåneder.alleMåneder()).isEqualTo(år(2021).alleMåneder())
+                        assertThat(it.omsorgsmåneder.alle()).isEqualTo(år(2021).alleMåneder())
                     }
                 }
                 grl.forMedlemskapIFolketrygden().also {
@@ -373,10 +377,12 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                             mars(2021),
                             april(2021),
                             mai(2021),
+                            juni(2021),
+                            juli(2021),
                             desember(2021)
                         )
                     )
-                    assertThat(it.omsorgsytersOmsorgsmåneder.antall()).isEqualTo(5)
+                    assertThat(it.omsorgsytersOmsorgsmåneder.antall()).isEqualTo(7)
                     assertThat(it.landstilknytningMåneder.alle()).isEqualTo(
                         setOf(
                             februar(2021),

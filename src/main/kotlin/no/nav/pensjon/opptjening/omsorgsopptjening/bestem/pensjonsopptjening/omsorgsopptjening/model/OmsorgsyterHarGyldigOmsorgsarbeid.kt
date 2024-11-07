@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
+import java.time.YearMonth
 
 
 object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag>() {
@@ -18,10 +19,14 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
                     JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Andre_Punktum,
                     JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Tredje_Punktum
                 ).let {
-                    if (grunnlag.erOppfyllt()) {
-                        VilkårsvurderingUtfall.Innvilget.Vilkår(it)
-                    } else {
-                        VilkårsvurderingUtfall.Avslag.Vilkår(it)
+                    when {
+                        grunnlag.erOppfyllt() -> {
+                            VilkårsvurderingUtfall.Innvilget.Vilkår(it)
+                        }
+
+                        else -> {
+                            VilkårsvurderingUtfall.Avslag.Vilkår(it)
+                        }
                     }
                 }
             }
@@ -42,10 +47,14 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
                         )
                     }
                 }.let {
-                    if (grunnlag.erOppfyllt()) {
-                        VilkårsvurderingUtfall.Innvilget.Vilkår(it)
-                    } else {
-                        VilkårsvurderingUtfall.Avslag.Vilkår(it)
+                    when {
+                        grunnlag.erOppfyllt() -> {
+                            VilkårsvurderingUtfall.Innvilget.Vilkår(it)
+                        }
+
+                        else -> {
+                            VilkårsvurderingUtfall.Avslag.Vilkår(it)
+                        }
                     }
                 }
             }
@@ -62,14 +71,11 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
         val omsorgsytersOmsorgsmåneder: Omsorgsmåneder,
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
-        val gyldigeOmsorgsmåneder: GyldigeOmsorgsmåneder
-            get() = GyldigeOmsorgsmåneder.of(
-                omsorgsmåneder = omsorgsytersOmsorgsmåneder,
-                utbetalingsmåneder = omsorgsytersUtbetalingsmåneder
-            )
+        val gyldigeOmsorgsmåneder: Set<YearMonth> =
+            omsorgsytersOmsorgsmåneder.alle().intersect(omsorgsytersUtbetalingsmåneder.alle())
 
         fun erOppfyllt(): Boolean {
-            return gyldigeOmsorgsmåneder.alleMåneder().count() >= antallMånederRegel.antall
+            return gyldigeOmsorgsmåneder.count() >= antallMånederRegel.antall
         }
 
         fun omsorgstype(): DomainOmsorgskategori {

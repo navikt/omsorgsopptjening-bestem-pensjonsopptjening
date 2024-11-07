@@ -341,7 +341,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
@@ -356,7 +356,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2020, Month.JANUARY),
                                     tom = YearMonth.of(2020, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
@@ -382,7 +382,10 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 ).isEqualTo(
                     OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "12345678910",
-                        oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.""")
+                        oppgavetekst = setOf(
+                            "Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.",
+                            "Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: 07081812345. Vurder retten til omsorgsopptjening."
+                        )
                     )
                 )
             }

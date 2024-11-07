@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.februar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.januar
@@ -28,7 +29,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024))),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024).omsorgsmåned(DomainOmsorgstype.Barnetrygd.Full))),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -53,7 +54,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).alleMåneder()),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -78,7 +79,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024))),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024).omsorgsmåned(DomainOmsorgstype.Barnetrygd.Full))),
                 antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -103,7 +104,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).alleMåneder()),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -132,7 +133,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                     Periode(
                         januar(2024),
                         september(2024)
-                    ).alleMåneder()
+                    ).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
                 ),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
@@ -153,7 +154,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024))),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024).omsorgsmåned(DomainOmsorgstype.Barnetrygd.Full))),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -178,7 +179,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).alleMåneder()),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -203,7 +204,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024))),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024).omsorgsmåned(DomainOmsorgstype.Barnetrygd.Full))),
                 antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -228,7 +229,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).alleMåneder()),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -253,7 +254,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).alleMåneder()),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -278,7 +279,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).alleMåneder()),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Eøs.UkjentPrimærOgSekundærLand),
             )
@@ -308,7 +309,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).alleMåneder()),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
             )
@@ -338,7 +339,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                         rådata = ""
                     )
                 ),
-                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).alleMåneder()),
+                omsorgsytersOmsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Eøs.UkjentPrimærOgSekundærLand),
             )
@@ -372,7 +373,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
                     Periode(
                         februar(2024),
                         juni((2024))
-                    ).alleMåneder()
+                    ).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
                 ),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
