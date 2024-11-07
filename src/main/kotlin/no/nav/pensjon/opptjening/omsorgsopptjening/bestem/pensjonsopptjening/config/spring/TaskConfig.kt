@@ -15,7 +15,7 @@ import java.util.concurrent.Executors
 class TaskConfig {
 
     @Bean
-    @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
+    @Profile("dev-gcp", "prod-gcp")
     fun taskExecutorService(
         oppgaveProcessingTask: OppgaveProcessingTask,
         brevProcessingTask: BrevProcessingTask,
