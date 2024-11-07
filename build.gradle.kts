@@ -6,17 +6,17 @@ val azureAdClient = "0.0.7"
 val jacksonVersion = "2.17.1"
 val logbackEncoderVersion = "8.0"
 val postgresqlVersion = "42.7.4"
-val flywayCoreVersion = "10.18.2"
+val flywayCoreVersion = "10.20.1"
 val springKafkaTestVersion = "3.2.4"
 val springCloudContractVersion = "4.0.4"
-val testcontainersVersion = "1.20.1"
-val mockkVersion = "1.13.12"
+val testcontainersVersion = "1.20.3"
+val mockkVersion = "1.13.13"
 val assertJVersion = "3.26.3"
 val jsonAssertVersion = "1.5.3"
-val wiremockVersion = "3.9.1"
+val wiremockVersion = "3.9.2"
 val mockitoVersion = "5.4.0"
 val unleashVersion = "9.2.4"
-val navTokenSupportVersion = "5.0.5"
+val navTokenSupportVersion = "5.0.8"
 val hibernateValidatorVersion = "8.0.1.Final"
 val junit5Version = "5.10.3"
 
@@ -31,7 +31,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.3.4"
+    id("org.springframework.boot") version "3.3.5"
     id("com.github.ben-manes.versions") version "0.51.0"
 }
 
