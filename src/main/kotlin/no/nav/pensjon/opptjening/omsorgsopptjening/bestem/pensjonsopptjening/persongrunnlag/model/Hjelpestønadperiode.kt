@@ -22,7 +22,9 @@ data class Hjelpestønadperiode(
      * Tell alle måneder hvor barnetrygd og hjelpestønad overlapper
      */
     fun omsorgsmåneder(omsorgsmåneder: Omsorgsmåneder.Barnetrygd): Omsorgsmåneder.Hjelpestønad {
-        return Omsorgsmåneder.Hjelpestønad(alleMåneder().intersect(omsorgsmåneder.alle()))
+        return Omsorgsmåneder.Hjelpestønad(
+            alleMåneder().intersect(omsorgsmåneder.alle()).map { Omsorgsmåneder.Omsorgsmåned(it, omsorgstype) }.toSet()
+        )
     }
 
     companion object {

@@ -129,22 +129,18 @@ sealed class OmsorgsopptjeningGrunnlag {
         )
     }
 
-    fun forGyldigOmsorgsarbeidPerOmsorgsyter(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
-        return grunnlag.persongrunnlag.associate {
-            it.omsorgsyter to forGyldigOmsorgsarbeid(it.omsorgsyter)
-        }.map {
-            it.key.fnr to it.value.gyldigeOmsorgsmåneder
-        }.let {
+    fun forOmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(): OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag {
+        return omsorgsmånederForOmsorgsmottakerPerOmsorgsyter().let {
             OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
                 omsorgsyter = omsorgsyter.fnr,
-                data = it.map { (yter, antallMnd) ->
+                data = it.map { (omsorgsyter, omsorgsmåneder) ->
                     OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
-                        omsorgsyter = yter,
+                        omsorgsyter = omsorgsyter.fnr,
                         omsorgsmottaker = omsorgsmottaker.fnr,
-                        omsorgsmåneder = antallMnd,
+                        omsorgsmåneder = omsorgsmåneder,
                         omsorgsår = omsorgsAr
                     )
-                }
+                }.toSet()
             )
         }
     }

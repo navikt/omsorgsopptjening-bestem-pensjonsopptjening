@@ -22,6 +22,22 @@ sealed class VilkårsvurderingUtfall {
         }
     }
 
+    fun erAvslag(): Boolean {
+        return when (this) {
+            is Avslag -> true
+            is Innvilget -> false
+            is Ubestemt -> false
+        }
+    }
+
+    fun erUbestemt(): Boolean {
+        return when (this) {
+            is Avslag -> false
+            is Innvilget -> false
+            is Ubestemt -> true
+        }
+    }
+
 }
 
 sealed class BehandlingUtfall {

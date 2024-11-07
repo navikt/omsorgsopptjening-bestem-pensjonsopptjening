@@ -6,10 +6,9 @@ import java.time.YearMonth
 
 sealed class Omsorgsmåneder {
     protected abstract val måneder: Set<YearMonth>
-    protected val sortert get() = måneder.toSortedSet()
 
     fun alle(): Set<YearMonth> {
-        return sortert
+        return måneder
     }
 
     fun antall(): Int {
@@ -24,20 +23,35 @@ sealed class Omsorgsmåneder {
     }
 
     data class Barnetrygd(
-        override val måneder: Set<YearMonth>
+        val omsorgsmåneder: Set<Omsorgsmåned>
     ) : Omsorgsmåneder() {
+        init {
+            require(omsorgsmåneder.all { it.omsorgstype.omsorgskategori() == DomainOmsorgskategori.BARNETRYGD })
+        }
+
+        override val måneder: Set<YearMonth> = omsorgsmåneder.map { it.måned }.toSortedSet()
+
         fun merge(other: Barnetrygd): Barnetrygd {
-            return Barnetrygd((sortert + other.sortert).toSet())
+            return Barnetrygd((omsorgsmåneder + other.omsorgsmåneder).toSet())
+        }
+
+        fun full(): Set<Omsorgsmåned> {
+            return omsorgsmåneder.filter { it.omsorgstype is DomainOmsorgstype.Barnetrygd.Full }.toSet()
+        }
+
+        fun antallFull(): Int {
+            return full().count()
+        }
+
+        fun delt(): Set<Omsorgsmåned> {
+            return omsorgsmåneder.filter { it.omsorgstype is DomainOmsorgstype.Barnetrygd.Delt }.toSet()
+        }
+
+        fun antallDelt(): Int {
+            return delt().count()
         }
 
         companion object {
-            fun of(måned: YearMonth, omsorgstype: DomainOmsorgstype.Barnetrygd): Barnetrygd {
-                return when (omsorgstype) {
-                    DomainOmsorgstype.Barnetrygd.Delt -> none()
-                    DomainOmsorgstype.Barnetrygd.Full -> Barnetrygd(setOf(måned))
-                }
-            }
-
             fun none(): Barnetrygd {
                 return Barnetrygd(emptySet())
             }
@@ -45,10 +59,16 @@ sealed class Omsorgsmåneder {
     }
 
     data class Hjelpestønad(
-        override val måneder: Set<YearMonth>
+        val omsorgsmåneder: Set<Omsorgsmåned>,
     ) : Omsorgsmåneder() {
+        init {
+            require(omsorgsmåneder.all { it.omsorgstype.omsorgskategori() == DomainOmsorgskategori.HJELPESTØNAD })
+        }
+
+        override val måneder = omsorgsmåneder.map { it.måned }.toSortedSet()
+
         fun merge(other: Hjelpestønad): Hjelpestønad {
-            return Hjelpestønad((sortert + other.sortert).toSet())
+            return Hjelpestønad((omsorgsmåneder + other.omsorgsmåneder).toSet())
         }
 
         companion object {
@@ -57,4 +77,9 @@ sealed class Omsorgsmåneder {
             }
         }
     }
+
+    data class Omsorgsmåned(
+        val måned: YearMonth,
+        val omsorgstype: DomainOmsorgstype
+    )
 }

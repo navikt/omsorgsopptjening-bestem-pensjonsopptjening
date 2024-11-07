@@ -14,14 +14,26 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
-        return if (grunnlag.omsorgsyterHarFlestOmsorgsmåneder()) {
-            VilkårsvurderingUtfall.Innvilget.Vilkår(emptySet()) // Har egentlig ikke noe godt å hekte dette på
-        } else if (grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder()) {
-            VilkårsvurderingUtfall.Ubestemt(
-                setOf(JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd)
-            )
-        } else {
-            VilkårsvurderingUtfall.Avslag.Vilkår(emptySet()) // Har egentlig ikke noe godt å hekte dette på
+        return when {
+            grunnlag.omsorgsyterHarFlestOmsorgsmånederMedFullOmsorg() -> {
+                VilkårsvurderingUtfall.Innvilget.Vilkår(emptySet()) // Har egentlig ikke noe godt å hekte dette på
+            }
+
+            grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedFullOmsorg() -> {
+                VilkårsvurderingUtfall.Ubestemt(setOf(JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd))
+            }
+
+            grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedDeltOmsorg() -> {
+                VilkårsvurderingUtfall.Ubestemt(setOf(JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd))
+            }
+
+            else -> {
+                if (grunnlag.omsorgsyterHarFlestOmsorgsmånederUavhengigAvFullEllerDelt()) {
+                    VilkårsvurderingUtfall.Innvilget.Vilkår(emptySet()) // Har egentlig ikke noe godt å hekte dette på
+                } else {
+                    VilkårsvurderingUtfall.Avslag.Vilkår(emptySet()) // Har egentlig ikke noe godt å hekte dette på
+                }
+            }
         }
     }
 
@@ -69,9 +81,16 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         private data class InnholdsvalgForOppgavetekstHvisFlereOmsorgsytereMedLikeMyeOmsorg(
             private val grunnlag: Grunnlag,
         ) {
+            //TODO ikke veldig pent
+            val utvalg = when {
+                grunnlag.omsorgsyterHarFlestOmsorgsmånederMedFullOmsorg() -> grunnlag.omsorgsytereMedFlestOmsorgsmånederFull
+                grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedFullOmsorg() -> grunnlag.omsorgsytereMedFlestOmsorgsmånederFull
+                grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedDeltOmsorg() -> grunnlag.omsorgsytereMedFlestOmsorgsmånederDelt
+                else -> throw IllegalStateException("En av alternativene må være oppfylt")
+            }
+
             private val prioritert: List<OmsorgsmånederForMottakerOgÅr> =
-                grunnlag
-                    .omsorgsytereMedFlestOmsorgsmåneder()
+                utvalg
                     .sortedWith(compareBy<OmsorgsmånederForMottakerOgÅr> { it.haddeOmsorgIDesember() }.thenBy { it.omsorgsyter == grunnlag.omsorgsyter })
                     .reversed()
 
@@ -91,27 +110,67 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
     data class Grunnlag(
         val omsorgsyter: String,
-        val data: List<OmsorgsmånederForMottakerOgÅr> // Det er teoretisk mulig med flere mottakere, men i praksis kun en
+        val data: Set<OmsorgsmånederForMottakerOgÅr> // Det er teoretisk mulig med flere mottakere, men i praksis kun en
     ) : ParagrafGrunnlag() {
-        private val omsorgsytereGruppertEtterOmsorgsmåneder = data
-            .groupBy { it.antall() }
-        private val omsorgsytereMedFlestOmsorgsmåneder = omsorgsytereGruppertEtterOmsorgsmåneder
-            .let { map -> map[map.maxOf { it.key }]!! }
+        val omsorgsytereGruppertEtterOmsorgsmånederMedFull = data
+            .groupBy { it.antallFull() }
+            .filter { it.key > 0 }
 
-        fun omsorgsyterHarFlestOmsorgsmåneder(): Boolean {
-            return omsorgsytereMedFlestOmsorgsmåneder().let { omsorgsytere ->
+        val omsorgsytereMedFlestOmsorgsmånederFull = if (omsorgsytereGruppertEtterOmsorgsmånederMedFull.isNotEmpty()) {
+            omsorgsytereGruppertEtterOmsorgsmånederMedFull.let { map -> map[map.maxOf { it.key }]!! }.toSet()
+        } else {
+            emptySet()
+        }
+
+        val omsorgsytereGruppertEtterOmsorgsmånederMedDelt = data
+            .groupBy { it.antallDelt() }
+            .filter { it.key > 0 }
+
+        val omsorgsytereMedFlestOmsorgsmånederDelt = if (omsorgsytereGruppertEtterOmsorgsmånederMedDelt.isNotEmpty()) {
+            omsorgsytereGruppertEtterOmsorgsmånederMedDelt
+                .let { map -> map[map.maxOf { it.key }]!! }
+                .toSet()
+        } else {
+            emptySet()
+        }
+
+        val omsorgsytereGruppertEtterOmsorgsmånederMedFullEllerDelt = data
+            .groupBy { it.antall() }
+            .filter { it.key > 0 }
+
+        val omsorgsytereMedFlestOmsorgsmånederFullEllerDelt =
+            if (omsorgsytereGruppertEtterOmsorgsmånederMedFullEllerDelt.isNotEmpty()) {
+                omsorgsytereGruppertEtterOmsorgsmånederMedFullEllerDelt.let { map -> map[map.maxOf { it.key }]!! }
+                    .toSet()
+            } else {
+                emptySet()
+            }
+
+        fun omsorgsyterHarFlestOmsorgsmånederMedFullOmsorg(): Boolean {
+            return omsorgsytereMedFlestOmsorgsmånederFull.let { omsorgsytere ->
                 omsorgsytere.count() == 1 && omsorgsytere.all { it.omsorgsyter == omsorgsyter }
             }
         }
 
-        fun omsorgsyterErEnAvFlereMedFlestOmsorgsmåneder(): Boolean {
-            return omsorgsytereMedFlestOmsorgsmåneder().let { omsorgsytere ->
+        fun omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedFullOmsorg(): Boolean {
+            require(!omsorgsyterHarFlestOmsorgsmånederMedFullOmsorg()) { "Rekkefølgeavhengig" }
+            return omsorgsytereMedFlestOmsorgsmånederFull.isNotEmpty() && omsorgsytereMedFlestOmsorgsmånederFull.let { omsorgsytere ->
                 omsorgsytere.count() > 1 && omsorgsytere.any { it.omsorgsyter == omsorgsyter }
             }
         }
 
-        fun omsorgsytereMedFlestOmsorgsmåneder(): Set<OmsorgsmånederForMottakerOgÅr> {
-            return omsorgsytereMedFlestOmsorgsmåneder.toSet()
+        fun omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedDeltOmsorg(): Boolean {
+            require(!omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedFullOmsorg()) { "Rekkefølgeavhengig" }
+            return omsorgsytereGruppertEtterOmsorgsmånederMedDelt.isNotEmpty() && omsorgsytereMedFlestOmsorgsmånederDelt.let { omsorgsytere ->
+                omsorgsytere.count() > 1 && omsorgsytere.any { it.omsorgsyter == omsorgsyter }
+            }
+        }
+
+        fun omsorgsyterHarFlestOmsorgsmånederUavhengigAvFullEllerDelt(): Boolean {
+            require(!omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedFullOmsorg()) { "Rekkefølgeavhengig" }
+            return omsorgsytereMedFlestOmsorgsmånederFullEllerDelt.isNotEmpty() && omsorgsytereMedFlestOmsorgsmånederFullEllerDelt.let { omsorgsytere ->
+                omsorgsytere.count() == 1 && omsorgsytere.any { it.omsorgsyter == omsorgsyter }
+            }
         }
     }
 
@@ -119,15 +178,29 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
     data class OmsorgsmånederForMottakerOgÅr(
         val omsorgsyter: String,
         val omsorgsmottaker: String,
-        val omsorgsmåneder: GyldigeOmsorgsmåneder,
+        val omsorgsmåneder: Omsorgsmåneder,
         val omsorgsår: Int
     ) {
-        fun antall(): Int {
-            return omsorgsmåneder.alleMåneder().count()
+        fun antallFull(): Int {
+            return when (omsorgsmåneder) {
+                is Omsorgsmåneder.Barnetrygd -> omsorgsmåneder.antallFull()
+                is Omsorgsmåneder.Hjelpestønad -> omsorgsmåneder.antall() //TODO hull for hjelpestønad med delt barnetrygd
+            }
         }
 
         fun haddeOmsorgIDesember(): Boolean {
-            return omsorgsmåneder.alleMåneder().contains(YearMonth.of(omsorgsår, Month.DECEMBER))
+            return omsorgsmåneder.alle().contains(YearMonth.of(omsorgsår, Month.DECEMBER))
+        }
+
+        fun antallDelt(): Int {
+            return when (omsorgsmåneder) {
+                is Omsorgsmåneder.Barnetrygd -> omsorgsmåneder.antallDelt()
+                is Omsorgsmåneder.Hjelpestønad -> omsorgsmåneder.antall() //TODO hull for hjelpestønad med delt barnetrygd
+            }
+        }
+
+        fun antall(): Int {
+            return omsorgsmåneder.antall()
         }
     }
 }
