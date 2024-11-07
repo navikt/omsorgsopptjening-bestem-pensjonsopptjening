@@ -11,3 +11,7 @@ sealed class AntallMånederRegel {
         override val antall: Int get() = 6
     }
 }
+
+fun Int.oppfyller(antallMånederRegel: AntallMånederRegel): Boolean {
+    return this >= antallMånederRegel.antall
+}

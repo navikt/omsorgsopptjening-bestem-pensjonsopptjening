@@ -75,7 +75,7 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
             omsorgsytersOmsorgsmåneder.alle().intersect(omsorgsytersUtbetalingsmåneder.alle())
 
         fun erOppfyllt(): Boolean {
-            return gyldigeOmsorgsmåneder.count() >= antallMånederRegel.antall
+            return gyldigeOmsorgsmåneder.count().oppfyller(antallMånederRegel)
         }
 
         fun omsorgstype(): DomainOmsorgskategori {

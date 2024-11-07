@@ -90,12 +90,12 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         fun erOppfyllt(): Boolean {
             return when (omsorgsytersOmsorgsmånederForOmsorgsmottaker) {
                 is Omsorgsmåneder.Barnetrygd -> {
-                    omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallFull() >= antallMånederRegel.antall
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallFull().oppfyller(antallMånederRegel)
                 }
 
                 is Omsorgsmåneder.Hjelpestønad -> {
                     //TODO et hull her ift full vs delt barnetrygd
-                    omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall() >= antallMånederRegel.antall
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall().oppfyller(antallMånederRegel)
                 }
             }
         }
@@ -104,7 +104,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
             require(!erOppfyllt()) { "Rekkefølgeavhengig" }
             return when (omsorgsytersOmsorgsmånederForOmsorgsmottaker) {
                 is Omsorgsmåneder.Barnetrygd -> {
-                    (omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallFull() + omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallDelt()) >= antallMånederRegel.antall
+                    (omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallFull() + omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallDelt()).oppfyller(antallMånederRegel)
                 }
 
                 is Omsorgsmåneder.Hjelpestønad -> {

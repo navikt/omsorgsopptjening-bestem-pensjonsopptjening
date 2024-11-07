@@ -60,7 +60,7 @@ object OmsorgsyterMottarBarnetrgyd : ParagrafVilkår<OmsorgsyterMottarBarnetrgyd
         val omsorgstype: DomainOmsorgskategori,
     ) : ParagrafGrunnlag() {
         fun erOppfyllt(): Boolean {
-            return omsorgsytersUtbetalingsmåneder.antall() >= antallMånederRegel.antall
+            return omsorgsytersUtbetalingsmåneder.antall().oppfyller(antallMånederRegel)
         }
     }
 }

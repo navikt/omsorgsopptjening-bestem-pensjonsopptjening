@@ -70,7 +70,7 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
             require(!erInnvilget()) { "Rekkefølgeavhengig" }
             val ytelseOgEøs = ytelsemåneder.alle().intersect(landstilknytningmåneder.alleEøsMåneder())
             val ikkeYtelseOgEøs = omsorgsmåneder.alle().minus(ytelseOgEøs)
-            return ytelseOgEøs.isNotEmpty() && ikkeYtelseOgEøs.count() >= antallMånederRegel.antall
+            return ytelseOgEøs.isNotEmpty() && ikkeYtelseOgEøs.count().oppfyller(antallMånederRegel)
         }
 
         fun manuell(): Boolean {
@@ -78,7 +78,7 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
             val ytelseOgEøs = ytelsemåneder.alle().intersect(landstilknytningmåneder.alleEøsMåneder())
             val omsorgOgYtelseEøs =
                 omsorgsmåneder.alle().minus(ytelseOgEøs).plus(omsorgsmåneder.alle().intersect(ytelseOgEøs))
-            return ytelseOgEøs.isNotEmpty() && omsorgOgYtelseEøs.count() >= antallMånederRegel.antall
+            return ytelseOgEøs.isNotEmpty() && omsorgOgYtelseEøs.count().oppfyller(antallMånederRegel)
         }
     }
 }
