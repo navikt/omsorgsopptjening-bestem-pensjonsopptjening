@@ -144,6 +144,68 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidDbTest {
     }
 
     @Test
+    fun `number of months with full omsorg hjelpestønad`() {
+        val omsorgsår = 2000
+        listOf(0, 1, 2, 3, 4, 5).forEach { monthsFullOmsorg ->
+            OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
+                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker = if (monthsFullOmsorg == 0) Omsorgsmåneder.Hjelpestønad(
+                        emptySet()
+                    ) else Omsorgsmåneder.Hjelpestønad(
+                        Periode(
+                            YearMonth.of(omsorgsår, Month.JANUARY),
+                            YearMonth.of(
+                                omsorgsår,
+                                monthsFullOmsorg
+                            )
+                        ).alleMåneder()
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
+            ).also { vurdering ->
+                assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, vurdering.utfall).also {
+                    assertEquals(
+                        setOf(
+                            JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Andre_Ledd,
+                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_b_Første_Punktum,
+                        ),
+                        it.henvisninger
+                    )
+                }
+            }
+
+        }
+        listOf(6, 7, 8, 9, 10, 11, 12).forEach { monthsFullOmsorg ->
+            OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
+                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+                    omsorgsytersOmsorgsmånederForOmsorgsmottaker = if (monthsFullOmsorg == 0) Omsorgsmåneder.Hjelpestønad(
+                        emptySet()
+                    ) else Omsorgsmåneder.Hjelpestønad(
+                        Periode(
+                            YearMonth.of(omsorgsår, Month.JANUARY),
+                            YearMonth.of(
+                                omsorgsår,
+                                monthsFullOmsorg
+                            )
+                        ).alleMåneder()
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
+            ).also {
+                assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall).also {
+                    assertEquals(
+                        setOf(
+                            JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Andre_Ledd,
+                            JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_b_Første_Punktum,
+                        ),
+                        it.henvisninger
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `no requirements met`() {
         val omsorgsår = 2000
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
