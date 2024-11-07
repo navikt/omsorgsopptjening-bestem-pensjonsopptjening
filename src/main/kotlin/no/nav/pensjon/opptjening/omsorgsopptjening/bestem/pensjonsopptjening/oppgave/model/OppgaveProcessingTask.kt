@@ -37,16 +37,14 @@ class OppgaveProcessingTask(
                 try {
                     if (unleash.isEnabled(NavUnleashConfig.Feature.OPPRETT_OPPGAVER) && datasourceReadinessCheck.isReady()) {
                         oppgaveProcessingMetricsMåling.oppdater {
-                            when (val result = service.process()) {
-                                is Resultat.FantIngenDataÅProsessere -> {
-                                    timeLock.lock()
-                                    emptyList()
-                                }
-
-                                is Resultat.Prosessert -> {
-                                    timeLock.open()
-                                    result.data
-                                }
+                            val låsteOppgaver = service.låsOgHentOppgaver()
+                            if (låsteOppgaver.data.isEmpty()) {
+                                timeLock.lock()
+                                emptyList()
+                            } else {
+                                val result = service.process(låsteOppgaver)
+                                timeLock.open()
+                                result.data
                             }
                         }
                     }

@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository.BrevRepository
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
@@ -90,10 +91,11 @@ class OppgaveService(
         }
     }
 
-    fun process(): Resultat<List<Oppgave.Persistent>> {
-        val låsteOppgaver = oppgaveRepo.finnNesteUprosesserte(10)
-            .also { it.data.ifEmpty { return Resultat.FantIngenDataÅProsessere() } }
+    fun låsOgHentOppgaver() : OppgaveRepo.Locked {
+        return oppgaveRepo.finnNesteUprosesserte(10)
+    }
 
+    fun process(låsteOppgaver: OppgaveRepo.Locked): Resultat.Prosessert<List<Oppgave.Persistent>> {
         return try {
             Resultat.Prosessert(
                 transactionTemplate.execute {

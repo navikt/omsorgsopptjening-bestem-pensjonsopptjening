@@ -180,7 +180,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             assertInstanceOf(Oppgave.Status.Klar::class.java, it.status)
         }
 
-        oppgaveService.process()
+        oppgaveService.process(oppgaveService.låsOgHentOppgaver())
 
         oppgaveRepo.findForMelding(melding).single().also { oppgave ->
             assertInstanceOf(Oppgave.Status.Retry::class.java, oppgave.status).also {
@@ -309,7 +309,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 
         assertInstanceOf(Oppgave.Status.Klar::class.java, oppgaveRepo.findForMelding(melding!!).single().status)
 
-        oppgaveService.process()
+        oppgaveService.process(oppgaveService.låsOgHentOppgaver())
 
         assertInstanceOf(
             Oppgave.Status.Retry::class.java,
@@ -319,9 +319,11 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         }
 
         clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantene
-        assertThat(oppgaveService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+        assertThat(oppgaveService.process(oppgaveService.låsOgHentOppgaver()))
+            .isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
         clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantene
-        assertThat(oppgaveService.process()).isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
+        assertThat(oppgaveService.process(oppgaveService.låsOgHentOppgaver()))
+            .isInstanceOf(Resultat.FantIngenDataÅProsessere::class.java)
         clock.nesteTikk(clock.nåtid().plus(2, ChronoUnit.HOURS)) //karantenetid utløpt
         assertThat(oppgaveService.processAndExpectResult()).isNotEmpty()
 
@@ -411,7 +413,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
         oppgaveRepo.findForMelding(melding!!).single().also {
             assertInstanceOf(Oppgave.Status.Klar::class.java, it.status)
         }
-        oppgaveService.process()
+        oppgaveService.process(oppgaveService.låsOgHentOppgaver())
 
         oppgaveRepo.findForMelding(melding).single().also { oppgave ->
             assertInstanceOf(Oppgave.Status.Retry::class.java, oppgave.status).also {
@@ -423,9 +425,9 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
             }
         }
 
-        oppgaveService.process()
-        oppgaveService.process()
-        oppgaveService.process()
+        oppgaveService.process(oppgaveService.låsOgHentOppgaver())
+        oppgaveService.process(oppgaveService.låsOgHentOppgaver())
+        oppgaveService.process(oppgaveService.låsOgHentOppgaver())
 
         oppgaveRepo.findForMelding(melding).single().also { oppgave ->
             oppgave.statushistorikk
@@ -441,7 +443,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 }
 
 fun OppgaveService.processAndExpectResult(): List<Oppgave.Persistent> {
-    return when (val result = this.process()) {
+    return when (val result = this.process(this.låsOgHentOppgaver())) {
         is Resultat.FantIngenDataÅProsessere -> fail("Expecting result")
         is Resultat.Prosessert -> result.data
     }
