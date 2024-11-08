@@ -1,7 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
-import java.time.YearMonth
 
 
 object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag>() {
@@ -68,18 +67,28 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
 
     data class Grunnlag(
         val omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder,
-        val omsorgsytersOmsorgsmåneder: Omsorgsmåneder,
+        private var omsorgsmåneder: Omsorgsmåneder,
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
-        val gyldigeOmsorgsmåneder: Set<YearMonth> =
-            omsorgsytersOmsorgsmåneder.alle().intersect(omsorgsytersUtbetalingsmåneder.alle())
+
+        init {
+            omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
+                omsorgsmåneder.kvalifisererForAutomatiskBehandling()
+            } else {
+                omsorgsmåneder.kvalifisererForManuellBehandling()
+            }
+        }
 
         fun erOppfyllt(): Boolean {
-            return gyldigeOmsorgsmåneder.count().oppfyller(antallMånederRegel)
+            return omsorgsmåneder.alle().intersect(omsorgsytersUtbetalingsmåneder.alle()).oppfyller(antallMånederRegel)
         }
 
         fun omsorgstype(): DomainOmsorgskategori {
-            return omsorgsytersOmsorgsmåneder.omsorgstype()
+            return omsorgsmåneder.omsorgstype()
+        }
+
+        fun omsorgsmåneder(): Omsorgsmåneder {
+            return omsorgsmåneder
         }
     }
 }

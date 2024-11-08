@@ -35,7 +35,7 @@ internal data class MedlemIFolketrygden(
 internal fun MedlemIFolketrygden.toDomain(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
     return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
         medlemskapsgrunnlag = medlemskapsvurdering.toDomain(),
-        omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),
+        omsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),
         antallMånederRegel = antallMånederRegel.toDomain(),
         landstilknytningMåneder = Landstilknytningmåneder(landstilknytningmåneder.toDomain())
     )
@@ -44,7 +44,7 @@ internal fun MedlemIFolketrygden.toDomain(): OmsorgsyterErMedlemIFolketrygden.Gr
 internal fun OmsorgsyterErMedlemIFolketrygden.Grunnlag.toDb(): MedlemIFolketrygden {
     return MedlemIFolketrygden(
         medlemskapsvurdering = medlemskapsgrunnlag.toDb(),
-        omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDb(),
+        omsorgsytersOmsorgsmåneder = omsorgsmåneder().toDb(),
         antallMånederRegel = antallMånederRegel.toDb(),
         landstilknytningmåneder = landstilknytningMåneder.toDb()
     )

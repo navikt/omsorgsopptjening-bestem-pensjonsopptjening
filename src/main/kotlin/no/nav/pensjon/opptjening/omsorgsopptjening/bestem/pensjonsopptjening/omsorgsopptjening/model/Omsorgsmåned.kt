@@ -22,6 +22,16 @@ sealed class Omsorgsmåneder {
         }
     }
 
+    abstract fun kvalifisererForAutomatiskBehandling(): Omsorgsmåneder
+    fun erKvalifisertForAutomatiskBehandling(antallMånederRegel: AntallMånederRegel): Boolean {
+        return kvalifisererForAutomatiskBehandling().antall().oppfyller(antallMånederRegel)
+    }
+
+    abstract fun kvalifisererForManuellBehandling(): Omsorgsmåneder
+    fun erKvalifisertForManuellBehandling(antallMånederRegel: AntallMånederRegel): Boolean {
+        return kvalifisererForManuellBehandling().antall().oppfyller(antallMånederRegel)
+    }
+
     data class Barnetrygd(
         val omsorgsmåneder: Set<Omsorgsmåned>
     ) : Omsorgsmåneder() {
@@ -30,6 +40,14 @@ sealed class Omsorgsmåneder {
         }
 
         override val måneder: Set<YearMonth> = omsorgsmåneder.map { it.måned }.toSortedSet()
+
+        override fun kvalifisererForAutomatiskBehandling(): Omsorgsmåneder {
+            return Barnetrygd(full())
+        }
+
+        override fun kvalifisererForManuellBehandling(): Omsorgsmåneder {
+            return Barnetrygd(full() + delt())
+        }
 
         fun merge(other: Barnetrygd): Barnetrygd {
             return Barnetrygd((omsorgsmåneder + other.omsorgsmåneder).toSet())
@@ -67,6 +85,17 @@ sealed class Omsorgsmåneder {
 
         override val måneder = omsorgsmåneder.map { it.måned }.toSortedSet()
 
+        //TODO et hull her ift full vs delt barnetrygd
+        override fun kvalifisererForAutomatiskBehandling(): Omsorgsmåneder {
+            return this
+        }
+
+        //TODO et hull her ift full vs delt barnetrygd
+        override fun kvalifisererForManuellBehandling(): Omsorgsmåneder {
+            return this
+        }
+
+
         fun merge(other: Hjelpestønad): Hjelpestønad {
             return Hjelpestønad((omsorgsmåneder + other.omsorgsmåneder).toSet())
         }
@@ -82,4 +111,8 @@ sealed class Omsorgsmåneder {
         val måned: YearMonth,
         val omsorgstype: DomainOmsorgstype
     )
+}
+
+fun Set<Omsorgsmåneder.Omsorgsmåned>.måneder(): Set<YearMonth> {
+    return map { it.måned }.toSet()
 }

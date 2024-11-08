@@ -31,14 +31,14 @@ internal data class TilstrekkeligOmsorgsarbeid(
 
 internal fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.toDb(): TilstrekkeligOmsorgsarbeid {
     return TilstrekkeligOmsorgsarbeid(
-        omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDb(),
+        omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsmåneder().toDb(),
         antallMånederRegel = antallMånederRegel.toDb()
     )
 }
 
 internal fun TilstrekkeligOmsorgsarbeid.toDomain(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
     return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
-        omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain(),
+        omsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain(),
         antallMånederRegel = antallMånederRegel.toDomain(),
     )
 }

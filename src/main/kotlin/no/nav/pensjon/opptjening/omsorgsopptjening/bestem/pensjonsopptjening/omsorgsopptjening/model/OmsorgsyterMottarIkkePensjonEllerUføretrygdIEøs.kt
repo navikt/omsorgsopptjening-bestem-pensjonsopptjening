@@ -13,7 +13,7 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
-        return when (grunnlag.omsorgsmåneder.omsorgstype()) {
+        return when (grunnlag.omsorgstype()) {
             DomainOmsorgskategori.BARNETRYGD -> emptySet<JuridiskHenvisning>()
             DomainOmsorgskategori.HJELPESTØNAD -> emptySet<JuridiskHenvisning>()
         }.let {
@@ -51,12 +51,19 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
     }
 
     data class Grunnlag(
-        val omsorgsmåneder: Omsorgsmåneder,
+        private var omsorgsmåneder: Omsorgsmåneder,
         val ytelsemåneder: Ytelsemåneder,
         val landstilknytningmåneder: Landstilknytningmåneder,
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
 
+        init {
+            omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
+                omsorgsmåneder.kvalifisererForAutomatiskBehandling()
+            } else {
+                omsorgsmåneder.kvalifisererForManuellBehandling()
+            }
+        }
 
         fun erInnvilget(): Boolean {
             return ytelsemåneder.alle().intersect(landstilknytningmåneder.alleEøsMåneder()).isEmpty()
@@ -76,9 +83,16 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
         fun manuell(): Boolean {
             require(!erInnvilget() && !erInnvilgetTilTrossForPerioderMedYtelseIEøs()) { "Rekkefølgeavhengig" }
             val ytelseOgEøs = ytelsemåneder.alle().intersect(landstilknytningmåneder.alleEøsMåneder())
-            val omsorgOgYtelseEøs =
-                omsorgsmåneder.alle().minus(ytelseOgEøs).plus(omsorgsmåneder.alle().intersect(ytelseOgEøs))
+            val omsorgOgYtelseEøs = omsorgsmåneder.alle().minus(ytelseOgEøs).plus(omsorgsmåneder.alle().intersect(ytelseOgEøs))
             return ytelseOgEøs.isNotEmpty() && omsorgOgYtelseEøs.count().oppfyller(antallMånederRegel)
+        }
+
+        fun omsorgstype(): DomainOmsorgskategori {
+            return omsorgsmåneder.omsorgstype()
+        }
+
+        fun omsorgsmåneder(): Omsorgsmåneder {
+            return omsorgsmåneder
         }
     }
 }

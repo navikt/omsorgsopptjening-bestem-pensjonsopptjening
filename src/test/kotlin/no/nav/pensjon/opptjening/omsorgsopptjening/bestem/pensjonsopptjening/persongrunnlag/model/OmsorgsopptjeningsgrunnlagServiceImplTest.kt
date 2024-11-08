@@ -245,9 +245,9 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                 }
                 grl.forTilstrekkeligOmsorgsarbeid().also {
                     assertThat(it.antallMånederRegel).isEqualTo(AntallMånederRegel.FødtIOmsorgsår)
-                    assertThat(it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alle()).isEqualTo(år(2021).alleMåneder())
-                    assertThat(it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall()).isEqualTo(12)
-                    assertThat(it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.omsorgstype()).isEqualTo(
+                    assertThat(it.omsorgsmåneder().alle()).isEqualTo(år(2021).alleMåneder())
+                    assertThat(it.omsorgsmåneder().antall()).isEqualTo(12)
+                    assertThat(it.omsorgsmåneder().omsorgstype()).isEqualTo(
                         DomainOmsorgskategori.BARNETRYGD
                     )
                 }
@@ -272,8 +272,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                     assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.pliktigEllerFrivillig).isEmpty()
                     assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.rådata).isEqualTo("")
                     assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.rådata).isEqualTo("")
-                    assertThat(it.omsorgsytersOmsorgsmåneder.alle()).isEqualTo(år(2021).alleMåneder())
-                    assertThat(it.omsorgsytersOmsorgsmåneder.antall()).isEqualTo(12)
+                    assertThat(it.omsorgsmåneder().alle()).isEqualTo(år(2021).alleMåneder())
+                    assertThat(it.omsorgsmåneder().antall()).isEqualTo(12)
                     assertThat(it.landstilknytningMåneder.alle()).isEqualTo(år(2021).alleMåneder())
                 }
             }
@@ -331,7 +331,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                 }
                 grl.forTilstrekkeligOmsorgsarbeid().also {
                     assertThat(it.antallMånederRegel).isEqualTo(AntallMånederRegel.FødtUtenforOmsorgsår)
-                    assertThat(it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.alle()).isEqualTo(
+                    assertThat(it.omsorgsmåneder().alle()).isEqualTo(
                         setOf(
                             februar(2021),
                             mars(2021),
@@ -342,8 +342,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                             desember(2021)
                         )
                     )
-                    assertThat(it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall()).isEqualTo(7)
-                    assertThat(it.omsorgsytersOmsorgsmånederForOmsorgsmottaker.omsorgstype()).isEqualTo(
+                    assertThat(it.omsorgsmåneder().antall()).isEqualTo(7)
+                    assertThat(it.omsorgsmåneder().omsorgstype()).isEqualTo(
                         DomainOmsorgskategori.BARNETRYGD
                     )
                 }
@@ -378,7 +378,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                     assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.pliktigEllerFrivillig).isEmpty()
                     assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.rådata).isEqualTo("")
                     assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.rådata).isEqualTo("")
-                    assertThat(it.omsorgsytersOmsorgsmåneder.alle()).isEqualTo(
+                    assertThat(it.omsorgsmåneder().alle()).isEqualTo(
                         setOf(
                             februar(2021),
                             mars(2021),
@@ -389,7 +389,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                             desember(2021)
                         )
                     )
-                    assertThat(it.omsorgsytersOmsorgsmåneder.antall()).isEqualTo(7)
+                    assertThat(it.omsorgsmåneder().antall()).isEqualTo(7)
                     assertThat(it.landstilknytningMåneder.alle()).isEqualTo(
                         setOf(
                             februar(2021),

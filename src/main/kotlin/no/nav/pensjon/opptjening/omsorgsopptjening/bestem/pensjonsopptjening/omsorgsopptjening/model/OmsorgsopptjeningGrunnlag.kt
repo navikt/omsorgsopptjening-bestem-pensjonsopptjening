@@ -90,7 +90,7 @@ sealed class OmsorgsopptjeningGrunnlag {
 
     fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
         return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
-            omsorgsytersOmsorgsmånederForOmsorgsmottaker = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel()
         )
     }
@@ -106,7 +106,7 @@ sealed class OmsorgsopptjeningGrunnlag {
     fun forGyldigOmsorgsarbeid(omsorgsyter: Person): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
         return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
             omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            omsorgsytersOmsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel()
         )
     }
@@ -114,7 +114,7 @@ sealed class OmsorgsopptjeningGrunnlag {
     fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
         return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
             medlemskapsgrunnlag = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag,
-            omsorgsytersOmsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel(),
             landstilknytningMåneder = landstilknytningForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!
         )
