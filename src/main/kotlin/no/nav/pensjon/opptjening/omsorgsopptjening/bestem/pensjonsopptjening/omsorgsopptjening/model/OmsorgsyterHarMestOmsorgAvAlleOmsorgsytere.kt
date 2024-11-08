@@ -118,7 +118,9 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
             .filter { it.key > 0 }
 
         val omsorgsytereMedFlestOmsorgsmånederFull = if (omsorgsytereGruppertEtterOmsorgsmånederMedFull.isNotEmpty()) {
-            omsorgsytereGruppertEtterOmsorgsmånederMedFull.let { map -> map[map.maxOf { it.key }]!! }.toSet()
+            omsorgsytereGruppertEtterOmsorgsmånederMedFull
+                .let { map -> map[map.maxOf { it.key }]!! }
+                .toSet()
         } else {
             emptySet()
         }
@@ -141,7 +143,8 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
 
         val omsorgsytereMedFlestOmsorgsmånederFullEllerDelt =
             if (omsorgsytereGruppertEtterOmsorgsmånederMedFullEllerDelt.isNotEmpty()) {
-                omsorgsytereGruppertEtterOmsorgsmånederMedFullEllerDelt.let { map -> map[map.maxOf { it.key }]!! }
+                omsorgsytereGruppertEtterOmsorgsmånederMedFullEllerDelt
+                    .let { map -> map[map.maxOf { it.key }]!! }
                     .toSet()
             } else {
                 emptySet()
@@ -183,10 +186,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         val omsorgsår: Int
     ) {
         fun antallFull(): Int {
-            return when (omsorgsmåneder) {
-                is Omsorgsmåneder.Barnetrygd -> omsorgsmåneder.antallFull()
-                is Omsorgsmåneder.Hjelpestønad -> omsorgsmåneder.antall() //TODO hull for hjelpestønad med delt barnetrygd
-            }
+            return omsorgsmåneder.antallFull()
         }
 
         fun haddeOmsorgIDesember(): Boolean {
@@ -194,10 +194,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         }
 
         fun antallDelt(): Int {
-            return when (omsorgsmåneder) {
-                is Omsorgsmåneder.Barnetrygd -> omsorgsmåneder.antallDelt()
-                is Omsorgsmåneder.Hjelpestønad -> omsorgsmåneder.antall() //TODO hull for hjelpestønad med delt barnetrygd
-            }
+            return omsorgsmåneder.antallDelt()
         }
 
         fun antall(): Int {

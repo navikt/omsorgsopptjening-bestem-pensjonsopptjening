@@ -19,11 +19,12 @@ internal fun Periode.tilOmsorgsmåneder(omsorgstype: DomainOmsorgstype): Set<Oms
     return alleMåneder().map { Omsorgsmåneder.Omsorgsmåned(it, omsorgstype) }.toSet()
 }
 
-internal fun Periode.omsorgsmåneder(omsorgstype: DomainOmsorgstype): Omsorgsmåneder {
-    return when (omsorgstype) {
-        is DomainOmsorgstype.Barnetrygd -> Omsorgsmåneder.Barnetrygd(tilOmsorgsmåneder(omsorgstype))
-        is DomainOmsorgstype.Hjelpestønad -> Omsorgsmåneder.Hjelpestønad(tilOmsorgsmåneder(omsorgstype))
-    }
+internal fun Periode.omsorgsmåneder(omsorgstype: DomainOmsorgstype.Barnetrygd): Omsorgsmåneder.Barnetrygd {
+    return Omsorgsmåneder.Barnetrygd(tilOmsorgsmåneder(omsorgstype))
+}
+
+internal fun Periode.omsorgsmånederHjelpestønad(omsorgstype: DomainOmsorgstype.Barnetrygd): Omsorgsmåneder.BarnetrygdOgHjelpestønad {
+    return Omsorgsmåneder.BarnetrygdOgHjelpestønad(tilOmsorgsmåneder(omsorgstype))
 }
 
 internal fun Periode.landstilknytningmåneder(landstilknytning: Landstilknytning): Landstilknytningmåneder {

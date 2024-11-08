@@ -600,6 +600,92 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     }
 
     @Test
+    fun `manuell behandling med oppgave dersom delt omsorg for hjelpestønadsmottaker`() {
+        wiremock.stubForPdlTransformer()
+        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
+        wiremock.ingenUnntaksperioderForMedlemskap()
+        wiremock.ingenLøpendeAlderspensjon()
+        wiremock.ingenLøpendeUføretrgyd()
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
+                                ),
+                            ),
+                            hjelpestønadsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Hjelpestønadperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_4,
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.INFOTRYGD
+                                )
+                            ),
+                        ),
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "04010012797",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = Landstilknytning.NORGE
+                                ),
+                            ),
+                            hjelpestønadsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Hjelpestønadperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_4,
+                                    omsorgsmottaker = "03041212345",
+                                    kilde = Kilde.INFOTRYGD
+                                )
+                            ),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().single().let { result ->
+            result.alle().single().also { behandling ->
+                assertThat(behandling.erManuell()).isTrue()
+                oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
+                    assertThat(oppgaveRepo.findForBehandling(behandling.id)).containsOnly(oppgave)
+                    assertThat(oppgave.detaljer).isEqualTo(
+                        OppgaveDetaljer.MottakerOgTekst(
+                            oppgavemottaker = "12345678910",
+                            oppgavetekst = setOf(
+                                "Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 03041212345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.",
+                                "Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: 03041212345. Vurder retten til omsorgsopptjening."
+                            )
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `manuell behandling med oppgave dersom det er innvilget opptjening for fellesbarn omsorgsyter ikke mottar barnetrygd for`() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)

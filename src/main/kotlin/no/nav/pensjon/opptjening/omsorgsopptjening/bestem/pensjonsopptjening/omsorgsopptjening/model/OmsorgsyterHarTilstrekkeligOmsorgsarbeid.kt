@@ -98,17 +98,8 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
         fun erManuell(): Boolean {
             require(!erOppfyllt()) { "Rekkefølgeavhengig" }
-            return when (omsorgsmåneder) {
-                is Omsorgsmåneder.Barnetrygd -> {
-                    omsorgsmåneder = omsorgsmåneder.kvalifisererForManuellBehandling()
-                    omsorgsmåneder.alle().oppfyller(antallMånederRegel)
-                }
-
-                is Omsorgsmåneder.Hjelpestønad -> {
-                    //TODO et hull her ift full vs delt barnetrygd
-                    false
-                }
-            }
+            omsorgsmåneder = omsorgsmåneder.kvalifisererForManuellBehandling()
+            return omsorgsmåneder.alle().oppfyller(antallMånederRegel)
         }
 
         fun omsorgstype(): DomainOmsorgskategori {
