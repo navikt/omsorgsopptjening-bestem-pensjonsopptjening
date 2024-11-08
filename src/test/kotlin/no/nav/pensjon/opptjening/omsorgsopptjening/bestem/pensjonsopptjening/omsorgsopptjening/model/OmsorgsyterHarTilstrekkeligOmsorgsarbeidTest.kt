@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.omsorgsmånederHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.tilOmsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.august
@@ -48,6 +49,22 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
                         YearMonth.of(2000, Month.JUNE)
                     ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt)
                 ),
+                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+            )
+        ).also { vurdering ->
+            assertInstanceOf(VilkårsvurderingUtfall.Ubestemt::class.java, vurdering.utfall)
+        }
+    }
+
+    @Test
+    fun `Gitt en mottaker med hjelpestønad seks måneder delt omsorg så ubestemt`() {
+        OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+                omsorgsmåneder =
+                Periode(
+                    YearMonth.of(2000, Month.JANUARY),
+                    YearMonth.of(2000, Month.JUNE)
+                ).omsorgsmånederHjelpestønad(DomainOmsorgstype.Barnetrygd.Delt),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
             )
         ).also { vurdering ->
@@ -257,17 +274,16 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         listOf(0, 1, 2, 3, 4, 5).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
                 grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
-                    omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.Hjelpestønad(
+                    omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.BarnetrygdOgHjelpestønad(
                         emptySet()
-                    ) else Omsorgsmåneder.Hjelpestønad(
+                    ) else
                         Periode(
                             YearMonth.of(omsorgsår, Month.JANUARY),
                             YearMonth.of(
                                 omsorgsår,
                                 monthsFullOmsorg
                             )
-                        ).tilOmsorgsmåneder(DomainOmsorgstype.Hjelpestønad)
-                    ),
+                        ).omsorgsmånederHjelpestønad(DomainOmsorgstype.Barnetrygd.Full),
                     antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
                 )
             ).also { vurdering ->
@@ -286,17 +302,11 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         listOf(6, 7, 8, 9, 10, 11, 12).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
                 grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
-                    omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.Hjelpestønad(
+                    omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.BarnetrygdOgHjelpestønad(
                         emptySet()
-                    ) else Omsorgsmåneder.Hjelpestønad(
-                        Periode(
-                            YearMonth.of(omsorgsår, Month.JANUARY),
-                            YearMonth.of(
-                                omsorgsår,
-                                monthsFullOmsorg
-                            )
-                        ).tilOmsorgsmåneder(DomainOmsorgstype.Hjelpestønad)
-                    ),
+                    ) else Periode(
+                        YearMonth.of(omsorgsår, Month.JANUARY), YearMonth.of(omsorgsår, monthsFullOmsorg)
+                    ).omsorgsmånederHjelpestønad(DomainOmsorgstype.Barnetrygd.Full),
                     antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
                 )
             ).also {

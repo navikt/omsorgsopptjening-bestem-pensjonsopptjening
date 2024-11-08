@@ -2015,7 +2015,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    fun `omsorgsyter med omsorg for seg selv får avslag - feks enslig mindreårige som mottar barnetrygd og hjelpestønad Pfor seg selv`() {
+    fun `omsorgsyter med omsorg for seg selv får avslag - feks enslig mindreårige som mottar barnetrygd og hjelpestønad for seg selv`() {
         wiremock.ingenUnntaksperioderForMedlemskap()
 
         repo.lagre(

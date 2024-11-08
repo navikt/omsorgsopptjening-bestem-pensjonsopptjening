@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.omsorgsmånederHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.tilOmsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.april
@@ -118,6 +119,33 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
             assertThat(it.utfall).isInstanceOf(VilkårsvurderingUtfall.Ubestemt::class.java)
             assertThat(it.grunnlag.omsorgsyterHarFlestOmsorgsmånederMedFullOmsorg()).isFalse()
             assertThat(it.grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedFullOmsorg()).isTrue()
+        }
+    }
+
+    @Test
+    fun `ubestemt for hvis flere har like mange måneder full omsorg for hjelpestønadsmottaker`() {
+        OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.vilkarsVurder(
+            OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Grunnlag(
+                omsorgsyter = "mor",
+                data = setOf(
+                    OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
+                        omsorgsyter = "mor",
+                        omsorgsmottaker = "gutt",
+                        omsorgsmåneder =
+                        Periode(januar(2022), juni(2022)).omsorgsmånederHjelpestønad(DomainOmsorgstype.Barnetrygd.Full),
+                        omsorgsår = 2022
+                    ),
+                    OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.OmsorgsmånederForMottakerOgÅr(
+                        omsorgsyter = "far",
+                        omsorgsmottaker = "gutt",
+                        omsorgsmåneder =
+                            Periode(juli(2022), desember(2022)).omsorgsmånederHjelpestønad(DomainOmsorgstype.Barnetrygd.Full),
+                        omsorgsår = 2022
+                    )
+                )
+            )
+        ).let {
+            assertThat(it.utfall).isInstanceOf(VilkårsvurderingUtfall.Ubestemt::class.java)
         }
     }
 

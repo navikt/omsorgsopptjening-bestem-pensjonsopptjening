@@ -32,36 +32,27 @@ sealed class OmsorgsopptjeningGrunnlag {
         }
     }
 
-    private fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Omsorgsmåneder> {
-        return (grunnlag.omsorgsmånederPerOmsorgsyter(omsorgsmottaker) to grunnlag.hjelpestønadMånederPerOmsorgsyter(
-            omsorgsmottaker
-        )).let { (bt, hs) ->
-            //disse skal i utgangspunktet være 1-1
-            (bt.keys + hs.keys).distinct().associate { p ->
-                Triple(p, bt[p]!!, hs[p]!!).let { (person, barnetrygd, hjelpestønad) ->
-                    when (omsorgstype) {
-                        DomainOmsorgskategori.BARNETRYGD -> {
-                            person to barnetrygd
-                        }
+    fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Omsorgsmåneder> {
+        return when (omsorgstype) {
+            DomainOmsorgskategori.BARNETRYGD -> {
+                grunnlag.omsorgsmånederPerOmsorgsyter(omsorgsmottaker)
+            }
 
-                        DomainOmsorgskategori.HJELPESTØNAD -> {
-                            person to hjelpestønad
-                        }
-                    }
-                }
+            DomainOmsorgskategori.HJELPESTØNAD -> {
+                grunnlag.omsorgsmånederPerOmsorgsyterHjelpestønad(omsorgsmottaker)
             }
         }
     }
 
-    private fun utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Utbetalingsmåneder> {
+    fun utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Utbetalingsmåneder> {
         return grunnlag.utbetalingsmånederPerOmsorgsyter(omsorgsmottaker)
     }
 
-    private fun landstilknytningForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Landstilknytningmåneder> {
+    fun landstilknytningForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Landstilknytningmåneder> {
         return grunnlag.landstilknytningMånederPerOmsorgsyter(omsorgsmottaker)
     }
 
-    private fun omsorgsytersYtelsemåneder(): Ytelsemåneder {
+    fun omsorgsytersYtelsemåneder(): Ytelsemåneder {
         return grunnlag.omsorgsytersPersongrunnlag.ytelsegrunnlag.ytelsesmåneder()
     }
 

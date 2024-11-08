@@ -19,20 +19,20 @@ internal fun Omsorgsmåneder.toDb(): OmsorgsmånederDb {
             OmsorgsmånederDb(omsorgsmåneder = omsorgsmåneder.toDb(), type = omsorgstype().toDb())
         }
 
-        is Omsorgsmåneder.Hjelpestønad -> {
-            toDb()
+        is Omsorgsmåneder.BarnetrygdOgHjelpestønad -> {
+            OmsorgsmånederDb(omsorgsmåneder = omsorgsmåneder.toDb(), type = omsorgstype().toDb())
         }
     }
 }
 
 internal fun OmsorgsmånederDb.toDomain(): Omsorgsmåneder {
-    return when (this.type) {
+    return when (type) {
         OmsorgskategoriDb.BARNETRYGD -> {
             Omsorgsmåneder.Barnetrygd(omsorgsmåneder.toDomain())
         }
 
         OmsorgskategoriDb.HJELPESTØNAD -> {
-            Omsorgsmåneder.Hjelpestønad(omsorgsmåneder.toDomain())
+            Omsorgsmåneder.BarnetrygdOgHjelpestønad(omsorgsmåneder.toDomain())
         }
     }
 }
@@ -55,11 +55,4 @@ internal fun Set<Omsorgsmåneder.Omsorgsmåned>.toDb(): Set<OmsorgsmånedDb> {
 
 internal fun Omsorgsmåneder.Omsorgsmåned.toDb(): OmsorgsmånedDb {
     return OmsorgsmånedDb(måned, omsorgstype.toDb())
-}
-
-internal fun Omsorgsmåneder.Hjelpestønad.toDb(): OmsorgsmånederDb {
-    return OmsorgsmånederDb(
-        omsorgsmåneder = alle().map { OmsorgsmånedDb(it, OmsorgstypeDb.HJELPESTØNAD) }.toSet(),
-        type = omsorgstype().toDb()
-    )
 }

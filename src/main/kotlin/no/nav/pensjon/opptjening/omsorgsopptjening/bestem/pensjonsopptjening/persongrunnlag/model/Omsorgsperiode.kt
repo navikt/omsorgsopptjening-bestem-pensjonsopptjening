@@ -46,14 +46,30 @@ data class Omsorgsperiode(
         )
     }
 
+    fun omsorgsmånederHjelpestønad(hjelpestønadperioder: List<Hjelpestønadperiode>): Omsorgsmåneder.BarnetrygdOgHjelpestønad {
+        require(hjelpestønadperioder.all { it.omsorgsmottaker.fnr == omsorgsmottaker.fnr }) { "Hjelpestønadsperioder må tilhøre samme omsorgsmottaker som barnetrgyd!" }
+        return Omsorgsmåneder.BarnetrygdOgHjelpestønad(
+            alleMåneder().intersect(hjelpestønadperioder.flatMap { it.periode.alleMåneder() }.toSortedSet())
+                .map { it to omsorgstype }
+                .map { (mnd, type) -> Omsorgsmåneder.Omsorgsmåned(mnd, type) }
+                .toSet()
+        )
+    }
+
     companion object {
         fun List<Omsorgsperiode>.alleMåneder(): Set<YearMonth> {
             return flatMap { it.alleMåneder() }.distinct().toSet()
         }
 
         fun List<Omsorgsperiode>.omsorgsmåneder(): Omsorgsmåneder.Barnetrygd {
-            return map { it.omsorgsmåneder() }.reduceOrNull { acc, o -> acc.merge(o) }
+            return map { it.omsorgsmåneder() }.reduceOrNull { acc, barnetrygd -> acc.merge(barnetrygd) }
                 ?: Omsorgsmåneder.Barnetrygd.none()
+        }
+
+        fun List<Omsorgsperiode>.omsorgsmånederHjelpestønad(hjelpestønadperiode: List<Hjelpestønadperiode>): Omsorgsmåneder.BarnetrygdOgHjelpestønad {
+            return map { it.omsorgsmånederHjelpestønad(hjelpestønadperiode) }.reduceOrNull { acc, barnetrygd ->
+                acc.merge(barnetrygd)
+            } ?: Omsorgsmåneder.BarnetrygdOgHjelpestønad.none()
         }
 
         fun List<Omsorgsperiode>.utbetalingsmåneder(): Utbetalingsmåneder {
