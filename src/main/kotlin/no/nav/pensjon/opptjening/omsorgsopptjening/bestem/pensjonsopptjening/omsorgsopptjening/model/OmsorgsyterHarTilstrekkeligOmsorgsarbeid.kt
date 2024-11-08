@@ -83,28 +83,25 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
 
 
     data class Grunnlag(
-        val omsorgsytersOmsorgsmånederForOmsorgsmottaker: Omsorgsmåneder,
+        private var omsorgsmåneder: Omsorgsmåneder,
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
 
         fun erOppfyllt(): Boolean {
-            return when (omsorgsytersOmsorgsmånederForOmsorgsmottaker) {
-                is Omsorgsmåneder.Barnetrygd -> {
-                    omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallFull().oppfyller(antallMånederRegel)
-                }
-
-                is Omsorgsmåneder.Hjelpestønad -> {
-                    //TODO et hull her ift full vs delt barnetrygd
-                    omsorgsytersOmsorgsmånederForOmsorgsmottaker.antall().oppfyller(antallMånederRegel)
-                }
+            return if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
+                omsorgsmåneder = omsorgsmåneder.kvalifisererForAutomatiskBehandling()
+                omsorgsmåneder.alle().oppfyller(antallMånederRegel)
+            } else {
+                false
             }
         }
 
         fun erManuell(): Boolean {
             require(!erOppfyllt()) { "Rekkefølgeavhengig" }
-            return when (omsorgsytersOmsorgsmånederForOmsorgsmottaker) {
+            return when (omsorgsmåneder) {
                 is Omsorgsmåneder.Barnetrygd -> {
-                    (omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallFull() + omsorgsytersOmsorgsmånederForOmsorgsmottaker.antallDelt()).oppfyller(antallMånederRegel)
+                    omsorgsmåneder = omsorgsmåneder.kvalifisererForManuellBehandling()
+                    omsorgsmåneder.alle().oppfyller(antallMånederRegel)
                 }
 
                 is Omsorgsmåneder.Hjelpestønad -> {
@@ -115,7 +112,11 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
         }
 
         fun omsorgstype(): DomainOmsorgskategori {
-            return omsorgsytersOmsorgsmånederForOmsorgsmottaker.omsorgstype()
+            return omsorgsmåneder.omsorgstype()
+        }
+
+        fun omsorgsmåneder(): Omsorgsmåneder {
+            return omsorgsmåneder
         }
     }
 }

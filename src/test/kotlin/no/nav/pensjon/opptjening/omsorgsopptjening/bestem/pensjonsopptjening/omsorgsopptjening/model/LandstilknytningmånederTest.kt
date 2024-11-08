@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.landstilknytningmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.april
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.desember
@@ -57,6 +58,3 @@ class LandstilknytningmånederTest {
     }
 }
 
-fun Periode.landstilknytningmåneder(landstilknytning: Landstilknytning): Landstilknytningmåneder {
-    return Landstilknytningmåneder(alleMåneder().map { LandstilknytningMåned(it, landstilknytning) }.toSet())
-}

@@ -46,7 +46,7 @@ internal fun OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsDbGrunnlag.toDomai
 
 internal fun OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.toDb(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsDbGrunnlag {
     return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsDbGrunnlag(
-        omsorgsmåneder = omsorgsmåneder.toDb(),
+        omsorgsmåneder = omsorgsmåneder().toDb(),
         ytelsemåneder = ytelsemåneder.alle(),
         landstilknytningmåneder = landstilknytningmåneder.toDb(),
         antallMånederRegel = antallMånederRegel.toDb(),

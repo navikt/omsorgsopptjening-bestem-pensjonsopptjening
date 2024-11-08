@@ -13,7 +13,7 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
-        return when (grunnlag.omsorgsytersOmsorgsmåneder.omsorgstype()) {
+        return when (grunnlag.omsorgstype()) {
             DomainOmsorgskategori.BARNETRYGD -> {
                 setOf(
                     JuridiskHenvisning.Folketrygdloven_Kap_20_Paragraf_8_Første_Ledd_Bokstav_a_Første_Punktum
@@ -54,7 +54,7 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
     data class Vurdering(
         override val grunnlag: Grunnlag,
         override val utfall: VilkårsvurderingUtfall
-    ) : ParagrafVurdering<Grunnlag>(){
+    ) : ParagrafVurdering<Grunnlag>() {
 
         override fun hentOppgaveopplysninger(behandling: FullførtBehandling): Oppgaveopplysninger {
             return Oppgaveopplysninger.Generell(
@@ -65,15 +65,22 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
     }
 
     data class Grunnlag(
-        val medlemskapsgrunnlag: Medlemskapsgrunnlag,
-        val omsorgsytersOmsorgsmåneder: Omsorgsmåneder,
+        val medlemskapsgrunnlag: Medlemskapsgrunnlag, //TODO recfactor ut
+        private var omsorgsmåneder: Omsorgsmåneder,
         val antallMånederRegel: AntallMånederRegel,
         val landstilknytningMåneder: Landstilknytningmåneder,
     ) : ParagrafGrunnlag() {
 
+        init {
+            omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
+                omsorgsmåneder.kvalifisererForAutomatiskBehandling()
+            } else {
+                omsorgsmåneder.kvalifisererForManuellBehandling()
+            }
+        }
+
         private val ikkeMedlem = medlemskapsgrunnlag.alleMånederUtenMedlemskap()
         private val medlem = medlemskapsgrunnlag.alleMånederMedMedlemskap()
-        private val omsorgsmåneder = omsorgsytersOmsorgsmåneder.alle()
 
         /**
          * Bygger på en antakelse om at personer som mottar barnetrygd til å begynne med er vurdert etter
@@ -83,8 +90,8 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
          * grad sannnsynliggjør medlemskap i folketrygden.
          */
         fun erInnvilget(): Boolean {
-            val antattMedlem = omsorgsmåneder.minus(ikkeMedlem).minus(medlem)
-            return (ikkeMedlem.isEmpty() && medlem.isEmpty()) || antattMedlem.count().oppfyller(antallMånederRegel)
+            val antattMedlem = omsorgsmåneder.alle().minus(ikkeMedlem).minus(medlem)
+            return (ikkeMedlem.isEmpty() && medlem.isEmpty()) || antattMedlem.oppfyller(antallMånederRegel)
         }
 
         /**
@@ -93,8 +100,8 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
          */
         fun erInnvilgetTilTrossForPerioderUtenMedlemskap(): Boolean {
             require(!erInnvilget()) { "Rekkefølgeavhengig" }
-            val antattMedlem = omsorgsmåneder.minus(ikkeMedlem)
-            return medlem.isEmpty() && antattMedlem.count().oppfyller(antallMånederRegel)
+            val antattMedlem = omsorgsmåneder.alle().minus(ikkeMedlem)
+            return medlem.isEmpty() && antattMedlem.oppfyller(antallMånederRegel)
         }
 
         /**
@@ -103,8 +110,8 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
          */
         fun erInnvilgetTilTrossForPerioderMedFrivilligEllerPliktigMedlemskap(): Boolean {
             require(!erInnvilget() && !erInnvilgetTilTrossForPerioderUtenMedlemskap()) { "Rekkefølgeavhengig" }
-            val antattMedlem = omsorgsmåneder.minus(medlem)
-            return ikkeMedlem.isEmpty() && antattMedlem.count().oppfyller(antallMånederRegel)
+            val antattMedlem = omsorgsmåneder.alle().minus(medlem)
+            return ikkeMedlem.isEmpty() && antattMedlem.oppfyller(antallMånederRegel)
         }
 
         /**
@@ -115,8 +122,16 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
          */
         fun manuell(): Boolean {
             require(!erInnvilget() && !erInnvilgetTilTrossForPerioderUtenMedlemskap() && !erInnvilgetTilTrossForPerioderMedFrivilligEllerPliktigMedlemskap()) { "Rekkefølgeavhengig" }
-            val antattMedlem = omsorgsmåneder.minus(ikkeMedlem).minus(medlem).plus(omsorgsmåneder.intersect(medlem))
-            return landstilknytningMåneder.erNorge(antattMedlem) && antattMedlem.count().oppfyller(antallMånederRegel)
+            val antattMedlem = omsorgsmåneder.alle().minus(ikkeMedlem).minus(medlem).plus(omsorgsmåneder.alle().intersect(medlem))
+            return landstilknytningMåneder.erNorge(antattMedlem) && antattMedlem.oppfyller(antallMånederRegel)
+        }
+
+        fun omsorgstype(): DomainOmsorgskategori {
+            return omsorgsmåneder.omsorgstype()
+        }
+
+        fun omsorgsmåneder(): Omsorgsmåneder {
+            return omsorgsmåneder
         }
     }
 }

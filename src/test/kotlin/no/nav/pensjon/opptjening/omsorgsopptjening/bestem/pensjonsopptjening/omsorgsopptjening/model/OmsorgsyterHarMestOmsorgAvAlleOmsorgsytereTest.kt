@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.tilOmsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.april
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.august
@@ -25,7 +26,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "mor",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(januar(2022), juli(2022)).omsorgsmåneder(
+                            Periode(januar(2022), juli(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Full
                             )
                         ),
@@ -35,7 +36,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "far",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(august(2022), desember(2022)).omsorgsmåneder(
+                            Periode(august(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Full
                             )
                         ),
@@ -59,7 +60,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "mor",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(januar(2022), mars(2022)).omsorgsmåneder(
+                            Periode(januar(2022), mars(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Full
                             )
                         ),
@@ -69,7 +70,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "far",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(april(2022), desember(2022)).omsorgsmåneder(
+                            Periode(april(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Full
                             )
                         ),
@@ -95,7 +96,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "mor",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(januar(2022), juni(2022)).omsorgsmåneder(
+                            Periode(januar(2022), juni(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Full
                             )
                         ),
@@ -105,7 +106,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "far",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(juli(2022), desember(2022)).omsorgsmåneder(
+                            Periode(juli(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Full
                             )
                         ),
@@ -130,7 +131,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "mor",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(januar(2022), januar(2022)).omsorgsmåneder(
+                            Periode(januar(2022), januar(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Full
                             )
                         ),
@@ -140,7 +141,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "far",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(februar(2022), desember(2022)).omsorgsmåneder(
+                            Periode(februar(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Delt
                             )
                         ),
@@ -164,7 +165,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "mor",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(januar(2022), desember(2022)).omsorgsmåneder(
+                            Periode(januar(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Delt
                             )
                         ),
@@ -174,7 +175,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "far",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(januar(2022), desember(2022)).omsorgsmåneder(
+                            Periode(januar(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Delt
                             )
                         ),
@@ -200,7 +201,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "mor",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(januar(2022), desember(2022)).omsorgsmåneder(
+                            Periode(januar(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Delt
                             )
                         ),
@@ -210,7 +211,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "far",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(mai(2022), desember(2022)).omsorgsmåneder(
+                            Periode(mai(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Delt
                             )
                         ),
@@ -237,7 +238,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "mor",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(mai(2022), desember(2022)).omsorgsmåneder(
+                            Periode(mai(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Delt
                             )
                         ),
@@ -247,7 +248,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "far",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(januar(2022), desember(2022)).omsorgsmåneder(
+                            Periode(januar(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Delt
                             )
                         ),
@@ -274,10 +275,10 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "mor",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(januar(2022), april(2022)).omsorgsmåneder(
+                            Periode(januar(2022), april(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Delt
                             ) +
-                                    Periode(mai(2022), desember(2022)).omsorgsmåneder(
+                                    Periode(mai(2022), desember(2022)).tilOmsorgsmåneder(
                                         DomainOmsorgstype.Barnetrygd.Delt
                                     )
                         ),
@@ -287,7 +288,7 @@ class OmsorgsyterHarMestOmsorgAvAlleOmsorgsytereTest {
                         omsorgsyter = "far",
                         omsorgsmottaker = "gutt",
                         omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                            Periode(mai(2022), desember(2022)).omsorgsmåneder(
+                            Periode(mai(2022), desember(2022)).tilOmsorgsmåneder(
                                 DomainOmsorgstype.Barnetrygd.Delt
                             )
                         ),

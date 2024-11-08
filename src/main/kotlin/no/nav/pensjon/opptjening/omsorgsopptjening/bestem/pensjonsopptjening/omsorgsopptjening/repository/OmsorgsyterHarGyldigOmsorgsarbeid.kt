@@ -35,7 +35,7 @@ internal fun GyldigOmsorgsarbeid.toDomain(): OmsorgsyterHarGyldigOmsorgsarbeid.G
     return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
         omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(omsorgsytersUtbetalingsmåneder.map { it.toDomain() }
                                                                 .toSet()),
-        omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),
+        omsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),
         antallMånederRegel = antallMånederRegel.toDomain(),
     )
 }
@@ -43,7 +43,7 @@ internal fun GyldigOmsorgsarbeid.toDomain(): OmsorgsyterHarGyldigOmsorgsarbeid.G
 internal fun OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.toDb(): GyldigOmsorgsarbeid {
     return GyldigOmsorgsarbeid(
         omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder.måneder.map { it.toDb() }.toSet(),
-        omsorgsytersOmsorgsmåneder = omsorgsytersOmsorgsmåneder.toDb(),
+        omsorgsytersOmsorgsmåneder = omsorgsmåneder().toDb(),
         antallMånederRegel = antallMånederRegel.toDb(),
     )
 }

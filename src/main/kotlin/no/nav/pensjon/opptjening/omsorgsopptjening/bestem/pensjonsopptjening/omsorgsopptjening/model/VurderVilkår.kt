@@ -14,7 +14,7 @@ interface VurderVilkår {
     fun OmsorgsyterErMedlemIFolketrygden(): OmsorgsyterErMedlemIFolketrygden.Vurdering
     fun OmsorgsyterErIkkeOmsorgsmottaker(): OmsorgsyterErikkeOmsorgsmottaker.Vurdering
     fun OmsorgsyterHarIkkeDødsdato(): OmsorgsyterHarIkkeDødsdato.Vurdering
-    fun OmsorgsyterMottarPensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering
+    fun OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering
     fun OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn(): OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering
 }
 
@@ -64,6 +64,7 @@ internal class VilkårsvurderingFactory(
         return OmsorgsyterErForelderTilMottakerAvHjelpestønad.vilkarsVurder(grunnlag.forFamilierelasjon())
     }
 
+    //TODO dette gir i praksis ikke noe ut over det vi får fra gyldig omsorgsarbeid - vurder å slett
     override fun OmsorgsyterMottarBarnetrgyd(): OmsorgsyterMottarBarnetrgyd.Vurdering {
         return OmsorgsyterMottarBarnetrgyd.vilkarsVurder(grunnlag.forMottarBarnetrygd())
     }
@@ -84,7 +85,7 @@ internal class VilkårsvurderingFactory(
         return OmsorgsyterHarIkkeDødsdato.vilkarsVurder(grunnlag.forOmsorgsyterHarIkkeDødsdato())
     }
 
-    override fun OmsorgsyterMottarPensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering {
+    override fun OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering {
         return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(grunnlag.forOmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs())
     }
 

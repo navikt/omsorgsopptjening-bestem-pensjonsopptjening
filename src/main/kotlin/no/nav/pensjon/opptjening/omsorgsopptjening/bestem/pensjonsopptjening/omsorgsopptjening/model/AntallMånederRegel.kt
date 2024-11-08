@@ -15,3 +15,7 @@ sealed class AntallMånederRegel {
 fun Int.oppfyller(antallMånederRegel: AntallMånederRegel): Boolean {
     return this >= antallMånederRegel.antall
 }
+
+fun Set<*>.oppfyller(antallMånederRegel: AntallMånederRegel): Boolean {
+    return count().oppfyller(antallMånederRegel)
+}

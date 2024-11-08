@@ -112,6 +112,7 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
         val omsorgsyter: String,
         val data: Set<OmsorgsmånederForMottakerOgÅr> // Det er teoretisk mulig med flere mottakere, men i praksis kun en
     ) : ParagrafGrunnlag() {
+
         val omsorgsytereGruppertEtterOmsorgsmånederMedFull = data
             .groupBy { it.antallFull() }
             .filter { it.key > 0 }
