@@ -40,11 +40,15 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.april
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.august
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.desember
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.januar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.juli
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.juni
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.mai
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.oktober
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.september
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.år
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -195,7 +199,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.OCTOBER),
+                                    fom = oktober(2020),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
@@ -229,8 +233,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     ).also {
                         assertEquals(
                             Periode(
-                                YearMonth.of(2020, Month.OCTOBER),
-                                YearMonth.of(2020, Month.DECEMBER)
+                                oktober(2020),
+                                desember(2020)
                             ).alleMåneder(),
                             it.omsorgsmåneder().alle()
                         )
@@ -254,7 +258,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.MAY),
+                                    fom = mai(2020),
                                     tom = YearMonth.of(2025, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
@@ -288,8 +292,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     ).also {
                         assertEquals(
                             Periode(
-                                YearMonth.of(2020, Month.MAY),
-                                YearMonth.of(2020, Month.DECEMBER)
+                                mai(2020),
+                                desember(2020)
                             ).alleMåneder(),
                             it.omsorgsmåneder().alle()
                         )
@@ -368,8 +372,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.MAY),
+                                    fom = januar(2020),
+                                    tom = mai(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -400,7 +404,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                         vurdering.grunnlag
                     ).also {
                         assertEquals(
-                            Periode(YearMonth.of(2020, Month.JANUARY), YearMonth.of(2020, Month.MAY)).alleMåneder(),
+                            Periode(januar(2020), mai(2020)).alleMåneder(),
                             it.omsorgsmåneder().alle()
                         )
                         assertEquals(
@@ -430,8 +434,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.MAY),
+                                    fom = januar(2020),
+                                    tom = mai(2020),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -462,7 +466,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                         vurdering.grunnlag
                     ).also {
                         assertEquals(
-                            Periode(YearMonth.of(2020, Month.JANUARY), YearMonth.of(2020, Month.MAY)).alleMåneder(),
+                            Periode(januar(2020), mai(2020)).alleMåneder(),
                             it.omsorgsmåneder().alle()
                         )
                         assertEquals(
@@ -492,8 +496,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.JUNE),
+                                    fom = januar(2020),
+                                    tom = juni(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -507,8 +511,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "04010012797",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JULY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = juli(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -556,8 +560,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
@@ -565,8 +569,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     landstilknytning = KafkaLandstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -704,8 +708,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -737,8 +741,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "04010012797",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -776,8 +780,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -785,8 +789,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     landstilknytning = KafkaLandstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
@@ -833,8 +837,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.JULY),
+                                    fom = januar(2020),
+                                    tom = juli(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -848,8 +852,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "04010012797",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JUNE),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = juni(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -863,8 +867,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "01019212345",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.JULY),
+                                    fom = januar(2020),
+                                    tom = juli(2020),
                                     omsorgstype = Omsorgstype.DELT_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -930,8 +934,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -1129,8 +1133,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -1384,8 +1388,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.MAY),
-                                    tom = YearMonth.of(2020, Month.JUNE),
+                                    fom = mai(2020),
+                                    tom = juni(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
@@ -1609,8 +1613,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = "12345678910",
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.MAY),
+                                    fom = januar(2020),
+                                    tom = mai(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -1618,8 +1622,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     landstilknytning = KafkaLandstilknytning.NORGE,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JUNE),
-                                    tom = YearMonth.of(2020, Month.JULY),
+                                    fom = juni(2020),
+                                    tom = juli(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -1627,8 +1631,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     landstilknytning = KafkaLandstilknytning.NORGE,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.AUGUST),
-                                    tom = YearMonth.of(2020, Month.AUGUST),
+                                    fom = august(2020),
+                                    tom = august(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -1636,8 +1640,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     landstilknytning = KafkaLandstilknytning.EØS_NORGE_SEKUNDÆR,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.SEPTEMBER),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = september(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
@@ -1672,9 +1676,9 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                 assertEquals(år(2020).alleMåneder(), vurdering.grunnlag.omsorgsmåneder().alle())
                 assertEquals(
                     setOf(
-                        YearMonth.of(2020, Month.JUNE),
-                        YearMonth.of(2020, Month.JULY),
-                        YearMonth.of(2020, Month.AUGUST),
+                        juni(2020),
+                        juli(2020),
+                        august(2020),
                     ), vurdering.grunnlag.omsorgsytersUtbetalingsmåneder.alle()
                 )
             }
@@ -1717,8 +1721,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = omsorgsyterGammeltFnr,
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = omsorgsmottakerGammeltFnr,
                                     kilde = Kilde.BARNETRYGD,
@@ -1824,8 +1828,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = omsorgsyterGammeltFnr,
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.APRIL),
+                                    fom = januar(2020),
+                                    tom = april(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = omsorgsmottakerFnr,
                                     kilde = Kilde.BARNETRYGD,
@@ -1839,8 +1843,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = omsorgsyterNyttFnr,
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.MAY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = mai(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = omsorgsmottakerFnr,
                                     kilde = Kilde.BARNETRYGD,
@@ -1908,8 +1912,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = omsorgsyterGammeltFnr,
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = omsorgsmottakerFnr,
                                     kilde = Kilde.BARNETRYGD,
@@ -1923,8 +1927,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                             omsorgsyter = omsorgsyterNyttFnr,
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = omsorgsmottakerFnr,
                                     kilde = Kilde.BARNETRYGD,

@@ -120,8 +120,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = januar(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = gutt.fnr,
                                     kilde = Kilde.BARNETRYGD,
@@ -189,7 +189,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     landstilknytning = Landstilknytning.NORGE
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
+                                    fom = januar(2020),
                                     tom = YearMonth.of(2022, Month.DECEMBER),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = gutt.fnr,

@@ -8,6 +8,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.desember
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.oktober
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
@@ -61,8 +63,8 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
                         omsorgsyter = "12345678910",
                         omsorgsperioder = listOf(
                             PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                fom = YearMonth.of(2020, Month.OCTOBER),
-                                tom = YearMonth.of(2020, Month.DECEMBER),
+                                fom = oktober(2020),
+                                tom = desember(2020),
                                 omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                 omsorgsmottaker = "01052012345",
                                 kilde = Kilde.BARNETRYGD,

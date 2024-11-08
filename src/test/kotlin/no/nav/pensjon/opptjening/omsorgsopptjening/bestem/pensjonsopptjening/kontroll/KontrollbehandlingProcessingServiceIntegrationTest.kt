@@ -19,6 +19,12 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.desember
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.januar
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.juli
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.juni
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.mars
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.november
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
@@ -327,8 +333,8 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                             omsorgsyter = omsorgsyter,
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.MARCH),
-                                    tom = YearMonth.of(2020, Month.NOVEMBER),
+                                    fom = mars(2020),
+                                    tom = november(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = omsorgsmottaker,
                                     kilde = Kilde.BARNETRYGD,
@@ -404,8 +410,8 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                             omsorgsyter = omsorgsyter,
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JULY),
-                                    tom = YearMonth.of(2020, Month.DECEMBER),
+                                    fom = juli(2020),
+                                    tom = desember(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = omsorgsmottaker,
                                     kilde = Kilde.BARNETRYGD,
@@ -419,8 +425,8 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                             omsorgsyter = annenOmsorgsyter,
                             omsorgsperioder = listOf(
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2020, Month.JANUARY),
-                                    tom = YearMonth.of(2020, Month.JUNE),
+                                    fom = januar(2020),
+                                    tom = juni(2020),
                                     omsorgstype = Omsorgstype.FULL_BARNETRYGD,
                                     omsorgsmottaker = omsorgsmottaker,
                                     kilde = Kilde.BARNETRYGD,
