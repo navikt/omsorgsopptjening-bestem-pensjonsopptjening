@@ -2011,7 +2011,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     assertInstanceOf(
                         OmsorgsyterErMedlemIFolketrygden.Grunnlag::class.java, vurdering.grunnlag
                     ).also {
-                        assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.ikkeMedlem).isNotEmpty()
+                        assertThat(it.ikkeMedlem).isNotEmpty()
                     }
                 }
         }

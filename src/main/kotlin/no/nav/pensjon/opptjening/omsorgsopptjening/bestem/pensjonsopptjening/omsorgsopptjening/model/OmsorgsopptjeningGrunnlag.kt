@@ -104,7 +104,8 @@ sealed class OmsorgsopptjeningGrunnlag {
 
     fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
         return OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
-            medlemskapsgrunnlag = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag,
+            ikkeMedlem = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag.alleMånederUtenMedlemskap(),
+            pliktigEllerFrivillig = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag.alleMånederMedMedlemskap(),
             omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel(),
             landstilknytningMåneder = landstilknytningForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!

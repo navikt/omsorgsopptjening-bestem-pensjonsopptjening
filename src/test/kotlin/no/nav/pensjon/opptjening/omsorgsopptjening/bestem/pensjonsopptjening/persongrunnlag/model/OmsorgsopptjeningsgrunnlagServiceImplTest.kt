@@ -272,10 +272,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                 }
                 grl.forMedlemskapIFolketrygden().also {
                     assertThat(it.antallMånederRegel).isEqualTo(AntallMånederRegel.FødtIOmsorgsår)
-                    assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.ikkeMedlem).isEmpty()
-                    assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.pliktigEllerFrivillig).isEmpty()
-                    assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.rådata).isEqualTo("")
-                    assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.rådata).isEqualTo("")
+                    assertThat(it.ikkeMedlem).isEmpty()
+                    assertThat(it.pliktigEllerFrivillig).isEmpty()
                     assertThat(it.omsorgsmåneder().alle()).isEqualTo(år(2021).alleMåneder())
                     assertThat(it.omsorgsmåneder().antall()).isEqualTo(12)
                     assertThat(it.landstilknytningMåneder.alle()).isEqualTo(år(2021).alleMåneder())
@@ -378,10 +376,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                 }
                 grl.forMedlemskapIFolketrygden().also {
                     assertThat(it.antallMånederRegel).isEqualTo(AntallMånederRegel.FødtUtenforOmsorgsår)
-                    assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.ikkeMedlem).isEmpty()
-                    assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.pliktigEllerFrivillig).isEmpty()
-                    assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.rådata).isEqualTo("")
-                    assertThat(it.medlemskapsgrunnlag.medlemskapsunntak.rådata).isEqualTo("")
+                    assertThat(it.ikkeMedlem).isEmpty()
+                    assertThat(it.pliktigEllerFrivillig).isEmpty()
                     assertThat(it.omsorgsmåneder().alle()).isEqualTo(
                         setOf(
                             februar(2021),
