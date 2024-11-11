@@ -35,7 +35,7 @@ internal data class OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsDbGrunnlag(
 ) : GrunnlagVilkårsvurderingDb()
 
 internal fun OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsDbGrunnlag.toDomain(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag {
-    return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag(
+    return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.persistent(
         omsorgsmåneder = omsorgsmåneder.toDomain(),
         ytelsemåneder = Ytelsemåneder(ytelsemåneder),
         landstilknytningmåneder = Landstilknytningmåneder(landstilknytningmåneder.toDomain()),

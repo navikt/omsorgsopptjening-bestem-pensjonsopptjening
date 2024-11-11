@@ -33,7 +33,7 @@ internal data class MedlemIFolketrygden(
 ) : GrunnlagVilkårsvurderingDb()
 
 internal fun MedlemIFolketrygden.toDomain(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
-    return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+    return OmsorgsyterErMedlemIFolketrygden.Grunnlag.persistent(
         medlemskapsgrunnlag = medlemskapsvurdering.toDomain(),
         omsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),
         antallMånederRegel = antallMånederRegel.toDomain(),

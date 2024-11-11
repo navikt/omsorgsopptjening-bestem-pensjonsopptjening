@@ -50,18 +50,44 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
         }
     }
 
-    data class Grunnlag(
-        private var omsorgsmåneder: Omsorgsmåneder,
+    data class Grunnlag private constructor(
+        val omsorgsmåneder: Omsorgsmåneder,
         val ytelsemåneder: Ytelsemåneder,
         val landstilknytningmåneder: Landstilknytningmåneder,
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
 
-        init {
-            omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
-                omsorgsmåneder.kvalifisererForAutomatiskBehandling()
-            } else {
-                omsorgsmåneder.kvalifisererForManuellBehandling()
+        companion object {
+            fun new(
+                omsorgsmåneder: Omsorgsmåneder,
+                ytelsemåneder: Ytelsemåneder,
+                landstilknytningmåneder: Landstilknytningmåneder,
+                antallMånederRegel: AntallMånederRegel,
+            ): Grunnlag {
+                return Grunnlag(
+                    omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
+                        omsorgsmåneder.kvalifisererForAutomatiskBehandling()
+                    } else {
+                        omsorgsmåneder.kvalifisererForManuellBehandling()
+                    },
+                    ytelsemåneder = ytelsemåneder,
+                    landstilknytningmåneder = landstilknytningmåneder,
+                    antallMånederRegel = antallMånederRegel
+                )
+            }
+
+            fun persistent(
+                omsorgsmåneder: Omsorgsmåneder,
+                ytelsemåneder: Ytelsemåneder,
+                landstilknytningmåneder: Landstilknytningmåneder,
+                antallMånederRegel: AntallMånederRegel,
+            ): Grunnlag {
+                return Grunnlag(
+                    omsorgsmåneder = omsorgsmåneder,
+                    ytelsemåneder = ytelsemåneder,
+                    landstilknytningmåneder = landstilknytningmåneder,
+                    antallMånederRegel = antallMånederRegel
+                )
             }
         }
 
@@ -83,7 +109,8 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
         fun manuell(): Boolean {
             require(!erInnvilget() && !erInnvilgetTilTrossForPerioderMedYtelseIEøs()) { "Rekkefølgeavhengig" }
             val ytelseOgEøs = ytelsemåneder.alle().intersect(landstilknytningmåneder.alleEøsMåneder())
-            val omsorgOgYtelseEøs = omsorgsmåneder.alle().minus(ytelseOgEøs).plus(omsorgsmåneder.alle().intersect(ytelseOgEøs))
+            val omsorgOgYtelseEøs =
+                omsorgsmåneder.alle().minus(ytelseOgEøs).plus(omsorgsmåneder.alle().intersect(ytelseOgEøs))
             return ytelseOgEøs.isNotEmpty() && omsorgOgYtelseEøs.count().oppfyller(antallMånederRegel)
         }
 

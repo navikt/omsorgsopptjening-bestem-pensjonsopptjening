@@ -31,13 +31,18 @@ sealed class Omsorgsmåneder {
     }
 
     fun kvalifisererForAutomatiskBehandling(): Omsorgsmåneder {
-        return Barnetrygd(full())
+        return when(this){
+            is Barnetrygd -> Barnetrygd(full())
+            is BarnetrygdOgHjelpestønad -> BarnetrygdOgHjelpestønad(full())
+        }
     }
 
     fun kvalifisererForManuellBehandling(): Omsorgsmåneder {
-        return Barnetrygd(full() + delt())
+        return when(this){
+            is Barnetrygd -> Barnetrygd(full() + delt())
+            is BarnetrygdOgHjelpestønad -> BarnetrygdOgHjelpestønad(full() + delt())
+        }
     }
-
 
     fun full(): Set<Omsorgsmåned> {
         return omsorgsmåneder.filter { it.omsorgstype is DomainOmsorgstype.Barnetrygd.Full }.toSet()

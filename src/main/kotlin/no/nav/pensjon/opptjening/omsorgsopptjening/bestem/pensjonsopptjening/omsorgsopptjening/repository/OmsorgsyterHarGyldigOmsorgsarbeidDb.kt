@@ -32,7 +32,7 @@ internal data class GyldigOmsorgsarbeid(
 ) : GrunnlagVilkårsvurderingDb()
 
 internal fun GyldigOmsorgsarbeid.toDomain(): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
-    return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+    return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.persistent(
         omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(omsorgsytersUtbetalingsmåneder.map { it.toDomain() }
                                                                 .toSet()),
         omsorgsmåneder = omsorgsytersOmsorgsmåneder.toDomain(),

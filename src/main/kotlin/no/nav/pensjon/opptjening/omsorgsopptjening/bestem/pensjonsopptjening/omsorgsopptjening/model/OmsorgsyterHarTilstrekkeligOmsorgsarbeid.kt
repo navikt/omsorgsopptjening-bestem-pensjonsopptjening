@@ -82,24 +82,38 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
     }
 
 
-    data class Grunnlag(
-        private var omsorgsmåneder: Omsorgsmåneder,
+    data class Grunnlag private constructor(
+        val omsorgsmåneder: Omsorgsmåneder,
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
 
-        fun erOppfyllt(): Boolean {
-            return if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
-                omsorgsmåneder = omsorgsmåneder.kvalifisererForAutomatiskBehandling()
-                omsorgsmåneder.alle().oppfyller(antallMånederRegel)
-            } else {
-                false
+        companion object {
+            fun new(omsorgsmåneder: Omsorgsmåneder, antallMånederRegel: AntallMånederRegel): Grunnlag {
+                return Grunnlag(
+                    omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
+                        omsorgsmåneder.kvalifisererForAutomatiskBehandling()
+                    } else {
+                        omsorgsmåneder.kvalifisererForManuellBehandling()
+                    },
+                    antallMånederRegel = antallMånederRegel
+                )
             }
+
+            fun persistent(omsorgsmåneder: Omsorgsmåneder, antallMånederRegel: AntallMånederRegel): Grunnlag {
+                return Grunnlag(
+                    omsorgsmåneder = omsorgsmåneder,
+                    antallMånederRegel = antallMånederRegel
+                )
+            }
+        }
+
+        fun erOppfyllt(): Boolean {
+            return omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)
         }
 
         fun erManuell(): Boolean {
             require(!erOppfyllt()) { "Rekkefølgeavhengig" }
-            omsorgsmåneder = omsorgsmåneder.kvalifisererForManuellBehandling()
-            return omsorgsmåneder.alle().oppfyller(antallMånederRegel)
+            return omsorgsmåneder.erKvalifisertForManuellBehandling(antallMånederRegel)
         }
 
         fun omsorgstype(): DomainOmsorgskategori {

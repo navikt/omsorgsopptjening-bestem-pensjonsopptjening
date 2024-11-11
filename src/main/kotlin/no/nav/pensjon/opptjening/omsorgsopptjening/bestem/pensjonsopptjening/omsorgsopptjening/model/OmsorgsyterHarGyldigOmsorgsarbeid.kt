@@ -65,17 +65,39 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>()
 
-    data class Grunnlag(
+    data class Grunnlag private constructor(
         val omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder,
-        private var omsorgsmåneder: Omsorgsmåneder,
+        val omsorgsmåneder: Omsorgsmåneder,
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
 
-        init {
-            omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
-                omsorgsmåneder.kvalifisererForAutomatiskBehandling()
-            } else {
-                omsorgsmåneder.kvalifisererForManuellBehandling()
+        companion object {
+            fun new(
+                omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder,
+                omsorgsmåneder: Omsorgsmåneder,
+                antallMånederRegel: AntallMånederRegel,
+            ): Grunnlag {
+                return Grunnlag(
+                    omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder,
+                    omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
+                        omsorgsmåneder.kvalifisererForAutomatiskBehandling()
+                    } else {
+                        omsorgsmåneder.kvalifisererForManuellBehandling()
+                    },
+                    antallMånederRegel = antallMånederRegel
+                )
+            }
+
+            fun persistent(
+                omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder,
+                omsorgsmåneder: Omsorgsmåneder,
+                antallMånederRegel: AntallMånederRegel,
+            ): Grunnlag {
+                return Grunnlag(
+                    omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder,
+                    omsorgsmåneder = omsorgsmåneder,
+                    antallMånederRegel = antallMånederRegel
+                )
             }
         }
 

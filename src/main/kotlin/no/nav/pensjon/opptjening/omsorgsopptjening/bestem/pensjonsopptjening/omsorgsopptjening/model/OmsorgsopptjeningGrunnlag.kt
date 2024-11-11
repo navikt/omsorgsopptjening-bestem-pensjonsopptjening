@@ -80,7 +80,7 @@ sealed class OmsorgsopptjeningGrunnlag {
     }
 
     fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
-        return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+        return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
             omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel()
         )
@@ -95,7 +95,7 @@ sealed class OmsorgsopptjeningGrunnlag {
     }
 
     fun forGyldigOmsorgsarbeid(omsorgsyter: Person): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
-        return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+        return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
             omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel()
@@ -103,7 +103,7 @@ sealed class OmsorgsopptjeningGrunnlag {
     }
 
     fun forMedlemskapIFolketrygden(): OmsorgsyterErMedlemIFolketrygden.Grunnlag {
-        return OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+        return OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
             medlemskapsgrunnlag = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag,
             omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel(),
@@ -141,7 +141,7 @@ sealed class OmsorgsopptjeningGrunnlag {
     }
 
     fun forOmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag {
-        return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag(
+        return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.new(
             omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             ytelsemåneder = omsorgsytersYtelsemåneder(),
             landstilknytningmåneder = landstilknytningForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,

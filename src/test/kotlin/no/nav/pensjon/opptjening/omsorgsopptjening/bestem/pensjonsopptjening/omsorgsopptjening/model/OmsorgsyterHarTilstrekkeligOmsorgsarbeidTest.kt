@@ -25,7 +25,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `Gitt en mottaker født utenfor omsorgsår når det er minst seks måneder full omsorg så invilget`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(2000, Month.JANUARY),
@@ -42,7 +42,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `Gitt en mottaker født utenfor omsorgsår når det er seks måneder delt omsorg så ubestemt`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(2000, Month.JANUARY),
@@ -59,7 +59,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `Gitt en mottaker med hjelpestønad seks måneder delt omsorg så ubestemt`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder =
                 Periode(
                     YearMonth.of(2000, Month.JANUARY),
@@ -75,7 +75,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `Gitt en mottaker født I omsorgsår når det er minst en måned full omsorg så invilget`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(2000, Month.JANUARY),
@@ -92,7 +92,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `Gitt en mottaker født I omsorgsår når det er en måned delt omsorg så ubestemt`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(2000, Month.JANUARY),
@@ -109,7 +109,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `Gitt en mottaker født I omsorgsår når det ikke er minst en måned full omsorg så avslag`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     (emptySet())
                 ),
@@ -123,7 +123,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `Gitt en mottaker født I desember i omsorgsår når det er minst en måned full omsorg i påfølgende år så invilget`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(2001, Month.JANUARY),
@@ -141,7 +141,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `Gitt en mottaker født I desember i omsorgsår når det ikke er minst en måned full omsorg i påfølgende år så avslag`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(emptySet()),
                 antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår
 
@@ -154,7 +154,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `innvilget hvis kombinasjon av delt og full men tilstrekkelig antall full`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(januar(2020), juni(2020)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full) +
                             Periode(juli(2020), desember(2020)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt)
@@ -170,7 +170,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `ubestemt hvis kombinajon av delt og full, men ikke tilstrekkelig full`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(januar(2020), mai(2020)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full) +
                             Periode(juni(2020), desember(2020)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt)
@@ -186,7 +186,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `ubestemt hvis delt og tilstrekkelig antall måneder`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(januar(2020), desember(2020)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt)
                 ),
@@ -201,7 +201,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     @Test
     fun `avslag hvis bare delt omsorg og ikke tilstrekkelig antall`() {
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(juli(2020), august(2020)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt)
                 ),
@@ -219,7 +219,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         val omsorgsår = 2000
         listOf(0, 1, 2, 3, 4, 5).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                     omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.Barnetrygd(
                         emptySet()
                     ) else Omsorgsmåneder.Barnetrygd(
@@ -248,7 +248,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         }
         listOf(6, 7, 8, 9, 10, 11, 12).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                     omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.Barnetrygd(
                         emptySet()
                     ) else Omsorgsmåneder.Barnetrygd(
@@ -273,7 +273,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         val omsorgsår = 2000
         listOf(0, 1, 2, 3, 4, 5).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                     omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.BarnetrygdOgHjelpestønad(
                         emptySet()
                     ) else
@@ -301,7 +301,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         }
         listOf(6, 7, 8, 9, 10, 11, 12).forEach { monthsFullOmsorg ->
             OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+                grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                     omsorgsmåneder = if (monthsFullOmsorg == 0) Omsorgsmåneder.BarnetrygdOgHjelpestønad(
                         emptySet()
                     ) else Periode(
@@ -327,7 +327,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
     fun `no requirements met`() {
         val omsorgsår = 2000
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
                     Periode(
                         YearMonth.of(omsorgsår, Month.JANUARY),
@@ -361,7 +361,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         )
 
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = alle,
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
             )
@@ -378,7 +378,7 @@ class OmsorgsyterHarTilstrekkeligOmsorgsarbeidTest {
         )
 
         OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(
-            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+            grunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
                 omsorgsmåneder = alle,
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
             )

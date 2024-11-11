@@ -27,7 +27,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `innvilget dersom ingen omsorgsmåneder uten medlemskap`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = emptySet(),
@@ -53,7 +53,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `innvilget dersom man har tilstrekkelig antall omsorgsmåneder utover de månedene man ikke er medlem`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -78,7 +78,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `innvilget dersom man har tilstrekkelig antall omsorgsmåneder utover de månedene man ikke er medlem - barn født i omsorgsår`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -109,7 +109,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `avslag dersom alle omsorgsmåneder uten medlemskap`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -134,7 +134,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `avslag dersom man har ikke har tilstrekkelig antall omsorgsmåneder utover de månedene man ikke er medlem`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -164,7 +164,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `innvilget dersom ingen omsorgsmåneder med pliktig eller frivillig medlemskap`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = emptySet(),
@@ -190,7 +190,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `innvilget dersom man har tilstrekkelig antall omsorgsmåneder utover de månedene med pliktig eller frivillig medlemskap`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = emptySet(),
@@ -215,7 +215,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `innvilget dersom man har tilstrekkelig antall omsorgsmåneder utover de månedene med pliktig eller frivillig medlemskap - barn født i omsorgsår`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = emptySet(),
@@ -246,7 +246,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `ubestemt dersom alle omsorgsmåneder pliktig eller frivillig medlemskap`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = emptySet(),
@@ -271,7 +271,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `ubestemt dersom man totalt har tilstrekkelig antall omsorgsmåneder, men ikke høyt nok antall måneder som ikke er pliktig eller frivillig`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = emptySet(),
@@ -296,7 +296,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `avslag dersom man totalt har tilstrekkelig antall omsorgsmåneder, men ikke høyt nok antall måneder som ikke er pliktig eller frivillig og landstilknytning EØS`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = emptySet(),
@@ -321,7 +321,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `ubestemt dersom man har halve året som pliktig eller frivillig og halve året som ikke-medlem`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -351,7 +351,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `avslag dersom man har halve året som pliktig eller frivillig og halve året som ikke-medlem og landstilknytning er EØS`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -381,7 +381,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `avslag for kombinasjon av ikke-medlem og pliktig eller frivillig uten tilstrekkelig antall omsorgsmåneder`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -416,7 +416,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `innvilget dersom omsorg ikke kvalifiserer for automatisk godskriving men måneder som kvalifiserer for manuell behandling er tilstrekkelig`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -452,7 +452,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
     @Test
     fun `ubestemt dersom omsorg ikke kvalifiserer for automatisk godskriving men måneder som kvalifiserer for manuell behandling er tilstrekkelig`() {
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -493,7 +493,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
         )
 
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(
@@ -528,7 +528,7 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
         )
 
         OmsorgsyterErMedlemIFolketrygden.vilkarsVurder(
-            OmsorgsyterErMedlemIFolketrygden.Grunnlag(
+            OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 medlemskapsgrunnlag = Medlemskapsgrunnlag(
                     Medlemskapsunntak(
                         ikkeMedlem = setOf(

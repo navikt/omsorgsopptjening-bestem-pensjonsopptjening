@@ -37,7 +37,7 @@ internal fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.toDb(): Tilstrekk
 }
 
 internal fun TilstrekkeligOmsorgsarbeid.toDomain(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
-    return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag(
+    return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.persistent(
         omsorgsmåneder = omsorgsytersOmsorgsmånederForOmsorgsmottaker.toDomain(),
         antallMånederRegel = antallMånederRegel.toDomain(),
     )

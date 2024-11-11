@@ -64,18 +64,44 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
         }
     }
 
-    data class Grunnlag(
+    data class Grunnlag private constructor(
         val medlemskapsgrunnlag: Medlemskapsgrunnlag, //TODO recfactor ut
-        private var omsorgsmåneder: Omsorgsmåneder,
+        val omsorgsmåneder: Omsorgsmåneder,
         val antallMånederRegel: AntallMånederRegel,
         val landstilknytningMåneder: Landstilknytningmåneder,
     ) : ParagrafGrunnlag() {
 
-        init {
-            omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
-                omsorgsmåneder.kvalifisererForAutomatiskBehandling()
-            } else {
-                omsorgsmåneder.kvalifisererForManuellBehandling()
+        companion object {
+            fun new(
+                medlemskapsgrunnlag: Medlemskapsgrunnlag, //TODO recfactor ut
+                omsorgsmåneder: Omsorgsmåneder,
+                antallMånederRegel: AntallMånederRegel,
+                landstilknytningMåneder: Landstilknytningmåneder,
+            ): Grunnlag {
+                return Grunnlag(
+                    medlemskapsgrunnlag = medlemskapsgrunnlag,
+                    omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
+                        omsorgsmåneder.kvalifisererForAutomatiskBehandling()
+                    } else {
+                        omsorgsmåneder.kvalifisererForManuellBehandling()
+                    },
+                    antallMånederRegel = antallMånederRegel,
+                    landstilknytningMåneder = landstilknytningMåneder
+                )
+            }
+
+            fun persistent(
+                medlemskapsgrunnlag: Medlemskapsgrunnlag, //TODO recfactor ut
+                omsorgsmåneder: Omsorgsmåneder,
+                antallMånederRegel: AntallMånederRegel,
+                landstilknytningMåneder: Landstilknytningmåneder,
+            ): Grunnlag {
+                return Grunnlag(
+                    medlemskapsgrunnlag = medlemskapsgrunnlag,
+                    omsorgsmåneder = omsorgsmåneder,
+                    antallMånederRegel = antallMånederRegel,
+                    landstilknytningMåneder = landstilknytningMåneder
+                )
             }
         }
 
@@ -122,7 +148,8 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
          */
         fun manuell(): Boolean {
             require(!erInnvilget() && !erInnvilgetTilTrossForPerioderUtenMedlemskap() && !erInnvilgetTilTrossForPerioderMedFrivilligEllerPliktigMedlemskap()) { "Rekkefølgeavhengig" }
-            val antattMedlem = omsorgsmåneder.alle().minus(ikkeMedlem).minus(medlem).plus(omsorgsmåneder.alle().intersect(medlem))
+            val antattMedlem =
+                omsorgsmåneder.alle().minus(ikkeMedlem).minus(medlem).plus(omsorgsmåneder.alle().intersect(medlem))
             return landstilknytningMåneder.erNorge(antattMedlem) && antattMedlem.oppfyller(antallMånederRegel)
         }
 

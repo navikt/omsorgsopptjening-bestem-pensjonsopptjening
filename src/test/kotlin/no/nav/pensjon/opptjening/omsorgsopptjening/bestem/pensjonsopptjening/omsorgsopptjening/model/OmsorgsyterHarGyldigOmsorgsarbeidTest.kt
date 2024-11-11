@@ -22,7 +22,7 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
     @Test
     fun `avslag hvis ingen måneder med utbetaling`() {
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
-            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(emptySet()),
                 omsorgsmåneder = år(2022).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
@@ -35,7 +35,7 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
     @Test
     fun `innvilget hvis alle måneder med utbetaling og omsorg`() {
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
-            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder = år(2022).utbetalingsmåneder(200, Landstilknytning.Norge),
                 omsorgsmåneder = år(2022).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full),
                 antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
@@ -48,7 +48,7 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
     @Test
     fun `avslag hvis omsorgsmåneder som kvalifiserer for automatisk godskriving ikke overlapper tilstrekkelig med utbetalingsmånedene`() {
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
-            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder =
                 Utbetalingsmåneder(
                     Periode(januar(2022), juni(2022)).tilUtbetalingsmåneder(200, Landstilknytning.Norge) +
@@ -68,7 +68,7 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
     @Test
     fun `innvilget hvis omsorgsmåneder som kvalifiserer for automatisk godskriving overlapper tilstrekkelig med utbetalingsmånedene`() {
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
-            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder =
                 Utbetalingsmåneder(
                     Periode(januar(2022), juni(2022)).tilUtbetalingsmåneder(200, Landstilknytning.Norge) +
@@ -88,7 +88,7 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
     @Test
     fun `innvilget hvis omsorgsmåneder som ikke kvalifiserer for automatisk godskriving overlapper tilstrekkelig med utbetalingsmånedene`() {
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
-            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder =
                 Utbetalingsmåneder(
                     Periode(januar(2022), juni(2022)).tilUtbetalingsmåneder(200, Landstilknytning.Norge) +
@@ -108,7 +108,7 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
     @Test
     fun `avslag hvis omsorgsmåneder som ikke kvalifiserer for automatisk godskriving ikke overlapper tilstrekkelig med utbetalingsmånedene`() {
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
-            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder =
                 Utbetalingsmåneder(
                     Periode(januar(2022), juni(2022)).tilUtbetalingsmåneder(
@@ -140,7 +140,7 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
         )
 
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
-            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder =
                 Utbetalingsmåneder(
                     Periode(januar(2022), juni(2022)).tilUtbetalingsmåneder(
@@ -163,7 +163,7 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
         )
 
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
-            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag(
+            OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder =
                 Utbetalingsmåneder(
                     Periode(januar(2022), juni(2022)).tilUtbetalingsmåneder(

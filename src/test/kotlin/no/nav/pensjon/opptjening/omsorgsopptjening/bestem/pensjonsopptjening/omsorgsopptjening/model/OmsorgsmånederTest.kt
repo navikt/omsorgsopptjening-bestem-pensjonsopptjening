@@ -25,8 +25,20 @@ class OmsorgsmånederTest {
             setOf(full, delt)
         )
 
+        val hjelpestønad = Omsorgsmåneder.BarnetrygdOgHjelpestønad(
+            setOf(full, delt)
+        )
+
         assertThat(barnetrygd.full()).isEqualTo(setOf(full))
+        assertThat(barnetrygd.kvalifisererForAutomatiskBehandling()).isEqualTo(Omsorgsmåneder.Barnetrygd(setOf(full)))
+        assertThat(hjelpestønad.kvalifisererForAutomatiskBehandling()).isEqualTo(Omsorgsmåneder.BarnetrygdOgHjelpestønad(setOf(full)))
+        assertThat(barnetrygd.erKvalifisertForAutomatiskBehandling(AntallMånederRegel.FødtIOmsorgsår)).isTrue()
+        assertThat(barnetrygd.erKvalifisertForAutomatiskBehandling(AntallMånederRegel.FødtUtenforOmsorgsår)).isFalse()
         assertThat(barnetrygd.delt()).isEqualTo(setOf(delt))
+        assertThat(barnetrygd.kvalifisererForManuellBehandling()).isEqualTo(barnetrygd)
+        assertThat(hjelpestønad.kvalifisererForManuellBehandling()).isEqualTo(hjelpestønad)
+        assertThat(barnetrygd.erKvalifisertForManuellBehandling(AntallMånederRegel.FødtIOmsorgsår)).isTrue()
+        assertThat(barnetrygd.erKvalifisertForManuellBehandling(AntallMånederRegel.FødtUtenforOmsorgsår)).isFalse()
         assertThat(barnetrygd.antallFull()).isEqualTo(1)
         assertThat(barnetrygd.antallDelt()).isEqualTo(1)
         assertThat(barnetrygd.alle()).isEqualTo(setOf(januar(2022), februar(2022)))
