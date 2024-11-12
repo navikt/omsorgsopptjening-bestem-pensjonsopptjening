@@ -77,11 +77,11 @@ spec:
   liveness:
     path: /actuator/health/liveness
     port: 8080
-    initialDelay: 50
+    initialDelay: 120
   readiness:
     path: /actuator/health/readiness
     port: 8080
-    initialDelay: 50
+    initialDelay: 120l
   prometheus:
     enabled: true
     path: /actuator/prometheus
@@ -91,12 +91,12 @@ spec:
       runtime: java
   replicas:
     # TODO: Antall replikas er satt til 0 for å hindre ressursbruk mens applikasjonen er idle
-    min: 0
-    max: 0
+    min: 1
+    max: 1
   resources:
     limits:
-      cpu: "2"
-      memory: "4096Mi"
+      cpu: "1000m"
+      memory: "1024Mi"
     requests:
-      cpu: "100m"
-      memory: "2048Mi"
+      cpu: "200m"
+      memory: "256Mi"
