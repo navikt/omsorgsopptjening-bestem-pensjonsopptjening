@@ -87,6 +87,13 @@ data class FullførteBehandlinger(
                     .fold(mutableMapOf()) { acc, vilkarsVurdering ->
                         acc.merge(vilkarsVurdering, 1) { gammel, value -> gammel + value }
                         acc
+                    } else emptyMap(),
+            summertManuellPerVilkår = if(aggregertUtfall.erManuell())
+                manuell()
+                    .flatMap { it.ubestemteVilkår()}
+                    .fold(mutableMapOf()) {acc, vilkarsVurdering ->
+                        acc.merge(vilkarsVurdering, 1) { gammel, value -> gammel + value }
+                        acc
                     } else emptyMap()
         )
     }
@@ -95,6 +102,7 @@ data class FullførteBehandlinger(
         val innvilgetOpptjening: Int,
         val avslåttOpptjening: Int,
         val manuellBehandling: Int,
-        val summertAvslagPerVilkår: Map<VilkarsVurdering<*>, Int>
+        val summertAvslagPerVilkår: Map<VilkarsVurdering<*>, Int>,
+        val summertManuellPerVilkår: Map<VilkarsVurdering<*>, Int>
     )
 }
