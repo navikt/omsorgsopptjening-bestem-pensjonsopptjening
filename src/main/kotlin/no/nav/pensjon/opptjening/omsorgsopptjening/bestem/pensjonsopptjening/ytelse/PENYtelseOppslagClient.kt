@@ -86,10 +86,16 @@ class PENYtelseOppslagClient(
         val gjelderTomDato: LocalDate?
     ) {
         init {
-            require(gjelderFomDato.isBefore(gjelderTomDato)) { "Fom ikke tidligere enn tom" }
+            if (gjelderTomDato != null) {
+                require(gjelderFomDato.isBefore(gjelderTomDato)) { "Fom ikke tidligere enn tom" }
+            }
         }
 
-        val periode: Periode get() = Periode(YearMonth.of(gjelderFomDato.year, gjelderFomDato.month), YearMonth.of(gjelderTomDato!!.year, gjelderTomDato.month))
+        val periode: Periode
+            get() = Periode(
+                YearMonth.of(gjelderFomDato.year, gjelderFomDato.month),
+                YearMonth.of(gjelderTomDato!!.year, gjelderTomDato.month)
+            )
     }
 
 
@@ -152,7 +158,9 @@ class PENYtelseOppslagClient(
         val tom: LocalDate?
     ) {
         init {
-            require(fom.isBefore(tom)) { "Fom ikke tidligere enn tom" }
+            if (tom != null) {
+                require(fom.isBefore(tom)) { "Fom ikke tidligere enn tom" }
+            }
         }
 
         val periode: Periode get() = Periode(YearMonth.of(fom.year, fom.month), YearMonth.of(tom!!.year, tom.month))
