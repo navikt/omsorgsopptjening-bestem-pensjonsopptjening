@@ -43,6 +43,10 @@ sealed class Oppgave {
             return """Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: $omsorgsmottaker må vurderes manuelt pga EØS-sak og mottar pensjon eller uføretrygd"""
         }
 
+        fun omsorgsyterErDød(omsorgsyter: String, omsorgsmottaker: String): String {
+            return """Omsorgsyter: $omsorgsyter er død, vurder om omsorgsopptjening for barn med fnr: $omsorgsmottaker skal godskrives annen forelder."""
+        }
+
         fun annenForelderInnvilgetOmsorgsopptjeningForAnnetFellesbarn(
             omsorgsmottaker: String,
             annenForelderOgBarn: Set<Pair<String, String>>

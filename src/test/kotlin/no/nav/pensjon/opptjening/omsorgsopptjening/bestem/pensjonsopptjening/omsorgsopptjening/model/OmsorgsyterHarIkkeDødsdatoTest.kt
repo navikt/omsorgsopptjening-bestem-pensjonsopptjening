@@ -17,13 +17,13 @@ class OmsorgsyterHarIkkeDødsdatoTest {
     }
 
     @Test
-    fun `avslag hvis omsorgsyter har dødsdato`() {
+    fun `ubestemt hvis omsorgsyter har dødsdato`() {
         OmsorgsyterHarIkkeDødsdato.vilkarsVurder(
             OmsorgsyterHarIkkeDødsdato.Grunnlag(
                 dødsdato = LocalDate.now().minusDays(1)
             )
         ).also {
-            assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, it.utfall)
+            assertInstanceOf(VilkårsvurderingUtfall.Ubestemt::class.java, it.utfall)
         }
     }
 }
