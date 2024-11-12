@@ -21,16 +21,16 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterOppfyllerAlderskrav
 
-val avslagTag = "avslag"
+val avslagValue = "avslag"
 val antallTag = "antall"
-val manuellTag = "manuell"
+val manuellValue = "manuell"
 
 class OmsorgsarbeidProcessingMetrikker(private val registry: MeterRegistry) : Metrikker<List<FullførteBehandlinger?>?> {
 
     private val omsorgsarbeidProsessertTidsbruk = registry.timer("prosessering", "tidsbruk", "omsorgsarbeidProsessert")
     private val innvilget = registry.counter("behandling", antallTag, "innvilget")
-    private val avslag = registry.counter("behandling", antallTag, avslagTag)
-    private val manuell = registry.counter("behandling", antallTag, manuellTag)
+    private val avslag = registry.counter("behandling", antallTag, avslagValue)
+    private val manuell = registry.counter("behandling", antallTag, manuellValue)
     private val totalt = registry.counter("behandling", antallTag, "totalt")
 
     val harMestOmsorgName = "OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere"
@@ -60,42 +60,42 @@ class OmsorgsarbeidProcessingMetrikker(private val registry: MeterRegistry) : Me
                     when (it.key) {
                         is EllerVurdering -> {}
                         is OgVurdering -> {}
-                        is OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering -> registry.counter(harMestOmsorgName, avslagTag, antallTag).increment()
-                        is OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering -> registry.counter(kunEtBarnName, avslagTag, antallTag).increment()
-                        is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering -> registry.counter(tilstrekkeligName, avslagTag, antallTag).increment()
-                        is OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering -> registry.counter(kunEnPerÅrName, avslagTag, antallTag).increment()
-                        is OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering -> registry.counter(erForelderHjelpestønadName, avslagTag, antallTag).increment()
-                        is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> registry.counter(mottakerOppfyllerHjelpestønadName, avslagTag, antallTag).increment()
-                        is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> registry.counter(mottakerOppfyllerBarnetrygdName, avslagTag, antallTag).increment()
-                        is OmsorgsyterOppfyllerAlderskrav.Vurdering -> registry.counter(omsorgsyterOppfyllerAlderName, avslagTag, antallTag).increment()
-                        is OmsorgsyterMottarBarnetrgyd.Vurdering -> registry.counter(omsorgsyterMottarName, avslagTag, antallTag).increment()
-                        is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> registry.counter(omsorgsyterHarGyldigName, avslagTag, antallTag).increment()
-                        is OmsorgsyterErMedlemIFolketrygden.Vurdering -> registry.counter(omsorgsyterMedlemName, avslagTag, antallTag).increment()
-                        is OmsorgsyterErikkeOmsorgsmottaker.Vurdering -> registry.counter(omsorgsyterIkkeMottakerName, avslagTag, antallTag).increment()
-                        is OmsorgsyterHarIkkeDødsdato.Vurdering -> registry.counter(omsorgsyterDødsdatoName, avslagTag, antallTag).increment()
-                        is OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering -> registry.counter(ytelseEøsName, avslagTag, antallTag).increment()
-                        is OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering -> registry.counter(ikkeGodskrevetAnnetFellesbarn, avslagTag, antallTag).increment()
+                        is OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering -> registry.counter(harMestOmsorgName, antallTag, avslagValue).increment()
+                        is OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering -> registry.counter(kunEtBarnName, antallTag, avslagValue).increment()
+                        is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering -> registry.counter(tilstrekkeligName, antallTag, avslagValue).increment()
+                        is OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering -> registry.counter(kunEnPerÅrName, antallTag, avslagValue).increment()
+                        is OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering -> registry.counter(erForelderHjelpestønadName, antallTag, avslagValue).increment()
+                        is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> registry.counter(mottakerOppfyllerHjelpestønadName, antallTag, avslagValue).increment()
+                        is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> registry.counter(mottakerOppfyllerBarnetrygdName, antallTag, avslagValue).increment()
+                        is OmsorgsyterOppfyllerAlderskrav.Vurdering -> registry.counter(omsorgsyterOppfyllerAlderName, antallTag, avslagValue).increment()
+                        is OmsorgsyterMottarBarnetrgyd.Vurdering -> registry.counter(omsorgsyterMottarName, antallTag, avslagValue).increment()
+                        is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> registry.counter(omsorgsyterHarGyldigName, antallTag, avslagValue).increment()
+                        is OmsorgsyterErMedlemIFolketrygden.Vurdering -> registry.counter(omsorgsyterMedlemName, antallTag, avslagValue).increment()
+                        is OmsorgsyterErikkeOmsorgsmottaker.Vurdering -> registry.counter(omsorgsyterIkkeMottakerName, antallTag, avslagValue).increment()
+                        is OmsorgsyterHarIkkeDødsdato.Vurdering -> registry.counter(omsorgsyterDødsdatoName, antallTag, avslagValue).increment()
+                        is OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering -> registry.counter(ytelseEøsName, antallTag, avslagValue).increment()
+                        is OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering -> registry.counter(ikkeGodskrevetAnnetFellesbarn, antallTag, avslagValue).increment()
                     }
                 }
                 statistikk.summertManuellPerVilkår.map {
                     when (it.key) {
                         is EllerVurdering -> {}
                         is OgVurdering -> {}
-                        is OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering -> registry.counter(harMestOmsorgName, manuellTag, antallTag).increment()
-                        is OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering -> registry.counter(kunEtBarnName, manuellTag, antallTag).increment()
-                        is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering -> registry.counter(tilstrekkeligName, manuellTag, antallTag).increment()
-                        is OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering -> registry.counter(kunEnPerÅrName, manuellTag, antallTag).increment()
-                        is OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering -> registry.counter(erForelderHjelpestønadName, manuellTag, antallTag).increment()
-                        is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> registry.counter(mottakerOppfyllerHjelpestønadName, manuellTag, antallTag).increment()
-                        is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> registry.counter(mottakerOppfyllerBarnetrygdName, manuellTag, antallTag).increment()
-                        is OmsorgsyterOppfyllerAlderskrav.Vurdering -> registry.counter(omsorgsyterOppfyllerAlderName, manuellTag, antallTag).increment()
-                        is OmsorgsyterMottarBarnetrgyd.Vurdering -> registry.counter(omsorgsyterMottarName, manuellTag, antallTag).increment()
-                        is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> registry.counter(omsorgsyterHarGyldigName, manuellTag, antallTag).increment()
-                        is OmsorgsyterErMedlemIFolketrygden.Vurdering -> registry.counter(omsorgsyterMedlemName, manuellTag, antallTag).increment()
-                        is OmsorgsyterErikkeOmsorgsmottaker.Vurdering -> registry.counter(omsorgsyterIkkeMottakerName, manuellTag, antallTag).increment()
-                        is OmsorgsyterHarIkkeDødsdato.Vurdering -> registry.counter(omsorgsyterDødsdatoName, manuellTag, antallTag).increment()
-                        is OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering -> registry.counter(ytelseEøsName, manuellTag, antallTag).increment()
-                        is OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering -> registry.counter(ikkeGodskrevetAnnetFellesbarn, manuellTag, antallTag).increment()
+                        is OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere.Vurdering -> registry.counter(harMestOmsorgName, antallTag, manuellValue).increment()
+                        is OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering -> registry.counter(kunEtBarnName, antallTag, manuellValue).increment()
+                        is OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering -> registry.counter(tilstrekkeligName, antallTag, manuellValue).increment()
+                        is OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering -> registry.counter(kunEnPerÅrName, antallTag, manuellValue).increment()
+                        is OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering -> registry.counter(erForelderHjelpestønadName, antallTag, manuellValue).increment()
+                        is OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering -> registry.counter(mottakerOppfyllerHjelpestønadName, antallTag, manuellValue).increment()
+                        is OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering -> registry.counter(mottakerOppfyllerBarnetrygdName, antallTag, manuellValue).increment()
+                        is OmsorgsyterOppfyllerAlderskrav.Vurdering -> registry.counter(omsorgsyterOppfyllerAlderName, antallTag, manuellValue).increment()
+                        is OmsorgsyterMottarBarnetrgyd.Vurdering -> registry.counter(omsorgsyterMottarName, antallTag, manuellValue).increment()
+                        is OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering -> registry.counter(omsorgsyterHarGyldigName, antallTag, manuellValue).increment()
+                        is OmsorgsyterErMedlemIFolketrygden.Vurdering -> registry.counter(omsorgsyterMedlemName, antallTag, manuellValue).increment()
+                        is OmsorgsyterErikkeOmsorgsmottaker.Vurdering -> registry.counter(omsorgsyterIkkeMottakerName, antallTag, manuellValue).increment()
+                        is OmsorgsyterHarIkkeDødsdato.Vurdering -> registry.counter(omsorgsyterDødsdatoName, antallTag, manuellValue).increment()
+                        is OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Vurdering -> registry.counter(ytelseEøsName, antallTag, manuellValue).increment()
+                        is OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering -> registry.counter(ikkeGodskrevetAnnetFellesbarn, antallTag, manuellValue).increment()
                     }
                 }
             }
