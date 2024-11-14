@@ -11,6 +11,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Ytelseinformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.april
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.august
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.desember
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.februar
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.januar
@@ -30,6 +31,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
@@ -46,9 +48,11 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
     private val medlemskapsUnntaktOppslag: MedlemskapsUnntakOppslag = mock()
     private val ytelseOppslag: YtelseOppslag = mock()
 
+    private val morGammeltFnr = "12345678999"
     private val mor = lagPerson(
         "12345678910",
-        LocalDate.of(1980, Month.JANUARY, 1)
+        LocalDate.of(1980, Month.JANUARY, 1),
+        morGammeltFnr,
     )
     private val jente = lagPerson(
         "01122012345",
@@ -58,10 +62,15 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
         "04010012797",
         LocalDate.of(1980, Month.JANUARY, 1)
     )
+
+    private val guttGammeltFnr: String = "07081812555"
     private val gutt = lagPerson(
         "07081812345",
-        LocalDate.of(2018, Month.AUGUST, 7)
+        LocalDate.of(2018, Month.AUGUST, 7),
+        guttGammeltFnr
     )
+
+
     private val ungdom = lagPerson(
         "03041212345",
         LocalDate.of(2012, Month.MARCH, 4)
@@ -76,9 +85,11 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
     @BeforeEach
     fun beforeEach() {
         whenever(personOppslag.hentPerson(mor.fnr)).thenReturn(mor)
+        whenever(personOppslag.hentPerson(morGammeltFnr)).thenReturn(mor)
         whenever(personOppslag.hentPerson(jente.fnr)).thenReturn(jente)
         whenever(personOppslag.hentPerson(far.fnr)).thenReturn(far)
         whenever(personOppslag.hentPerson(gutt.fnr)).thenReturn(gutt)
+        whenever(personOppslag.hentPerson(guttGammeltFnr)).thenReturn(gutt)
         whenever(personOppslag.hentPerson(ungdom.fnr)).thenReturn(ungdom)
 
         whenever(medlemskapsUnntaktOppslag.hentUnntaksperioder(any(), any(), any())).thenReturn(
@@ -546,7 +557,203 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
         }
     }
 
-    private fun lagPerson(fnr: String, fødselsdato: LocalDate): Person {
+    @Test
+    fun `kan ikke opprette grunnlag dersom det er overlapp i perioder for omsorgsmottaker og disse ikke kan slås sammen`() {
+        assertThrows<IllegalArgumentException> {
+            service.lagOmsorgsopptjeningsgrunnlag(
+                PersongrunnlagMelding.Mottatt(
+                    id = UUID.randomUUID(),
+                    opprettet = Instant.now(),
+                    innhold = PersongrunnlagMeldingKafka(
+                        omsorgsyter = mor.fnr,
+                        persongrunnlag = listOf(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
+                                omsorgsyter = mor.fnr,
+                                omsorgsperioder = listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                        fom = januar(2021),
+                                        tom = desember(2021),
+                                        omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                        omsorgsmottaker = gutt.fnr,
+                                        kilde = Kilde.BARNETRYGD,
+                                        utbetalt = 1234,
+                                        landstilknytning = Landstilknytning.NORGE
+                                    ),
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                        fom = januar(2021),
+                                        tom = januar(2021),
+                                        omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                        omsorgsmottaker = guttGammeltFnr,
+                                        kilde = Kilde.INFOTRYGD,
+                                        utbetalt = 2345,
+                                        landstilknytning = Landstilknytning.EØS_UKJENT_PRIMÆR_OG_SEKUNDÆR_LAND
+                                    ),
+                                ),
+                                hjelpestønadsperioder = emptyList()
+                            ),
+                        ),
+                        rådata = Rådata(),
+                        innlesingId = InnlesingId.generate(),
+                        correlationId = CorrelationId.generate(),
+                    )
+                )
+            )
+        }.also {
+            assertThat(it.message).contains("Overlappende perioder for samme omsorgsmottaker")
+        }
+    }
+
+    @Test
+    fun `kan opprette grunnlag dersom det er overlapp i perioder for omsorgsmottaker og disse kan slås sammen`() {
+        service.lagOmsorgsopptjeningsgrunnlag(
+            PersongrunnlagMelding.Mottatt(
+                id = UUID.randomUUID(),
+                opprettet = Instant.now(),
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = mor.fnr,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = mor.fnr,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2021),
+                                    tom = desember(2021),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = gutt.fnr,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 1234,
+                                    landstilknytning = Landstilknytning.NORGE
+                                ),
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2021),
+                                    tom = januar(2021),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = guttGammeltFnr,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 1234,
+                                    landstilknytning = Landstilknytning.NORGE
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList()
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            )
+        ).also {
+            assertThat(it).hasSize(1)
+            assertThat(it.single().grunnlag.persongrunnlag).hasSize(1)
+            assertThat(it.single().grunnlag.persongrunnlag.single().omsorgsperioder).hasSize(1)
+        }
+    }
+
+    @Test
+    fun `kan ikke opprette grunnlag dersom det er overlapp i perioder for omsorgsyter og disse ikke kan slås sammen`() {
+        assertThrows<IllegalArgumentException> {
+            service.lagOmsorgsopptjeningsgrunnlag(
+                PersongrunnlagMelding.Mottatt(
+                    id = UUID.randomUUID(),
+                    opprettet = Instant.now(),
+                    innhold = PersongrunnlagMeldingKafka(
+                        omsorgsyter = morGammeltFnr,
+                        persongrunnlag = listOf(
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
+                                omsorgsyter = mor.fnr,
+                                omsorgsperioder = listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                        fom = januar(2020),
+                                        tom = desember(2020),
+                                        omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                        omsorgsmottaker = gutt.fnr,
+                                        kilde = Kilde.BARNETRYGD,
+                                        utbetalt = 5001,
+                                        landstilknytning = Landstilknytning.NORGE,
+                                    ),
+                                ),
+                                hjelpestønadsperioder = emptyList(),
+                            ),
+                            PersongrunnlagMeldingKafka.Persongrunnlag(
+                                omsorgsyter = morGammeltFnr,
+                                omsorgsperioder = listOf(
+                                    PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                        fom = mai(2020),
+                                        tom = august(2020),
+                                        omsorgstype = Omsorgstype.DELT_BARNETRYGD,
+                                        omsorgsmottaker = gutt.fnr,
+                                        kilde = Kilde.BARNETRYGD,
+                                        utbetalt = 2500,
+                                        landstilknytning = Landstilknytning.NORGE,
+                                    ),
+                                ),
+                                hjelpestønadsperioder = emptyList(),
+                            ),
+                        ),
+                        rådata = Rådata(),
+                        innlesingId = InnlesingId.generate(),
+                        correlationId = CorrelationId.generate(),
+                    )
+                )
+            )
+        }.also {
+            assertThat(it.message).contains("Overlappende perioder for samme omsorgsmottaker")
+        }
+    }
+
+    @Test
+    fun `kan opprette grunnlag dersom det er overlapp i perioder for omsorgsyter og disse kan slås sammen`() {
+        service.lagOmsorgsopptjeningsgrunnlag(
+            PersongrunnlagMelding.Mottatt(
+                id = UUID.randomUUID(),
+                opprettet = Instant.now(),
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = morGammeltFnr,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = mor.fnr,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = gutt.fnr,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 5001,
+                                    landstilknytning = Landstilknytning.NORGE,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = morGammeltFnr,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = mai(2020),
+                                    tom = august(2020),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = gutt.fnr,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 5001,
+                                    landstilknytning = Landstilknytning.NORGE,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            )
+        ).also {
+            assertThat(it).hasSize(1)
+            assertThat(it.single().grunnlag.persongrunnlag).hasSize(1)
+            assertThat(it.single().grunnlag.persongrunnlag.single().omsorgsperioder).hasSize(1)
+        }
+    }
+
+    private fun lagPerson(fnr: String, fødselsdato: LocalDate, vararg gammelIdent: String): Person {
         return Person(
             fødselsdato = fødselsdato,
             dødsdato = null,
@@ -554,7 +761,11 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                 relasjoner = listOf()
             ),
             identhistorikk = IdentHistorikk(
-                identer = setOf(Ident.FolkeregisterIdent.Gjeldende(fnr))
+                identer = setOf(Ident.FolkeregisterIdent.Gjeldende(fnr)) + gammelIdent.map {
+                    Ident.FolkeregisterIdent.Historisk(
+                        it
+                    )
+                }
             )
         )
     }

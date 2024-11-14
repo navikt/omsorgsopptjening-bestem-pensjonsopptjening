@@ -8,7 +8,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Ytelsegrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ytelse.YtelseOppslag
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.KanSlåsSammen.Companion.slåSammenLike
 import java.time.Month
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding.Persongrunnlag as KafkaPersongrunnlag
@@ -42,7 +41,8 @@ internal class OmsorgsopptjeningsgrunnlagServiceImpl(
 
         return BeriketDatagrunnlag(
             omsorgsyter = persondata.finnPerson(omsorgsyter),
-            persongrunnlag = persongrunnlag.consolidate { persondata.finnPerson(it.omsorgsyter) }
+            persongrunnlag = persongrunnlag
+                .oppdaterFødselsnummerOgSlåSammenLikePerioder { persondata.finnPerson(it) }
                 .map { persongrunnlag ->
                     val omsorgsyter = persondata.finnPerson(persongrunnlag.omsorgsyter)
 
@@ -118,31 +118,24 @@ internal class OmsorgsopptjeningsgrunnlagServiceImpl(
         )
     }
 
-
-    fun consolidatePersongrunnlag(
-        key: (KafkaPersongrunnlag) -> Any,
-        persongrunnlag: List<KafkaPersongrunnlag>
-    ): List<KafkaPersongrunnlag> {
-        fun merge(persongrunnlag: List<KafkaPersongrunnlag>): KafkaPersongrunnlag {
-            // todo : sjekk omsorgsperioder
-            val omsorgsyter = persongrunnlag.first().omsorgsyter
-            val omsorgsperioder = persongrunnlag.flatMap { it.omsorgsperioder }.sortedBy { it.fom }.slåSammenLike()
-            val hjelpestønadperioder =
-                persongrunnlag.flatMap { it.hjelpestønadsperioder }.sortedBy { it.fom }.slåSammenLike()
-            return KafkaPersongrunnlag(
-                omsorgsyter = omsorgsyter,
-                omsorgsperioder = omsorgsperioder,
-                hjelpestønadsperioder = hjelpestønadperioder,
+    fun List<KafkaPersongrunnlag>.oppdaterFødselsnummerOgSlåSammenLikePerioder(finnPerson: (fnr: String) -> Person): List<KafkaPersongrunnlag> {
+        return map { persongrunnlag ->
+            KafkaPersongrunnlag.of(
+                omsorgsyter = finnPerson(persongrunnlag.omsorgsyter).fnr,
+                omsorgsperioder = persongrunnlag.omsorgsperioder
+                    .map { (it.copy(omsorgsmottaker = finnPerson(it.omsorgsmottaker).fnr)) },
+                hjelpestønadsperioder = persongrunnlag.hjelpestønadsperioder
+                    .map { (it.copy(omsorgsmottaker = finnPerson(it.omsorgsmottaker).fnr)) }
             )
-        }
-
-        val persongrunnlag = persongrunnlag.groupBy { key(it) }.values.map { merge(it) }
-        return persongrunnlag
+        }.groupBy { finnPerson(it.omsorgsyter) }
+            .map {
+                KafkaPersongrunnlag.of(
+                    omsorgsyter = it.key.fnr,
+                    omsorgsperioder = it.value.flatMap { it.omsorgsperioder },
+                    hjelpestønadsperioder = it.value.flatMap { it.hjelpestønadsperioder })
+            }
     }
 
-    fun List<KafkaPersongrunnlag>.consolidate(key: (KafkaPersongrunnlag) -> Any): List<KafkaPersongrunnlag> {
-        return consolidatePersongrunnlag(key, this)
-    }
 
     fun BeriketDatagrunnlag.grunnlagPerMottakerPerÅr(): List<OmsorgsopptjeningGrunnlag> {
         return `opprett grunnlag per omsorgsmottaker per år`()
