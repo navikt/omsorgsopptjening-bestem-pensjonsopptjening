@@ -7,6 +7,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
@@ -32,15 +33,26 @@ internal class PersongrunnlagMeldingServiceImpl(
     }
 
     override fun behandle(melding: PersongrunnlagMelding.Mottatt): FullførteBehandlinger {
-        return behandleIntern(melding).let { fullførte ->
-            persongrunnlagRepo.updateStatus(melding.ferdig())
-            fullførte.also {
-                it.håndterUtfall(
-                    innvilget = ::håndterInnvilgelse,
-                    manuell = oppgaveService::opprettOppgaveForManuellBehandlingHvisNødvendig,
-                    avslag = {} //noop
-                )
+        return if (melding.harFeilinformasjon()) {
+            behandleFeilinformasjon(melding)
+            FullførteBehandlinger(emptyList())
+        } else {
+            behandleIntern(melding).let { fullførte ->
+                persongrunnlagRepo.updateStatus(melding.ferdig())
+                fullførte.also {
+                    it.håndterUtfall(
+                        innvilget = ::håndterInnvilgelse,
+                        manuell = oppgaveService::opprettOppgaveForManuellBehandlingHvisNødvendig,
+                        avslag = {} //noop
+                    )
+                }
             }
+        }
+    }
+
+    private fun behandleFeilinformasjon(melding: PersongrunnlagMelding.Mottatt): Oppgave.Persistent {
+        return oppgaveService.opprett(melding.opprettOppgave()!!).also {
+            persongrunnlagRepo.updateStatus(melding.ferdig())
         }
     }
 
@@ -146,7 +158,7 @@ internal class PersongrunnlagMeldingServiceImpl(
             PersongrunnlagMelding.Lest(
                 innhold = it.innhold,
                 opprettet = Instant.now(),
-                kopiertFra = it
+                kopiertFra = it,
             )
         }.let {
             return persongrunnlagRepo.lagre(it)
