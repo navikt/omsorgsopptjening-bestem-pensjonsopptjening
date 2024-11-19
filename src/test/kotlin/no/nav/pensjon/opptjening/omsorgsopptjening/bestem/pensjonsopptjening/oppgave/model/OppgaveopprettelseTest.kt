@@ -19,6 +19,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Feilinformasjon
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.IdentRolle
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
@@ -40,7 +42,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
 
     @Autowired
-    private lateinit var repo: PersongrunnlagRepo
+    private lateinit var persongrunnlagRepo: PersongrunnlagRepo
 
     @Autowired
     private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
@@ -65,7 +67,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -114,7 +116,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             assertThat(oppgaveRepo.findForBehandling(behandling.id)).isEmpty()
         }
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "04010012797",
@@ -181,7 +183,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -248,7 +250,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             }
         }
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "04010012797",
@@ -343,7 +345,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -404,7 +406,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             }
         }
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "04010012797",
@@ -461,7 +463,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -557,7 +559,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -609,7 +611,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -695,7 +697,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",
@@ -727,7 +729,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             result.alle().single().also { behandling -> assertThat(behandling.erInnvilget()).isTrue() }
         }
 
-        repo.lagre(
+        persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "04010012797",
@@ -767,6 +769,51 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     )
                 }
             }
+        }
+    }
+
+    @Test
+    fun `oppretter oppgaver for meldinger som inneholder feil oversendt fra start`() {
+        val melding = persongrunnlagRepo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = emptyList(),
+                    feilinfo = listOf(
+                        Feilinformasjon.OverlappendeBarnetrygdperioder("obt"),
+                        Feilinformasjon.OverlappendeHjelpestønadperioder("ohs"),
+                        Feilinformasjon.FeilIDataGrunnlag("fidg"),
+                        Feilinformasjon.UgyldigIdent(
+                            message = "ugyldig ident",
+                            exceptionType = "RuntimeException",
+                            exceptionMessage = "error",
+                            ident = "12345678910",
+                            identRolle = IdentRolle.BARNETRYGDMOTTAKER
+                        )
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                )
+            ),
+        )!!
+
+        persongrunnlagMeldingProcessingService.process()
+
+        persongrunnlagRepo.find(melding).also {
+            assertThat(it.status).isInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java)
+        }
+
+        oppgaveRepo.findForMelding(melding).also {
+            assertThat(it).hasSize(1)
+            assertThat(it.single().oppgavetekst).containsAll(
+                setOf(
+                    "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for barnetrygdperiodene tilhørende et av barna. Vurder omsorgsopptjening manuelt.",
+                    "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna. Vurder omsorgsopptjening manuelt.",
+                    "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av feil i datagrunnlaget. Vurder omsorgsopptjening manuelt.",
+                    "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av at det ikke eksisterer et gjeldende fnr for barnetrygdmottaker med ident: 12345678910"
+                )
+            )
         }
     }
 }

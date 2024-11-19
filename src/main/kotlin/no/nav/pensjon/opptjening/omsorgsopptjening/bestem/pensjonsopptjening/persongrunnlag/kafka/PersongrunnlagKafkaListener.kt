@@ -36,7 +36,9 @@ class PersongrunnlagKafkaListener(
             Mdc.scopedMdc(persongrunnlagMelding.correlationId) { _ ->
                 Mdc.scopedMdc(persongrunnlagMelding.innlesingId) { _ ->
                     persongrunnlagRepo.lagre(
-                        PersongrunnlagMelding.Lest(innhold = persongrunnlagMelding)
+                        PersongrunnlagMelding.Lest(
+                            innhold = persongrunnlagMelding,
+                        )
                     )
                     log.info("Melding prosessert")
                 }

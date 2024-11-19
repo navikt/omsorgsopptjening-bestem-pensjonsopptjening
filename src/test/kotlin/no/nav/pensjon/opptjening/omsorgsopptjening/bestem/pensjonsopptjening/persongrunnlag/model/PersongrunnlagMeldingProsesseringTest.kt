@@ -20,6 +20,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Feilinformasjon
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.IdentRolle
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
@@ -257,7 +259,9 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
         }
 
         clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.HOURS)) //karantenetid utløpt
-        assertThat(persongrunnlagMeldingProcessingService.processAndExpectResult().first().antallBehandlinger()).isEqualTo(1)
+        assertThat(
+            persongrunnlagMeldingProcessingService.processAndExpectResult().first().antallBehandlinger()
+        ).isEqualTo(1)
 
         assertInstanceOf(PersongrunnlagMelding.Status.Ferdig::class.java, repo.find(melding).status)
     }

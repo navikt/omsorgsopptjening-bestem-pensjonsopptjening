@@ -126,7 +126,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -181,7 +181,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
         assertEquals(0, persongrunnlagMeldingProcessingService.processAndExpectResult().first().antallBehandlinger())
@@ -213,7 +213,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -272,7 +272,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -331,7 +331,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -386,7 +386,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -448,7 +448,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -525,7 +525,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -592,7 +592,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -671,7 +671,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -722,7 +722,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -755,7 +755,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -803,7 +803,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -881,7 +881,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -948,7 +948,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1020,7 +1020,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1084,7 +1084,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1147,7 +1147,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1182,7 +1182,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1313,7 +1313,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1361,7 +1361,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1410,7 +1410,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1457,7 +1457,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1504,7 +1504,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1543,7 +1543,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1588,7 +1588,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1654,7 +1654,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1735,7 +1735,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1779,7 +1779,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1825,7 +1825,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 
@@ -1883,7 +1883,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
-                )
+                ),
             ),
         )
 

@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Feilinformasjon
 import java.time.Instant
 import java.time.Instant.now
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 sealed class PersongrunnlagMelding {
@@ -19,6 +20,11 @@ sealed class PersongrunnlagMelding {
     val correlationId get() = innhold.correlationId
     val innlesingId get() = innhold.innlesingId
     val status: Status get() = statushistorikk.last()
+    val feilinformasjon: List<Feilinformasjon> get() = innhold.feilinfo
+
+    fun harFeilinformasjon(): Boolean {
+        return feilinformasjon.isNotEmpty()
+    }
 
     data class Lest(
         override val innhold: PersongrunnlagMeldingKafka,
@@ -64,6 +70,16 @@ sealed class PersongrunnlagMelding {
                     ),
                     behandlingId = null,
                     meldingId = id,
+                )
+            } else if (harFeilinformasjon()) {
+                require(innhold.persongrunnlag.isEmpty()) { "Forventer at det ikke er persongrunnlag dersom feilinformasjon inneholder data" }
+                Oppgave.Transient(
+                    detaljer = OppgaveDetaljer.MottakerOgTekst(
+                        oppgavemottaker = "fnr",
+                        oppgavetekst = feilinformasjon.oppgavetekster(innhold.omsorgsyter)
+                    ),
+                    behandlingId = null,
+                    meldingId = id
                 )
             } else {
                 null
