@@ -37,7 +37,7 @@ internal class PersongrunnlagMeldingServiceImpl(
             fullførte.also {
                 it.håndterUtfall(
                     innvilget = ::håndterInnvilgelse,
-                    manuell = oppgaveService::opprettOppgaveHvisNødvendig,
+                    manuell = oppgaveService::opprettOppgaveForManuellBehandlingHvisNødvendig,
                     avslag = {} //noop
                 )
             }

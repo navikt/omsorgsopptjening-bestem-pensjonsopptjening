@@ -454,7 +454,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    fun `gitt at to omsorgsytere har like mange omsorgsmåneder for flere barn innenfor samme omsorgsår opprettes det bare oppgave for det eldste barnet`() {
+    fun `gitt at to omsorgsytere har like mange omsorgsmåneder for flere barn innenfor samme omsorgsår opprettes det bare en oppgave, men oppgaven inneholder informasjon om begge tilfellene`() {
         wiremock.stubForPdlTransformer()
         willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
@@ -527,13 +527,13 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             result.alle().first().also { behandling ->
                 assertThat(behandling.erInnvilget()).isFalse()
                 oppgaveRepo.findForMelding(behandling.meldingId).single().also { oppgave ->
-                    assertThat(oppgaveRepo.findForBehandling(behandling.id)).containsOnly(oppgave)
-                    assertThat(
-                        oppgave.detaljer
-                    ).isEqualTo(
+                    assertThat(oppgave.detaljer).isEqualTo(
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "12345678910",
-                            oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.""")
+                            oppgavetekst = setOf(
+                                "Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.",
+                                "Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01122012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."
+                            )
                         )
                     )
                 }
