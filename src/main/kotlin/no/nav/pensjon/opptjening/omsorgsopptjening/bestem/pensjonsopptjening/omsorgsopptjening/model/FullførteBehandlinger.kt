@@ -1,12 +1,17 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.FullførtBehandlingOppgaveopplysninger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.FullførteBehandlingerOppgaveopplysninger
 import org.jetbrains.annotations.TestOnly
 import java.util.UUID
 
+/**
+ * [FullførtBehandling] for alle barn omsorgsyter har blitt vurdert omsorgsopptjening for i et gitt omsorgsår.
+ */
 data class FullførteBehandlinger(
     private val behandlinger: List<FullførtBehandling>
 ) {
-    private val aggregertUtfall = AggregertBehandlingsutfall(behandlinger.map { it.utfall }).utfall()
+    val aggregertUtfall = AggregertBehandlingsutfall(behandlinger.map { it.utfall }).utfall()
 
     init {
         require(
@@ -15,23 +20,26 @@ data class FullførteBehandlinger(
         require(
             behandlinger.isEmpty() || behandlinger.alleOmsorgsytere().count() == 1
         ) { "Forventet bare behandlinger for en omsorgsyter" }
+        require(
+            behandlinger.isEmpty() || behandlinger.alleMeldingIder().count() == 1
+        ) { "Forventer bare fullførte behandlinger med utgangspunkt i samme kafkamelding" }
     }
 
-    private fun innvilget(): FullførtBehandling {
+    fun innvilget(): FullførtBehandling {
         return behandlinger.single { it.erInnvilget() }
     }
 
-    private fun manuell(): List<FullførtBehandling> {
+    fun alleManuelle(): List<FullførtBehandling> {
         return behandlinger.filter { it.erManuell() }
     }
 
-    private fun avslag(): List<FullførtBehandling> {
+    fun alleAvslåtte(): List<FullførtBehandling> {
         return behandlinger.filter { it.erAvslag() }
     }
 
     fun håndterUtfall(
         innvilget: (behandling: FullførtBehandling) -> Unit,
-        manuell: (behandling: FullførtBehandling) -> Unit,
+        manuell: (behandlinger: FullførteBehandlinger) -> Unit,
         avslag: () -> Unit,
     ) {
         when (aggregertUtfall) {
@@ -44,7 +52,7 @@ data class FullførteBehandlinger(
             }
 
             AggregertBehandlingUtfall.Manuell -> {
-                manuell().forEach { manuell(it) }
+                manuell(this)
             }
         }
     }
@@ -75,6 +83,10 @@ data class FullførteBehandlinger(
         return map { it.omsorgsyter }.distinct().toSet()
     }
 
+    private fun List<FullførtBehandling>.alleMeldingIder(): Set<UUID> {
+        return map { it.meldingId }.distinct().toSet()
+    }
+
     fun statistikk(): FullførteBehandlingerStatistikk {
         return FullførteBehandlingerStatistikk(
             innvilgetOpptjening = if (aggregertUtfall.erInnvilget()) 1 else 0,
@@ -82,27 +94,55 @@ data class FullførteBehandlinger(
             manuellBehandling = if (aggregertUtfall.erManuell()) 1 else 0,
             //summerer bare avslagsårsaker for tilfeller hvor aggregert utfall er avslag
             summertAvslagPerVilkår = if (aggregertUtfall.erAvslag())
-                avslag()
+                alleAvslåtte()
                     .flatMap { it.avslåtteVilkår() }
                     .fold(mutableMapOf()) { acc, vilkarsVurdering ->
                         acc.merge(vilkarsVurdering, 1) { gammel, value -> gammel + value }
                         acc
                     } else emptyMap(),
-            summertManuellPerVilkår = if(aggregertUtfall.erManuell())
-                manuell()
-                    .flatMap { it.ubestemteVilkår()}
-                    .fold(mutableMapOf()) {acc, vilkarsVurdering ->
+            summertManuellPerVilkår = if (aggregertUtfall.erManuell())
+                alleManuelle()
+                    .flatMap { it.ubestemteVilkår() }
+                    .fold(mutableMapOf()) { acc, vilkarsVurdering ->
                         acc.merge(vilkarsVurdering, 1) { gammel, value -> gammel + value }
                         acc
                     } else emptyMap()
         )
     }
 
-    data class FullførteBehandlingerStatistikk(
-        val innvilgetOpptjening: Int,
-        val avslåttOpptjening: Int,
-        val manuellBehandling: Int,
-        val summertAvslagPerVilkår: Map<VilkarsVurdering<*>, Int>,
-        val summertManuellPerVilkår: Map<VilkarsVurdering<*>, Int>
-    )
+    fun meldingId(): UUID {
+        return behandlinger.alleMeldingIder().single()
+    }
+
+    fun omsorgsyter(): String {
+        return behandlinger.alleOmsorgsytere().single()
+    }
+
+    fun omsorgsår(): Int {
+        return behandlinger.alleOmsorgsår().single()
+    }
+
+    fun hentOppgaveopplysninger(): FullførteBehandlingerOppgaveopplysninger {
+        require(aggregertUtfall.erManuell())
+        return FullførteBehandlingerOppgaveopplysninger(
+            omsorgsyter = omsorgsyter(),
+            omsorgsAr = omsorgsår(),
+            behandlingOppgaveopplysninger = alleManuelle().map {
+                FullførtBehandlingOppgaveopplysninger(
+                    behandlingId = it.id,
+                    omsorgsmottaker = it.omsorgsmottaker,
+                    oppgaveopplysninger = it.hentOppgaveopplysninger()
+                )
+            },
+            meldingId = meldingId()
+        )
+    }
 }
+
+data class FullførteBehandlingerStatistikk(
+    val innvilgetOpptjening: Int,
+    val avslåttOpptjening: Int,
+    val manuellBehandling: Int,
+    val summertAvslagPerVilkår: Map<VilkarsVurdering<*>, Int>,
+    val summertManuellPerVilkår: Map<VilkarsVurdering<*>, Int>
+)

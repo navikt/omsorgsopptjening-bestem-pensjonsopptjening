@@ -4,15 +4,16 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Brevopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRowMapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.toDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.toDomain
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapToJson
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
+import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -214,13 +215,18 @@ class KontrollbehandlingRepo(
         }
     }
 
-    fun oppdaterMedGodskriv(fullførtBehandling: FullførtBehandling, godskrivOpptjening: GodskrivOpptjening.Transient) {
+    fun oppdaterMedGodskriv(
+        fullførtBehandling: FullførtBehandling,
+        godskrivOpptjening: GodskrivOpptjening.Transient,
+        referanse: String,
+    ) {
         jdbcTemplate.update(
-            """update kontrollbehandling set godskriv = to_jsonb(:godskriv::jsonb) where id = :id""",
+            """update kontrollbehandling set godskriv = to_jsonb(:godskriv::jsonb) where id = :id and referanse = :referanse""",
             MapSqlParameterSource(
                 mapOf(
                     "id" to fullførtBehandling.id,
-                    "godskriv" to serialize(godskrivOpptjening)
+                    "godskriv" to serialize(godskrivOpptjening),
+                    "referanse" to referanse
                 )
             )
         )
@@ -228,26 +234,35 @@ class KontrollbehandlingRepo(
 
     fun oppdaterMedBrev(
         fullførtBehandling: FullførtBehandling,
-        brevopplysninger: Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker
+        brevopplysninger: Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker,
+        referanse: String,
     ) {
         jdbcTemplate.update(
-            """update kontrollbehandling set brev = to_jsonb(:brev::jsonb) where id = :id""",
+            """update kontrollbehandling set brev = to_jsonb(:brev::jsonb) where id = :id and referanse = :referanse""",
             MapSqlParameterSource(
                 mapOf(
                     "id" to fullførtBehandling.id,
-                    "brev" to serialize(brevopplysninger)
+                    "brev" to serialize(brevopplysninger),
+                    "referanse" to referanse
                 )
             )
         )
     }
 
-    fun oppdaterMedOppgave(fullførtBehandling: FullførtBehandling, oppgaveopplysninger: List<Oppgaveopplysninger>) {
+    fun oppdaterMedOppgave(oppgave: Oppgave.Transient, referanse: String) {
+        val sql = if (oppgave.behandlingId != null) {
+            """update kontrollbehandling set oppgave = to_jsonb(:oppgave::jsonb) where id = :id and referanse = :referanse"""
+        } else {
+            """update kontrollbehandling set oppgave = to_jsonb(:oppgave::jsonb) where kafkameldingid = :kafkameldingid and referanse = :referanse"""
+        }
         jdbcTemplate.update(
-            """update kontrollbehandling set oppgave = to_jsonb(:oppgave::jsonb) where id = :id""",
+            sql,
             MapSqlParameterSource(
                 mapOf(
-                    "id" to fullførtBehandling.id,
-                    "oppgave" to serialize(oppgaveopplysninger)
+                    "id" to oppgave.behandlingId,
+                    "kafkameldingid" to oppgave.meldingId,
+                    "oppgave" to serialize(oppgave),
+                    "referanse" to referanse
                 )
             )
         )
@@ -305,6 +320,30 @@ class KontrollbehandlingRepo(
             ),
             BehandlingRowMapper()
         ).toDomain()
+    }
+
+    fun existsForOmsorgsyterOgÅr(omsorgsyter: String, år: Int, referanse: String): Boolean {
+        return jdbcTemplate.query(
+            """select count(1) as antall from kontrollbehandling where omsorgsyter = :omsorgsyter and omsorgs_ar = :omsorgsar and oppgave is not null and referanse = :referanse""".trimMargin(),
+            mapOf<String, Any>(
+                "omsorgsyter" to omsorgsyter,
+                "omsorgsar" to år,
+                "referanse" to referanse,
+            ),
+            ResultSetExtractor { rs -> if (rs.next()) rs.getInt("antall") > 0 else throw RuntimeException("Could not extract resultset") }
+        )!!
+    }
+
+    fun existsForOmsorgsmottakerOgÅr(omsorgsmottaker: String, år: Int, referanse: String): Boolean {
+        return jdbcTemplate.query(
+            """select count(1) as antall from kontrollbehandling where omsorgsmottaker = :omsorgsmottaker and omsorgs_ar = :omsorgsar and oppgave is not null and referanse = :referanse""".trimMargin(),
+            mapOf<String, Any>(
+                "omsorgsmottaker" to omsorgsmottaker,
+                "omsorgsar" to år,
+                "referanse" to referanse,
+            ),
+            ResultSetExtractor { rs -> if (rs.next()) rs.getInt("antall") > 0 else throw RuntimeException("Could not extract resultset") }
+        )!!
     }
 
 
