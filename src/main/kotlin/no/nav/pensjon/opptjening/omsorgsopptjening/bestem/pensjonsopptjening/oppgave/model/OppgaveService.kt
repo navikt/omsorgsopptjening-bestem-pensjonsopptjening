@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.sql.SQLException
 import java.util.UUID
 
-@Component
 class OppgaveService(
     private val sakKlient: BestemSakKlient,
     private val oppgaveKlient: OppgaveKlient,
@@ -42,7 +41,6 @@ class OppgaveService(
         private val secureLog: Logger = LoggerFactory.getLogger("secure")
     }
 
-    @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
     fun opprett(oppgave: Oppgave.Transient): Oppgave.Persistent {
         return oppgaveRepo.persist(oppgave)
     }
@@ -55,7 +53,6 @@ class OppgaveService(
         return oppgaveRepo.existsForOmsorgsmottakerOgÅr(omsorgsmottaker, år)
     }
 
-    @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
     fun opprettOppgaveHvisNødvendig(behandling: FullførtBehandling) {
         val omsorgsMottakerHarOppgaveForÅr =
             oppgaveEksistererForOmsorgsmottakerOgÅr(
