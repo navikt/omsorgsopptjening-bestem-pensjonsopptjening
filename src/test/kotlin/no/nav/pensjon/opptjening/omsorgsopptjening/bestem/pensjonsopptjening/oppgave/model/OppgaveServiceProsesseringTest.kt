@@ -32,10 +32,7 @@ import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpHeaders
-import java.time.Month
-import java.time.YearMonth
 import java.time.temporal.ChronoUnit
-import kotlin.test.assertContains
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 
@@ -188,8 +185,8 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(1, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
                 assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
-                assertContains(it.melding, "Feil ved kall til http://localhost:9991/pen/api/bestemsak/v1")
-                assertContains(it.melding, "BAD_REQUEST")
+                assertThat(it.melding).contains("Feil ved kall til http://localhost:9991/pen/api/bestemsak/v1")
+                assertThat(it.melding).contains("BAD_REQUEST")
             }
         }
         oppgaveService.processAndExpectResult().first().also { oppgave ->
@@ -423,8 +420,8 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                 assertEquals(1, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
                 assertEquals(it.tidspunkt.plus(5, ChronoUnit.HOURS), it.karanteneTil)
-                assertContains(it.melding, "Feil ved kall til http://localhost:9991/pen/api/bestemsak/v1")
-                assertContains(it.melding, "BAD_REQUEST")
+                assertThat(it.melding).contains("Feil ved kall til http://localhost:9991/pen/api/bestemsak/v1")
+                assertThat(it.melding).contains("BAD_REQUEST")
             }
         }
 
