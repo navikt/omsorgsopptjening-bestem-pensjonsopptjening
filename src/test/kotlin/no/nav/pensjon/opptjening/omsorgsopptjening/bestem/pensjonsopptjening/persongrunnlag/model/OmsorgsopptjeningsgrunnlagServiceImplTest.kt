@@ -19,6 +19,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ytelse.YtelseOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.UgyldigPersongrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
@@ -559,7 +560,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
 
     @Test
     fun `kan ikke opprette grunnlag dersom det er overlapp i perioder for omsorgsmottaker og disse ikke kan slås sammen`() {
-        assertThrows<IllegalArgumentException> {
+        assertThrows<UgyldigPersongrunnlag.OverlappendeOmsorgsperiode> {
             service.lagOmsorgsopptjeningsgrunnlag(
                 PersongrunnlagMelding.Mottatt(
                     id = UUID.randomUUID(),
@@ -651,7 +652,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
 
     @Test
     fun `kan ikke opprette grunnlag dersom det er overlapp i perioder for omsorgsyter og disse ikke kan slås sammen`() {
-        assertThrows<IllegalArgumentException> {
+        assertThrows<UgyldigPersongrunnlag.OverlappendeOmsorgsperiode> {
             service.lagOmsorgsopptjeningsgrunnlag(
                 PersongrunnlagMelding.Mottatt(
                     id = UUID.randomUUID(),

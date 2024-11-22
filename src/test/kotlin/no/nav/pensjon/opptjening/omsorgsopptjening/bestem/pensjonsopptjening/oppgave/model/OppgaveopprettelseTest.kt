@@ -780,9 +780,23 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     omsorgsyter = "12345678910",
                     persongrunnlag = emptyList(),
                     feilinfo = listOf(
-                        Feilinformasjon.OverlappendeBarnetrygdperioder("obt"),
-                        Feilinformasjon.OverlappendeHjelpestønadperioder("ohs"),
-                        Feilinformasjon.FeilIDataGrunnlag("fidg"),
+                        Feilinformasjon.OverlappendeBarnetrygdperioder(
+                            message = "obt",
+                            exceptionType = "et",
+                            exceptionMessage = "em",
+                            omsorgsmottaker = "om"
+                        ),
+                        Feilinformasjon.OverlappendeHjelpestønadperioder(
+                            message = "ohs",
+                            exceptionType = "et",
+                            exceptionMessage = "em",
+                            omsorgsmottaker = "om"
+                        ),
+                        Feilinformasjon.FeilIDataGrunnlag(
+                            message = "fidg",
+                            exceptionType = "et",
+                            exceptionMessage = "em"
+                        ),
                         Feilinformasjon.UgyldigIdent(
                             message = "ugyldig ident",
                             exceptionType = "RuntimeException",
