@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerInnvilget
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.EllerUbestemt
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgAvslått
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgInnvilget
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OgUbestemt
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingUtfall
 
 
@@ -19,11 +21,17 @@ internal sealed class VilkårsvurderingUtfallDb {
     @JsonTypeName("EllerAvslått")
     data object EllerAvslått : VilkårsvurderingUtfallDb()
 
+    @JsonTypeName("EllerUbestemt")
+    data object EllerUbestemt : VilkårsvurderingUtfallDb()
+
     @JsonTypeName("EllerInnvilget")
     data object EllerInnvilget : VilkårsvurderingUtfallDb()
 
     @JsonTypeName("OgAvslått")
     data object OgAvslått : VilkårsvurderingUtfallDb()
+
+    @JsonTypeName("OgUbestemt")
+    data object OgUbestemt : VilkårsvurderingUtfallDb()
 
     @JsonTypeName("OgInnvilget")
     data object OgInnvilget : VilkårsvurderingUtfallDb()
@@ -95,8 +103,16 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
             VilkårsvurderingUtfallDb.EllerAvslått
         }
 
+        is OgUbestemt -> {
+            VilkårsvurderingUtfallDb.OgUbestemt
+        }
+
         is EllerInnvilget -> {
             VilkårsvurderingUtfallDb.EllerInnvilget
+        }
+
+        is EllerUbestemt -> {
+            VilkårsvurderingUtfallDb.EllerUbestemt
         }
 
         is OgAvslått -> {
@@ -115,7 +131,7 @@ internal fun VilkårsvurderingUtfall.toDb(): VilkårsvurderingUtfallDb {
             VilkårsvurderingUtfallDb.VilkårAvslag(henvisning = henvisninger.toDb())
         }
 
-        is VilkårsvurderingUtfall.Ubestemt -> {
+        is VilkårsvurderingUtfall.Ubestemt.Vilkår -> {
             VilkårsvurderingUtfallDb.Manuell(henvisning = henvisninger.toDb())
         }
     }
@@ -127,12 +143,20 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
             EllerAvslått
         }
 
+        is VilkårsvurderingUtfallDb.EllerUbestemt -> {
+            EllerUbestemt
+        }
+
         is VilkårsvurderingUtfallDb.EllerInnvilget -> {
             EllerInnvilget
         }
 
         is VilkårsvurderingUtfallDb.OgAvslått -> {
             OgAvslått
+        }
+
+        is VilkårsvurderingUtfallDb.OgUbestemt -> {
+            OgUbestemt
         }
 
         is VilkårsvurderingUtfallDb.OgInnvilget -> {
@@ -148,7 +172,7 @@ internal fun VilkårsvurderingUtfallDb.toDomain(): VilkårsvurderingUtfall {
         }
 
         is VilkårsvurderingUtfallDb.Manuell -> {
-            VilkårsvurderingUtfall.Ubestemt(henvisninger = henvisning.toDomain())
+            VilkårsvurderingUtfall.Ubestemt.Vilkår(henvisninger = henvisning.toDomain())
         }
     }
 }

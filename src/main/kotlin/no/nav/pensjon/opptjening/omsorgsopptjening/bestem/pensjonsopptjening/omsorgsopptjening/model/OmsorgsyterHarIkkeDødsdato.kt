@@ -13,7 +13,7 @@ object OmsorgsyterHarIkkeDødsdato : ParagrafVilkår<OmsorgsyterHarIkkeDødsdato
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
         return when (grunnlag.harDødsdato()) {
-            true -> VilkårsvurderingUtfall.Ubestemt(emptySet())
+            true -> VilkårsvurderingUtfall.Ubestemt.Vilkår(emptySet())
             false -> VilkårsvurderingUtfall.Innvilget.Vilkår(emptySet())
         }
     }

@@ -19,7 +19,7 @@ object OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn :
         ).let { referanser ->
             when {
                 grunnlag.erManuell() -> {
-                    VilkårsvurderingUtfall.Ubestemt(referanser)
+                    VilkårsvurderingUtfall.Ubestemt.Vilkår(referanser)
                 }
 
                 else -> {

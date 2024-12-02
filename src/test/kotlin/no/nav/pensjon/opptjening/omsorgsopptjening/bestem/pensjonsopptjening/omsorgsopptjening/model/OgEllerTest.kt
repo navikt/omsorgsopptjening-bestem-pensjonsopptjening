@@ -1,11 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Eller.Companion.eller
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class EllerTest {
+class OgEllerTest {
 
     private val grunnlag = AldersvurderingsGrunnlag(
         person = Person(
@@ -24,43 +25,34 @@ class EllerTest {
     private val avslag = innvilget.copy(utfall = VilkårsvurderingUtfall.Avslag.Vilkår(emptySet()))
     private val ubestemt = innvilget.copy(utfall = VilkårsvurderingUtfall.Ubestemt.Vilkår(emptySet()))
 
+
     @Test
-    fun `all avslag is avslag`() {
-        eller(avslag, avslag).also { assertThat(it.erAvslått()).isTrue() }
+    fun `innvilget hvis nøstet eller har en innvilget`() {
+        eller(og(innvilget), og(avslag))
+            .also { assertThat(it.erInnvilget()).isTrue() }
     }
 
     @Test
-    fun `one innvilget is innvilget`() {
-        eller(avslag, innvilget).also { assertThat(it.erInnvilget()).isTrue() }
+    fun `innvilget hvis nøstet eller har en ubestemt`() {
+        eller(og(innvilget), og(ubestemt))
+            .also { assertThat(it.erInnvilget()).isTrue() }
     }
 
     @Test
-    fun `all innvilget is innvilget`() {
-        eller(innvilget, innvilget).also { assertThat(it.erInnvilget()).isTrue() }
+    fun `avslag hvis nøstet og har et avslag`() {
+        og(eller(innvilget), og(avslag))
+            .also { assertThat(it.erAvslått()).isTrue() }
     }
 
     @Test
-    fun `nested eller with all avslag is avslag`() {
-        eller(avslag, eller(avslag)).also { assertThat(it.erAvslått()).isTrue() }
+    fun `ubestemt hvis nøstet og har et avslag`() {
+        og(eller(innvilget), eller(innvilget, ubestemt), eller(avslag, ubestemt))
+            .also { assertThat(it.erUbestemt()).isTrue() }
     }
 
     @Test
-    fun `nested eller with all innvilget is innvilget`() {
-        eller(avslag, eller(innvilget)).also { assertThat(it.erInnvilget()).isTrue() }
-    }
-
-    @Test
-    fun `avslag og ubestemt er ubestemt`() {
-        eller(avslag, ubestemt).also { assertThat(it.erUbestemt()).isTrue() }
-    }
-
-    @Test
-    fun `innvilget og ubestemt er innvilget`() {
-        eller(innvilget, ubestemt).also { assertThat(it.erInnvilget()).isTrue() }
-    }
-
-    @Test
-    fun `ubestemt og ubestemt er ubestemt`() {
-        eller(ubestemt, ubestemt).also { assertThat(it.erUbestemt()).isTrue() }
+    fun `avslag hvis nøstet avslag`() {
+        og(innvilget, og(innvilget, innvilget), og(innvilget, eller(avslag, avslag)))
+            .also { assertThat(it.erAvslått()).isTrue() }
     }
 }

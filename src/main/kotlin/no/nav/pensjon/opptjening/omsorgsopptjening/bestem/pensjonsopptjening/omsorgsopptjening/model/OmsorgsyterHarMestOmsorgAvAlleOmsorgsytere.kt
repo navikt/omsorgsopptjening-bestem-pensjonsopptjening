@@ -20,11 +20,11 @@ object OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere :
             }
 
             grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedFullOmsorg() -> {
-                VilkårsvurderingUtfall.Ubestemt(setOf(JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd))
+                VilkårsvurderingUtfall.Ubestemt.Vilkår(setOf(JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd))
             }
 
             grunnlag.omsorgsyterErEnAvFlereMedFlestOmsorgsmånederMedDeltOmsorg() -> {
-                VilkårsvurderingUtfall.Ubestemt(setOf(JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd))
+                VilkårsvurderingUtfall.Ubestemt.Vilkår(setOf(JuridiskHenvisning.Forskrift_Om_Alderspensjon_I_Folketrygden_Kap_3_Paragraf_4_Tredje_Ledd))
             }
 
             else -> {

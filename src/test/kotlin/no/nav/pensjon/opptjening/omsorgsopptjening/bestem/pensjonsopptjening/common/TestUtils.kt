@@ -46,4 +46,3 @@ internal fun Periode.tilUtbetalingsmåneder(utbetalt: Int, landstilknytning: Lan
 internal fun Periode.utbetalingsmåneder(utbetalt: Int, landstilknytning: Landstilknytning): Utbetalingsmåneder {
     return Utbetalingsmåneder(tilUtbetalingsmåneder(utbetalt, landstilknytning))
 }
-

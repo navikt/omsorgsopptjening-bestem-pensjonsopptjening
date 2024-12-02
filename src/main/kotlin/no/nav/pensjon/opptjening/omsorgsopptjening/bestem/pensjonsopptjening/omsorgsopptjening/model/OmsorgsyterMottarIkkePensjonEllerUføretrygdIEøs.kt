@@ -27,7 +27,7 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
                 }
 
                 grunnlag.manuell() -> {
-                    VilkårsvurderingUtfall.Ubestemt(it)
+                    VilkårsvurderingUtfall.Ubestemt.Vilkår(it)
                 }
 
                 else -> {

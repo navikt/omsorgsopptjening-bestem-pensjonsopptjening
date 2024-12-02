@@ -24,9 +24,14 @@ class Eller : Vilkar<List<VilkarsVurdering<*>>>() {
     }
 
     override fun <T : Vilkar<List<VilkarsVurdering<*>>>> T.bestemUtfall(grunnlag: List<VilkarsVurdering<*>>): VilkårsvurderingUtfall {
+        val alleUtfall = grunnlag.map { it.utfall }
         return when {
-            grunnlag.map { it.utfall }.any { it.erInnvilget() } -> {
+            alleUtfall.any { it.erInnvilget() } -> {
                 EllerInnvilget
+            }
+
+            alleUtfall.none { it.erInnvilget() } && alleUtfall.any { it.erUbestemt() } -> {
+                EllerUbestemt
             }
 
             else -> {
@@ -43,5 +48,5 @@ data class EllerVurdering(
 ) : VilkarsVurdering<List<VilkarsVurdering<*>>>()
 
 data object EllerInnvilget : VilkårsvurderingUtfall.Innvilget()
-
+data object EllerUbestemt : VilkårsvurderingUtfall.Ubestemt()
 data object EllerAvslått : VilkårsvurderingUtfall.Avslag()

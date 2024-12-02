@@ -13,36 +13,51 @@ sealed class VilkarsVurdering<Grunnlag : Any> {
 
 sealed class ParagrafVurdering<T : ParagrafGrunnlag> : VilkarsVurdering<T>()
 
+@JvmName("reifiedErAvslått")
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erAvslått(): Boolean {
-    return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { it.utfall.erAvslag() }.single()
+    return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { it.erAvslått() }.single()
 }
 
+fun VilkarsVurdering<*>.erAvslått(): Boolean {
+    return utfall.erAvslag()
+}
+
+@JvmName("reifiedErInnvilget")
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erInnvilget(): Boolean {
-    return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { it.utfall.erInnvilget() }.single()
+    return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { it.erInnvilget() }.single()
 }
 
+fun VilkarsVurdering<*>.erInnvilget(): Boolean {
+    return utfall.erInnvilget()
+}
+
+@JvmName("reifiedErUbestemt")
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erUbestemt(): Boolean {
-    return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { it.utfall.erUbestemt() }.single()
+    return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { erUbestemt() }.single()
+}
+
+fun VilkarsVurdering<*>.erUbestemt(): Boolean {
+    return utfall.erUbestemt()
 }
 
 fun VilkarsVurdering<*>.finnAlleInnvilget(): List<VilkarsVurdering<*>> {
-    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Innvilget }
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.erInnvilget() }
 }
 
 fun VilkarsVurdering<*>.finnAlleAvslatte(): List<VilkarsVurdering<*>> {
-    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Avslag }
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.erAvslått() }
 }
 
 fun VilkarsVurdering<*>.finnAlleUbestemte(): List<VilkarsVurdering<*>> {
-    return UnwrapOgEllerVisitor.unwrap(this).filter { it.utfall is VilkårsvurderingUtfall.Ubestemt }
+    return UnwrapOgEllerVisitor.unwrap(this).filter { it.erUbestemt() }
 }
 
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erEnesteAvslag(): Boolean {
-    return erAvslått<T>() && UnwrapOgEllerVisitor.unwrap(this).count { it.utfall.erAvslag() } == 1
+    return erAvslått<T>() && UnwrapOgEllerVisitor.unwrap(this).count { it.erAvslått() } == 1
 }
 
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erEnesteUbestemt(): Boolean {
-    return erUbestemt<T>() && UnwrapOgEllerVisitor.unwrap(this).count { it.utfall.erUbestemt() } == 1
+    return erUbestemt<T>() && UnwrapOgEllerVisitor.unwrap(this).count { it.erUbestemt() } == 1
 }
 
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.finnVurdering(): T {

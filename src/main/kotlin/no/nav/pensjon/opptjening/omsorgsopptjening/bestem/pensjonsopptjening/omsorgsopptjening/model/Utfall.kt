@@ -11,7 +11,9 @@ sealed class VilkårsvurderingUtfall {
         data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Avslag()
     }
 
-    data class Ubestemt(val henvisninger: Set<JuridiskHenvisning>) : VilkårsvurderingUtfall()
+    sealed class Ubestemt : VilkårsvurderingUtfall() {
+        data class Vilkår(val henvisninger: Set<JuridiskHenvisning>) : Ubestemt()
+    }
 
 
     fun erInnvilget(): Boolean {

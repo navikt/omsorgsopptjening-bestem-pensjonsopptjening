@@ -25,7 +25,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                         }
 
                         grunnlag.erManuell() -> {
-                            VilkårsvurderingUtfall.Ubestemt(it)
+                            VilkårsvurderingUtfall.Ubestemt.Vilkår(it)
                         }
 
                         else -> {
@@ -57,7 +57,7 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
                         }
 
                         grunnlag.erManuell() -> {
-                            VilkårsvurderingUtfall.Ubestemt(it)
+                            VilkårsvurderingUtfall.Ubestemt.Vilkår(it)
                         }
 
                         else -> {
