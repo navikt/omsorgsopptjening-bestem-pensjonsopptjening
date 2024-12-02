@@ -6,20 +6,19 @@ val azureAdClient = "0.0.7"
 val jacksonVersion = "2.17.1"
 val logbackEncoderVersion = "8.0"
 val postgresqlVersion = "42.7.4"
-val flywayCoreVersion = "11.0.0"
-val springKafkaTestVersion = "3.3.0"
+val flywayCoreVersion = "10.20.1"
+val springKafkaTestVersion = "3.2.4"
 val springCloudContractVersion = "4.0.4"
-val testcontainersVersion = "1.20.4"
+val testcontainersVersion = "1.20.3"
 val mockkVersion = "1.13.13"
 val assertJVersion = "3.26.3"
 val jsonAssertVersion = "1.5.3"
 val wiremockVersion = "3.9.2"
 val mockitoVersion = "5.4.0"
-val unleashVersion = "9.2.5"
-val navTokenSupportVersion = "5.0.11"
+val unleashVersion = "9.2.4"
+val navTokenSupportVersion = "5.0.8"
 val hibernateValidatorVersion = "8.0.1.Final"
 val junit5Version = "5.10.3"
-val jsonUnitVersion = "4.0.0"
 
 
 val snakeYamlVersion = "2.3"
@@ -32,7 +31,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.4.0"
+    id("org.springframework.boot") version "3.3.5"
     id("com.github.ben-manes.versions") version "0.51.0"
 }
 
@@ -93,7 +92,6 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-    testImplementation("org.skyscreamer:jsonassert:$jsonAssertVersion")
     testImplementation("org.skyscreamer:jsonassert:$jsonAssertVersion")
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoVersion")
     testImplementation("io.mockk:mockk:${mockkVersion}")
