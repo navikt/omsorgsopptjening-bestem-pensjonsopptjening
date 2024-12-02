@@ -20,4 +20,11 @@ class DatasourceConfig {
             }
         )
     }
+
+    @Bean
+    fun datasourceReadiness(
+        datasource: HikariDataSource
+    ): DatasourceReadinessCheck {
+        return DatasourceReadinessCheck(datasource)
+    }
 }

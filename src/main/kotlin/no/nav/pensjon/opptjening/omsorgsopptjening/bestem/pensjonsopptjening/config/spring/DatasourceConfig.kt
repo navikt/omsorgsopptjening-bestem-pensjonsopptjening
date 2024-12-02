@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 
 @Configuration
-@Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
+@Profile("dev-gcp", "prod-gcp")
 class DatasourceConfig {
 
     @Bean

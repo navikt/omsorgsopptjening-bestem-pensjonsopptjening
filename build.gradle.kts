@@ -18,13 +18,13 @@ val mockitoVersion = "5.4.0"
 val unleashVersion = "9.2.5"
 val navTokenSupportVersion = "5.0.11"
 val hibernateValidatorVersion = "8.0.1.Final"
-val junit5Version = "5.10.3"
+val junit5Version = "5.11.3"
 val jsonUnitVersion = "4.0.0"
 
 
 val snakeYamlVersion = "2.3"
 val snappyJavaVersion = "1.1.10.7"
-val httpClient5Version = "5.3.1" // TODO: 5.4 feiler med NoClassDefFoundError
+val httpClient5Version = "5.4.1"
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {

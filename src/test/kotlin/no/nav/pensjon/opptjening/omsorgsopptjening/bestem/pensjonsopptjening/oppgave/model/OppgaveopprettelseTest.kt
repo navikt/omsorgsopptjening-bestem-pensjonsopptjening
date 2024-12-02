@@ -8,7 +8,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.unntaksperioderMedPliktigEllerFrivilligMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
@@ -31,9 +30,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
 import java.time.YearMonth
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
@@ -47,9 +44,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @Autowired
     private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
 
-    @MockBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
-
     @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
 
@@ -62,7 +56,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt to omsorgsytere med like mange omsorgsmåneder for samme barn i samme omsorgsår skal det opprettes oppgave for den som mottok i desember`() {
         wiremock.stubForPdlTransformer()
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -178,7 +171,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt to omsorgsytere med like mange omsorgsmåneder for samme barn i samme omsorgsår kan det opprettes oppgave for begge dersom en av foreldrene inngår i en annen familiekonstellasjon hvor oppgave også skal opprettes`() {
         wiremock.stubForPdlTransformer()
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -340,7 +332,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt to omsorgsytere med like mange omsorgsmåneder for samme barn i samme omsorgsår skal det opprettes oppgave for den som mottok i desember - hvis begge mottok i desember opprettes det for en av partene`() {
         wiremock.stubForPdlTransformer()
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -458,7 +449,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @Test
     fun `gitt at to omsorgsytere har like mange omsorgsmåneder for flere barn innenfor samme omsorgsår opprettes det bare en oppgave, men oppgaven inneholder informasjon om begge tilfellene`() {
         wiremock.stubForPdlTransformer()
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -551,7 +541,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @Test
     fun `manuell behandling med oppgave dersom bruker kan få innvilget omsorgsopptjening hvis perioder med pliktig eller frivillig medlemskap telles med`() {
         wiremock.stubForPdlTransformer()
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.unntaksperioderMedPliktigEllerFrivilligMedlemskap(
             "12345678910",
             setOf(Periode(mars(2020), september(2020)))
@@ -606,7 +595,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @Test
     fun `manuell behandling med oppgave dersom delt omsorg for hjelpestønadsmottaker`() {
         wiremock.stubForPdlTransformer()
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -692,7 +680,6 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     @Test
     fun `manuell behandling med oppgave dersom det er innvilget opptjening for fellesbarn omsorgsyter ikke mottar barnetrygd for`() {
         wiremock.stubForPdlTransformer()
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()

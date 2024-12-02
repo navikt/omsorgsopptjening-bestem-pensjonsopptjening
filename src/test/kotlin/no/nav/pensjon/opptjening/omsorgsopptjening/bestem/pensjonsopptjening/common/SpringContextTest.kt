@@ -1,6 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
-import jakarta.annotation.PostConstruct
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Application
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.TestKlokke
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.kafka.PersongrunnlagKafkaConfig
@@ -11,29 +10,22 @@ import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.clients.producer.RecordMetadata
-import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.header.internals.RecordHeader
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.BeforeEach
-import org.mockito.BDDMockito.any
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
-import org.springframework.kafka.support.SendResult
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import java.io.Serializable
 import java.util.UUID
-import java.util.concurrent.CompletableFuture
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 @DirtiesContext
@@ -65,31 +57,7 @@ sealed class SpringContextTest {
     }
 
     @SpringBootTest(classes = [Application::class])
-    class NoKafka : SpringContextTest() {
-
-        @MockBean
-        private lateinit var kafkaTemplate: KafkaTemplate<String, String>
-
-        @PostConstruct
-        fun postConstruct() {
-            willAnswer { invocation ->
-                invocation.getArgument(0, ProducerRecord::class.java).let {
-                    CompletableFuture.completedFuture(
-                        SendResult(
-                            it,
-                            RecordMetadata(
-                                TopicPartition(
-                                    it.topic(),
-                                    0
-                                ), 0L, 0, 0L, 0, 0
-                            )
-                        )
-                    )
-                }
-            }.given(kafkaTemplate).send(any<ProducerRecord<String, String>>())
-        }
-    }
-
+    class NoKafka : SpringContextTest()
 
     @EmbeddedKafka(partitions = 1, topics = ["\${OMSORGSOPPTJENING_TOPIC}"])
     @SpringBootTest(classes = [Application::class])
@@ -147,7 +115,7 @@ sealed class SpringContextTest {
             producer.send(pr).get()
         }
 
-        fun send(melding: String){
+        fun send(melding: String) {
             val pr = ProducerRecord(
                 Topics.Omsorgsopptjening.NAME,
                 null,

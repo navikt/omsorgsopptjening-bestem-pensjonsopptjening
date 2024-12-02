@@ -12,7 +12,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
@@ -29,9 +28,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
@@ -44,9 +41,6 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
 
     @Autowired
     private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
-
-    @MockBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @Autowired
     private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
@@ -82,8 +76,6 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
-
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         /**
          * Stiller klokka litt fram i tid for å unngå at [GodskrivOpptjening.Status.Retry.karanteneTil] fører til at vi hopper over raden.
@@ -177,8 +169,6 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-
         val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
@@ -235,7 +225,6 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(WireMock.serverError())
         )
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()

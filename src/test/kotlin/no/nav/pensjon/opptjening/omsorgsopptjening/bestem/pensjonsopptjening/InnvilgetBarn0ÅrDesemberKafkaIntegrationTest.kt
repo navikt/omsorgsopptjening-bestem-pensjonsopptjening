@@ -1,13 +1,11 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
 import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.matching.EqualToJsonPattern
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
@@ -17,10 +15,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
-import org.mockito.Mockito.verify
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
 import java.time.YearMonth
 import kotlin.test.assertEquals
@@ -31,12 +26,6 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
 
     @Autowired
     private lateinit var behandlingRepo: BehandlingRepo
-
-    @MockBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
-
-    @MockBean
-    private lateinit var godskrivOpptjeningClient: GodskrivOpptjeningClient
 
     companion object {
         @JvmField
@@ -51,7 +40,6 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
             WireMock.post(WireMock.urlPathEqualTo(POPP_OMSORG_PATH))
                 .willReturn(WireMock.ok())
         )
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         sendOmsorgsgrunnlagKafka(
             omsorgsGrunnlag = PersongrunnlagMeldingKafka(
@@ -83,11 +71,19 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
 
         assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
 
-        verify(godskrivOpptjeningClient).godskriv(
-            omsorgsyter = "12345678910",
-            omsorgsÅr = 2020,
-            omsorgstype = DomainOmsorgskategori.BARNETRYGD,
-            omsorgsmottaker = "01122012345"
+        wiremock.verify(
+            WireMock.postRequestedFor(WireMock.urlEqualTo(POPP_OMSORG_PATH))
+                .withRequestBody(
+                    EqualToJsonPattern("""
+                        {
+                            "fnr":"12345678910",
+                            "ar":2020,
+                            "omsorgType":"OBU6",
+                            "kilde":"OMSORGSOPPTJENING",
+                            "fnrOmsorgFor":"01122012345"
+                        }
+                    """.trimIndent(),true,true)
+                )
         )
     }
 }

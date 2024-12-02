@@ -20,8 +20,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Feilinformasjon
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.IdentRolle
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
@@ -31,9 +29,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
@@ -51,9 +47,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
-
-    @MockBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
@@ -108,7 +101,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
          * Stiller klokka litt fram i tid for å unngå at [PersongrunnlagMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -202,7 +194,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                         .withHeader("Content-Type", "application/json")
                 )
         )
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -296,7 +287,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
          * Stiller klokka litt fram i tid for å unngå at [PersongrunnlagMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 

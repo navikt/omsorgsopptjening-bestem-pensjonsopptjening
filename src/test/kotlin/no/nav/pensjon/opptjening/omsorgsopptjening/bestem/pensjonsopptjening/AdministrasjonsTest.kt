@@ -24,7 +24,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.OPPGAVEN_ER_KANSELLERT
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
@@ -41,9 +40,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpHeaders
 import java.time.LocalDate
 import java.time.Month.DECEMBER
@@ -80,10 +77,6 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Autowired
     private lateinit var brevService: BrevService
 
-    @MockBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
-
-
     companion object {
         @JvmField
         @RegisterExtension
@@ -95,8 +88,6 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     override fun beforeEach() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
-        willAnswer { true }
-            .given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
