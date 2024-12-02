@@ -3,8 +3,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ko
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Brevopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.AggregertOppgaveForFullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.OmsorgsopptjeningsgrunnlagService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
@@ -67,11 +67,7 @@ class KontrollbehandlingServiceImpl(
         ).also { fullførteBehandlinger ->
             fullførteBehandlinger.håndterUtfall(
                 innvilget = {
-                    kontrollbehandlingRepo.oppdaterMedGodskriv(
-                        fullførtBehandling = it,
-                        godskrivOpptjening = it.godskrivOpptjening(),
-                        referanse = kontrollbehandling.referanse
-                    )
+                    kontrollbehandlingRepo.oppdaterMedGodskriv(it, it.godskrivOpptjening())
                     it.hentBrevopplysninger(
                         hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgstype,
                         hentPensjonspoengForInntekt = hentPensjonspoeng::hentPensjonspoengForInntekt
@@ -80,8 +76,7 @@ class KontrollbehandlingServiceImpl(
                             is Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker -> {
                                 kontrollbehandlingRepo.oppdaterMedBrev(
                                     fullførtBehandling = it,
-                                    brevopplysninger = brevopplysninger,
-                                    referanse = kontrollbehandling.referanse,
+                                    brevopplysninger = brevopplysninger
                                 )
                             }
 
@@ -89,29 +84,14 @@ class KontrollbehandlingServiceImpl(
                         }
                     }
                 },
-                manuell = {
-                    AggregertOppgaveForFullførteBehandlinger(
-                        omsorgsyterHarOppgave = { omsorgsyter, år ->
-                            kontrollbehandlingRepo.existsForOmsorgsyterOgÅr(
-                                omsorgsyter = omsorgsyter,
-                                år = år,
-                                referanse = kontrollbehandling.referanse
-                            )
-                        },
-                        omsorgsmottakerHarOppgave = { omsorgsmottaker, år ->
-                            kontrollbehandlingRepo.existsForOmsorgsmottakerOgÅr(
-                                omsorgsmottaker = omsorgsmottaker,
-                                år = år,
-                                referanse = kontrollbehandling.referanse
-                            )
-                        },
-                        alleOppgaveopplysninger = fullførteBehandlinger.hentOppgaveopplysninger()
-                    ).oppgave?.let {
-                        kontrollbehandlingRepo.oppdaterMedOppgave(
-                            oppgave = it,
-                            referanse = kontrollbehandling.referanse,
-                        )
-                    }
+                manuell = { b ->
+                    //TODO litt mikk for å få dette helt likt som oppgaveservice
+                    b.hentOppgaveopplysninger()
+                        .filterNot { it is Oppgaveopplysninger.Ingen }
+                        .takeIf { it.isNotEmpty() }
+                        ?.let {
+                            kontrollbehandlingRepo.oppdaterMedOppgave(b, it)
+                        }
                 },
                 avslag = {} //noop,
             )

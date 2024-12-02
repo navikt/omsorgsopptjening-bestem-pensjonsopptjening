@@ -1,12 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.*
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -16,7 +11,7 @@ import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.toJavaDuration
 
@@ -139,9 +134,9 @@ class OppgaveRepo(
     fun existsForOmsorgsyterOgÅr(omsorgsyter: String, år: Int): Boolean {
         return jdbcTemplate.query(
             """select count(1) as antall from oppgave o 
-                |join behandling b on b.kafkameldingid = o.meldingid
-                |where b.omsorgsyter = :omsorgsyter and b.omsorgs_ar = :omsorgsar
-                |and o.status <> 'Stoppet'""".trimMargin(),
+                |join behandling b on b.id = o.behandlingId
+                | where b.omsorgsyter = :omsorgsyter and b.omsorgs_ar = :omsorgsar
+                | and o.status <> 'Stoppet'""".trimMargin(),
             mapOf<String, Any>(
                 "omsorgsyter" to omsorgsyter,
                 "omsorgsar" to år
@@ -153,7 +148,7 @@ class OppgaveRepo(
     fun existsForOmsorgsmottakerOgÅr(omsorgsmottaker: String, år: Int): Boolean {
         return jdbcTemplate.query(
             """select count(1) as antall from oppgave o 
-                |join behandling b on b.kafkameldingid = o.meldingid 
+                |join behandling b on b.id = o.behandlingId 
                 |where b.omsorgsmottaker = :omsorgsmottaker 
                 |and b.omsorgs_ar = :omsorgsar
                 |and o.status <> 'Stoppet'""".trimMargin(),

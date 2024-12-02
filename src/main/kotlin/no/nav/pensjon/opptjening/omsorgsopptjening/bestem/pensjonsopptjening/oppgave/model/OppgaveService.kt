@@ -1,7 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.KansellerOppgaveRespons
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveInfo
@@ -22,6 +23,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import java.sql.SQLException
 import java.util.UUID
 
@@ -41,20 +45,46 @@ class OppgaveService(
         return oppgaveRepo.persist(oppgave)
     }
 
-    private fun oppgaveEksistererForOmsorgsyterOgÅr(omsorgsyter: String, år: Int): Boolean {
+    fun oppgaveEksistererForOmsorgsyterOgÅr(omsorgsyter: String, år: Int): Boolean {
         return oppgaveRepo.existsForOmsorgsyterOgÅr(omsorgsyter, år)
     }
 
-    private fun oppgaveEksistererForOmsorgsmottakerOgÅr(omsorgsmottaker: String, år: Int): Boolean {
+    fun oppgaveEksistererForOmsorgsmottakerOgÅr(omsorgsmottaker: String, år: Int): Boolean {
         return oppgaveRepo.existsForOmsorgsmottakerOgÅr(omsorgsmottaker, år)
     }
 
-    fun opprettOppgaveForManuellBehandlingHvisNødvendig(behandlinger: FullførteBehandlinger) {
-        AggregertOppgaveForFullførteBehandlinger(
-            omsorgsyterHarOppgave = ::oppgaveEksistererForOmsorgsyterOgÅr,
-            omsorgsmottakerHarOppgave = ::oppgaveEksistererForOmsorgsmottakerOgÅr,
-            alleOppgaveopplysninger = behandlinger.hentOppgaveopplysninger()
-        ).oppgave?.let { opprett(it) }
+    fun opprettOppgaveHvisNødvendig(behandling: FullførtBehandling) {
+        val omsorgsMottakerHarOppgaveForÅr =
+            oppgaveEksistererForOmsorgsmottakerOgÅr(
+                behandling.omsorgsmottaker,
+                behandling.omsorgsAr
+            )
+
+        fun oppgavemottakerHarOppgaveForÅr(oppgaveopplysning: Oppgaveopplysninger.Generell): Boolean {
+            return oppgaveEksistererForOmsorgsyterOgÅr(
+                oppgaveopplysning.oppgavemottaker,
+                behandling.omsorgsAr
+            )
+        }
+        if (!omsorgsMottakerHarOppgaveForÅr) {
+            behandling.hentOppgaveopplysninger()
+                .filterIsInstance<Oppgaveopplysninger.Generell>()
+                .filterNot { oppgaveopplysning -> oppgavemottakerHarOppgaveForÅr(oppgaveopplysning) }
+                .groupBy { it.oppgavemottaker }
+                .mapValues { o -> o.value.map { it.oppgaveTekst }.toSet() }
+                .forEach { (oppgavemottaker, oppgaveTekster) ->
+                    opprett(
+                        Oppgave.Transient(
+                            behandlingId = behandling.id,
+                            meldingId = behandling.meldingId,
+                            detaljer = OppgaveDetaljer.MottakerOgTekst(
+                                oppgavemottaker = oppgavemottaker,
+                                oppgavetekst = oppgaveTekster
+                            )
+                        )
+                    )
+                }
+        }
     }
 
     fun process(): Resultat<List<Oppgave.Persistent>> {
