@@ -7,23 +7,19 @@ fun List<Feilinformasjon>.oppgavetekster(omsorgsyter: String): Set<String> {
     return map {
         when (it) {
             is Feilinformasjon.OverlappendeBarnetrygdperioder -> {
-                "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av motstridende opplysninger for barnetrygdperiodene tilhørende et av barna. Vurder omsorgsopptjening manuelt."
+                """Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av motstridende opplysninger for barnetrygdperiodene tilhørende et av barna."""
             }
 
             is Feilinformasjon.OverlappendeHjelpestønadperioder -> {
-                "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna. Vurder omsorgsopptjening manuelt."
+                """Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna."""
             }
 
             is Feilinformasjon.UgyldigIdent -> {
-                """Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av at det ikke eksisterer et gjeldende fnr for ${
-                    rolle(
-                        it
-                    )
-                } med ident: ${it.ident}""".trimIndent()
+                """Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av at det ikke eksisterer et gjeldende fnr for ${rolle(it)} med ident: ${it.ident}."""
             }
 
             is Feilinformasjon.FeilIDataGrunnlag -> {
-                "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av feil i datagrunnlaget. Vurder omsorgsopptjening manuelt."
+                """Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av feil i datagrunnlaget."""
             }
         }
     }.toSet()

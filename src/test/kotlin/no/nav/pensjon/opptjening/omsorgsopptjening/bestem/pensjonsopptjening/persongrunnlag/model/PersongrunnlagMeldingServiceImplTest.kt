@@ -962,7 +962,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                 listOf(
                     Oppgaveopplysninger.Generell(
                         oppgavemottaker = "12345678910",
-                        oppgaveTekst = """Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: 07081812345 må vurderes manuelt pga EØS-sak og mottar pensjon eller uføretrygd"""
+                        oppgaveTekst = "Vurder omsorgsopptjening manuelt. Bruker var bosatt i EØS-land i perioden hen mottok barnetrygd for barn med fnr: 07081812345."
                     )
                 ),
                 behandling.hentOppgaveopplysninger()

@@ -328,7 +328,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "04010012797",
                         oppgavetekst = setOf(
-                            "Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: 01052012345 må vurderes manuelt pga at andre foreldre: 12345678910 mottar barnetrygd for felles barn: 07081812345",
+                            "Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 12345678910,04010012797 har mottatt barnetrygd for ulike felles barn med fnr: 07081812345,01052012345. En av foreldrene har fått godskrevet omsorgsopptjening automatisk, eller har oppgave for manuell vurdering.",
                             "Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01052012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."
                         )
                     )
@@ -399,7 +399,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                         oppgavemottaker = "12345678910",
                         oppgavetekst = setOf(
                             "Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.",
-                            "Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: 07081812345. Vurder retten til omsorgsopptjening."
+                            "Vurder omsorgsopptjening manuelt. Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: 07081812345."
                         )
                     )
                 )
@@ -595,7 +595,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     assertThat(oppgave.detaljer).isEqualTo(
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "12345678910",
-                            oppgavetekst = setOf("""Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: 07081812345 må vurderes manuelt pga perioder i MEDL""")
+                            oppgavetekst = setOf("Vurder omsorgsopptjening manuelt. Bruker var pliktig eller frivillig medlem i utlandet i perioden hen mottok barnetrygd for barn med fnr: 07081812345.")
                         )
                     )
                 }
@@ -680,7 +680,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                             oppgavemottaker = "12345678910",
                             oppgavetekst = setOf(
                                 "Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 03041212345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.",
-                                "Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: 03041212345. Vurder retten til omsorgsopptjening."
+                                "Vurder omsorgsopptjening manuelt. Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: 03041212345."
                             )
                         )
                     )
@@ -764,7 +764,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     assertThat(oppgave.detaljer).isEqualTo(
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "04010012797",
-                            oppgavetekst = setOf("""Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: 01122012345 må vurderes manuelt pga at andre foreldre: 12345678910 mottar barnetrygd for felles barn: 07081812345""")
+                            oppgavetekst = setOf("Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 12345678910,04010012797 har mottatt barnetrygd for ulike felles barn med fnr: 07081812345,01122012345. En av foreldrene har fått godskrevet omsorgsopptjening automatisk, eller har oppgave for manuell vurdering.")
                         )
                     )
                 }
@@ -822,10 +822,10 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             assertThat(it).hasSize(1)
             assertThat(it.single().oppgavetekst).containsAll(
                 setOf(
-                    "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for barnetrygdperiodene tilhørende et av barna. Vurder omsorgsopptjening manuelt.",
-                    "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna. Vurder omsorgsopptjening manuelt.",
-                    "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av feil i datagrunnlaget. Vurder omsorgsopptjening manuelt.",
-                    "Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av at det ikke eksisterer et gjeldende fnr for barnetrygdmottaker med ident: 12345678910"
+                    "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for barnetrygdperiodene tilhørende et av barna.",
+                    "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av feil i datagrunnlaget.",
+                    "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna.",
+                    "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av at det ikke eksisterer et gjeldende fnr for barnetrygdmottaker med ident: 12345678910."
                 )
             )
         }

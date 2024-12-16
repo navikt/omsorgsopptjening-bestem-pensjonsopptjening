@@ -32,28 +32,31 @@ sealed class Oppgave {
         }
 
         fun perioderMedPliktigEllerFrivilligMedlemskap(omsorgsmottaker: String): String {
-            return """Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: $omsorgsmottaker må vurderes manuelt pga perioder i MEDL"""
+            return """Vurder omsorgsopptjening manuelt. Bruker var pliktig eller frivillig medlem i utlandet i perioden hen mottok barnetrygd for barn med fnr: $omsorgsmottaker."""
         }
 
         fun kombinasjonAvFullOgDeltErTilstrekkelig(omsorgsmottaker: String): String {
-            return """Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: $omsorgsmottaker. Vurder retten til omsorgsopptjening."""
+            return """Vurder omsorgsopptjening manuelt. Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: $omsorgsmottaker."""
         }
 
         fun eøsSakMottarPensjonEllerUføretrygd(omsorgsmottaker: String): String {
-            return """Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: $omsorgsmottaker må vurderes manuelt pga EØS-sak og mottar pensjon eller uføretrygd"""
+            return """Vurder omsorgsopptjening manuelt. Bruker var bosatt i EØS-land i perioden hen mottok barnetrygd for barn med fnr: $omsorgsmottaker."""
         }
 
         fun omsorgsyterErDød(omsorgsyter: String, omsorgsmottaker: String): String {
-            return """Omsorgsyter: $omsorgsyter er død, vurder om omsorgsopptjening for barn med fnr: $omsorgsmottaker skal godskrives annen forelder."""
+            return """Vurder omsorgsopptjening manuelt. Omsorgsyter: $omsorgsyter er død, vurder om omsorgsopptjening for barn med fnr: $omsorgsmottaker skal godskrives annen forelder."""
         }
 
         fun annenForelderInnvilgetOmsorgsopptjeningForAnnetFellesbarn(
+            omsorgsyter: String,
             omsorgsmottaker: String,
             annenForelderOgBarn: Set<Pair<String, String>>
         ): String {
-            val andreOmsorgsytere = annenForelderOgBarn.joinToString(separator = ",") { it.first }
-            val andreOmsorgsmottakere = annenForelderOgBarn.joinToString(separator = ",") { it.second }
-            return """Godskriving omsorgspoeng: Manuell behandling. Godskriving for barn med fnr: $omsorgsmottaker må vurderes manuelt pga at andre foreldre: $andreOmsorgsytere mottar barnetrygd for felles barn: $andreOmsorgsmottakere"""
+            val omsorgsytere = annenForelderOgBarn
+                .map { it.first }.plus(omsorgsyter).joinToString(separator = ",")
+            val omsorgsmottakere = annenForelderOgBarn
+                .map { it.second }.plus(omsorgsmottaker).joinToString(separator = ",")
+            return """Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: $omsorgsytere har mottatt barnetrygd for ulike felles barn med fnr: $omsorgsmottakere. En av foreldrene har fått godskrevet omsorgsopptjening automatisk, eller har oppgave for manuell vurdering."""
         }
     }
 
