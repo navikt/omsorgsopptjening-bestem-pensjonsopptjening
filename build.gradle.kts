@@ -27,7 +27,7 @@ val httpClient5Version = "5.3.1" // TODO: 5.4 feiler med NoClassDefFoundError
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {
-    val kotlinVersion = "2.0.0"
+    val kotlinVersion = "2.0.20"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
