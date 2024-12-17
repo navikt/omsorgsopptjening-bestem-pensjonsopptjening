@@ -24,10 +24,10 @@ class TaskConfig {
         godskrivOpptjeningProcessingTask: GodskrivOpptjeningProcessingTask
     ): ExecutorService {
         return Executors.newVirtualThreadPerTaskExecutor().also { executor ->
-            repeat(4) { executor.submit(oppgaveProcessingTask) }
-            repeat(4) { executor.submit(brevProcessingTask) }
-            repeat(12) { executor.submit(persongrunnlagMeldingProcessingTask) }
-            repeat(12) { executor.submit(kontrollbehandlingProcessingTask) }
+            repeat(2) { executor.submit(oppgaveProcessingTask) }
+            repeat(2) { executor.submit(brevProcessingTask) }
+            repeat(16) { executor.submit(persongrunnlagMeldingProcessingTask) }
+            repeat(0) { executor.submit(kontrollbehandlingProcessingTask) }
             repeat(4) { executor.submit(godskrivOpptjeningProcessingTask) }
         }
     }
