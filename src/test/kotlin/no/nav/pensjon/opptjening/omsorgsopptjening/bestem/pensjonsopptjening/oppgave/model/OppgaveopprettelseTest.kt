@@ -820,14 +820,17 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
 
         oppgaveRepo.findForMelding(melding).also {
             assertThat(it).hasSize(1)
-            assertThat(it.single().oppgavetekst).containsAll(
-                setOf(
-                    "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for barnetrygdperiodene tilhørende et av barna.",
-                    "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av feil i datagrunnlaget.",
-                    "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna.",
-                    "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av at det ikke eksisterer et gjeldende fnr for barnetrygdmottaker med ident: 12345678910."
+            it.single().also {
+                assertThat(it.mottaker).isEqualTo("12345678910")
+                assertThat(it.oppgavetekst).containsAll(
+                    setOf(
+                        "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for barnetrygdperiodene tilhørende et av barna.",
+                        "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av feil i datagrunnlaget.",
+                        "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna.",
+                        "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av at det ikke eksisterer et gjeldende fnr for barnetrygdmottaker med ident: 12345678910."
+                    )
                 )
-            )
+            }
         }
     }
 }

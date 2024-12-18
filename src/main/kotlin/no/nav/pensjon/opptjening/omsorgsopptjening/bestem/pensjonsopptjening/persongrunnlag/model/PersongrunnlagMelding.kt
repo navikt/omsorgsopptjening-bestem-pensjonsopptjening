@@ -75,7 +75,7 @@ sealed class PersongrunnlagMelding {
                 require(innhold.persongrunnlag.isEmpty()) { "Forventer at det ikke er persongrunnlag dersom feilinformasjon inneholder data" }
                 Oppgave.Transient(
                     detaljer = OppgaveDetaljer.MottakerOgTekst(
-                        oppgavemottaker = "fnr",
+                        oppgavemottaker = innhold.omsorgsyter,
                         oppgavetekst = feilinformasjon.oppgavetekster(innhold.omsorgsyter)
                     ),
                     behandlingId = null,
