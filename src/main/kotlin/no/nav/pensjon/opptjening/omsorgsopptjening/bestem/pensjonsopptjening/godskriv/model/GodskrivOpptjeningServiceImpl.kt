@@ -47,18 +47,18 @@ internal class GodskrivOpptjeningServiceImpl(
     }
 
 
-    override fun stoppForMelding(meldingsId: UUID) {
+    override fun stoppForMelding(meldingsId: UUID, begrunnelse: String?) {
         godskrivOpptjeningRepo.findForMelding(meldingsId).forEach { godkjenn ->
             log.info("Stopper godkjenning: ${godkjenn.id}")
-            godkjenn.stoppet().let {
+            godkjenn.stoppet(begrunnelse).let {
                 godskrivOpptjeningRepo.updateStatus(it)
             }
         }
     }
 
-    override fun stopp(id: UUID): UUID? {
+    override fun stopp(id: UUID, begrunnelse: String?): UUID? {
         log.info("Stopper godkjenning: $id")
-        return godskrivOpptjeningRepo.tryFind(id)?.stoppet()?.let {
+        return godskrivOpptjeningRepo.tryFind(id)?.stoppet(begrunnelse)?.let {
             godskrivOpptjeningRepo.updateStatus(it)
             id
         }

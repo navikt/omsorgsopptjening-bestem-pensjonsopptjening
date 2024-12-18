@@ -132,13 +132,24 @@ internal class PersongrunnlagMeldingServiceImpl(
 
     private fun stoppMeldingIntern(id: UUID, begrunnelse: String?): UUID {
         log.info("Stopper melding: $id")
-        persongrunnlagRepo.find(id).stoppet(begrunnelse).let {
+        persongrunnlagRepo.find(id).stoppet(begrunnelse = begrunnelse).let {
             persongrunnlagRepo.updateStatus(it)
         }
-        oppgaveService.stoppForMelding(meldingsId = id)
-        brevService.stoppForMelding(meldingsId = id)
-        behandlingRepo.stoppBehandlingerForMelding(meldingsId = id)
-        godskrivOpptjeningService.stoppForMelding(meldingsId = id)
+        oppgaveService.stoppForMelding(
+            meldingsId = id,
+            begrunnelse = begrunnelse
+        )
+        brevService.stoppForMelding(
+            meldingsId = id,
+            begrunnelse = begrunnelse
+        )
+        behandlingRepo.stoppBehandlingerForMelding(
+            meldingsId = id
+        )
+        godskrivOpptjeningService.stoppForMelding(
+            meldingsId = id,
+            begrunnelse = begrunnelse,
+        )
         return id
     }
 

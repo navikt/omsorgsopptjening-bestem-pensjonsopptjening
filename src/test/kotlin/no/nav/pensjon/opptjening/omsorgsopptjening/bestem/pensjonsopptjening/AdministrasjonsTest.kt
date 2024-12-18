@@ -38,6 +38,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -313,7 +314,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kopiere og rekjøre melding med oppgave`() {
         val stoppetmeldingId = lagreOgProsesserMeldingSomGirOppgave().let {
-            service.stoppMelding(it, null)!!
+            service.stoppMelding(it, "begrunnelse")!!
         }
         val nyMelding =
             service.rekjørStoppetMelding(stoppetmeldingId)!!.let {
@@ -326,7 +327,13 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
         val nyOppgave = oppgaveRepo.findForBehandling(behandling.alle().single().id).single()
 
         assertThat(stoppetMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
-        assertThat(stoppetOppgave.status).isInstanceOf(Oppgave.Status.Stoppet::class.java)
+
+        assertInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java, stoppetMelding.status).also {
+            assertThat(it.begrunnelse).isEqualTo("begrunnelse")
+        }
+        assertInstanceOf(Oppgave.Status.Stoppet::class.java, stoppetOppgave.status).also {
+            assertThat(it.begrunnelse).isEqualTo("begrunnelse")
+        }
 
         assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
         assertThat(nyOppgave.status).isInstanceOf(Oppgave.Status.Klar::class.java)
@@ -335,7 +342,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kopiere og rekjøre melding med brev`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
-            service.stoppMelding(it, null)!!
+            service.stoppMelding(it, "begrunnelse")!!
         }
         val nyMelding =
             service.rekjørStoppetMelding(stoppetMeldingId)!!.let {
@@ -348,8 +355,12 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
 
         val nyttBrev = brevRepository.findForBehandling(behandling.alle().single().id).single()
 
-        assertThat(stoppetMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
-        assertThat(stoppetBrev.status).isInstanceOf(Brev.Status.Stoppet::class.java)
+        assertInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java, stoppetMelding.status).also {
+            assertThat(it.begrunnelse).isEqualTo("begrunnelse")
+        }
+        assertInstanceOf(Brev.Status.Stoppet::class.java, stoppetBrev.status).also {
+            assertThat(it.begrunnelse).isEqualTo("begrunnelse")
+        }
 
         assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
         assertThat(nyttBrev.status).isInstanceOf(Brev.Status.Klar::class.java)
@@ -358,7 +369,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     @Test
     fun `kan kopiere og rekjøre melding med godskriving`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
-            service.stoppMelding(it, null)!!
+            service.stoppMelding(it, "begrunnelse")!!
         }
         val nyMelding =
             service.rekjørStoppetMelding(stoppetMeldingId)!!.let {
@@ -371,8 +382,12 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
 
         val nyGodskriv = godskrivOpptjeningRepo.findForBehandling(behandling.alle().single().id).single()
 
-        assertThat(stoppetMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java)
-        assertThat(stoppetGodskriv.status).isInstanceOf(GodskrivOpptjening.Status.Stoppet::class.java)
+        assertInstanceOf(PersongrunnlagMelding.Status.Stoppet::class.java, stoppetMelding.status).also {
+            assertThat(it.begrunnelse).isEqualTo("begrunnelse")
+        }
+        assertInstanceOf(GodskrivOpptjening.Status.Stoppet::class.java, stoppetGodskriv.status).also {
+            assertThat(it.begrunnelse).isEqualTo("begrunnelse")
+        }
 
         assertThat(nyMelding.status).isInstanceOf(PersongrunnlagMelding.Status.Klar::class.java)
         assertThat(nyGodskriv.status).isInstanceOf(GodskrivOpptjening.Status.Klar::class.java)

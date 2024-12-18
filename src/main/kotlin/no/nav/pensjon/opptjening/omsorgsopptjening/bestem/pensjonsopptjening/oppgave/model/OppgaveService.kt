@@ -23,9 +23,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Propagation
-import org.springframework.transaction.annotation.Transactional
 import java.sql.SQLException
 import java.util.UUID
 
@@ -138,10 +135,10 @@ class OppgaveService(
         }
     }
 
-    fun stoppForMelding(meldingsId: UUID) {
+    fun stoppForMelding(meldingsId: UUID, begrunnelse: String?) {
         oppgaveRepo.findForMelding(meldingsId).forEach { oppgave ->
             log.info("Stopper oppgave: ${oppgave.id}")
-            oppgave.stoppet().let { oppgaveRepo.updateStatus(it) }
+            oppgave.stoppet(begrunnelse = begrunnelse).let { oppgaveRepo.updateStatus(it) }
         }
     }
 

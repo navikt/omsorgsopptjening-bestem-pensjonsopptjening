@@ -6,8 +6,8 @@ interface GodskrivOpptjeningService {
     fun opprett(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening.Persistent
     fun håndter(godskrivOpptjening: GodskrivOpptjening.Persistent): GodskrivOpptjening.Persistent
     fun retry(godskrivOpptjening: GodskrivOpptjening.Persistent, ex: Throwable)
-    fun stoppForMelding(meldingsId: UUID)
-    fun stopp(id: UUID): UUID?
+    fun stoppForMelding(meldingsId: UUID, begrunnelse: String?)
+    fun stopp(id: UUID, begrunnelse: String?): UUID?
     fun restart(id: UUID): UUID?
     fun hentOgLås(antall: Int): GodskrivOpptjeningRepo.Locked
     fun frigiLås(låst: GodskrivOpptjeningRepo.Locked)

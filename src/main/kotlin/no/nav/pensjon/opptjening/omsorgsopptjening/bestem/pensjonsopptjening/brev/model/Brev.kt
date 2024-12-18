@@ -46,8 +46,8 @@ sealed class Brev {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 
-        fun stoppet(): Persistent {
-            return copy(statushistorikk = statushistorikk + status.stoppet())
+        fun stoppet(begrunnelse: String?): Persistent {
+            return copy(statushistorikk = statushistorikk + status.stoppet(begrunnelse))
         }
 
         fun restart(): Persistent {
@@ -71,7 +71,7 @@ sealed class Brev {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Retry")
         }
 
-        open fun stoppet(): Status {
+        open fun stoppet(begrunnelse: String?): Status {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
         }
 
@@ -92,8 +92,8 @@ sealed class Brev {
                 return Retry(melding = melding)
             }
 
-            override fun stoppet(): Status {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?): Status {
+                return Stoppet(begrunnelse = begrunnelse)
             }
 
             override fun restart() : Status {
@@ -114,6 +114,7 @@ sealed class Brev {
         @JsonTypeName("Stoppet")
         data class Stoppet(
             val tidspunkt: Instant = Instant.now(),
+            val begrunnelse: String? = null,
         ) : Status() {
             override fun restart() : Status {
                 return Klar()
@@ -153,8 +154,8 @@ sealed class Brev {
                 }
             }
 
-            override fun stoppet(): Status {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?): Status {
+                return Stoppet(begrunnelse = begrunnelse)
             }
 
             override fun restart() : Status {
@@ -166,8 +167,8 @@ sealed class Brev {
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
         ) : Status() {
-            override fun stoppet(): Status {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?): Status {
+                return Stoppet(begrunnelse = begrunnelse)
             }
 
             override fun restart() : Status {

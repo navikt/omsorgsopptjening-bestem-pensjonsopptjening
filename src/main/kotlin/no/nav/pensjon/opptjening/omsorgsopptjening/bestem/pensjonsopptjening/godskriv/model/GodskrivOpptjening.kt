@@ -44,8 +44,8 @@ sealed class GodskrivOpptjening {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 
-        fun stoppet(): Persistent {
-            return copy(statushistorikk = statushistorikk + status.stoppet())
+        fun stoppet(begrunnelse: String?): Persistent {
+            return copy(statushistorikk = statushistorikk + status.stoppet(begrunnelse))
         }
 
         fun klar(): Persistent {
@@ -87,7 +87,7 @@ sealed class GodskrivOpptjening {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Retry")
         }
 
-        open fun stoppet(): Status {
+        open fun stoppet(begrunnelse: String?): Status {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
         }
 
@@ -107,8 +107,8 @@ sealed class GodskrivOpptjening {
                 return Retry(melding = melding)
             }
 
-            override fun stoppet(): Stoppet {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?): Stoppet {
+                return Stoppet(begrunnelse = begrunnelse)
             }
         }
 
@@ -116,14 +116,15 @@ sealed class GodskrivOpptjening {
         data class Ferdig(
             val tidspunkt: Instant = Instant.now(),
         ) : Status() {
-            override fun stoppet(): Stoppet {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?): Stoppet {
+                return Stoppet(begrunnelse = begrunnelse)
             }
         }
 
         @JsonTypeName("Stoppet")
         data class Stoppet(
-            val tidspunkt: Instant = Instant.now()
+            val tidspunkt: Instant = Instant.now(),
+            val begrunnelse: String? = null,
         ) : Status() {
             override fun klar(): Status {
                 return Klar()
@@ -166,8 +167,8 @@ sealed class GodskrivOpptjening {
                 }
             }
 
-            override fun stoppet(): Stoppet {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?): Stoppet {
+                return Stoppet(begrunnelse = begrunnelse)
             }
         }
 
@@ -175,8 +176,8 @@ sealed class GodskrivOpptjening {
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
         ) : Status() {
-            override fun stoppet(): Stoppet {
-                return Stoppet()
+            override fun stoppet(begrunnelse: String?): Stoppet {
+                return Stoppet(begrunnelse = begrunnelse)
             }
 
             override fun klar(): Status {

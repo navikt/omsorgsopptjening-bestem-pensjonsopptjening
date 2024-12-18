@@ -101,14 +101,14 @@ class BrevService(
         }
     }
 
-    fun stoppForMelding(meldingsId: UUID) {
+    fun stoppForMelding(meldingsId: UUID, begrunnelse: String?) {
         brevRepository.findForMelding(meldingsId).forEach { brev ->
             when (brev.status) {
                 is Brev.Status.Ferdig -> Unit
                 is Brev.Status.Stoppet -> Unit
                 else -> {
                     log.info("Stopper brev: ${brev.id}")
-                    brev.stoppet().let {
+                    brev.stoppet(begrunnelse).let {
                         brevRepository.updateStatus(it)
                     }
                 }
@@ -116,14 +116,14 @@ class BrevService(
         }
     }
 
-    fun stopp(id: UUID): UUID? {
+    fun stopp(id: UUID, begrunnelse: String?): UUID? {
         return brevRepository.tryFind(id)?.let { brev ->
             when (brev.status) {
                 is Brev.Status.Ferdig -> brev.id
                 is Brev.Status.Stoppet -> brev.id
                 else -> {
                     log.info("Stopper brev: ${brev.id}")
-                    brev.stoppet().let {
+                    brev.stoppet(begrunnelse).let {
                         brevRepository.updateStatus(it)
                         it.id
                     }

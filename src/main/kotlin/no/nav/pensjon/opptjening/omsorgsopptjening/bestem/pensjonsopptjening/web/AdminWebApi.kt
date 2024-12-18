@@ -211,7 +211,7 @@ class AdminWebApi(
             val responsStrenger =
                 brev.map { id ->
                     try {
-                        val retId = brevService.stopp(id)
+                        val retId = brevService.stopp(id, begrunnelse)
                         if (retId == null) {
                             "$id: Fant ikke brevet"
                         } else {
@@ -251,7 +251,7 @@ class AdminWebApi(
             val responsStrenger =
                 uuider.map { id ->
                     try {
-                        val retId = godskrivOpptjeningService.stopp(id)
+                        val retId = godskrivOpptjeningService.stopp(id, begrunnelse)
                         if (retId == null) {
                             "$id: Fant ikke godskrivingen"
                         } else {
