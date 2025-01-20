@@ -13,7 +13,7 @@ class DatasourceConfig {
     ): HikariDataSource {
         return HikariDataSource(
             HikariConfig().apply {
-                jdbcUrl = "jdbc:tc:postgresql:16:///test"
+                jdbcUrl = "jdbc:tc:postgresql:17:///test"
                 username = "test"
                 password = "test"
                 driverClassName = "org.testcontainers.jdbc.ContainerDatabaseDriver"

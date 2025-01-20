@@ -41,7 +41,7 @@ spec:
     pool: nav-dev
   gcp:
     sqlInstances:
-      - type: POSTGRES_16
+      - type: POSTGRES_17
         cascadingDelete: false
         diskAutoresize: true
         pointInTimeRecovery: true
