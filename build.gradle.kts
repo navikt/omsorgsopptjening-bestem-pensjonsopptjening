@@ -5,17 +5,17 @@ val domeneVersion = "2.1.3"
 val azureAdClient = "0.0.7"
 val jacksonVersion = "2.17.1"
 val logbackEncoderVersion = "8.0"
-val postgresqlVersion = "42.7.4"
-val flywayCoreVersion = "10.20.1"
+val postgresqlVersion = "42.7.5"
+val flywayCoreVersion = "11.2.0"
 val springKafkaTestVersion = "3.2.4"
 val springCloudContractVersion = "4.0.4"
-val testcontainersVersion = "1.20.3"
-val mockkVersion = "1.13.13"
+val testcontainersVersion = "1.20.4"
+val mockkVersion = "1.13.16"
 val assertJVersion = "3.26.3"
 val jsonAssertVersion = "1.5.3"
-val wiremockVersion = "3.9.2"
+val wiremockVersion = "3.10.0"
 val mockitoVersion = "5.4.0"
-val unleashVersion = "9.2.4"
+val unleashVersion = "9.2.6"
 val navTokenSupportVersion = "5.0.8"
 val hibernateValidatorVersion = "8.0.1.Final"
 val junit5Version = "5.10.3"
@@ -27,7 +27,7 @@ val httpClient5Version = "5.3.1" // TODO: 5.4 feiler med NoClassDefFoundError
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {
-    val kotlinVersion = "2.0.20"
+    val kotlinVersion = "2.1.0"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
