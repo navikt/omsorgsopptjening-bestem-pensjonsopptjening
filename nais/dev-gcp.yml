@@ -92,8 +92,9 @@ spec:
       runtime: java
   replicas:
     # TODO: Antall replikas er satt til 0 for å hindre ressursbruk mens applikasjonen er idle
-    min: 1
-    max: 1
+    # TODO: Applikasjonen feiler pga en rar konflikt i spring-konfigurasjonen. Må fikses før applikasjonen kan kjøre.
+    min: 0
+    max: 0
   resources:
     limits:
       cpu: "1000m"
