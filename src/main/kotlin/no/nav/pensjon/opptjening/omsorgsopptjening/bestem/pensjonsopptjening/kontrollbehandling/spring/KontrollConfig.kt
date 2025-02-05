@@ -13,6 +13,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -28,7 +29,7 @@ class KontrollConfig {
         kontrollbehandlingRepo: KontrollbehandlingRepo,
         behandlingRepo: BehandlingRepo,
         persongrunnlagRepo: PersongrunnlagRepo,
-        hentPensjonspoengClient: HentPensjonspoengClient,
+        @Qualifier("hentPensjonspoeng") hentPensjonspoengClient: HentPensjonspoengClient,
     ): KontrollbehandlingService {
         return KontrollbehandlingServiceImpl(
             omsorgsopptjeningsgrunnlagService = omsorgsopptjeningsgrunnlagService,
