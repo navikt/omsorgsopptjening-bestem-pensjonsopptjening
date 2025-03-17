@@ -1,7 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.external
 
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
-import com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
+import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
@@ -20,6 +21,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
+import no.nav.security.mock.oauth2.http.objectMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
@@ -51,6 +53,16 @@ class MedlemskapsUnntakOppslagClientTest {
             perioder = setOf(Periode(mai(2024), oktober(2024)))
         )
 
+        val soekRequestBody = SoekRequestBody(
+            personident = "04427625287",
+            fraOgMed = "2024-01-01",
+            tilOgMed = "2024-12-31",
+            statuser = listOf("GYLD", "UAVK"),
+            type = null,
+            ekskluderKilder = null,
+            inkluderSporingsinfo = null
+        )
+
         Mdc.scopedMdc(CorrelationId.generate()) { correlation ->
             Mdc.scopedMdc(InnlesingId.generate()) { innlesing ->
                 val grunnlag = client.hentUnntaksperioder(
@@ -72,15 +84,13 @@ class MedlemskapsUnntakOppslagClientTest {
                     )
                 )
                 wiremock.verify(
-                    getRequestedFor(urlPathEqualTo("/api/v1/medlemskapsunntak"))
-                        .withQueryParam("fraOgMed", equalTo("2024-01-01"))
-                        .withQueryParam("tilOgMed", equalTo("2024-12-31"))
-                        .withHeader("Nav-Personident", equalTo("04427625287"))
+                    postRequestedFor(urlPathEqualTo("/rest/v1/periode/soek"))
                         .withHeader("x-correlation-id", equalTo(correlation.toString()))
                         .withHeader("x-innlesing-id", equalTo(innlesing.toString()))
                         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
                         .withHeader(HttpHeaders.CONTENT_TYPE, equalTo(MediaType.APPLICATION_JSON_VALUE))
                         .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer ${TokenProviderConfig.MOCK_TOKEN}"))
+                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(soekRequestBody)))
                 )
             }
         }
@@ -101,6 +111,16 @@ class MedlemskapsUnntakOppslagClientTest {
                     tilOgMed = desember(2024)
                 )
 
+                val soekRequestBody = SoekRequestBody(
+                    personident = "04427625287",
+                    fraOgMed = "2024-01-01",
+                    tilOgMed = "2024-12-31",
+                    statuser = listOf("GYLD", "UAVK"),
+                    type = null,
+                    ekskluderKilder = null,
+                    inkluderSporingsinfo = null
+                )
+
                 assertThat(grunnlag).isEqualTo(
                     Medlemskapsunntak(
                         ikkeMedlem = emptySet(),
@@ -114,15 +134,13 @@ class MedlemskapsUnntakOppslagClientTest {
                     )
                 )
                 wiremock.verify(
-                    getRequestedFor(urlPathEqualTo("/api/v1/medlemskapsunntak"))
-                        .withQueryParam("fraOgMed", equalTo("2024-01-01"))
-                        .withQueryParam("tilOgMed", equalTo("2024-12-31"))
-                        .withHeader("Nav-Personident", equalTo("04427625287"))
+                    postRequestedFor(urlPathEqualTo("/rest/v1/periode/soek"))
                         .withHeader("x-correlation-id", equalTo(correlation.toString()))
                         .withHeader("x-innlesing-id", equalTo(innlesing.toString()))
                         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
                         .withHeader(HttpHeaders.CONTENT_TYPE, equalTo(MediaType.APPLICATION_JSON_VALUE))
                         .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer ${TokenProviderConfig.MOCK_TOKEN}"))
+                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(soekRequestBody)))
                 )
             }
         }
