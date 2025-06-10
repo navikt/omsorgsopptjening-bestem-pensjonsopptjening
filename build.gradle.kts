@@ -3,38 +3,38 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val domeneVersion = "2.1.3"
+val domeneVersion = "2.1.4"
 val azureAdClient = "0.0.7"
-val jacksonVersion = "2.17.1"
-val logbackEncoderVersion = "8.0"
-val postgresqlVersion = "42.7.5"
-val flywayCoreVersion = "11.3.1"
-val springKafkaTestVersion = "3.3.2"
+val jacksonVersion = "2.19.0"
+val logbackEncoderVersion = "7.4" // kan ikke oppdateres, pga spring/logback-classic
+val postgresqlVersion = "42.7.6"
+val flywayCoreVersion = "11.9.1"
+val springKafkaTestVersion = "3.3.6"
 val springCloudContractVersion = "4.0.4"
-val testcontainersVersion = "1.20.4"
-val mockkVersion = "1.13.16"
+val testcontainersVersion = "1.21.1"
+val mockkVersion = "1.14.2"
 val assertJVersion = "3.27.3"
 val jsonAssertVersion = "1.5.3"
-val wiremockVersion = "3.11.0"
+val wiremockVersion = "3.13.0"
 val mockitoVersion = "5.4.0"
 val unleashVersion = "9.2.6"
-val navTokenSupportVersion = "5.0.16"
+val navTokenSupportVersion = "5.0.29"
 val hibernateValidatorVersion = "8.0.1.Final"
 val junit5Version = "5.11.3"
 
 
-val snakeYamlVersion = "2.3"
+val snakeYamlVersion = "2.4"
 val snappyJavaVersion = "1.1.10.7"
 // val httpClient5Version = "5.3.1" // TODO: 5.4 feiler med NoClassDefFoundError
-val httpClient5Version = "5.4.2" // TODO: 5.4 feiler med NoClassDefFoundError
+val httpClient5Version = "5.5" // TODO: 5.4 feiler med NoClassDefFoundError
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {
-    val kotlinVersion = "2.0.20"
+    val kotlinVersion = "2.1.21"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.4.2"
+    id("org.springframework.boot") version "3.5.0"
     id("com.github.ben-manes.versions") version "0.52.0"
 }
 
