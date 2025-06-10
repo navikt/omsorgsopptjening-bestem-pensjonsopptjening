@@ -61,8 +61,6 @@ spec:
         groups:
           - id: "7ef907b4-ec9f-47dd-ab41-4e54ba32ceb1" #AAD pensjonopptjening testgruppe
 
-  secureLogs:
-    enabled: true
   ingresses:
     - https://omsorgsopptjening-bestem-pensjonsopptjening.intern.dev.nav.no
   accessPolicy:
@@ -74,6 +72,9 @@ spec:
         - host: pensjon-popp-q2.dev-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
         - host: medlemskap-medl-api.dev-fss-pub.nais.io
+      rules:
+        - application: logging
+          namespace: nais-system
   image: {{ image }}
   liveness:
     path: /actuator/health/liveness
@@ -90,6 +91,10 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
   replicas:
     # TODO: Antall replikas er satt til 0 for å hindre ressursbruk mens applikasjonen er idle
     # TODO: Applikasjonen feiler pga en rar konflikt i spring-konfigurasjonen. Må fikses før applikasjonen kan kjøre.
