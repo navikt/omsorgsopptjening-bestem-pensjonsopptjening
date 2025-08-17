@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.common.FileSource
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
@@ -88,7 +87,7 @@ fun WireMockExtension.stubForPdlTransformer() {
 
 fun WireMockExtension.ingenUnntaksperioderForMedlemskap() {
     this.stubFor(
-        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)
@@ -103,8 +102,7 @@ fun WireMockExtension.unntaksperioderUtenMedlemskap(
     perioder: Set<Periode>
 ) {
     this.stubFor(
-        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
-            .withHeader("Nav-Personident", equalTo(fnr))
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)
@@ -155,8 +153,7 @@ fun WireMockExtension.unntaksperioderMedPliktigEllerFrivilligMedlemskap(
     perioder: Set<Periode>
 ) {
     this.stubFor(
-        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
-            .withHeader("Nav-Personident", equalTo(fnr))
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)

@@ -41,19 +41,23 @@ internal class MedlemskapsUnntakOppslagClient(
         val fomDato = fraOgMed.atDay(1)
         val tomDato = tilOgMed.atEndOfMonth()
 
-        val entity = RequestEntity<Void>(
-            HttpHeaders().apply {
-                add("Nav-Call-Id", Mdc.getCorrelationId())
-                add("Nav-Personident", fnr)
-                add(CorrelationId.identifier, Mdc.getCorrelationId())
-                add(InnlesingId.identifier, Mdc.getInnlesingId())
-                accept = listOf(MediaType.APPLICATION_JSON)
-                contentType = MediaType.APPLICATION_JSON
-                setBearerAuth(tokenProvider.getToken())
-            },
-            HttpMethod.GET,
-            URI.create("$url/api/v1/medlemskapsunntak?fraOgMed=$fomDato&tilOgMed=$tomDato")
+        val headers = HttpHeaders().apply {
+            add("Nav-Call-Id", Mdc.getCorrelationId())
+            add(CorrelationId.identifier, Mdc.getCorrelationId())
+            add(InnlesingId.identifier, Mdc.getInnlesingId())
+            accept = listOf(MediaType.APPLICATION_JSON)
+            contentType = MediaType.APPLICATION_JSON
+            setBearerAuth(tokenProvider.getToken())
+        }
+
+        val body = SoekRequestBody(
+            personident = fnr,
+            fraOgMed = fomDato.toString(),
+            tilOgMed = tomDato.toString(),
+            statuser = listOf(PeriodestatusMedl.GYLD.name, PeriodestatusMedl.UAVK.name)
         )
+
+        val entity = RequestEntity(body, headers, HttpMethod.POST, URI.create("$url/rest/v1/periode/soek"))
 
         val response = restTemplate.exchange(entity, String::class.java).body!!
 
@@ -106,8 +110,18 @@ internal data class ResponsePeriode(
     val grunnlag: String,
 )
 
-enum class PeriodestatusMedl {
-    AVST, //avvist
-    GYLD, //gyldig
-    UAVK, //uavklart
+enum class PeriodestatusMedl(val description: String) {
+    AVST("avvist"),
+    GYLD("gyldig"),
+    UAVK("uavklart"),
 }
+
+internal data class SoekRequestBody(
+    val personident: String,
+    val fraOgMed: String,
+    val tilOgMed: String,
+    val statuser: List<String>,
+    val type: String? = null,
+    val ekskluderKilder: List<String>? = null,
+    val inkluderSporingsinfo: Boolean? = null
+)
