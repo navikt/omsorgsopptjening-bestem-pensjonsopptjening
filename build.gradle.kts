@@ -5,37 +5,37 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val domeneVersion = "2.1.4"
 val azureAdClient = "0.0.7"
-val jacksonVersion = "2.19.0"
+val jacksonVersion = "2.20.0"
 val logbackEncoderVersion = "7.4" // kan ikke oppdateres, pga spring/logback-classic
-val postgresqlVersion = "42.7.7"
-val flywayCoreVersion = "11.9.1"
-val springKafkaTestVersion = "3.3.6"
+val postgresqlVersion = "42.7.8"
+val flywayCoreVersion = "11.13.3"
+val springKafkaTestVersion = "3.3.10"
 val springCloudContractVersion = "4.0.4"
-val testcontainersVersion = "1.21.1"
-val mockkVersion = "1.14.2"
-val assertJVersion = "3.27.3"
+val testcontainersVersion = "1.21.3"
+val mockkVersion = "1.14.6"
+val assertJVersion = "3.27.6"
 val jsonAssertVersion = "1.5.3"
-val wiremockVersion = "3.13.0"
-val mockitoVersion = "5.4.0"
+val wiremockVersion = "3.13.1"
+val mockitoVersion = "6.1.0"
 val unleashVersion = "9.2.6"
-val navTokenSupportVersion = "5.0.29"
+val navTokenSupportVersion = "5.0.37"
 val hibernateValidatorVersion = "8.0.1.Final"
 val junit5Version = "5.11.3"
 
 
-val snakeYamlVersion = "2.4"
-val snappyJavaVersion = "1.1.10.7"
+val snakeYamlVersion = "2.5"
+val snappyJavaVersion = "1.1.10.8"
 // val httpClient5Version = "5.3.1" // TODO: 5.4 feiler med NoClassDefFoundError
-val httpClient5Version = "5.5" // TODO: 5.4 feiler med NoClassDefFoundError
+val httpClient5Version = "5.5.1" // TODO: 5.4 feiler med NoClassDefFoundError
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {
-    val kotlinVersion = "2.1.21"
+    val kotlinVersion = "2.2.10"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.5.0"
-    id("com.github.ben-manes.versions") version "0.52.0"
+    id("org.springframework.boot") version "3.5.6"
+    id("com.github.ben-manes.versions") version "0.53.0"
 }
 
 apply(plugin = "io.spring.dependency-management")
