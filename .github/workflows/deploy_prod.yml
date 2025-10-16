@@ -30,8 +30,8 @@ jobs:
           echo "DATETIME=$(TZ=Europe/Oslo date '+%Y-%m-%d_%H.%M.%S')" >> $GITHUB_ENV
 
           echo "REPO=${{ steps.nais-login.outputs.registry }}" >> $GITHUB_ENV
-          echo "IMAGE=${{ steps.nais-login.outputs.registry }}/omsorgsopptjening-start-innlesning:${{ github.event.inputs.version }}" >> $GITHUB_ENV
-          echo "IMAGE_BASE=${{ steps.nais-login.outputs.registry }}/omsorgsopptjening-start-innlesning" >> $GITHUB_ENV
+          echo "IMAGE=${{ steps.nais-login.outputs.registry }}/omsorgsopptjening-bestem-pensjonsopptjening:${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          echo "IMAGE_BASE=${{ steps.nais-login.outputs.registry }}/omsorgsopptjening-bestem-pensjonsopptjening" >> $GITHUB_ENV
 
       - name: 'Information'
         id: info
