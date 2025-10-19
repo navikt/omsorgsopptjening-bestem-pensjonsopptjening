@@ -1,4 +1,4 @@
-name: 'Bygg og deploy til prod-gcp og dev-gcp'
+name: 'Bygg og deploy til test'
 
 on:
   workflow_dispatch:
