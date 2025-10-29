@@ -45,7 +45,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 
 
 class BrevProsesseringTest(
-    @Value("\${PEN_BASE_URL}")
+    @Value($$"${PEN_BASE_URL}")
     private val baseUrl: String,
 ) : SpringContextTest.NoKafka() {
 

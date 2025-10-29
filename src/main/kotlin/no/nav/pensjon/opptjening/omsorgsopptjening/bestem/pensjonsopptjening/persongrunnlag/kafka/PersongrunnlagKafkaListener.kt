@@ -25,8 +25,8 @@ class PersongrunnlagKafkaListener(
 
     @KafkaListener(
         containerFactory = "listener",
-        topics = ["\${OMSORGSOPPTJENING_TOPIC}"],
-        groupId = "\${OMSORGSOPPTJENING_CONSUMER_GROUP}"
+        topics = [$$"${OMSORGSOPPTJENING_TOPIC}"],
+        groupId = $$"${OMSORGSOPPTJENING_CONSUMER_GROUP}"
     )
     fun poll(
         consumerRecord: ConsumerRecord<String, String>,

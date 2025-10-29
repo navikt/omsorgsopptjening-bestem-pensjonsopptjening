@@ -14,11 +14,11 @@ class DatasourceConfig {
 
     @Bean
     fun datasource(
-        @Value("\${DATABASE_HOST}") dbHost: String,
-        @Value("\${DATABASE_PORT}") dbPort: String,
-        @Value("\${DATABASE_DATABASE}") dbName: String,
-        @Value("\${DATABASE_USERNAME}") dbUsername: String,
-        @Value("\${DATABASE_PASSWORD}") dbPassword: String,
+        @Value($$"${DATABASE_HOST}") dbHost: String,
+        @Value($$"${DATABASE_PORT}") dbPort: String,
+        @Value($$"${DATABASE_DATABASE}") dbName: String,
+        @Value($$"${DATABASE_USERNAME}") dbUsername: String,
+        @Value($$"${DATABASE_PASSWORD}") dbPassword: String,
     ): HikariDataSource {
         return HikariDataSource(
             HikariConfig().apply {

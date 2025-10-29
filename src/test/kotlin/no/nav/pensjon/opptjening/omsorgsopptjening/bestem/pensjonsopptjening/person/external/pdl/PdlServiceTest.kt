@@ -26,7 +26,7 @@ import kotlin.test.assertNotNull
 internal class PdlServiceTest {
 
     private val UUID_REGEX =
-        "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}\$"
+        $$"^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"
 
     companion object {
         const val FNR = "11111111111"

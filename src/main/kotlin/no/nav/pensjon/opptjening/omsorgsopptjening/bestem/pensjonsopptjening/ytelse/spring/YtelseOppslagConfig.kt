@@ -14,7 +14,7 @@ class YtelseOppslagConfig {
 
     @Bean
     fun ytelseOppslag(
-        @Value("\${PEN_BASE_URL}") penBaseUrl: String,
+        @Value($$"${PEN_BASE_URL}") penBaseUrl: String,
         @Qualifier("PENTokenProvider") tokenProvider: TokenProvider,
         restTemplate: RestTemplate,
     ): YtelseOppslag {

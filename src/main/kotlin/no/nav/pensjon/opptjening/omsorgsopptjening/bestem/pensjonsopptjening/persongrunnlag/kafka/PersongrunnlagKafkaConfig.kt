@@ -17,13 +17,13 @@ import java.time.Duration
 @EnableKafka
 @Configuration
 @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
-class PersongrunnlagKafkaConfig(@Value("\${kafka.brokers}") private val aivenBootstrapServers: String) {
+class PersongrunnlagKafkaConfig(@Value($$"${kafka.brokers}") private val aivenBootstrapServers: String) {
     @Bean
     @Profile("dev-gcp", "prod-gcp")
     fun securityConfig(
-        @Value("\${kafka.keystore.path}") keystorePath: String,
-        @Value("\${kafka.credstore.password}") credstorePassword: String,
-        @Value("\${kafka.truststore.path}") truststorePath: String,
+        @Value($$"${kafka.keystore.path}") keystorePath: String,
+        @Value($$"${kafka.credstore.password}") credstorePassword: String,
+        @Value($$"${kafka.truststore.path}") truststorePath: String,
     ) = SecurityConfig(
         SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG to keystorePath,
         SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG to credstorePassword,

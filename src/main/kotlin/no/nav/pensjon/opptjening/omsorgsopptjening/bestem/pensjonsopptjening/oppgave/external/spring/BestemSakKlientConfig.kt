@@ -15,7 +15,7 @@ class BestemSakKlientConfig {
 
     @Bean
     fun bestemSakKlient(
-        @Value("\${PEN_BASE_URL}") bestemSakUrl: String,
+        @Value($$"${PEN_BASE_URL}") bestemSakUrl: String,
         @Qualifier("PENTokenProvider") tokenProvider: TokenProvider,
         bestemSakMetrics: BestemSakMetrics,
         restTemplate: RestTemplate,

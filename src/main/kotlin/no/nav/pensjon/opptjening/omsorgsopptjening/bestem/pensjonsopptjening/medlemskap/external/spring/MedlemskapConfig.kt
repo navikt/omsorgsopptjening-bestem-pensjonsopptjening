@@ -14,7 +14,7 @@ class MedlemskapConfig {
 
     @Bean
     fun medlemskapsClient(
-        @Value("\${MEDLEMSKAP_URL}") url: String,
+        @Value($$"${MEDLEMSKAP_URL}") url: String,
         @Qualifier("medlemskapTokenProvider") tokenProvider: TokenProvider,
         restTemplate: RestTemplate,
     ): MedlemskapsUnntakOppslag {

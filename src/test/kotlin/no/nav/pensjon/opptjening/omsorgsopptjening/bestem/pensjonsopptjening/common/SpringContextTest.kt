@@ -91,7 +91,7 @@ sealed class SpringContextTest {
     }
 
 
-    @EmbeddedKafka(partitions = 1, topics = ["\${OMSORGSOPPTJENING_TOPIC}"])
+    @EmbeddedKafka(partitions = 1, topics = [$$"${OMSORGSOPPTJENING_TOPIC}"])
     @SpringBootTest(classes = [Application::class])
     @ActiveProfiles("kafkaIntegrationTest")
     class WithKafka : SpringContextTest() {
@@ -100,7 +100,7 @@ sealed class SpringContextTest {
         @Profile("kafkaIntegrationTest")
         class KafkaCfg {
 
-            @Value("\${kafka.brokers}")
+            @Value($$"${kafka.brokers}")
             private lateinit var kafkaBrokers: String
 
             @Bean

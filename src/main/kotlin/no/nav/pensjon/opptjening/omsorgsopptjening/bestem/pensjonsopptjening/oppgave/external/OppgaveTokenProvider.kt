@@ -12,7 +12,7 @@ import pensjon.opptjening.azure.ad.client.TokenProvider
 @Component("oppgaveTokenProvider")
 @Profile("dev-gcp", "prod-gcp")
 class OppgaveTokenProvider(
-    @Value("\${OPPGAVE_API_ID}") val appId: String,
+    @Value($$"${OPPGAVE_API_ID}") val appId: String,
     azureAdConfig: AzureAdTokenClientConfig,
 ) : TokenProvider {
     private val config: AzureAdConfig = AzureAdVariableConfig(

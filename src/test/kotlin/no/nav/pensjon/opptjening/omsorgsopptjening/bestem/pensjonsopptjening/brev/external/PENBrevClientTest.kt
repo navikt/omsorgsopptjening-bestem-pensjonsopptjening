@@ -97,8 +97,8 @@ internal class PENBrevClientTest {
                         .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
                         .withRequestBody(
                             equalToJson(
-                                """{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
-                                    "eksternReferanseId":"${'$'}{json-unit.any-string}"
+                                $$"""{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
+                                    "eksternReferanseId":"${json-unit.any-string}"
                                    }""".trimMargin()
                             )
                         )
@@ -131,8 +131,8 @@ internal class PENBrevClientTest {
                         .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
                         .withRequestBody(
                             equalToJson(
-                                """{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
-                                    "eksternReferanseId":"${'$'}{json-unit.any-string}"
+                                $$"""{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
+                                    "eksternReferanseId":"${json-unit.any-string}"
                                    }""".trimMargin()
                             )
                         )
@@ -165,8 +165,8 @@ internal class PENBrevClientTest {
                         .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
                         .withRequestBody(
                             equalToJson(
-                                """{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
-                                    "eksternReferanseId":"${'$'}{json-unit.any-string}"
+                                $$"""{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
+                                    "eksternReferanseId":"${json-unit.any-string}"
                                    }""".trimMargin()
                             )
                         )
@@ -201,8 +201,8 @@ internal class PENBrevClientTest {
                         .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
                         .withRequestBody(
                             equalToJson(
-                                """{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
-                                    "eksternReferanseId":"${'$'}{json-unit.any-string}"
+                                $$"""{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
+                                    "eksternReferanseId":"${json-unit.any-string}"
                                    }""".trimMargin()
                             )
                         )

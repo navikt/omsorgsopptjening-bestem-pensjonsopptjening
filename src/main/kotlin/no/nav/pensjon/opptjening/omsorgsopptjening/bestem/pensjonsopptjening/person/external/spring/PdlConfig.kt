@@ -19,7 +19,7 @@ internal class PdlConfig {
 
     @Bean
     fun pdlClient(
-        @Value("\${PDL_URL}") pdlUrl: String,
+        @Value($$"${PDL_URL}") pdlUrl: String,
         @Qualifier("pdlTokenProvider") tokenProvider: TokenProvider,
         pdlClientMetrics: PdlClientMetrics,
         @Value("classpath:pdl/folkeregisteridentifikator.graphql") hentPersonQuery: Resource,

@@ -14,8 +14,8 @@ import java.time.Clock
 @Configuration
 @Profile("dev-gcp", "prod-gcp")
 class NavUnleashConfig(
-    @Value("\${UNLEASH_SERVER_API_URL}") private val unleash_url: String,
-    @Value("\${UNLEASH_SERVER_API_TOKEN}") private val unleash_api_key: String
+    @Value($$"${UNLEASH_SERVER_API_URL}") private val unleash_url: String,
+    @Value($$"${UNLEASH_SERVER_API_TOKEN}") private val unleash_api_key: String
 ) {
 
     @Bean

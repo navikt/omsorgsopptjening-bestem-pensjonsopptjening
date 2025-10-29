@@ -13,7 +13,7 @@ class OppgaveKlientConfig {
 
     @Bean
     fun oppgaveKlient(
-        @Value("\${OPPGAVE_URL}") oppgaveUrl: String,
+        @Value($$"${OPPGAVE_URL}") oppgaveUrl: String,
         @Qualifier("oppgaveTokenProvider") tokenProvider: TokenProvider,
         restTemplate: RestTemplate,
     ): OppgaveKlient {

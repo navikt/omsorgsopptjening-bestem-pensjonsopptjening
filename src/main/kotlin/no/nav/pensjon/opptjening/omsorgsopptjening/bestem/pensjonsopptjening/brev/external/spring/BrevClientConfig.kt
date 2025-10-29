@@ -15,7 +15,7 @@ class BrevClientConfig {
 
     @Bean
     fun brevClient(
-        @Value("\${PEN_BASE_URL}") baseUrl: String,
+        @Value($$"${PEN_BASE_URL}") baseUrl: String,
         @Qualifier("PENTokenProvider") tokenProvider: TokenProvider,
         penBrevMetricsMåling: PENBrevMetrikker,
         restTemplate: RestTemplate,
