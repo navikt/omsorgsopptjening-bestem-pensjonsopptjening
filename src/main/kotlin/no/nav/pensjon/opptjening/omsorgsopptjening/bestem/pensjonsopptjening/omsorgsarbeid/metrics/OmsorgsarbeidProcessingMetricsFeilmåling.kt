@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.om
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.metrics.Metrikker
-import org.springframework.stereotype.Component
 
 class OmsorgsarbeidProcessingMetricsFeilmåling(registry: MeterRegistry) : Metrikker<Unit> {
 

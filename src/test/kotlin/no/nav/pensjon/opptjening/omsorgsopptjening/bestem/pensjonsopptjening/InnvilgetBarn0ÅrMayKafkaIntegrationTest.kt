@@ -22,9 +22,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.willAnswer
 import org.mockito.Mockito.verify
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
-import java.time.Month
-import java.time.YearMonth
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import kotlin.test.assertEquals
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
@@ -34,10 +32,10 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
     @Autowired
     private lateinit var behandlingRepo: BehandlingRepo
 
-    @MockBean
+    @MockitoBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
-    @MockBean
+    @MockitoBean
     private lateinit var godskrivOpptjeningClient: GodskrivOpptjeningClient
 
     companion object {

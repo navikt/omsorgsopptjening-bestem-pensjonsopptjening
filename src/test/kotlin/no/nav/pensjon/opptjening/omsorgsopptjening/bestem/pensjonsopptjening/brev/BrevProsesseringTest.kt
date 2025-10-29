@@ -36,7 +36,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.net.URI
 import java.time.Month
 import java.time.YearMonth
@@ -55,7 +55,7 @@ class BrevProsesseringTest(
     @Autowired
     private lateinit var persongrunnlagMeldingService: PersongrunnlagMeldingProcessingService
 
-    @MockBean
+    @MockitoBean
     private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @Autowired

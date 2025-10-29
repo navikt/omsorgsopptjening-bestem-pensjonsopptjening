@@ -21,7 +21,6 @@ import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -31,6 +30,7 @@ import org.springframework.kafka.support.SendResult
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.io.Serializable
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -67,7 +67,7 @@ sealed class SpringContextTest {
     @SpringBootTest(classes = [Application::class])
     class NoKafka : SpringContextTest() {
 
-        @MockBean
+        @MockitoBean
         private lateinit var kafkaTemplate: KafkaTemplate<String, String>
 
         @PostConstruct
