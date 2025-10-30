@@ -3,12 +3,12 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val domeneVersion = "2.1.4"
+val domeneVersion = "2.1.101"
 val azureAdClient = "0.0.7"
 val jacksonVersion = "2.20.0"
 val logbackEncoderVersion = "7.4" // kan ikke oppdateres, pga spring/logback-classic
 val postgresqlVersion = "42.7.8"
-val flywayCoreVersion = "11.13.3"
+val flywayCoreVersion = "11.15.0"
 val springKafkaTestVersion = "3.3.10"
 val springCloudContractVersion = "4.0.4"
 val testcontainersVersion = "1.21.3"
@@ -30,11 +30,11 @@ val httpClient5Version = "5.5.1" // TODO: 5.4 feiler med NoClassDefFoundError
 val httpClientVersion = "4.5.14" // deprecated, men brukes av
 
 plugins {
-    val kotlinVersion = "2.2.10"
+    val kotlinVersion = "2.2.21"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.5.6"
+    id("org.springframework.boot") version "3.5.7"
     id("com.github.ben-manes.versions") version "0.53.0"
 }
 
