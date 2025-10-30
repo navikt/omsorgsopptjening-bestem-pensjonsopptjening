@@ -53,8 +53,10 @@ spec:
         flags:
           - name: cloudsql.enable_pgaudit
             value: "on"
+          - name: pgaudit.log_parameter
+            value: "on"
           - name: pgaudit.log
-            value: 'write'
+            value: "write,ddl,role,read"
   azure:
     sidecar:
       enabled: true
