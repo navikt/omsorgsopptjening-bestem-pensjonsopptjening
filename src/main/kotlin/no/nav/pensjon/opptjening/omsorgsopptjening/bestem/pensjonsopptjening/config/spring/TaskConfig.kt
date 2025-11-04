@@ -26,7 +26,7 @@ class TaskConfig {
         return Executors.newVirtualThreadPerTaskExecutor().also { executor ->
             repeat(1) { executor.submit(oppgaveProcessingTask) }
             repeat(1) { executor.submit(brevProcessingTask) }
-            repeat(1) { executor.submit(persongrunnlagMeldingProcessingTask) }
+            repeat(16) { executor.submit(persongrunnlagMeldingProcessingTask) }
             repeat(0) { executor.submit(kontrollbehandlingProcessingTask) }
             repeat(4) { executor.submit(godskrivOpptjeningProcessingTask) }
         }
