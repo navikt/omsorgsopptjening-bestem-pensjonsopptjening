@@ -38,9 +38,7 @@ internal class PdlClient(
             PdlResponse::class.java
         ).body
 
-        response?.error?.extensions?.code?.also {
-            if (it == PdlErrorCode.SERVER_ERROR) throw PdlException(response.error)
-        }
+        response?.error?.let { throw PdlException(it) }
         response?.warnings?.let { log.warn(it.toString()) }
 
         metrics.tellPersonHentet()

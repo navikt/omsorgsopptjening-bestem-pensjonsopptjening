@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 internal data class PdlError(val message: String, val extensions: ErrorExtension)
 
-internal data class ErrorExtension(val code: PdlErrorCode)
+internal data class ErrorExtension(val code: PdlErrorCode?)
 
 internal enum class PdlErrorCode {
     @JsonProperty("unauthenticated") UNAUTHENTICATED,

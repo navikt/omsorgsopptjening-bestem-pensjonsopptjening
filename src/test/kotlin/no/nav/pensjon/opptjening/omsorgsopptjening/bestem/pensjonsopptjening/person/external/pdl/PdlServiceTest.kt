@@ -264,4 +264,29 @@ internal class PdlServiceTest {
             }
         }
     }
+
+    @Test
+    fun `should throw PersonOppslagException whenever response contains schema validation error`() {
+        Mdc.scopedMdc(CorrelationId.generate()) {
+            Mdc.scopedMdc(InnlesingId.generate()) {
+                wiremock.stubFor(
+                    WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(
+                        WireMock.aResponse()
+                            .withHeader("Content-Type", "application/json")
+                            .withBodyFile("schema_validation_error.json")
+                    )
+                )
+
+                val error = assertThrows<PersonOppslagException> { pdlService.hentPerson(FNR) }
+                assertInstanceOf(PdlException::class.java, error.cause).also {
+                    assertEquals(
+                        "Validation error (FieldUndefined@[hentPerson/foedsel]) : Field 'foedsel' in type 'Person' is undefined",
+                        it.message
+                    )
+                }
+                wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+            }
+        }
+    }
+
 }

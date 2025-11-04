@@ -11,7 +11,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 internal data class PdlResponse(
-    val data: PdlData,
+    val data: PdlData?,
     private val errors: List<PdlError>? = null,
     private val extensions: Extensions? = null,
 ) {
