@@ -23,7 +23,7 @@ class TaskConfig {
         kontrollbehandlingProcessingTask: KontrollbehandlingProcessingTask,
         godskrivOpptjeningProcessingTask: GodskrivOpptjeningProcessingTask
     ): ExecutorService {
-        return Executors.newVirtualThreadPerTaskExecutor().also { executor ->
+        return Executors.newThreadPerTaskExecutor(Executors.defaultThreadFactory()).also { executor ->
             repeat(1) { executor.submit(oppgaveProcessingTask) }
             repeat(1) { executor.submit(brevProcessingTask) }
             repeat(16) { executor.submit(persongrunnlagMeldingProcessingTask) }
