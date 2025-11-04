@@ -34,7 +34,7 @@ internal data class PdlData(
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class HentPersonQueryResponse(
     val folkeregisteridentifikator: List<Folkeregisteridentifikator>,
-    val foedsel: List<Foedsel>,
+    val foedselsdato: List<Foedselsdato>,
     val doedsfall: List<Doedsfall?>,
     val forelderBarnRelasjon: List<ForelderBarnRelasjon>,
 ) {
@@ -47,17 +47,17 @@ internal data class HentPersonQueryResponse(
     }
 
     private fun foedselsdato(): LocalDate {
-        return when (foedsel.size) {
+        return when (foedselsdato.size) {
             0 -> {
                 throw PdlMottatDataException("Fødselsår finnes ikke i respons fra pdl")
             }
 
             1 -> {
-                LocalDate.parse(foedsel.first().foedselsdato)
+                LocalDate.parse(foedselsdato.first().foedselsdato)
             }
 
             else -> {
-                LocalDate.parse(foedsel.avklarFoedsel()?.foedselsdato)
+                LocalDate.parse(foedselsdato.avklarFoedsel()?.foedselsdato)
                     ?: throw PdlMottatDataException("Fødselsår finnes ikke i respons fra pdl")
             }
         }
@@ -122,7 +122,7 @@ internal data class Folkeregisteridentifikator(
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-internal data class Foedsel(
+internal data class Foedselsdato(
     val foedselsaar: Int,
     val foedselsdato: String,
     val metadata: Metadata,

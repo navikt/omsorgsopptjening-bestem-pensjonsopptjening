@@ -4,14 +4,14 @@ import java.time.LocalDateTime
 
 private const val FOLKEREGISTERET = "FREG"
 
-internal fun List<Foedsel>.avklarFoedsel(): Foedsel? {
+internal fun List<Foedselsdato>.avklarFoedsel(): Foedselsdato? {
     val foedslerSortert = sortedByDescending { it.sisteEndringstidspunktOrNull() }
     val foedselFreg = foedslerSortert.find { it.metadata harMaster FOLKEREGISTERET }
     if (foedselFreg != null) return foedselFreg
     return foedslerSortert.firstOrNull()
 }
 
-private fun Foedsel.sisteEndringstidspunktOrNull() = sisteEndringstidspunktOrNull(metadata, folkeregistermetadata)
+private fun Foedselsdato.sisteEndringstidspunktOrNull() = sisteEndringstidspunktOrNull(metadata, folkeregistermetadata)
 
 private fun sisteEndringstidspunktOrNull(metadata: Metadata, fregMetadata: Folkeregistermetadata?): LocalDateTime? =
     when {

@@ -1,6 +1,6 @@
 query pdlPerson($ident: ID!) {
     hentPerson(ident: $ident) {
-        foedsel {
+        foedselsdato {
             foedselsaar
             foedselsdato
             foedeland
