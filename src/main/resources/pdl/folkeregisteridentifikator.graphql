@@ -3,9 +3,6 @@ query pdlPerson($ident: ID!) {
         foedselsdato {
             foedselsaar
             foedselsdato
-            foedeland
-            foedested
-            foedekommune
             folkeregistermetadata{
                 ajourholdstidspunkt
             }
