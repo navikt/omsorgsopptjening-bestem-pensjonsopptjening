@@ -4,16 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
-import com.github.tomakehurst.wiremock.common.FileSource
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.extension.Parameters
-import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformer
-import com.github.tomakehurst.wiremock.http.Request
+import com.github.tomakehurst.wiremock.extension.ResponseDefinitionTransformerV2
 import com.github.tomakehurst.wiremock.http.ResponseDefinition
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.matching.ContainsPattern
+import com.github.tomakehurst.wiremock.stubbing.ServeEvent
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.POPP_PENSJONSPOENG_PATH
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
@@ -27,7 +24,7 @@ import kotlin.random.Random
  * Merk at dette bare gjøres dersom [ResponseDefinition.bodyFileName] ikke er satt fra før, slik at man fortsatt står
  * fritt til å returnere det man ønsker (f.eks for å simulere feilsituasjoner).
  */
-class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformer() {
+class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformerV2 {
 
     companion object {
         private val fnrToBodyMapping = mapOf(
@@ -48,22 +45,19 @@ class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformer() {
         return this::class.qualifiedName!!
     }
 
-    override fun transform(
-        p0: Request?,
-        p1: ResponseDefinition?,
-        p2: FileSource?,
-        p3: Parameters?
-    ): ResponseDefinition {
-        return if (p0!!.url.equals(SpringContextTest.PDL_PATH) && p1!!.bodyFileName == null) {
-            val ident = mapper.readValue<JsonNode>(p0.bodyAsString).get("variables").get("ident").textValue()
-            ResponseDefinitionBuilder.like(p1)
+    override fun transform(serveEvent: ServeEvent): ResponseDefinition? {
+        val request = serveEvent.request
+        val responseDefinition = serveEvent.responseDefinition
+        return if (request!!.url.equals(SpringContextTest.PDL_PATH) && responseDefinition!!.bodyFileName == null) {
+            val ident = mapper.readValue<JsonNode>(request.bodyAsString).get("variables").get("ident").textValue()
+            ResponseDefinitionBuilder.like(responseDefinition)
                 .withBodyFile(
                     fnrToBodyMapping[ident]
                         ?: throw RuntimeException("Ident fo body not defined for: $ident, known mappings: $fnrToBodyMapping")
                 )
                 .build()
         } else {
-            p1!!
+            responseDefinition!!
         }
     }
 }
@@ -88,7 +82,7 @@ fun WireMockExtension.stubForPdlTransformer() {
 
 fun WireMockExtension.ingenUnntaksperioderForMedlemskap() {
     this.stubFor(
-        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)
@@ -103,8 +97,8 @@ fun WireMockExtension.unntaksperioderUtenMedlemskap(
     perioder: Set<Periode>
 ) {
     this.stubFor(
-        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
-            .withHeader("Nav-Personident", equalTo(fnr))
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+            .withRequestBody(ContainsPattern(fnr))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)
@@ -155,8 +149,8 @@ fun WireMockExtension.unntaksperioderMedPliktigEllerFrivilligMedlemskap(
     perioder: Set<Periode>
 ) {
     this.stubFor(
-        WireMock.get(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
-            .withHeader("Nav-Personident", equalTo(fnr))
+        WireMock.post(WireMock.urlPathEqualTo(SpringContextTest.MEDLEMSKAP_PATH))
+            .withRequestBody(ContainsPattern(fnr))
             .willReturn(
                 WireMock.aResponse()
                     .withStatus(200)

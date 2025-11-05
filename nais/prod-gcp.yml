@@ -26,7 +26,7 @@ spec:
     - name: POPP_API_ID
       value: prod-fss.pensjonopptjening.pensjon-popp
     - name: MEDLEMSKAP_URL
-      value: https://medlemskap-medl-api.intern.nav.no
+      value: http://medlemskap-medl-api.team-rocket
     - name: MEDLEMSKAP_API_ID
       value: prod-gcp.team-rocket.medlemskap-medl-api
     - name: OMSORGSOPPTJENING_TOPIC
@@ -77,10 +77,11 @@ spec:
         - host: oppgave.prod-fss-pub.nais.io
         - host: pensjon-popp.prod-fss-pub.nais.io
         - host: pensjonopptjening-unleash-api.nav.cloud.nais.io
-        - host: medlemskap-medl-api.intern.nav.no
       rules:
         - application: logging
           namespace: nais-system
+        - application: medlemskap-medl-api
+          namespace: team-rocket
   image: {{ image }}
   liveness:
     path: /actuator/health/liveness

@@ -41,18 +41,22 @@ internal class MedlemskapsUnntakOppslagClient(
         val fomDato = fraOgMed.atDay(1)
         val tomDato = tilOgMed.atEndOfMonth()
 
-        val entity = RequestEntity<Void>(
+        val entity = RequestEntity<Body>(
+            Body(
+                personident = fnr,
+                fraOgMed = fomDato.toString(),
+                tilOgMed = tomDato.toString(),
+            ),
             HttpHeaders().apply {
                 add("Nav-Call-Id", Mdc.getCorrelationId())
-                add("Nav-Personident", fnr)
                 add(CorrelationId.identifier, Mdc.getCorrelationId())
                 add(InnlesingId.identifier, Mdc.getInnlesingId())
                 accept = listOf(MediaType.APPLICATION_JSON)
                 contentType = MediaType.APPLICATION_JSON
                 setBearerAuth(tokenProvider.getToken())
             },
-            HttpMethod.GET,
-            URI.create("$url/api/v1/medlemskapsunntak?fraOgMed=$fomDato&tilOgMed=$tomDato")
+            HttpMethod.POST,
+            URI.create("$url/rest/v1/periode/soek")
         )
 
         val response = restTemplate.exchange(entity, String::class.java).body!!
@@ -111,3 +115,9 @@ enum class PeriodestatusMedl {
     GYLD, //gyldig
     UAVK, //uavklart
 }
+
+private data class Body(
+    val personident: String,
+    val fraOgMed: String,
+    val tilOgMed: String,
+)

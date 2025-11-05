@@ -1,10 +1,11 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.external
 
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
-import com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
+import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import com.github.tomakehurst.wiremock.matching.EqualToJsonPattern
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.WIREMOCK_PORT
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.TokenProviderConfig
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.unntaksperioderMedPliktigEllerFrivilligMedlemskap
@@ -72,10 +73,18 @@ class MedlemskapsUnntakOppslagClientTest {
                     )
                 )
                 wiremock.verify(
-                    getRequestedFor(urlPathEqualTo("/api/v1/medlemskapsunntak"))
-                        .withQueryParam("fraOgMed", equalTo("2024-01-01"))
-                        .withQueryParam("tilOgMed", equalTo("2024-12-31"))
-                        .withHeader("Nav-Personident", equalTo("04427625287"))
+                    postRequestedFor(urlPathEqualTo("/rest/v1/periode/soek"))
+                        .withRequestBody(
+                            EqualToJsonPattern(
+                                """
+                            {
+                                "personident":"04427625287",
+                                "fraOgMed":"2024-01-01",
+                                "tilOgMed":"2024-12-31"
+                            }
+                        """.trimIndent(), false, false
+                            )
+                        )
                         .withHeader("x-correlation-id", equalTo(correlation.toString()))
                         .withHeader("x-innlesing-id", equalTo(innlesing.toString()))
                         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
@@ -114,10 +123,18 @@ class MedlemskapsUnntakOppslagClientTest {
                     )
                 )
                 wiremock.verify(
-                    getRequestedFor(urlPathEqualTo("/api/v1/medlemskapsunntak"))
-                        .withQueryParam("fraOgMed", equalTo("2024-01-01"))
-                        .withQueryParam("tilOgMed", equalTo("2024-12-31"))
-                        .withHeader("Nav-Personident", equalTo("04427625287"))
+                    postRequestedFor(urlPathEqualTo("/rest/v1/periode/soek"))
+                        .withRequestBody(
+                            EqualToJsonPattern(
+                                """
+                            {
+                                "personident":"04427625287",
+                                "fraOgMed":"2024-01-01",
+                                "tilOgMed":"2024-12-31"
+                            }
+                        """.trimIndent(), false, false
+                            )
+                        )
                         .withHeader("x-correlation-id", equalTo(correlation.toString()))
                         .withHeader("x-innlesing-id", equalTo(innlesing.toString()))
                         .withHeader(HttpHeaders.ACCEPT, equalTo(MediaType.APPLICATION_JSON_VALUE))
