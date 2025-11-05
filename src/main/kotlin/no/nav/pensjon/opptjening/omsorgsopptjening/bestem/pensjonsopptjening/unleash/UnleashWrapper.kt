@@ -42,14 +42,20 @@ class UnleashWrapper(
                         lock.unlock()
                     }
                 } else {
-                    false //default to false while refresh is in progress
+                    //refresh might be complete, check for value or return false if still in progress
+                    getPotentiallyCached(toggle)?.enabled ?: false
                 }
             }
 
             else -> {
-                throw IllegalStateException("Should never happen")
+                //refresh might be complete, check for value or return false if still in progress
+                getPotentiallyCached(toggle)?.enabled ?: false
             }
         }
+    }
+
+    private fun getPotentiallyCached(toggle: NavUnleashConfig.Feature): CacheValue? {
+        return cache[toggle]
     }
 
     private fun getCached(toggle: NavUnleashConfig.Feature): CacheValue {
@@ -66,7 +72,7 @@ class UnleashWrapper(
     }
 
     private fun refreshAndGet(toggle: NavUnleashConfig.Feature): Boolean {
-        log.info("Refreshing toggle: ${toggle.toggleName}, existing value: ${cache[toggle]}")
+        log.info("Refreshing toggle: ${toggle.toggleName}, existing value: ${getPotentiallyCached(toggle)?.enabled}")
         return unleash.isEnabled(toggle.toggleName)
             .let {
                 cache[toggle] = CacheValue(it, getNow())
