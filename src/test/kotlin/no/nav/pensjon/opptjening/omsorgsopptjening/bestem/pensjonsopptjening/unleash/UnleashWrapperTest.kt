@@ -24,7 +24,6 @@ class UnleashWrapperTest {
         )
     )
 
-
     @Test
     fun `henter fra unleash hvis ingen cached`() {
         whenever(unleash.isEnabled(any())).thenReturn(true)
