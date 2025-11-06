@@ -35,6 +35,26 @@ class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
     }
 
     @Test
+    fun `kan lagre flere persongrunnlagmeldinger`() {
+        val innlesingId = InnlesingId.generate()
+        val correlationId1 = CorrelationId.generate()
+        val correlationId2 = CorrelationId.generate()
+        val correlationId3 = CorrelationId.generate()
+        persongrunnlagRepo.lagre(
+            listOf(
+                persongrunnlag(innlesingId, correlationId1),
+                persongrunnlag(innlesingId, correlationId2),
+                persongrunnlag(innlesingId, correlationId2), //duplikat, no insert
+                persongrunnlag(innlesingId, correlationId3),
+            )
+        )
+        val lagret = persongrunnlagRepo.finnNesteMeldingerForBehandling(10)
+
+        assertThat(lagret.data.count()).isEqualTo(3)
+        assertThat(lagret.data.map { it.correlationId }).containsExactlyInAnyOrder(correlationId1, correlationId2, correlationId3)
+    }
+
+    @Test
     fun `lagrer ikke den samme meldingen flere ganger`() {
         val innlesingId = InnlesingId.generate()
         val correlationId = CorrelationId.generate()

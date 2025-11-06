@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.toJavaDuration
@@ -74,6 +74,30 @@ class PersongrunnlagRepo(
         )
         return keyHolder.getKeyAs(UUID::class.java)
             .also { if (it == null) log.info("Ingen primærnøkkel returnert fra insert, meldingen med correlationId:${melding.correlationId}, innlesingId:${melding.innlesingId} er et duplikat") }
+    }
+
+    fun lagre(meldinger: List<PersongrunnlagMelding.Lest>) {
+        jdbcTemplate.batchUpdate(
+            //language=postgres-psql
+            """insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, status, karantene_til) 
+              |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:statushistorikk::jsonb), :status, :karanteneTil::timestamptz) 
+              |on conflict (correlation_id, innlesing_id) where status <> 'Stoppet' do nothing 
+              |returning id
+            """.trimMargin(),
+            meldinger.map {
+                MapSqlParameterSource(
+                    mapOf<String, Any?>(
+                        "melding" to serialize(it.innhold),
+                        "correlation_id" to it.correlationId.toString(),
+                        "innlesing_id" to it.innlesingId.toString(),
+                        "opprettet" to it.opprettet.toString(),
+                        "status" to "Klar",
+                        "karanteneTil" to null,
+                        "statushistorikk" to it.statushistorikk.serializeList(),
+                    ),
+                )
+            }.toTypedArray()
+        )
     }
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
@@ -190,7 +214,7 @@ class PersongrunnlagRepo(
         )
     }
 
-    fun frigi(locked:Locked) {
+    fun frigi(locked: Locked) {
         jdbcTemplate.update(
             """update melding set lockId = null where lockId = :lockId""",
             mapOf(
@@ -199,7 +223,7 @@ class PersongrunnlagRepo(
         )
     }
 
-    fun frigiGamleLåser() : Int {
+    fun frigiGamleLåser(): Int {
         val oneHourAgo = Instant.now(clock).minus(1.hours.toJavaDuration()).toString()
         return jdbcTemplate.update(
             """update melding set lockId = null, lockTime = null 
@@ -235,7 +259,7 @@ class PersongrunnlagRepo(
             """select * from melding
                 | where status not in ('Ferdig','Stoppet','Avsluttet')
                 | order by opprettet asc limit 1""".trimMargin(),
-            emptyMap<String,Any>(),
+            emptyMap<String, Any>(),
             PersongrunnlagMeldingMapper()
         ).singleOrNull()
     }
