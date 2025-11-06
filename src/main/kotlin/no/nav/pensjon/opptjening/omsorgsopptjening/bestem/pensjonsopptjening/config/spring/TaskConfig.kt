@@ -26,9 +26,9 @@ class TaskConfig {
         return Executors.newThreadPerTaskExecutor(Executors.defaultThreadFactory()).also { executor ->
             repeat(1) { executor.submit(oppgaveProcessingTask) }
             repeat(1) { executor.submit(brevProcessingTask) }
-            repeat(16) { executor.submit(persongrunnlagMeldingProcessingTask) }
+            repeat(8) { executor.submit(persongrunnlagMeldingProcessingTask) }
             repeat(0) { executor.submit(kontrollbehandlingProcessingTask) }
-            repeat(4) { executor.submit(godskrivOpptjeningProcessingTask) }
+            repeat(2) { executor.submit(godskrivOpptjeningProcessingTask) }
         }
     }
 }
