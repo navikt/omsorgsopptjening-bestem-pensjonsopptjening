@@ -7,11 +7,10 @@ import java.time.Instant
 import java.util.concurrent.atomic.AtomicLong
 
 data class TimeLock(
-    private val initialDelay: Duration,
-    private val maxDelay: Duration,
+    private val properties: Properties,
     private val clock: Clock
 ) {
-    private var delayUntil: Instant = getNow().plusSeconds(initialDelay.toSeconds())
+    private var delayUntil: Instant = getNow().plus(properties.initialDelaySeconds)
     private var count = AtomicLong(0)
 
     fun isOpen(): Boolean {
@@ -20,9 +19,9 @@ data class TimeLock(
 
     fun lock() {
         val now = getNow()
-        val toAdd = maxDelay.dividedBy(10).multipliedBy(count.incrementAndGet()).toSeconds()
+        val toAdd = properties.maxDelaySeconds.dividedBy(10).multipliedBy(count.incrementAndGet()).toSeconds()
         val newUntil = now.plusSeconds(toAdd)
-        val maxUntil = now.plusSeconds(maxDelay.toSeconds())
+        val maxUntil = now.plusSeconds(properties.maxDelaySeconds.toSeconds())
         delayUntil = min(newUntil, maxUntil)
     }
 
@@ -37,5 +36,9 @@ data class TimeLock(
     private fun getNow(): Instant {
         return Instant.now(clock)
     }
-}
 
+    data class Properties(
+        val initialDelaySeconds: Duration = Duration.ofSeconds(60),
+        val maxDelaySeconds: Duration = Duration.ofSeconds(120)
+    )
+}

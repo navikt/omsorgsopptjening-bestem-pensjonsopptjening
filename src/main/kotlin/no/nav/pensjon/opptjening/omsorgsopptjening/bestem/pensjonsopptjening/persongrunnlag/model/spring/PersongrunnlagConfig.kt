@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.TimeLock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.medlemskap.MedlemskapsUnntakOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsarbeid.metrics.OmsorgsarbeidProcessingMetricsFeilmåling
@@ -72,13 +73,15 @@ class PersongrunnlagConfig {
         omsorgsarbeidMetricsMåling: OmsorgsarbeidProcessingMetrikker,
         omsorgsarbeidMetricsFeilmåling: OmsorgsarbeidProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,
+        timeLockProperties: TimeLock.Properties,
     ): PersongrunnlagMeldingProcessingTask {
         return PersongrunnlagMeldingProcessingTask(
             service = service,
             unleash = unleash,
             omsorgsarbeidMetricsMåling = omsorgsarbeidMetricsMåling,
             omsorgsarbeidMetricsFeilmåling = omsorgsarbeidMetricsFeilmåling,
-            datasourceReadinessCheck = datasourceReadinessCheck
+            datasourceReadinessCheck = datasourceReadinessCheck,
+            timeLockProperties = timeLockProperties,
         )
 
     }

@@ -14,7 +14,7 @@ import java.util.concurrent.Executors
 @Configuration
 class TaskConfig {
 
-    @Bean
+    @Bean(destroyMethod = "shutdown") //normal close() waits for task completion, while(true) never completes..
     @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
     fun taskExecutorService(
         oppgaveProcessingTask: OppgaveProcessingTask,

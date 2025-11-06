@@ -11,8 +11,7 @@ import java.time.Clock
 class NavUnleashConfig {
     @Bean
     fun unleashConfig(): Unleash {
-        // return FakeUnleash().also { it.enableAll() }
-        return FakeUnleash().also { it.disableAll() }
+        return FakeUnleash().also { it.enableAll() }
     }
 
     @Bean

@@ -10,7 +10,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unl
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Clock
-import java.time.Duration
 
 class BrevProcessingTask(
     private val service: BrevService,
@@ -18,6 +17,7 @@ class BrevProcessingTask(
     private val brevProcessingMetricsMåling: BrevProcessingMetrikker,
     private val brevProcessingMetricsFeilmåling: BrevProcessingMetricsFeilmåling,
     private val datasourceReadinessCheck: DatasourceReadinessCheck,
+    private val timeLockProperties: TimeLock.Properties,
 ) : Runnable {
 
     companion object {
@@ -27,8 +27,7 @@ class BrevProcessingTask(
 
     override fun run() {
         val timeLock = TimeLock(
-            initialDelay = Duration.ofMinutes(1),
-            maxDelay = Duration.ofMinutes(2),
+            properties = timeLockProperties,
             clock = Clock.systemUTC()
         )
         while (true) {

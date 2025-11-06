@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.spring
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.TimeLock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.BestemSakKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.external.OppgaveKlient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.metrics.OppgaveProcessingMetricsFeilmåling
@@ -26,6 +27,7 @@ class OppgaveConfig {
         oppgaveProcessingMetricsMåling: OppgaveProcessingMetrikker,
         oppgaveProcessingMetricsFeilmåling: OppgaveProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,
+        timeLockProperties: TimeLock.Properties,
     ): OppgaveProcessingTask {
         return OppgaveProcessingTask(
             service = service,
@@ -33,6 +35,7 @@ class OppgaveConfig {
             oppgaveProcessingMetricsMåling = oppgaveProcessingMetricsMåling,
             oppgaveProcessingMetricsFeilmåling = oppgaveProcessingMetricsFeilmåling,
             datasourceReadinessCheck = datasourceReadinessCheck,
+            timeLockProperties = timeLockProperties,
         )
     }
 

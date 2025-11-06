@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 
 @Configuration
-@Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
 class DatasourceConfig {
 
     @Bean
+    @Profile("dev-gcp", "prod-gcp")
     fun datasource(
         @Value($$"${DATABASE_HOST}") dbHost: String,
         @Value($$"${DATABASE_PORT}") dbPort: String,

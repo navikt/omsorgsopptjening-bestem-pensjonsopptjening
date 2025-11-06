@@ -10,7 +10,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unl
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Clock
-import java.time.Duration
 
 
 class OppgaveProcessingTask(
@@ -19,6 +18,7 @@ class OppgaveProcessingTask(
     private val oppgaveProcessingMetricsMåling: OppgaveProcessingMetrikker,
     private val oppgaveProcessingMetricsFeilmåling: OppgaveProcessingMetricsFeilmåling,
     private val datasourceReadinessCheck: DatasourceReadinessCheck,
+    private val timeLockProperties: TimeLock.Properties,
 ) : Runnable {
 
     companion object {
@@ -28,8 +28,7 @@ class OppgaveProcessingTask(
 
     override fun run() {
         val timeLock = TimeLock(
-            initialDelay = Duration.ofMinutes(1),
-            maxDelay = Duration.ofMinutes(2),
+            properties = timeLockProperties,
             clock = Clock.systemUTC()
         )
         while (true) {

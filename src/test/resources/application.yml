@@ -11,3 +11,6 @@ OMSORGSOPPTJENING_TOPIC: "pensjonopptjening.omsorgsopptjening"
 OMSORGSOPPTJENING_CONSUMER_GROUP: "omsorgsopptjening-bestem-pensjonsopptjening-test"
 MEDLEMSKAP_URL: http://localhost:9991
 GYLDIG_OPPTJENINGSAR: "2020"
+
+timelock.initialDelaySeconds: 0
+timelock.maxDelaySeconds: 0

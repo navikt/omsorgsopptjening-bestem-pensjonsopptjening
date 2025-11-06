@@ -5,6 +5,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.bre
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevProcessingTask
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.TimeLock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,13 +22,15 @@ class BrevConfig {
         brevProcessingMetricsMåling: BrevProcessingMetrikker,
         brevProcessingMetricsFeilmåling: BrevProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,
+        timeLockProperties: TimeLock.Properties,
     ): BrevProcessingTask {
         return BrevProcessingTask(
             service = service,
             unleash = unleash,
             brevProcessingMetricsMåling = brevProcessingMetricsMåling,
             brevProcessingMetricsFeilmåling = brevProcessingMetricsFeilmåling,
-            datasourceReadinessCheck = datasourceReadinessCheck
+            datasourceReadinessCheck = datasourceReadinessCheck,
+            timeLockProperties = timeLockProperties,
         )
     }
 }

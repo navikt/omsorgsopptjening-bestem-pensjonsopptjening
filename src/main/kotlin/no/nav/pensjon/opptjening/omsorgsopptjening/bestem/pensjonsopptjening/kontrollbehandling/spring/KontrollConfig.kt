@@ -1,6 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.spring
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.TimeLock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingProcessingServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingProcessingTask
@@ -66,11 +67,13 @@ class KontrollConfig {
         service: KontrollbehandlingProcessingService,
         unleash: UnleashWrapper,
         datasourceReadinessCheck: DatasourceReadinessCheck,
+        timeLockProperties: TimeLock.Properties,
     ): KontrollbehandlingProcessingTask {
         return KontrollbehandlingProcessingTask(
             service = service,
             unleash = unleash,
-            datasourceReadinessCheck = datasourceReadinessCheck
+            datasourceReadinessCheck = datasourceReadinessCheck,
+            timeLockProperties = timeLockProperties,
         )
     }
 }

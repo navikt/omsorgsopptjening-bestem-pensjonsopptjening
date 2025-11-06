@@ -22,8 +22,10 @@ class TimeLockTest {
             .nesteTikk(fixedClock.instant())
 
         val lock = TimeLock(
-            initialDelay = Duration.ZERO,
-            maxDelay = Duration.ofSeconds(10),
+            TimeLock.Properties(
+                initialDelaySeconds = Duration.ZERO,
+                maxDelaySeconds = Duration.ofSeconds(10),
+            ),
             clock = testKlokke
         )
 
@@ -36,8 +38,10 @@ class TimeLockTest {
             .nesteTikk(fixedClock.instant())
 
         val lock = TimeLock(
-            initialDelay = Duration.ofSeconds(3),
-            maxDelay = Duration.ofSeconds(10),
+            TimeLock.Properties(
+                initialDelaySeconds = Duration.ofSeconds(3),
+                maxDelaySeconds = Duration.ofSeconds(10),
+            ),
             clock = testKlokke
         )
 
@@ -57,8 +61,10 @@ class TimeLockTest {
             .nesteTikk(fixedClock.instant())
 
         val lock = TimeLock(
-            initialDelay = Duration.ZERO,
-            maxDelay = Duration.ofSeconds(10),
+            TimeLock.Properties(
+                initialDelaySeconds = Duration.ZERO,
+                maxDelaySeconds = Duration.ofSeconds(10),
+            ),
             clock = testKlokke
         )
 
@@ -76,8 +82,10 @@ class TimeLockTest {
             .nesteTikk(fixedClock.instant())
 
         val lock = TimeLock(
-            initialDelay = Duration.ZERO,
-            maxDelay = Duration.ofSeconds(10),
+            TimeLock.Properties(
+                initialDelaySeconds = Duration.ZERO,
+                maxDelaySeconds = Duration.ofSeconds(10),
+            ),
             clock = testKlokke
         )
 
@@ -98,8 +106,10 @@ class TimeLockTest {
             .nesteTikk(fixedClock.instant())
 
         val lock = TimeLock(
-            initialDelay = Duration.ZERO,
-            maxDelay = Duration.ofSeconds(10),
+            TimeLock.Properties(
+                initialDelaySeconds = Duration.ZERO,
+                maxDelaySeconds = Duration.ofSeconds(10),
+            ),
             clock = testKlokke
         )
 

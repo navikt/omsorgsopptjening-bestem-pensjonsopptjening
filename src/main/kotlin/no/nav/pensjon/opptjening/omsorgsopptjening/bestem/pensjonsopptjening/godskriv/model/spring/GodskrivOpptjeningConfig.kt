@@ -2,6 +2,7 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.go
 
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.TimeLock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetricsFeilmåling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.metrics.GodskrivProcessingMetrikker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningClient
@@ -57,6 +58,7 @@ class GodskrivOpptjeningConfig {
         godskrivProcessingMetricsMåling: GodskrivProcessingMetrikker,
         godskrivProcessingMetricsFeilmåling: GodskrivProcessingMetricsFeilmåling,
         datasourceReadinessCheck: DatasourceReadinessCheck,
+        timeLockProperties: TimeLock.Properties,
     ): GodskrivOpptjeningProcessingTask {
         return GodskrivOpptjeningProcessingTask(
             service = service,
@@ -64,6 +66,7 @@ class GodskrivOpptjeningConfig {
             godskrivProcessingMetricsMåling = godskrivProcessingMetricsMåling,
             godskrivProcessingMetricsFeilmåling = godskrivProcessingMetricsFeilmåling,
             datasourceReadinessCheck = datasourceReadinessCheck,
+            timeLockProperties = timeLockProperties,
         )
     }
 
