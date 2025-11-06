@@ -35,7 +35,7 @@ class PersongrunnlagKafkaListener(
         deserialisert.map { PersongrunnlagMelding.Lest(it) }
             .also { leste ->
                 persongrunnlagRepo.lagre(leste)
-                log.info("Meldinger med offset: min(${consumerRecord.minBy { it.offset() }}), max(${consumerRecord.maxBy { it.offset() }}), antall: ${consumerRecord.count()} prosessert.")
+                log.info("Meldinger med offset: min(${consumerRecord.minOf { it.offset() }}), max(${consumerRecord.maxOf { it.offset() }}), antall: ${consumerRecord.count()} prosessert.")
             }
 
         acknowledgment.acknowledge()
