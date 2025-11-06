@@ -12,7 +12,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveDetaljer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
@@ -29,14 +28,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.TestPropertySource
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
+@TestPropertySource(
+    properties = ["GYLDIG_OPPTJENINGSAR=2020"]
+)
 class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoKafka() {
 
     @Autowired
@@ -44,9 +45,6 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
 
     @Autowired
     private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
-
-    @MockitoBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @Autowired
     private lateinit var godskrivOpptjeningRepo: GodskrivOpptjeningRepo
@@ -82,8 +80,6 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
-
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         /**
          * Stiller klokka litt fram i tid for å unngå at [GodskrivOpptjening.Status.Retry.karanteneTil] fører til at vi hopper over raden.
@@ -177,7 +173,6 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val melding = repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -235,7 +230,6 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                 .whenScenarioStateIs(Scenario.STARTED)
                 .willReturn(WireMock.serverError())
         )
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -248,7 +242,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
         val innlesingId = InnlesingId.generate()
         val correlationId = CorrelationId.generate()
 
-        val melding = repo.lagre(
+        repo.lagre(
             PersongrunnlagMelding.Lest(
                 innhold = PersongrunnlagMeldingKafka(
                     omsorgsyter = "12345678910",

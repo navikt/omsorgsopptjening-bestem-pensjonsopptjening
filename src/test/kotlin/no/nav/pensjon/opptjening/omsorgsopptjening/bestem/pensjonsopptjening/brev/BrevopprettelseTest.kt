@@ -12,7 +12,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
@@ -29,22 +28,21 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.TestPropertySource
 import java.time.Month
 import java.time.YearMonth
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
+@TestPropertySource(
+    properties = ["GYLDIG_OPPTJENINGSAR=2020"]
+)
 internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     @Autowired
     private lateinit var persongrunnlagRepo: PersongrunnlagRepo
 
     @Autowired
     private lateinit var persongrunnlagMeldingService: PersongrunnlagMeldingProcessingService
-
-    @MockitoBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @Autowired
     private lateinit var brevRepository: BrevRepository
@@ -60,7 +58,6 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     override fun beforeEach() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()

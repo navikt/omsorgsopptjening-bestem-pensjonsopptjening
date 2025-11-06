@@ -15,7 +15,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenUnntaksperioderForMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.processAndExpectResult
@@ -33,17 +32,18 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.TestPropertySource
 import java.net.URI
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
-
+@TestPropertySource(
+    properties = ["GYLDIG_OPPTJENINGSAR=2020"]
+)
 class BrevProsesseringTest(
     @Value($$"${PEN_BASE_URL}")
     private val baseUrl: String,
@@ -54,9 +54,6 @@ class BrevProsesseringTest(
 
     @Autowired
     private lateinit var persongrunnlagMeldingService: PersongrunnlagMeldingProcessingService
-
-    @MockitoBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @Autowired
     private lateinit var brevRepository: BrevRepository
@@ -123,7 +120,6 @@ class BrevProsesseringTest(
          * Stiller klokka litt fram i tid for å unngå at [Brev.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val (behandling, brev) = persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(
@@ -223,7 +219,6 @@ class BrevProsesseringTest(
          * Stiller klokka litt fram i tid for å unngå at [Brev.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
 
         val (behandling, brev) = persongrunnlagRepo.lagre(
             PersongrunnlagMelding.Lest(

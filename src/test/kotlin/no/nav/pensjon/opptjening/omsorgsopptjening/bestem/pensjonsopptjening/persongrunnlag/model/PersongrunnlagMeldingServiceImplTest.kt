@@ -63,9 +63,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.TestPropertySource
 import java.time.Month
 import java.time.YearMonth
 import kotlin.test.Test
@@ -73,15 +72,15 @@ import kotlin.test.assertFalse
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning as KafkaLandstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
+@TestPropertySource(
+    properties = ["GYLDIG_OPPTJENINGSAR=2020"]
+)
 class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
     @Autowired
     private lateinit var repo: PersongrunnlagRepo
 
     @Autowired
     private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
-
-    @MockitoBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     companion object {
         @JvmField
@@ -94,7 +93,6 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
     override fun beforeEach() {
         super.beforeEach()
         wiremock.stubForPdlTransformer()
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(OPPTJENINGSÅR)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -1116,81 +1114,6 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                 behandling.hentOppgaveopplysninger()
             )
         }
-    }
-
-    @Test
-    fun `gitt en omsorgsmottaker som har blitt innvilget for en omsorgsyter i et år, kan innvilges for en annen omsorgsyter et annet år`() {
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2021)
-
-        repo.lagre(
-            PersongrunnlagMelding.Lest(
-                innhold = PersongrunnlagMeldingKafka(
-                    omsorgsyter = "12345678910",
-                    persongrunnlag = listOf(
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "12345678910",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = januar(2020),
-                                    tom = desember(2020),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                    ),
-                    rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
-                ),
-            ),
-        )
-
-
-        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().assertInnvilget(
-            omsorgsyter = "12345678910",
-            omsorgsmottaker = "07081812345",
-            år = OPPTJENINGSÅR,
-        )
-
-        repo.lagre(
-            PersongrunnlagMelding.Lest(
-                innhold = PersongrunnlagMeldingKafka(
-                    omsorgsyter = "04010012797",
-                    persongrunnlag = listOf(
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "04010012797",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2021, Month.JANUARY),
-                                    tom = YearMonth.of(2021, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "07081812345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                )
-                            ),
-                            hjelpestønadsperioder = emptyList(),
-                        ),
-                    ),
-                    rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
-                ),
-            ),
-        )
-
-        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().assertInnvilget(
-            omsorgsyter = "04010012797",
-            omsorgsmottaker = "07081812345",
-            år = 2021,
-        )
     }
 
     @Test

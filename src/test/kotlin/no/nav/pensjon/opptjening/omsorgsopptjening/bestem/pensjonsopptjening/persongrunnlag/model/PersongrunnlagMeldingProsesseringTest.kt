@@ -29,16 +29,17 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.BDDMockito.willAnswer
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.TestPropertySource
 import java.time.Month
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import kotlin.test.assertContains
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
-
+@TestPropertySource(
+    properties = ["GYLDIG_OPPTJENINGSAR=2020"]
+)
 class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
     @Autowired
@@ -49,9 +50,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
-
-    @MockitoBean
-    private lateinit var gyldigOpptjeningår: GyldigOpptjeningår
 
     @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
@@ -106,7 +104,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
          * Stiller klokka litt fram i tid for å unngå at [PersongrunnlagMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -200,7 +197,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
                         .withHeader("Content-Type", "application/json")
                 )
         )
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
@@ -294,7 +290,6 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
          * Stiller klokka litt fram i tid for å unngå at [PersongrunnlagMelding.Status.Retry.karanteneTil] fører til at vi hopper over raden.
          */
         clock.nesteTikk(clock.nåtid().plus(10, ChronoUnit.DAYS))
-        willAnswer { true }.given(gyldigOpptjeningår).erGyldig(2020)
         wiremock.ingenLøpendeAlderspensjon()
         wiremock.ingenLøpendeUføretrgyd()
 
