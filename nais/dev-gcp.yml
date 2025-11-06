@@ -108,8 +108,8 @@ spec:
     max: 1
   resources:
     limits:
-      cpu: "2"
-      memory: 4096Mi
+      cpu: "1000m"
+      memory: "1024Mi"
     requests:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: "200m"
+      memory: "256Mi"
