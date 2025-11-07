@@ -7,7 +7,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.Clock
 
 class KontrollbehandlingProcessingTask(
     private val service: KontrollbehandlingProcessingService,
@@ -23,8 +22,7 @@ class KontrollbehandlingProcessingTask(
 
     override fun run() {
         val timeLock = TimeLock(
-            properties = timeLockProperties,
-            clock = Clock.systemUTC()
+            properties = timeLockProperties
         )
         while (true) {
             if (timeLock.isOpen()) {
