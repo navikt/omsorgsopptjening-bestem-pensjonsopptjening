@@ -90,6 +90,11 @@
                     setBegrunnelseEnabled(false)
                     setArEnabled(false)
                     break;
+                case "stopp_oppgave":
+                    setActionAndText("/bestem/stopp-oppgave", "Stopp oppgave")
+                    setBegrunnelseEnabled(true)
+                    setArEnabled(false)
+                    break;
                 case "restart_godskriving":
                     setActionAndText("/bestem/restart-godskriving", "Restart godskriving")
                     setBegrunnelseEnabled(false)
@@ -208,6 +213,10 @@
         <li>kanseller oppgaver vil kansellere registrerte oppgaver. Oppgaver som er ferdigbehandlet vil ikke bli rørt,
             mens oppgaver som er nye eller påstartet av en saksbehandler vil bli lukket (med status "feilregistrert")
         </li>
+        <li>
+            Stopp oppgave oppdaterer status til stoppet. Kan f.eks brukes for å markere at oppgaver er stoppet teknisk
+            fordi de er håndtert manuelt på utsiden av systemet eller lignende.
+        </li>
         <li>hent status på oppgave vil hente behandlingsstatus for en registrert oppgave</li>
         <li>
             Kontrollbehandling gjennomfører en ny vilkårsvurdering av grunnlaget til alle meldinger tilnyttet
@@ -245,6 +254,7 @@
         <option value="restart_brev">Restart brev (begynn prosessering igjen fra klar)</option>
         <option value="stopp_brev">Stopp brev</option>
         <option value="stopp_godskriving">Stopp godskriving</option>
+        <option value="stopp_oppgave">Stopp oppgave</option>
         <option value="restart_godskriving">Restart godskriving</option>
         <option value="kontrollbehandling">Kontrollbehandling</option>
         <!-- option value="test">TEST (intern, midlertidig)</option -->

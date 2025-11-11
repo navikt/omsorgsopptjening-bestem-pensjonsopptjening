@@ -233,6 +233,15 @@ class OppgaveService(
         }!!
     }
 
+    fun stopp(oppgaveId: UUID, begrunnelse: String?): UUID? {
+        return transactionTemplate.execute {
+            oppgaveRepo.tryFind(oppgaveId)?.stoppet(begrunnelse)?.let {
+                oppgaveRepo.updateStatus(it)
+                it.id
+            }
+        }
+    }
+
     sealed class OppgaveInfoResult {
         class Info(val info: OppgaveInfo) : OppgaveInfoResult()
         data object FantIkkeOppgavenLokalt : OppgaveInfoResult()
