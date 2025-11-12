@@ -83,38 +83,10 @@ internal class PENBrevClient(
                     }
                 }
 
-                404 -> throw BrevClientException("Vedtak eksisterer ikke (400 Not Found)")
-                400 -> {
-                    val feil =
-                        mapper.readValue(
-                            response.body,
-                            SendBrevResponse.Feil::class.java
-                        )
-                    throw BrevClientException("${feil.error.tekniskgrunn} ${feil.error.beskrivelse ?: ""}}")
-                }
-
                 else -> throw BrevClientException("PEN Brev returnerte http ${response.statusCode.value()}")
             }
         } catch (ex: HttpClientErrorException) {
-            when (ex.statusCode.value()) {
-                400 -> {
-                    mapper.readValue(
-                        ex.responseBodyAsString,
-                        SendBrevResponse.Feil::class.java
-                    ).let { feil ->
-                        "Feil fra brevtjenesten: teknisk grunn: ${feil.error.tekniskgrunn}, beskrivelse: ${feil.error.beskrivelse}"
-                            .let { message ->
-                                throw BrevClientException(message, ex)
-                            }
-                    }
-                }
-
-                404 -> {
-                    throw BrevClientException("Feil fra brevtjenesten: vedtak finnes ikke")
-                }
-
-                else -> throw BrevClientException("PEN Brev returnerte http ${ex.statusCode.value()}", ex)
-            }
+            throw BrevClientException(ex)
         } catch (ex: BrevClientException) {
             throw ex
         } catch (ex: Throwable) {
@@ -140,8 +112,6 @@ internal class PENBrevClient(
 
     private sealed class SendBrevResponse {
         data class JournalPostId(val journalpostId: String, val error: Error?) : SendBrevResponse()
-        data object IkkeFunnet
-        data class Feil(val error: Error)
         data class Error(val tekniskgrunn: String, val beskrivelse: String?)
     }
 }

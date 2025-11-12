@@ -180,7 +180,7 @@ class BrevProsesseringTest(
             assertInstanceOf(Brev.Status.Retry::class.java, m.status).let {
                 assertEquals(2, it.antallForsøk)
                 assertEquals(3, it.maxAntallForsøk)
-                assertThat(it.melding).contains("Feil fra brevtjenesten: vedtak finnes ikke")
+                assertThat(it.melding).contains("BrevClientException(msg=Feil fra brevtjenesten, status:404")
             }
         }
 

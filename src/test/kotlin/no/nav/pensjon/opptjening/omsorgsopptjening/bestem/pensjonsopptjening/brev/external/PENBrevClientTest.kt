@@ -116,7 +116,7 @@ internal class PENBrevClientTest {
     }
 
     @Test
-    fun `returnerer ikke funnet hvis vedtak ikke finnes`() {
+    fun `returnerer ikke funnet hvis sak ikke finnes`() {
         val sakId = "42"
         val path = URI(PENBrevClient.createPath(wiremock.baseUrl(), sakId)).toURL().path
         Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
@@ -144,7 +144,7 @@ internal class PENBrevClientTest {
                     (client.sendBrev("42", EksternReferanseId("referanse"), Year.of(2020)))
                 }
                     .isInstanceOf(BrevClientException::class.java)
-                    .hasMessage("Feil fra brevtjenesten: vedtak finnes ikke")
+                    .hasMessage("""Feil fra brevtjenesten, status:404, body:""")
             }
         }
     }
@@ -180,7 +180,42 @@ internal class PENBrevClientTest {
                     (client.sendBrev("42", EksternReferanseId("referanse"), Year.of(2020)))
                 }
                     .isInstanceOf(BrevClientException::class.java)
-                    .hasMessage("Feil fra brevtjenesten: teknisk grunn: noe mangler, beskrivelse: dette kan leses")
+                    .hasMessage("""Feil fra brevtjenesten, status:400, body:{ "error": { "tekniskgrunn": "noe mangler", "beskrivelse": "dette kan leses"}}""")
+            }
+        }
+    }
+
+    @Test
+    fun `returnerer feilårsak dersom opprettelse av brev feilet med uhåndtert feilsituasjon`() {
+        val sakId = "42"
+        val path = URI(PENBrevClient.createPath(wiremock.baseUrl(), sakId)).toURL().path
+        Mdc.scopedMdc(CorrelationId.generate()) { correlationId ->
+            Mdc.scopedMdc(InnlesingId.generate()) { innlesingId ->
+                wiremock.givenThat(
+                    post(urlPathEqualTo(path))
+                        .withHeader(HttpHeaders.AUTHORIZATION, equalTo("Bearer test.token.test"))
+                        .withHeader(HttpHeaders.ACCEPT, equalTo("application/json"))
+                        .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
+                        .withHeader("x-correlation-id", equalTo(correlationId.toString()))
+                        .withHeader("X-Correlation-ID", equalTo(correlationId.toString()))
+                        .withHeader("x-innlesing-id", equalTo(innlesingId.toString()))
+                        .withRequestBody(
+                            equalToJson(
+                                $$"""{"brevdata":{"aarInnvilgetOmsorgspoeng":2020},
+                                    "eksternReferanseId":"${json-unit.any-string}"
+                                   }""".trimMargin()
+                            )
+                        )
+                        .willReturn(
+                            badRequest()
+                                .withBody("""{"feilmelding":"dette er en feilmelding"}""")
+                        )
+                )
+                assertThatThrownBy {
+                    (client.sendBrev("42", EksternReferanseId("referanse"), Year.of(2020)))
+                }
+                    .isInstanceOf(BrevClientException::class.java)
+                    .hasMessage("""Feil fra brevtjenesten, status:400, body:{"feilmelding":"dette er en feilmelding"}""")
             }
         }
     }
