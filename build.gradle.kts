@@ -7,16 +7,16 @@ val domeneVersion = "2.1.101"
 val azureAdClient = "0.0.7"
 val jacksonVersion = "2.20.0"
 val logbackEncoderVersion = "7.4" // kan ikke oppdateres, pga spring/logback-classic
-val postgresqlVersion = "42.7.8"
-val flywayCoreVersion = "11.15.0"
+val postgresqlVersion = "42.7.11"
+val flywayCoreVersion = "12.6.0"
 val springKafkaTestVersion = "3.3.10"
 val springCloudContractVersion = "4.0.4"
-val testcontainersVersion = "1.21.3"
+val testcontainersVersion = "1.21.4"
 val mockkVersion = "1.14.6"
 val assertJVersion = "3.27.6"
 val jsonAssertVersion = "1.5.3"
-val wiremockVersion = "3.13.1"
-val mockitoVersion = "6.1.0"
+val wiremockVersion = "3.13.2"
+val mockitoVersion = "6.3.0"
 val unleashVersion = "9.2.6"
 val navTokenSupportVersion = "5.0.37"
 val hibernateValidatorVersion = "8.0.1.Final"
@@ -34,7 +34,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "3.5.7"
+    id("org.springframework.boot") version "3.5.13"
     id("com.github.ben-manes.versions") version "0.53.0"
 }
 
