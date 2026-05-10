@@ -1,10 +1,11 @@
-name: 'Bygg og deploy til test'
+name: 'Bygg og deploy'
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+      -
 jobs:
   build_and_push:
     permissions:
@@ -13,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: 'Setup Java'
         uses: actions/setup-java@v5
@@ -34,10 +35,10 @@ jobs:
           echo "GIT_REF_TAG=git_${GIT_BRANCH}_${GIT_COMMIT}" >> $GITHUB_ENV
 
       - name: 'Setup Gradle'
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: 'Generate and submit dependency graph'
-        uses: gradle/actions/dependency-submission@v5
+        uses: gradle/actions/dependency-submission@v6
 
       - name: 'Build code'
         run: |
@@ -57,5 +58,14 @@ jobs:
         env:
           RESOURCE: nais/dev-gcp.yml,nais/unleash-apitoken-dev-gcp.yml
           CLUSTER: dev-gcp
+          IMAGE: ${{ steps.docker-push.outputs.image }}
+          TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
+
+      - name: 'Deploy til prod-gcp (hvis main)'
+        uses: nais/deploy/actions/deploy@v2
+        if: ${{github.ref == 'refs/heads/main' }}
+        env:
+          RESOURCE: nais/prod-gcp.yml,nais/unleash-apitoken-prod-gcp.yml
+          CLUSTER: prod-gcp
           IMAGE: ${{ steps.docker-push.outputs.image }}
           TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
