@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val domeneVersion = "2.1.101"
 val azureAdClient = "0.0.7"
-val jacksonVersion = "2.20.0"
+val jacksonVersion = "2.22.0"
 val logbackEncoderVersion = "7.4" // kan ikke oppdateres, pga spring/logback-classic
 val postgresqlVersion = "42.7.11"
 val flywayCoreVersion = "12.6.0"
