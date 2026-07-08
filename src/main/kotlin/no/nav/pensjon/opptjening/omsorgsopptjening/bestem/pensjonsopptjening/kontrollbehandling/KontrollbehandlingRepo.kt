@@ -134,7 +134,7 @@ class KontrollbehandlingRepo(
                 "lockId" to lockId
             ),
             UUID::class.java
-        )
+        ).filterNotNull()
     }
 
     fun finnNesteKlarForRetry(lockId: UUID, antall: Int): List<UUID> {
@@ -167,7 +167,7 @@ class KontrollbehandlingRepo(
                 "lockId" to lockId,
             ),
             UUID::class.java
-        )
+        ).filterNotNull()
     }
 
     fun frigi(locked: Locked) {

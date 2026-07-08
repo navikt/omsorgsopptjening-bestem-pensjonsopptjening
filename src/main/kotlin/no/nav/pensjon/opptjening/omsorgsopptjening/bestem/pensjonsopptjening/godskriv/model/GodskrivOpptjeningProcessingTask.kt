@@ -28,7 +28,7 @@ class GodskrivOpptjeningProcessingTask(
         val timeLock = TimeLock(
             properties = timeLockProperties
         )
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             if (timeLock.isOpen()) {
                 try {
                     if (unleash.isEnabled(NavUnleashConfig.Feature.GODSKRIV) && datasourceReadinessCheck.isReady()) {
@@ -46,6 +46,8 @@ class GodskrivOpptjeningProcessingTask(
                             }
                         }
                     }
+                } catch (interrupted: InterruptedException) {
+                    Thread.currentThread().interrupt() // let while-condition exit the loop on shutdownNow
                 } catch (exception: Throwable) {
                     godskrivProcessingMetricsFeilmåling.oppdater {
                         log.warn("Exception caught while processing ${exception::class.qualifiedName}")

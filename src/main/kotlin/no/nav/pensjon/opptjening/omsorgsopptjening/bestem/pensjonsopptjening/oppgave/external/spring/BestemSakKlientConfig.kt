@@ -19,12 +19,14 @@ class BestemSakKlientConfig {
         @Qualifier("PENTokenProvider") tokenProvider: TokenProvider,
         bestemSakMetrics: BestemSakMetrics,
         restTemplate: RestTemplate,
+        objectMapper: tools.jackson.databind.ObjectMapper,
     ): BestemSakKlient {
         return BestemSakKlient(
             bestemSakUrl = bestemSakUrl,
             tokenProvider = tokenProvider,
             metrics = bestemSakMetrics,
             restTemplate = restTemplate,
+            objectMapper = objectMapper,
         )
     }
 

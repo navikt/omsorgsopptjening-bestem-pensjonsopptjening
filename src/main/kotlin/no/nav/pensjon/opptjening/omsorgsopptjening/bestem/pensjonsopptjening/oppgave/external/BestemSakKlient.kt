@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
+import tools.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
@@ -21,6 +21,7 @@ class BestemSakKlient(
     private val tokenProvider: TokenProvider,
     private val metrics: BestemSakMetrics,
     private val restTemplate: RestTemplate,
+    private val objectMapper: ObjectMapper,
 ) {
     private val log: Logger by lazy { LoggerFactory.getLogger(BestemSakKlient::class.java) }
 
@@ -50,7 +51,7 @@ class BestemSakKlient(
                 String::class.java
             )
             metrics.tellAntallSakerHentet()
-            mapper.readValue(response.body, BestemSakResponse::class.java).omsorgssak.let {
+            objectMapper.readValue(response.body, BestemSakResponse::class.java).omsorgssak.let {
                 Omsorgssak(
                     sakId = it.sakId,
                     enhet = it.saksbehandlendeEnhetId
@@ -97,7 +98,6 @@ class BestemSakKlient(
         val saksbehandlendeEnhetId: String = "",
         val nyopprettet: Boolean = false,
 
-        @JsonIgnore
         val tilknyttedeSaker: List<SakInformasjon> = emptyList()
     )
 

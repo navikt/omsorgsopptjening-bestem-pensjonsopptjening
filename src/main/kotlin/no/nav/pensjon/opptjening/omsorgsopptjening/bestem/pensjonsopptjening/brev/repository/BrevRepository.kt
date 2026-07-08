@@ -190,7 +190,7 @@ class BrevRepository(
                 "lockId" to lockId,
             ),
             UUID::class.java
-        )
+        ).filterNotNull()
     }
 
     fun finnNesteUprosesserteRetry(lockId: UUID, antall: Int): List<UUID> {
@@ -218,7 +218,7 @@ class BrevRepository(
                 "lockId" to lockId,
             ),
             UUID::class.java
-        )
+        ).filterNotNull()
     }
 
     private fun BrevÅrsak.toDb(): String {

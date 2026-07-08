@@ -218,7 +218,7 @@ class OppgaveRepo(
                 "lockId" to lockId,
             ),
             UUID::class.java
-        )
+        ).filterNotNull()
     }
 
     fun finnNesteUprosesserteRetry(lockId: UUID, now: Instant, antall: Int): List<UUID> {
@@ -247,7 +247,7 @@ class OppgaveRepo(
                 "lockId" to lockId,
             ),
             UUID::class.java
-        )
+        ).filterNotNull()
     }
 
     fun finnEldsteUbehandledeOppgave(): Oppgave.Persistent? {

@@ -1,6 +1,13 @@
 kafka:
   brokers: ${spring.embedded.kafka.brokers}
 
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:17:///test
+    username: test
+    password: test
+
 PDL_URL: http://localhost:9991/graphql
 PEN_BASE_URL: http://localhost:9991/pen
 OPPGAVE_URL: http://localhost:9991/api/v1/oppgaver

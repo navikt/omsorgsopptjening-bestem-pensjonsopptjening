@@ -14,7 +14,7 @@ import java.util.concurrent.Executors
 @Configuration
 class TaskConfig {
 
-    @Bean(destroyMethod = "shutdown") //normal close() waits for task completion, while(true) never completes..
+    @Bean(destroyMethod = "shutdownNow") // shutdownNow interrupts the while-loop tasks so contexts (and @DirtiesContext) tear down cleanly
     @Profile("dev-gcp", "prod-gcp", "kafkaIntegrationTest")
     fun taskExecutorService(
         oppgaveProcessingTask: OppgaveProcessingTask,
@@ -23,7 +23,10 @@ class TaskConfig {
         kontrollbehandlingProcessingTask: KontrollbehandlingProcessingTask,
         godskrivOpptjeningProcessingTask: GodskrivOpptjeningProcessingTask
     ): ExecutorService {
-        return Executors.newThreadPerTaskExecutor(Executors.defaultThreadFactory()).also { executor ->
+        val daemonFactory = Executors.defaultThreadFactory().let { base ->
+            java.util.concurrent.ThreadFactory { base.newThread(it).apply { isDaemon = true } }
+        }
+        return Executors.newThreadPerTaskExecutor(daemonFactory).also { executor ->
             repeat(1) { executor.submit(oppgaveProcessingTask) }
             repeat(1) { executor.submit(brevProcessingTask) }
             repeat(16) { executor.submit(persongrunnlagMeldingProcessingTask) }

@@ -19,12 +19,14 @@ class BrevClientConfig {
         @Qualifier("PENTokenProvider") tokenProvider: TokenProvider,
         penBrevMetricsMåling: PENBrevMetrikker,
         restTemplate: RestTemplate,
+        objectMapper: tools.jackson.databind.ObjectMapper,
     ): BrevClient {
         return PENBrevClient(
             baseUrl = baseUrl,
             tokenProvider = tokenProvider,
             penBrevMetricsMåling = penBrevMetricsMåling,
             restTemplate = restTemplate,
+            objectMapper = objectMapper,
         )
     }
 }

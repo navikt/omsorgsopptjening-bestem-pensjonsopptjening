@@ -38,17 +38,18 @@ class PersongrunnlagKafkaConfig(@Value($$"${kafka.brokers}") private val aivenBo
     class SecurityConfig(vararg input: Pair<String, Any>) : Map<String, Any> by input.toMap()
 
     @Bean("listener")
-    fun listener(securityConfig: SecurityConfig): ConcurrentKafkaListenerContainerFactory<String, String>? =
-        ConcurrentKafkaListenerContainerFactory<String, String>().apply {
+    fun listener(securityConfig: SecurityConfig): ConcurrentKafkaListenerContainerFactory<String, String> {
+        return ConcurrentKafkaListenerContainerFactory<String, String>().apply {
             containerProperties.ackMode = ContainerProperties.AckMode.MANUAL
             containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(4L))
-            consumerFactory = DefaultKafkaConsumerFactory(
+            setConsumerFactory(DefaultKafkaConsumerFactory(
                 consumerConfig() + securityConfig,
                 StringDeserializer(),
                 StringDeserializer()
-            )
-            isBatchListener = true
+            ))
+            setBatchListener(true)
         }
+    }
 
     private fun consumerConfig(): Map<String, Any> = mapOf(
         ConsumerConfig.CLIENT_ID_CONFIG to "omsorgsopptjening-bestem-pensjonsopptjening",

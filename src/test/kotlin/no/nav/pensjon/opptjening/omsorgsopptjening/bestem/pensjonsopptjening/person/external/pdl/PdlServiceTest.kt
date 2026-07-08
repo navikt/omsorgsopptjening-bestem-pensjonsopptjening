@@ -12,12 +12,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.uti
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import org.junit.jupiter.api.Assertions.assertInstanceOf
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
-import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.core.io.ClassPathResource
 import org.springframework.web.client.RestClientException
 import kotlin.test.assertEquals
@@ -147,22 +146,21 @@ internal class PdlServiceTest {
     }
 
     @Test
-    @Disabled("Treig som følge av backoff ved retry")
-    fun `Given other code than 200 When getting person Then retry 3 times before give up`() {
+    fun `Given non-2xx http status When getting person Then wrap RestClientException and call pdl once`() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
                 wiremock.stubFor(
                     WireMock.post(WireMock.urlEqualTo(PDL_PATH)).willReturn(WireMock.aResponse().withStatus(401))
                 )
-                assertThrows<RestClientException> { pdlService.hentPerson(FNR) }
-                wiremock.verify(4, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+                val error = assertThrows<PersonOppslagException> { pdlService.hentPerson(FNR) }
+                assertInstanceOf(RestClientException::class.java, error.cause)
+                wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
             }
         }
     }
 
     @Test
-    @Disabled("Treig som følge av backoff ved retry")
-    fun `Given server error When getting person Then retry 3 times before give up`() {
+    fun `Given server error When getting person Then throw PdlException and call pdl once`() {
         Mdc.scopedMdc(CorrelationId.generate()) {
             Mdc.scopedMdc(InnlesingId.generate()) {
                 wiremock.stubFor(
@@ -173,12 +171,13 @@ internal class PdlServiceTest {
                     )
                 )
 
-                val error = assertThrows<PdlException> { pdlService.hentPerson(FNR) }
-                assertEquals(PdlErrorCode.SERVER_ERROR, error.code)
-                wiremock.verify(4, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
+                val error = assertThrows<PersonOppslagException> { pdlService.hentPerson(FNR) }
+                assertInstanceOf(PdlException::class.java, error.cause).also {
+                    assertEquals(PdlErrorCode.SERVER_ERROR, it.code)
+                }
+                wiremock.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo(PDL_PATH)))
             }
         }
-
     }
 
     @Test

@@ -24,7 +24,7 @@ class KontrollbehandlingProcessingTask(
         val timeLock = TimeLock(
             properties = timeLockProperties
         )
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             if (timeLock.isOpen()) {
                 try {
                     if (unleash.isEnabled(NavUnleashConfig.Feature.KONTROLL) && datasourceReadinessCheck.isReady()) {
@@ -38,6 +38,8 @@ class KontrollbehandlingProcessingTask(
                             }
                         }
                     }
+                } catch (interrupted: InterruptedException) {
+                    Thread.currentThread().interrupt() // let while-condition exit the loop on shutdownNow
                 } catch (exception: Throwable) {
                     log.warn("Exception caught while processing ${exception::class.qualifiedName}")
                     secureLog.error("Exception caught while processing", exception)
