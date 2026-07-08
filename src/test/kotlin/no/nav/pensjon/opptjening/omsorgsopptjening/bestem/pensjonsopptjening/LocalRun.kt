@@ -1,8 +1,8 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening
 
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
+import no.nav.security.token.support.spring.test.MockLoginController
+import no.nav.security.token.support.spring.test.MockOAuth2ServerAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
-import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.test.EmbeddedKafkaKraftBroker
 
 /**
@@ -23,11 +23,13 @@ fun main(args: Array<String>) {
     broker.afterPropertiesSet()
     System.setProperty("kafka.brokers", broker.brokersAsString)
 
-    SpringApplicationBuilder(Application::class.java, LocalRunConfig::class.java)
+    // Importerer mock-OAuth2-autoconfig direkte (ikke via @EnableMockOAuth2Server på en
+    // @Configuration - det ville blitt component-scannet og brutt alle @SpringBootTest-kontekster).
+    SpringApplicationBuilder(
+        Application::class.java,
+        MockOAuth2ServerAutoConfiguration::class.java,
+        MockLoginController::class.java,
+    )
         .profiles("kafkaIntegrationTest")
         .run(*args)
 }
-
-@Configuration
-@EnableMockOAuth2Server
-class LocalRunConfig

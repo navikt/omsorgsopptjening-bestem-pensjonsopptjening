@@ -6,7 +6,7 @@ val domeneVersion = "2.1.101"
 val azureAdClient = "0.0.7"
 val logbackEncoderVersion = "9.0"
 val flywayCoreVersion = "12.6.0"
-val wiremockVersion = "3.13.2"
+val wiremockVersion = "4.0.0-beta.38"
 val mockitoVersion = "6.3.0"
 val unleashVersion = "9.2.6"
 val navTokenSupportVersion = "6.0.8"
@@ -77,11 +77,9 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.21.4") // ponytail: TC 1.x jdbc:tc driver approach, same as afp-api
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoVersion")
-    testImplementation("org.wiremock:wiremock-jetty12:$wiremockVersion")
+    testImplementation("org.wiremock:wiremock:$wiremockVersion") // aggregator: httpclient-apache5 factory + core (runtime)
+    testImplementation("org.wiremock:wiremock-junit5:$wiremockVersion") // WireMockExtension (compile)
     testImplementation("no.nav.security:token-validation-spring-test:$navTokenSupportVersion")
-
-    // WireMock 3.13 requires Jetty ee10 12.1.x aligned with jetty-core. BOM pins ee10 to 12.0.x.
-    testImplementation("org.eclipse.jetty.ee10:jetty-ee10-servlet:12.1.10")
 }
 
 // Lokal smoke-run av hele appen mot in-process Kafka + Testcontainers Postgres. Se LocalRun.kt.
