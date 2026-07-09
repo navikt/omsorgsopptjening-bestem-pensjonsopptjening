@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestTemplate
 import pensjon.opptjening.azure.ad.client.TokenProvider
+import tools.jackson.databind.ObjectMapper
 
 @Configuration
 class BestemSakKlientConfig {
@@ -19,7 +20,7 @@ class BestemSakKlientConfig {
         @Qualifier("PENTokenProvider") tokenProvider: TokenProvider,
         bestemSakMetrics: BestemSakMetrics,
         restTemplate: RestTemplate,
-        objectMapper: tools.jackson.databind.ObjectMapper,
+        objectMapper: ObjectMapper,
     ): BestemSakKlient {
         return BestemSakKlient(
             bestemSakUrl = bestemSakUrl,

@@ -28,7 +28,7 @@ class PersongrunnlagMeldingProcessingTask(
         val timeLock = TimeLock(
             properties = timeLockProperties
         )
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!Thread.currentThread().isInterrupted) {
             if (timeLock.isOpen()) {
                 try {
                     if (unleash.isEnabled(NavUnleashConfig.Feature.BEHANDLING) && datasourceReadinessCheck.isReady()) {

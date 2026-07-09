@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestTemplate
 import pensjon.opptjening.azure.ad.client.TokenProvider
+import tools.jackson.databind.ObjectMapper
 
 @Configuration
 class BrevClientConfig {
@@ -19,7 +20,7 @@ class BrevClientConfig {
         @Qualifier("PENTokenProvider") tokenProvider: TokenProvider,
         penBrevMetricsMåling: PENBrevMetrikker,
         restTemplate: RestTemplate,
-        objectMapper: tools.jackson.databind.ObjectMapper,
+        objectMapper: ObjectMapper,
     ): BrevClient {
         return PENBrevClient(
             baseUrl = baseUrl,

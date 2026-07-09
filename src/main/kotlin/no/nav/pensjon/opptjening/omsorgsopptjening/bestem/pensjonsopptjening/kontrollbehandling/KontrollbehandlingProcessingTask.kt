@@ -24,7 +24,7 @@ class KontrollbehandlingProcessingTask(
         val timeLock = TimeLock(
             properties = timeLockProperties
         )
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!Thread.currentThread().isInterrupted) {
             if (timeLock.isOpen()) {
                 try {
                     if (unleash.isEnabled(NavUnleashConfig.Feature.KONTROLL) && datasourceReadinessCheck.isReady()) {
