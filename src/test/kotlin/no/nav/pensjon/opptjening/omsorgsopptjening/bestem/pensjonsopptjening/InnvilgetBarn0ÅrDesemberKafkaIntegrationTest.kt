@@ -16,9 +16,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.Mockito.mockingDetails
 import org.mockito.Mockito.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
@@ -28,7 +28,6 @@ import java.time.YearMonth
 import kotlin.test.assertEquals
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
-@Disabled("feiler på gihub")
 @TestPropertySource(
     properties = ["GYLDIG_OPPTJENINGSAR=2020"]
 )
@@ -82,7 +81,7 @@ class InnvilgetBarn0ÅrDesemberKafkaIntegrationTest : SpringContextTest.WithKafk
             )
         )
 
-        Thread.sleep(2500)
+        await { mockingDetails(godskrivOpptjeningClient).invocations.isNotEmpty() }
 
         assertEquals(1, behandlingRepo.finnForOmsorgsyter("12345678910").count())
 

@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      -
+
 jobs:
   build_and_push:
     permissions:
@@ -20,29 +20,20 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 25
           cache: 'gradle'
 
-      - name: 'Setter dato og commit variabel'
+      - name: 'Setter git-referansetag'
         run: |
-          export TZ=CET
-          echo "DATE=$(date '+%Y-%m-%d--%H-%M-%S')" >> $GITHUB_ENV
-          echo "GIT_COMMIT=$(echo ${{github.sha}} | cut -c 1-7)" >> $GITHUB_ENV
-          echo "GIT_BRANCH=$(echo ${{github.ref_name}})" >> $GITHUB_ENV
-
-      - name: 'Configure git reference tag'
-        run: |
-          echo "GIT_REF_TAG=git_${GIT_BRANCH}_${GIT_COMMIT}" >> $GITHUB_ENV
-
-      - name: 'Setup Gradle'
-        uses: gradle/actions/setup-gradle@v6
+          echo "GIT_REF_TAG=git_${{github.ref_name}}_$(echo ${{github.sha}} | cut -c 1-7)" >> $GITHUB_ENV
 
       - name: 'Generate and submit dependency graph'
         uses: gradle/actions/dependency-submission@v6
+        with:
+          dependency-graph-include-configurations: '^runtimeClasspath$'
 
       - name: 'Build code'
-        run: |
-          ./gradlew build
+        run: ./gradlew build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,9 +52,8 @@ jobs:
           IMAGE: ${{ steps.docker-push.outputs.image }}
           TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
 
-      - name: 'Deploy til prod-gcp (hvis main)'
+      - name: 'Deploy to prod-gcp'
         uses: nais/deploy/actions/deploy@v2
-        if: ${{github.ref == 'refs/heads/main' }}
         env:
           RESOURCE: nais/prod-gcp.yml,nais/unleash-apitoken-prod-gcp.yml
           CLUSTER: prod-gcp

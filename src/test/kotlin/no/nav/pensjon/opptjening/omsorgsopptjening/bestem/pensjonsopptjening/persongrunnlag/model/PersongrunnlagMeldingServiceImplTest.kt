@@ -23,7 +23,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningGrunnlag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErForelderTilMottakerAvHjelpestønad
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErikkeOmsorgsmottaker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarGyldigOmsorgsarbeid
@@ -61,7 +60,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
@@ -1246,56 +1244,6 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                 omsorgsmottaker = "03041212345",
                 omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
             )
-        }
-    }
-
-    @Test
-    @Disabled("Ikke et kriterium i BPEN030 - se OmsorgsyterErForelderTilMottakerAvHjelpestønad og relatert bruk")
-    fun `en omsorgsyter som mottar barnetrygd for en omsorgsmottaker over 6 år med hjelpestønad skal avslås omsorgsyter og omsorgsmottaker ikke har en foreldre-barn relasjon`() {
-        repo.lagre(
-            PersongrunnlagMelding.Lest(
-                innhold = PersongrunnlagMeldingKafka(
-                    omsorgsyter = "01019212345",
-                    persongrunnlag = listOf(
-                        PersongrunnlagMeldingKafka.Persongrunnlag(
-                            omsorgsyter = "01019212345",
-                            omsorgsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Omsorgsperiode(
-                                    fom = YearMonth.of(2018, Month.JANUARY),
-                                    tom = YearMonth.of(2030, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
-                                    omsorgsmottaker = "03041212345",
-                                    kilde = Kilde.BARNETRYGD,
-                                    utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
-                                ),
-                            ),
-                            hjelpestønadsperioder = listOf(
-                                PersongrunnlagMeldingKafka.Hjelpestønadperiode(
-                                    fom = YearMonth.of(2018, Month.JANUARY),
-                                    tom = YearMonth.of(2030, Month.DECEMBER),
-                                    omsorgstype = Omsorgstype.HJELPESTØNAD_FORHØYET_SATS_3,
-                                    omsorgsmottaker = "03041212345",
-                                    kilde = Kilde.INFOTRYGD,
-                                )
-                            )
-                        ),
-                    ),
-                    rådata = Rådata(),
-                    innlesingId = InnlesingId.generate(),
-                    correlationId = CorrelationId.generate(),
-                ),
-            ),
-        )
-
-        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
-            behandling.assertAvslag(
-                omsorgsyter = "01019212345",
-                omsorgsmottaker = "03041212345",
-                omsorgstype = DomainOmsorgskategori.HJELPESTØNAD,
-            ).also {
-                assertTrue(it.vilkårsvurdering.erEnesteAvslag<OmsorgsyterErForelderTilMottakerAvHjelpestønad.Vurdering>())
-            }
         }
     }
 

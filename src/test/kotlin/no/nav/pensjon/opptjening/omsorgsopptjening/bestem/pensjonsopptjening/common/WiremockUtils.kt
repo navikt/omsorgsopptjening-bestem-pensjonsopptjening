@@ -1,7 +1,7 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.readValue
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
@@ -13,7 +13,6 @@ import com.github.tomakehurst.wiremock.matching.ContainsPattern
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.POPP_PENSJONSPOENG_PATH
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 import kotlin.random.Random
 
 /**
@@ -49,7 +48,7 @@ class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformerV2 {
         val request = serveEvent.request
         val responseDefinition = serveEvent.responseDefinition
         return if (request!!.url.equals(SpringContextTest.PDL_PATH) && responseDefinition!!.bodyFileName == null) {
-            val ident = mapper.readValue<JsonNode>(request.bodyAsString).get("variables").get("ident").textValue()
+            val ident = ObjectMapper().readValue(request.bodyAsString, JsonNode::class.java).get("variables").get("ident").textValue()
             ResponseDefinitionBuilder.like(responseDefinition)
                 .withBodyFile(
                     fnrToBodyMapping[ident]

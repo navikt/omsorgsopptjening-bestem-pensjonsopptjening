@@ -28,7 +28,7 @@ class PersongrunnlagMeldingProcessingTask(
         val timeLock = TimeLock(
             properties = timeLockProperties
         )
-        while (true) {
+        while (!Thread.currentThread().isInterrupted) {
             if (timeLock.isOpen()) {
                 try {
                     if (unleash.isEnabled(NavUnleashConfig.Feature.BEHANDLING) && datasourceReadinessCheck.isReady()) {
@@ -46,6 +46,8 @@ class PersongrunnlagMeldingProcessingTask(
                             }
                         }
                     }
+                } catch (interrupted: InterruptedException) {
+                    Thread.currentThread().interrupt() // let while-condition exit the loop on shutdownNow
                 } catch (exception: Throwable) {
                     omsorgsarbeidMetricsFeilmåling.oppdater {
                         log.warn("Exception caught while processing ${exception::class.qualifiedName}")

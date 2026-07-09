@@ -28,7 +28,7 @@ class BrevProcessingTask(
         val timeLock = TimeLock(
             properties = timeLockProperties
         )
-        while (true) {
+        while (!Thread.currentThread().isInterrupted) {
             if (timeLock.isOpen()) {
                 try {
                     if (unleash.isEnabled(NavUnleashConfig.Feature.BREV) && datasourceReadinessCheck.isReady()) {
@@ -46,6 +46,8 @@ class BrevProcessingTask(
                             }
                         }
                     }
+                } catch (interrupted: InterruptedException) {
+                    Thread.currentThread().interrupt() // let while-condition exit the loop on shutdownNow
                 } catch (exception: Throwable) {
                     brevProcessingMetricsFeilmåling.oppdater {
                         log.warn("Exception caught while processing ${exception::class.qualifiedName}")

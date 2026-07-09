@@ -34,6 +34,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.io.Serializable
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import javax.sql.DataSource
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 @DirtiesContext
@@ -58,9 +59,24 @@ sealed class SpringContextTest {
     @Autowired
     protected lateinit var clock: TestKlokke
 
+    @Autowired
+    private lateinit var dataSource: DataSource
+
     @BeforeEach
     protected open fun beforeEach() {
-        PostgresqlTestContainer.instance.removeDataFromDB()
+        dataSource.connection.use { conn ->
+            conn.createStatement().execute(
+                """
+                DELETE FROM BREV;
+                DELETE FROM GODSKRIV_OPPTJENING;
+                DELETE FROM OPPGAVE;
+                DELETE FROM KONTROLLBEHANDLING;
+                DELETE FROM KONTROLLMELDING;
+                DELETE FROM BEHANDLING;
+                DELETE FROM MELDING;
+                """
+            )
+        }
         clock.reset()
     }
 
@@ -162,6 +178,16 @@ sealed class SpringContextTest {
                 )
             )
             producer.send(pr).get()
+        }
+
+        // ponytail: poll instead of a fixed sleep; ceiling = timeoutMs then fail. Replaces flaky Thread.sleep.
+        fun await(timeoutMs: Long = 10_000, condition: () -> Boolean) {
+            val deadline = System.currentTimeMillis() + timeoutMs
+            while (System.currentTimeMillis() < deadline) {
+                if (condition()) return
+                Thread.sleep(100)
+            }
+            error("Condition not met within ${timeoutMs}ms")
         }
     }
 }

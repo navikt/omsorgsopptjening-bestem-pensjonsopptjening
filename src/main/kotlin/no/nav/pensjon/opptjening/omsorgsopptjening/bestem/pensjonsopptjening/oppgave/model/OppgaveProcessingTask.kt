@@ -29,7 +29,7 @@ class OppgaveProcessingTask(
         val timeLock = TimeLock(
             properties = timeLockProperties
         )
-        while (true) {
+        while (!Thread.currentThread().isInterrupted) {
             if (timeLock.isOpen()) {
                 try {
                     if (unleash.isEnabled(NavUnleashConfig.Feature.OPPRETT_OPPGAVER) && datasourceReadinessCheck.isReady()) {
@@ -47,6 +47,8 @@ class OppgaveProcessingTask(
                             }
                         }
                     }
+                } catch (interrupted: InterruptedException) {
+                    Thread.currentThread().interrupt() // let while-condition exit the loop on shutdownNow
                 } catch (exception: Throwable) {
                     oppgaveProcessingMetricsFeilmåling.oppdater {
                         log.warn("Exception caught while processing ${exception::class.qualifiedName}")

@@ -16,6 +16,30 @@ seg gjøre.
 
 [Overordnet arkitektur omsorgsopptjening](https://confluence.adeo.no/x/Gl_qHg)
 
+## Kjøre lokalt
+
+Appen kan startes lokalt for en rask røyktest av at hele Spring-konteksten (Flyway, alle beans,
+Kafka-lytter og bakgrunnstasker) starter opp:
+
+```
+./gradlew runLocal
+```
+
+Starteren ligger i test-scope (`src/test/.../LocalRun.kt`) og bruker `kafkaIntegrationTest`-profilen,
+som gir PLAINTEXT Kafka, `FakeUnleash` og mock OAuth2. Postgres startes automatisk via
+Testcontainers (`jdbc:tc`) og Kafka kjøres in-process – **ingen ekstern infrastruktur kreves**.
+
+> **Hvorfor ligger den i test-scope og ikke som en vanlig `main`?** Starteren er avhengig av tre
+> test-biblioteker: Testcontainers (Postgres via `jdbc:tc`), `spring-kafka-test` (in-process
+> Kafka-broker) og mock-oauth2-server (fake JWT-issuer). Å kalle den fra en `main`-funksjon ville
+> tvinge disse testavhengighetene inn i produksjons-classpathen og prod-jaren. Dette er det vanlige
+> Spring Boot-mønsteret for en Testcontainers-basert lokal starter. Kjøres via `runLocal`-tasken over.
+
+Sjekk at appen er oppe: http://localhost:8080/actuator/health → `{"status":"UP"}`. Avslutt med Ctrl-C.
+
+Merk: eksterne tjenester (PDL/PEN/POPP/Oppgave) er ikke koblet til, så appen idler etter oppstart.
+Dette verifiserer oppstart og wiring, ikke de eksterne integrasjonene.
+
 ## Intern arkitektur
 
 Applikasjonen er delt inn i følgende distinkte steg som opererer uavhenging av hverandre:

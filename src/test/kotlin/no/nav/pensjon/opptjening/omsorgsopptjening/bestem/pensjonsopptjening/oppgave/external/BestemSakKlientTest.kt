@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
-import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import kotlin.test.assertEquals
 
@@ -32,7 +32,8 @@ class BestemSakKlientTest {
         bestemSakUrl = "${wiremock.baseUrl()}/pen",
         tokenProvider = mock { on { getToken() }.thenReturn(TokenProviderConfig.MOCK_TOKEN) },
         metrics = mock(),
-        restTemplate = RestTemplateBuilder().build()
+        restTemplate = RestTemplateBuilder().build(),
+        objectMapper = tools.jackson.databind.ObjectMapper(),
     )
 
     @Test

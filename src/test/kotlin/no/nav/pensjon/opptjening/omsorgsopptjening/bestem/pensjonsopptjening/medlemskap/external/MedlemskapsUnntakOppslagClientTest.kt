@@ -24,7 +24,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
-import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import kotlin.test.Test

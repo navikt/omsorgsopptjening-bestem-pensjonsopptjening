@@ -10,8 +10,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.bre
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.mapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
+import tools.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -27,6 +27,7 @@ internal class PENBrevClient(
     private val tokenProvider: TokenProvider,
     private val penBrevMetricsMåling: PENBrevMetrikker,
     private val restTemplate: RestTemplate,
+    private val objectMapper: ObjectMapper,
 ) : BrevClient {
 
     companion object {
@@ -70,7 +71,7 @@ internal class PENBrevClient(
             )
             when (response.statusCode.value()) {
                 200 -> {
-                    mapper.readValue(
+                    objectMapper.readValue(
                         response.body,
                         SendBrevResponse.JournalPostId::class.java
                     ).let { response ->
