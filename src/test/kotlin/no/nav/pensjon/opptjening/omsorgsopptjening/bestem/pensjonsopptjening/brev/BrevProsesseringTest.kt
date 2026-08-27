@@ -136,7 +136,8 @@ class BrevProsesseringTest(
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -235,7 +236,8 @@ class BrevProsesseringTest(
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -280,7 +282,7 @@ class BrevProsesseringTest(
 }
 
 private fun BrevService.processAndExpectResult(): List<Brev.Persistent> {
-    return when(val result = this.process()){
+    return when (val result = this.process()) {
         is Resultat.FantIngenDataÅProsessere -> fail("Expecting result")
         is Resultat.Prosessert -> result.data
     }

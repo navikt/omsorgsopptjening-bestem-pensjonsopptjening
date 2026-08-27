@@ -339,7 +339,8 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                                     omsorgsmottaker = omsorgsmottaker,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -373,7 +374,8 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                                     omsorgsmottaker = omsorgsmottaker,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -416,7 +418,8 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                                     omsorgsmottaker = omsorgsmottaker,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -431,7 +434,8 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                                     omsorgsmottaker = omsorgsmottaker,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),

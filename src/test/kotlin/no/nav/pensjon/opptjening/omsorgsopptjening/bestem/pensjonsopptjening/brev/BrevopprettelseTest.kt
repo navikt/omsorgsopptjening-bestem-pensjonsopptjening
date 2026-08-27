@@ -68,11 +68,15 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
-                .withRequestBody(equalToJson("""
+                .withRequestBody(
+                    equalToJson(
+                        """
                     {
                         "fnr" : "04010012797"
                     }
-                """.trimIndent(), false, true))
+                """.trimIndent(), false, true
+                    )
+                )
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -107,7 +111,8 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -141,12 +146,16 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     fun `innvilget omsorgsopptjening for barn over 6 år skal sende brev dersom omsorgsyters omsorgspoeng som godskrives er høyere enn annen forelders pensjonspoeng for inntekt i omsorgsåret`() {
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
-                .withRequestBody(equalToJson("""
+                .withRequestBody(
+                    equalToJson(
+                        """
                     {
                        "fnr": "12345678910",
                        "fomAr": 2019
                     }
-                """.trimIndent(), false, true))
+                """.trimIndent(), false, true
+                    )
+                )
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -168,11 +177,15 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
 
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
-                .withRequestBody(equalToJson("""
+                .withRequestBody(
+                    equalToJson(
+                        """
                     {
                         "fnr" : "04010012797"
                     }
-                """.trimIndent(), false, true))
+                """.trimIndent(), false, true
+                    )
+                )
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -201,7 +214,8 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -235,12 +249,16 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
     fun `innvilget omsorgsopptjening for barn over 6 år skal ikke sende brev dersom omsorgsyters omsorgspoeng som godskrives er lavere enn annen forelders pensjonspoeng for inntekt i omsorgsåret`() {
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
-                .withRequestBody(equalToJson("""
+                .withRequestBody(
+                    equalToJson(
+                        """
                     {
                         "fnr" : "12345678910",
                         "fomAr": 2019
                     }
-                """.trimIndent(), false, true))
+                """.trimIndent(), false, true
+                    )
+                )
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -262,11 +280,15 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
 
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
-                .withRequestBody(equalToJson("""
+                .withRequestBody(
+                    equalToJson(
+                        """
                     {
                         "fnr" : "04010012797"
                     }
-                """.trimIndent(), false, true))
+                """.trimIndent(), false, true
+                    )
+                )
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -301,7 +323,8 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -333,11 +356,15 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
         wiremock.ingenPensjonspoeng("12345678910") //mor
         wiremock.givenThat(
             WireMock.post(WireMock.urlPathEqualTo("$POPP_PENSJONSPOENG_PATH/hent"))
-                .withRequestBody(equalToJson("""
+                .withRequestBody(
+                    equalToJson(
+                        """
                     {
                         "fnr" : "04010012797"
                     }
-                """.trimIndent(), false, true))
+                """.trimIndent(), false, true
+                    )
+                )
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -372,7 +399,8 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
@@ -381,7 +409,8 @@ internal class BrevopprettelseTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 3123,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(

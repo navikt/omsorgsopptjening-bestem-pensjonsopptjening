@@ -60,6 +60,7 @@ data class Behandling(
             vurderVilkår.OmsorgsyterOppfyllerAlderskrav(),
             vurderVilkår.OmsorgsyterMottarBarnetrgyd(),
             vurderVilkår.OmsorgsyterHarTilstrekkeligOmsorgsarbeid(),
+            vurderVilkår.OmsorgsyterHarIkkeSelvstendigRett(),
             vurderVilkår.OmsorgsyterHarGyldigOmsorgsarbeid(),
             vurderVilkår.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere(),
             vurderVilkår.OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(),

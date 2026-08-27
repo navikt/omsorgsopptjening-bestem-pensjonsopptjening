@@ -54,7 +54,8 @@ internal class OmsorgsopptjeningsgrunnlagServiceImpl(
                             omsorgsmottaker = persondata.finnPerson(omsorgVedtakPeriode.omsorgsmottaker),
                             kilde = omsorgVedtakPeriode.kilde.toDomain(),
                             utbetalt = omsorgVedtakPeriode.utbetalt,
-                            landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain()
+                            landstilknytning = omsorgVedtakPeriode.landstilknytning.toDomain(),
+                            omsorgsyterHarSelvstendigRett = omsorgVedtakPeriode.omsorgsyterHarSelvstendigRett,
                         )
                     }
 
@@ -227,6 +228,7 @@ internal class OmsorgsopptjeningsgrunnlagServiceImpl(
                                                 kilde = barnetrygdPeriode.kilde,
                                                 utbetalt = barnetrygdPeriode.utbetalt,
                                                 landstilknytning = barnetrygdPeriode.landstilknytning,
+                                                omsorgsyterHarSelvstendigRett = barnetrygdPeriode.omsorgsyterHarSelvstendigRett,
                                             )
                                         }
                                 },

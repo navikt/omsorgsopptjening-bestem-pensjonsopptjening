@@ -48,6 +48,10 @@ sealed class OmsorgsopptjeningGrunnlag {
         return grunnlag.utbetalingsmånederPerOmsorgsyter(omsorgsmottaker)
     }
 
+    fun selvstendigRettMånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, SelvstendigRettMåneder> {
+        return grunnlag.selvstendigRettMånederPerOmsorgsyter(omsorgsmottaker)
+    }
+
     fun landstilknytningForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Landstilknytningmåneder> {
         return grunnlag.landstilknytningMånederPerOmsorgsyter(omsorgsmottaker)
     }
@@ -97,6 +101,14 @@ sealed class OmsorgsopptjeningGrunnlag {
     fun forGyldigOmsorgsarbeid(omsorgsyter: Person): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
         return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
             omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            antallMånederRegel = antallMånederRegel()
+        )
+    }
+
+    fun forSelvstendigRett(): OmsorgsyterHarIkkeSelvstendigRett.Grunnlag {
+        return OmsorgsyterHarIkkeSelvstendigRett.Grunnlag.new(
+            selvstendigRettMåneder = selvstendigRettMånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             antallMånederRegel = antallMånederRegel()
         )

@@ -4,6 +4,7 @@ interface VurderVilkår {
     fun OmsorgsyterOppfyllerAlderskrav(): OmsorgsyterOppfyllerAlderskrav.Vurdering
     fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering
     fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering
+    fun OmsorgsyterHarIkkeSelvstendigRett(): OmsorgsyterHarIkkeSelvstendigRett.Vurdering
     fun OmsorgsmottakerOppfyllerAlderskravForBarnetryg(): OmsorgsmottakerOppfyllerAlderskravForBarnetrygd.Vurdering
     fun OmsorgsmottakerOppfyllerAlderskravForHjelpestønad(): OmsorgsmottakerOppfyllerAlderskravForHjelpestønad.Vurdering
     fun OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr(): OmsorgsopptjeningKanKunGodskrivesForEtBarnPerÅr.Vurdering
@@ -65,6 +66,7 @@ internal class VilkårsvurderingFactory(
     }
 
     //TODO dette gir i praksis ikke noe ut over det vi får fra gyldig omsorgsarbeid - vurder å slett
+    //TODO se i sammenheng med å evt ikke vurdere dersom omsorgsmåneder ikke oppfyller i seg selv
     override fun OmsorgsyterMottarBarnetrgyd(): OmsorgsyterMottarBarnetrgyd.Vurdering {
         return OmsorgsyterMottarBarnetrgyd.vilkarsVurder(grunnlag.forMottarBarnetrygd())
     }
@@ -116,6 +118,10 @@ internal class VilkårsvurderingFactory(
     override fun OmsorgsyterHarTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering {
         return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.vilkarsVurder(grunnlag.forTilstrekkeligOmsorgsarbeid())
 
+    }
+
+    override fun OmsorgsyterHarIkkeSelvstendigRett(): OmsorgsyterHarIkkeSelvstendigRett.Vurdering {
+        return OmsorgsyterHarIkkeSelvstendigRett.vilkarsVurder(grunnlag.forSelvstendigRett())
     }
 
     override fun OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr(): OmsorgsopptjeningKanKunGodskrivesEnOmsorgsyterPerÅr.Vurdering {

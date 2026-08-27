@@ -3,6 +3,8 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.LandstilknytningMåned
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Landstilknytningmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Omsorgsmåneder
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.SelvstendigRettMåned
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.SelvstendigRettMåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåned
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Ytelsemåneder
@@ -45,4 +47,12 @@ internal fun Periode.tilUtbetalingsmåneder(utbetalt: Int, landstilknytning: Lan
 
 internal fun Periode.utbetalingsmåneder(utbetalt: Int, landstilknytning: Landstilknytning): Utbetalingsmåneder {
     return Utbetalingsmåneder(tilUtbetalingsmåneder(utbetalt, landstilknytning))
+}
+
+internal fun YearMonth.tilSelvstendigRettMåned(): SelvstendigRettMåned? {
+    return SelvstendigRettMåned.of(this, true)
+}
+
+internal fun Periode.tilSelvstendigRettMåneder(): SelvstendigRettMåneder {
+    return SelvstendigRettMåneder(alleMåneder().mapNotNull { it.tilSelvstendigRettMåned() }.toSet())
 }

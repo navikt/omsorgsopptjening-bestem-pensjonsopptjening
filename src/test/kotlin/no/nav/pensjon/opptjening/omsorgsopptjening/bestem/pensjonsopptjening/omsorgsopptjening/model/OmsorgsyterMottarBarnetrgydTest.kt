@@ -91,7 +91,7 @@ class OmsorgsyterMottarBarnetrgydTest {
                         Utbetalingsmåned(
                             måned = januar(år = 2022),
                             utbetalt = 500,
-                            landstilknytning = Landstilknytning.Norge
+                            landstilknytning = Landstilknytning.Norge,
                         )
                     )
                 ),
@@ -114,7 +114,7 @@ class OmsorgsyterMottarBarnetrgydTest {
                         Utbetalingsmåned(
                             måned = it,
                             utbetalt = 500,
-                            landstilknytning = Landstilknytning.Norge
+                            landstilknytning = Landstilknytning.Norge,
                         )
                     }.toSet()
                 ),
@@ -137,7 +137,7 @@ class OmsorgsyterMottarBarnetrgydTest {
                         Utbetalingsmåned(
                             måned = it,
                             utbetalt = 500,
-                            landstilknytning = Landstilknytning.Norge
+                            landstilknytning = Landstilknytning.Norge,
                         )
                     }.toSet()
                 ),

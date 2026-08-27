@@ -3,10 +3,12 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Landstilknytningmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.SelvstendigRettMåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.landstilknytningsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.omsorgsmånederHjelpestønad
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.selvstendigRettMåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.Omsorgsperiode.Companion.utbetalingsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -56,6 +58,13 @@ data class BeriketDatagrunnlag(
         return persongrunnlag.associate { pg ->
             pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }
                 .utbetalingsmåneder()
+        }
+    }
+
+    fun selvstendigRettMånederPerOmsorgsyter(omsorgsmottaker: Person): Map<Person, SelvstendigRettMåneder> {
+        return persongrunnlag.associate { pg ->
+            pg.omsorgsyter to pg.omsorgsperioder.filter { it.omsorgsmottaker == omsorgsmottaker }
+                .selvstendigRettMåneder()
         }
     }
 

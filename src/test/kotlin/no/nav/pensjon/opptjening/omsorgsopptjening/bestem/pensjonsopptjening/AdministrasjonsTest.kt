@@ -145,7 +145,8 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -196,7 +197,8 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -211,7 +213,8 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = emptyList(),
