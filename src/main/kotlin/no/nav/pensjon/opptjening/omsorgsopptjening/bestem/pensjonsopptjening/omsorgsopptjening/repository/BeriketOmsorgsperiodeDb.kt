@@ -19,7 +19,8 @@ internal data class BeriketOmsorgsperiodeDb(
     val omsorgsmottaker: PersonDb,
     val kilde: KildeDb,
     val utbetalt: Int,
-    val landstilknytning: LandstilknytningDb
+    val landstilknytning: LandstilknytningDb,
+    val omsorgsyterHarSelvstendigRett: Boolean
 )
 
 internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
@@ -31,6 +32,7 @@ internal fun Omsorgsperiode.toDb(): BeriketOmsorgsperiodeDb {
         kilde = kilde.toDb(),
         utbetalt = utbetalt,
         landstilknytning = landstilknytning.toDb(),
+        omsorgsyterHarSelvstendigRett = omsorgsyterHarSelvstendigRett,
     )
 }
 
@@ -43,5 +45,6 @@ internal fun BeriketOmsorgsperiodeDb.toDomain(): Omsorgsperiode {
         kilde = kilde.toDomain(),
         utbetalt = utbetalt,
         landstilknytning = landstilknytning.toDomain(),
+        omsorgsyterHarSelvstendigRett = omsorgsyterHarSelvstendigRett,
     )
 }

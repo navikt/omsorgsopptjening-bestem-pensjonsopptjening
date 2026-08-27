@@ -104,7 +104,8 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -189,7 +190,8 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -257,7 +259,8 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),

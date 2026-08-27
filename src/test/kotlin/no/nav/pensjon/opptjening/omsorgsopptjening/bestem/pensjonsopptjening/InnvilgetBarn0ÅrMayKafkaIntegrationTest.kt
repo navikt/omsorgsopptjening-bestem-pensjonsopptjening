@@ -69,7 +69,8 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
                                 omsorgsmottaker = "01052012345",
                                 kilde = Kilde.BARNETRYGD,
                                 utbetalt = 7234,
-                                landstilknytning = Landstilknytning.NORGE
+                                landstilknytning = Landstilknytning.NORGE,
+                                omsorgsyterHarSelvstendigRett = false,
                             )
                         ),
                         hjelpestønadsperioder = emptyList(),

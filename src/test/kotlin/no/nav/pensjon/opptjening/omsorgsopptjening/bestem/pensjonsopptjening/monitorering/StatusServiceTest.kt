@@ -54,7 +54,8 @@ class StatusServiceTest : SpringContextTest.NoKafka() {
                                 omsorgsmottaker = "07081812345",
                                 kilde = Kilde.BARNETRYGD,
                                 utbetalt = 7234,
-                                landstilknytning = Landstilknytning.NORGE
+                                landstilknytning = Landstilknytning.NORGE,
+                                omsorgsyterHarSelvstendigRett = false,
                             )
                         ),
                         hjelpestønadsperioder = emptyList()

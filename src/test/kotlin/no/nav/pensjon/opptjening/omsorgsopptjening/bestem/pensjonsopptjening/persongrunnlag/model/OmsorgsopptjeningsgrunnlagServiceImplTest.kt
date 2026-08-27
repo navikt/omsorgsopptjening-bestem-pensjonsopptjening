@@ -129,7 +129,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = jente.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = januar(2020),
@@ -138,7 +139,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = gutt.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.FEBRUARY),
@@ -147,7 +149,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = gutt.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.APRIL),
@@ -156,7 +159,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = gutt.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.JUNE),
@@ -165,7 +169,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = gutt.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 2000,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.DECEMBER),
@@ -174,7 +179,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = gutt.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2022, Month.JUNE),
@@ -183,7 +189,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = gutt.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 2000,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -198,7 +205,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = jente.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = januar(2020),
@@ -207,7 +215,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = gutt.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -443,7 +452,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = ungdom.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 1234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = april(2021),
@@ -452,7 +462,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = ungdom.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 2345,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = februar(2022),
@@ -461,7 +472,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = ungdom.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 1111,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -491,7 +503,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = ungdom.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 1111,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -578,7 +591,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                         omsorgsmottaker = gutt.fnr,
                                         kilde = Kilde.BARNETRYGD,
                                         utbetalt = 1234,
-                                        landstilknytning = Landstilknytning.NORGE
+                                        landstilknytning = Landstilknytning.NORGE,
+                                        omsorgsyterHarSelvstendigRett = false,
                                     ),
                                     PersongrunnlagMeldingKafka.Omsorgsperiode(
                                         fom = januar(2021),
@@ -587,7 +601,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                         omsorgsmottaker = guttGammeltFnr,
                                         kilde = Kilde.INFOTRYGD,
                                         utbetalt = 2345,
-                                        landstilknytning = Landstilknytning.EØS_UKJENT_PRIMÆR_OG_SEKUNDÆR_LAND
+                                        landstilknytning = Landstilknytning.EØS_UKJENT_PRIMÆR_OG_SEKUNDÆR_LAND,
+                                        omsorgsyterHarSelvstendigRett = false,
                                     ),
                                 ),
                                 hjelpestønadsperioder = emptyList()
@@ -623,7 +638,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = gutt.fnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 1234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = januar(2021),
@@ -632,7 +648,8 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     omsorgsmottaker = guttGammeltFnr,
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 1234,
-                                    landstilknytning = Landstilknytning.NORGE
+                                    landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = emptyList()
@@ -671,6 +688,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                         kilde = Kilde.BARNETRYGD,
                                         utbetalt = 5001,
                                         landstilknytning = Landstilknytning.NORGE,
+                                        omsorgsyterHarSelvstendigRett = false,
                                     ),
                                 ),
                                 hjelpestønadsperioder = emptyList(),
@@ -686,6 +704,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                         kilde = Kilde.BARNETRYGD,
                                         utbetalt = 2500,
                                         landstilknytning = Landstilknytning.NORGE,
+                                        omsorgsyterHarSelvstendigRett = false,
                                     ),
                                 ),
                                 hjelpestønadsperioder = emptyList(),
@@ -722,6 +741,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 5001,
                                     landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -737,6 +757,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 5001,
                                     landstilknytning = Landstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = emptyList(),

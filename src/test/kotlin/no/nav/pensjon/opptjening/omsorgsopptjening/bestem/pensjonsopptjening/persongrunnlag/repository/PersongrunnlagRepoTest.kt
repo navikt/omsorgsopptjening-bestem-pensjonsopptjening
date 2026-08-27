@@ -51,7 +51,11 @@ class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
         val lagret = persongrunnlagRepo.finnNesteMeldingerForBehandling(10)
 
         assertThat(lagret.data.count()).isEqualTo(3)
-        assertThat(lagret.data.map { it.correlationId }).containsExactlyInAnyOrder(correlationId1, correlationId2, correlationId3)
+        assertThat(lagret.data.map { it.correlationId }).containsExactlyInAnyOrder(
+            correlationId1,
+            correlationId2,
+            correlationId3
+        )
     }
 
     @Test
@@ -110,7 +114,8 @@ class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
                                 omsorgsmottaker = "03041212345",
                                 kilde = Kilde.BARNETRYGD,
                                 utbetalt = 7234,
-                                landstilknytning = Landstilknytning.NORGE
+                                landstilknytning = Landstilknytning.NORGE,
+                                omsorgsyterHarSelvstendigRett = false,
                             ),
                         ),
                         hjelpestønadsperioder = listOf(

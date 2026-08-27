@@ -26,6 +26,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErMedlemIFolketrygden
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterErikkeOmsorgsmottaker
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarGyldigOmsorgsarbeid
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarIkkeSelvstendigRett
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarMestOmsorgAvAlleOmsorgsytere
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterHarTilstrekkeligOmsorgsarbeid
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
@@ -52,7 +53,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Kilde
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
 import org.assertj.core.api.Assertions.assertThat
@@ -113,7 +113,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -168,7 +169,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -200,7 +202,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -259,7 +262,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -318,7 +322,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -357,6 +362,63 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
     }
 
     @Test
+    fun `gitt et barn født utenfor opptjeningsåret skal det ikke innvilges opptjening dersom omsorgsyter har barnetrygd med selvstendig rett`() {
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = "12345678910",
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = "12345678910",
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = YearMonth.of(2018, Month.SEPTEMBER),
+                                    tom = YearMonth.of(2025, Month.DECEMBER),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = "07081812345",
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = true,
+                                )
+                            ),
+                            hjelpestønadsperioder = emptyList(),
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                ),
+            ),
+        )
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().first().single().also { behandling ->
+            behandling.assertAvslag(
+                omsorgsyter = "12345678910",
+                omsorgsmottaker = "07081812345"
+            )
+            assertInstanceOf(OmsorgsopptjeningGrunnlag.IkkeFødtIOmsorgsår::class.java, behandling.grunnlag)
+            behandling.vilkårsvurdering.erEnesteAvslag<OmsorgsyterHarIkkeSelvstendigRett.Vurdering>()
+            behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarIkkeSelvstendigRett.Vurdering>()
+                .also { vurdering ->
+                    assertInstanceOf(
+                        OmsorgsyterHarIkkeSelvstendigRett.Grunnlag::class.java,
+                        vurdering.grunnlag
+                    ).also {
+                        assertEquals(
+                            Periode(2020).alleMåneder(),
+                            it.selvstendigRettMåneder.alle()
+                        )
+                        assertEquals(
+                            AntallMånederRegel.FødtUtenforOmsorgsår,
+                            it.antallMånederRegel,
+                        )
+                    }
+                }
+        }
+    }
+
+    @Test
     fun `gitt et barn født utenfor opptjeningsåret skal det avslås opptjening dersom omsorgsyter har ytt mindre enn et halvt år omsorg - full omsorg`() {
         repo.lagre(
             PersongrunnlagMelding.Lest(
@@ -373,7 +435,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -412,6 +475,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                 listOf(
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarIkkeSelvstendigRett.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
                 ), behandling.vilkårsvurdering.finnAlleAvslatte()
             )
@@ -435,7 +499,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -474,6 +539,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                 listOf(
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterMottarBarnetrgyd.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Vurdering>(),
+                    behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarIkkeSelvstendigRett.Vurdering>(),
                     behandling.vilkårsvurdering.finnVurdering<OmsorgsyterHarGyldigOmsorgsarbeid.Vurdering>(),
                 ), behandling.vilkårsvurdering.finnAlleAvslatte()
             )
@@ -497,7 +563,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -512,7 +579,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 0,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -561,7 +629,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = januar(2020),
@@ -570,7 +639,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.JANUARY),
@@ -579,7 +649,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -634,7 +705,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -649,7 +721,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = YearMonth.of(2021, Month.MARCH),
@@ -658,7 +731,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -709,7 +783,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -742,7 +817,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -781,7 +857,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = januar(2020),
@@ -790,7 +867,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01052012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -838,7 +916,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -853,7 +932,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -868,7 +948,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -935,7 +1016,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.EØS_UKJENT_PRIMÆR_OG_SEKUNDÆR_LAND
+                                    landstilknytning = KafkaLandstilknytning.EØS_UKJENT_PRIMÆR_OG_SEKUNDÆR_LAND,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -983,7 +1065,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = juni(2020),
@@ -992,7 +1075,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -1007,7 +1091,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -1056,7 +1141,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -1071,7 +1157,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "01122012345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -1217,7 +1304,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -1264,7 +1352,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -1311,7 +1400,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "03041212345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 0,
-                                    landstilknytning = Landstilknytning.NORGE,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = listOf(
@@ -1358,7 +1448,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(
@@ -1406,6 +1497,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 0,
                                     landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -1451,6 +1543,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 0,
                                     landstilknytning = KafkaLandstilknytning.EØS_NORGE_SEKUNDÆR,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -1490,6 +1583,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 0,
                                     landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = juni(2020),
@@ -1499,6 +1593,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 1000,
                                     landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = august(2020),
@@ -1508,6 +1603,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 0,
                                     landstilknytning = KafkaLandstilknytning.EØS_NORGE_SEKUNDÆR,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                                 PersongrunnlagMeldingKafka.Omsorgsperiode(
                                     fom = september(2020),
@@ -1517,6 +1613,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 0,
                                     landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -1598,6 +1695,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 5001,
                                     landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -1687,7 +1785,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "07081812345",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 )
                             ),
                             hjelpestønadsperioder = emptyList(),
@@ -1737,7 +1836,8 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                                     omsorgsmottaker = "12340378910",
                                     kilde = Kilde.BARNETRYGD,
                                     utbetalt = 7234,
-                                    landstilknytning = KafkaLandstilknytning.NORGE
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
                                 ),
                             ),
                             hjelpestønadsperioder = listOf(

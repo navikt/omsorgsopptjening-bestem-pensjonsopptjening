@@ -4,6 +4,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Landstilknytningmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Omsorgsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Person
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.SelvstendigRettMåned
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.SelvstendigRettMåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåned
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Utbetalingsmåneder
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
@@ -16,7 +18,8 @@ data class Omsorgsperiode(
     val omsorgsmottaker: Person,
     val kilde: DomainKilde,
     val utbetalt: Int,
-    val landstilknytning: Landstilknytning
+    val landstilknytning: Landstilknytning,
+    val omsorgsyterHarSelvstendigRett: Boolean,
 ) {
     val periode = Periode(fom, tom)
 
@@ -29,6 +32,15 @@ data class Omsorgsperiode(
             alleMåneder()
                 .map { Triple(it, utbetalt, landstilknytning) }
                 .mapNotNull { (mnd, utb, land) -> Utbetalingsmåned.of(mnd, utb, land) }
+                .toSet()
+        )
+    }
+
+    fun selvstendigRettMåneder(): SelvstendigRettMåneder {
+        return SelvstendigRettMåneder(
+            alleMåneder()
+                .map { it to omsorgsyterHarSelvstendigRett }
+                .mapNotNull { (mnd, selvstendigRett) -> SelvstendigRettMåned.of(mnd, selvstendigRett) }
                 .toSet()
         )
     }
@@ -75,6 +87,11 @@ data class Omsorgsperiode(
         fun List<Omsorgsperiode>.utbetalingsmåneder(): Utbetalingsmåneder {
             return map { it.utbetalingsmåneder() }.reduceOrNull { acc, o -> acc.merge(o) }
                 ?: Utbetalingsmåneder.none()
+        }
+
+        fun List<Omsorgsperiode>.selvstendigRettMåneder(): SelvstendigRettMåneder {
+            return map { it.selvstendigRettMåneder() }.reduceOrNull { acc, o -> acc.merge(o) }
+                ?: SelvstendigRettMåneder.none()
         }
 
         fun List<Omsorgsperiode>.landstilknytningsmåneder(): Landstilknytningmåneder {
