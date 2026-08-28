@@ -22,10 +22,12 @@ class OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsTest {
     fun `innvilget dersom bruker ikke har noen ytelsesmåneder`() {
         OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(
             OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.new(
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024).tilOmsorgsmåned(DomainOmsorgstype.Barnetrygd.Full))),
                 ytelsemåneder = Ytelsemåneder(emptySet()),
                 landstilknytningmåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(setOf(januar(2024).tilOmsorgsmåned(DomainOmsorgstype.Barnetrygd.Full))),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -36,10 +38,12 @@ class OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsTest {
     fun `innvilget dersom bruker har noen ytelsesmåneder i eøs, men tilstrekkelig antall omsorgsmåneder utover disse`() {
         OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(
             OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.new(
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 ytelsemåneder = Periode(januar(2024), februar(2024)).ytelseMåneder(),
                 landstilknytningmåneder = år(2024).landstilknytningmåneder(Landstilknytning.Eøs.NorgeSekundærland),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -50,10 +54,12 @@ class OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsTest {
     fun `ubestemt dersom alle omsorgsmåneder er ytelesmåneder i eøs`() {
         OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(
             OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.new(
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 ytelsemåneder = år(2024).ytelseMåneder(),
                 landstilknytningmåneder = år(2024).landstilknytningmåneder(Landstilknytning.Eøs.UkjentPrimærOgSekundærLand),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertInstanceOf(VilkårsvurderingUtfall.Ubestemt::class.java, it.utfall)
@@ -64,13 +70,19 @@ class OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsTest {
     fun `avslag dersom alle omsorgsmåneder er ytelesmåneder i eøs og antall ikke er tilstrekkelig`() {
         OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(
             OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.new(
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(Periode(januar(2024), mars(2024)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 ytelsemåneder = Periode(januar(2024), mars(2024)).ytelseMåneder(),
                 landstilknytningmåneder = Periode(
                     januar(2024),
                     mars(2024)
                 ).landstilknytningmåneder(Landstilknytning.Eøs.UkjentPrimærOgSekundærLand),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(januar(2024), mars(2024)).tilOmsorgsmåneder(
+                            DomainOmsorgstype.Barnetrygd.Full
+                        )
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertInstanceOf(VilkårsvurderingUtfall.Avslag::class.java, it.utfall)
@@ -81,10 +93,12 @@ class OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsTest {
     fun `innvilget dersom ingen ytelsesmåneder i eøs`() {
         OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(
             OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.new(
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
                 ytelsemåneder = år(2024).ytelseMåneder(),
                 landstilknytningmåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget::class.java, it.utfall)
@@ -104,10 +118,12 @@ class OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsTest {
 
         OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(
             OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.new(
-                omsorgsmåneder = alle,
                 ytelsemåneder = år(2024).ytelseMåneder(),
                 landstilknytningmåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = alle,
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertThat(it.grunnlag.omsorgsmåneder()).isEqualTo(relevant)
@@ -123,10 +139,12 @@ class OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøsTest {
 
         OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.vilkarsVurder(
             OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.new(
-                omsorgsmåneder = alle,
                 ytelsemåneder = år(2024).ytelseMåneder(),
                 landstilknytningmåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = alle,
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertThat(it.grunnlag.omsorgsmåneder()).isEqualTo(alle)

@@ -24,8 +24,10 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
             OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder = Utbetalingsmåneder(emptySet()),
-                omsorgsmåneder = år(2022).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = år(2022).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertThat(it.utfall.erAvslag()).isTrue()
@@ -37,8 +39,10 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
         OmsorgsyterHarGyldigOmsorgsarbeid.vilkarsVurder(
             OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
                 omsorgsytersUtbetalingsmåneder = år(2022).utbetalingsmåneder(200, Landstilknytning.Norge),
-                omsorgsmåneder = år(2022).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = år(2022).omsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertThat(it.utfall.erInnvilget()).isTrue()
@@ -54,11 +58,13 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
                     Periode(januar(2022), juni(2022)).tilUtbetalingsmåneder(200, Landstilknytning.Norge) +
                             Periode(juli(2022), desember(2022)).tilUtbetalingsmåneder(0, Landstilknytning.Norge)
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(januar(2022), juni(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt) +
-                            Periode(juli(2022), desember(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(januar(2022), juni(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt) +
+                                Periode(juli(2022), desember(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertThat(it.utfall.erAvslag()).isTrue()
@@ -74,11 +80,13 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
                     Periode(januar(2022), juni(2022)).tilUtbetalingsmåneder(200, Landstilknytning.Norge) +
                             Periode(juli(2022), desember(2022)).tilUtbetalingsmåneder(400, Landstilknytning.Norge)
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(januar(2022), juni(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt) +
-                            Periode(juli(2022), desember(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(januar(2022), juni(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt) +
+                                Periode(juli(2022), desember(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertThat(it.utfall.erInnvilget()).isTrue()
@@ -94,11 +102,13 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
                     Periode(januar(2022), juni(2022)).tilUtbetalingsmåneder(200, Landstilknytning.Norge) +
                             Periode(juli(2022), desember(2022)).tilUtbetalingsmåneder(400, Landstilknytning.Norge)
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(januar(2022), oktober(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt) +
-                            Periode(november(2022), desember(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(januar(2022), oktober(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt) +
+                                Periode(november(2022), desember(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertThat(it.utfall.erInnvilget()).isTrue()
@@ -117,12 +127,14 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
                     ) +
                             Periode(november(2022), desember(2022)).tilUtbetalingsmåneder(400, Landstilknytning.Norge)
                 ),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(januar(2022), oktober(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt) +
-                            Periode(november(2022), desember(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
-            )
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(januar(2022), oktober(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt) +
+                                Periode(november(2022), desember(2022)).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
+                )
         ).also {
             assertThat(it.utfall.erAvslag()).isTrue()
         }
@@ -147,8 +159,10 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
                         0, Landstilknytning.Eøs.UkjentPrimærOgSekundærLand
                     ) + Periode(november(2022), desember(2022)).tilUtbetalingsmåneder(400, Landstilknytning.Norge)
                 ),
-                omsorgsmåneder = alle,
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = alle,
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertThat(it.grunnlag.omsorgsmåneder()).isEqualTo(relevant)
@@ -172,8 +186,10 @@ class OmsorgsyterHarGyldigOmsorgsarbeidTest {
                     ) +
                             Periode(november(2022), desember(2022)).tilUtbetalingsmåneder(400, Landstilknytning.Norge)
                 ),
-                omsorgsmåneder = alle,
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = alle,
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             assertThat(it.grunnlag.omsorgsmåneder()).isEqualTo(alle)

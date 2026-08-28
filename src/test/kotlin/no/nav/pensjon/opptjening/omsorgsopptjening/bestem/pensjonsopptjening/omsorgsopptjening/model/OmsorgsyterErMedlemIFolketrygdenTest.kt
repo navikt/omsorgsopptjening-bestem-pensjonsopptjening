@@ -31,15 +31,17 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = emptySet(),
                 pliktigEllerFrivillig = emptySet(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    setOf(
-                        januar(2024).tilOmsorgsmåned(
-                            DomainOmsorgstype.Barnetrygd.Full
-                        )
-                    )
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        setOf(
+                            januar(2024).tilOmsorgsmåned(
+                                DomainOmsorgstype.Barnetrygd.Full
+                            )
+                        )
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -52,9 +54,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), april(2024)).alleMåneder(),
                 pliktigEllerFrivillig = emptySet(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -67,15 +71,17 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(februar(2024), desember(2024)).alleMåneder(),
                 pliktigEllerFrivillig = emptySet(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    setOf(
-                        januar(2024).tilOmsorgsmåned(
-                            DomainOmsorgstype.Barnetrygd.Full
-                        )
-                    )
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        setOf(
+                            januar(2024).tilOmsorgsmåned(
+                                DomainOmsorgstype.Barnetrygd.Full
+                            )
+                        )
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -88,9 +94,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), desember(2024)).alleMåneder(),
                 pliktigEllerFrivillig = emptySet(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, it.utfall)
@@ -103,14 +111,16 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), april(2024)).alleMåneder(),
                 pliktigEllerFrivillig = emptySet(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(
-                        januar(2024),
-                        september(2024)
-                    ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(
+                            januar(2024),
+                            september(2024)
+                        ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, it.utfall)
@@ -123,15 +133,17 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = emptySet(),
                 pliktigEllerFrivillig = emptySet(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    setOf(
-                        januar(2024).tilOmsorgsmåned(
-                            DomainOmsorgstype.Barnetrygd.Full
-                        )
-                    )
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        setOf(
+                            januar(2024).tilOmsorgsmåned(
+                                DomainOmsorgstype.Barnetrygd.Full
+                            )
+                        )
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -144,9 +156,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = emptySet(),
                 pliktigEllerFrivillig = Periode(januar(2024), april(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -159,15 +173,17 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = emptySet(),
                 pliktigEllerFrivillig = Periode(februar(2024), desember(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    setOf(
-                        januar(2024).tilOmsorgsmåned(
-                            DomainOmsorgstype.Barnetrygd.Full
-                        )
-                    )
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        setOf(
+                            januar(2024).tilOmsorgsmåned(
+                                DomainOmsorgstype.Barnetrygd.Full
+                            )
+                        )
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtIOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -180,9 +196,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = emptySet(),
                 pliktigEllerFrivillig = Periode(januar(2024), desember(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Ubestemt::class.java, it.utfall)
@@ -195,9 +213,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = emptySet(),
                 pliktigEllerFrivillig = Periode(mai(2024), desember(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Ubestemt::class.java, it.utfall)
@@ -210,9 +230,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = emptySet(),
                 pliktigEllerFrivillig = Periode(mai(2024), desember(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Eøs.UkjentPrimærOgSekundærLand),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag::class.java, it.utfall)
@@ -225,9 +247,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), juni(2024)).alleMåneder(),
                 pliktigEllerFrivillig = Periode(juli(2024), desember(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Ubestemt::class.java, it.utfall)
@@ -240,9 +264,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), juni(2024)).alleMåneder(),
                 pliktigEllerFrivillig = Periode(juli(2024), desember(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Eøs.UkjentPrimærOgSekundærLand),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(år(2024).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag::class.java, it.utfall)
@@ -255,14 +281,16 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), mars(2024)).alleMåneder(),
                 pliktigEllerFrivillig = Periode(april(2024), desember(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(
-                        februar(2024),
-                        juni((2024))
-                    ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(
+                            februar(2024),
+                            juni((2024))
+                        ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Avslag.Vilkår::class.java, it.utfall)
@@ -275,15 +303,17 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), mars(2024)).alleMåneder(),
                 pliktigEllerFrivillig = Periode(april(2024), mai(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(juni(2024), august((2024))).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full) +
-                            Periode(
-                                september(2024),
-                                desember((2024))
-                            ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(juni(2024), august((2024))).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full) +
+                                Periode(
+                                    september(2024),
+                                    desember((2024))
+                                ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, it.utfall)
@@ -296,11 +326,13 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), mars(2024)).alleMåneder(),
                 pliktigEllerFrivillig = Periode(april(2024), september(2024)).alleMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(april(2024), desember((2024))).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Norge),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(april(2024), desember((2024))).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Delt)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             Assertions.assertInstanceOf(VilkårsvurderingUtfall.Ubestemt::class.java, it.utfall)
@@ -322,9 +354,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), juni(2024)).alleMåneder(),
                 pliktigEllerFrivillig = Periode(juli(2024), desember(2024)).alleMåneder(),
-                omsorgsmåneder = alle,
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Eøs.UkjentPrimærOgSekundærLand),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = alle,
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             assertThat(it.grunnlag.omsorgsmåneder()).isEqualTo(relevant)
@@ -342,9 +376,11 @@ class OmsorgsyterErMedlemIFolketrygdenTest {
             OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
                 ikkeMedlem = Periode(januar(2024), juni(2024)).alleMåneder(),
                 pliktigEllerFrivillig = Periode(juli(2024), Companion.desember(2024)).alleMåneder(),
-                omsorgsmåneder = alle,
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
                 landstilknytningMåneder = år(2024).landstilknytningmåneder(Landstilknytning.Eøs.UkjentPrimærOgSekundærLand),
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = alle,
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår,
+                )
             )
         ).also {
             assertThat(it.grunnlag.omsorgsmåneder()).isEqualTo(alle)

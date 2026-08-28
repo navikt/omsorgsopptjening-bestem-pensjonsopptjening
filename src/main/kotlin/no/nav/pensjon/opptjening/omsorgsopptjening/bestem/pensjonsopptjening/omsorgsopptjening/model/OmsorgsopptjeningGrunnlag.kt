@@ -32,6 +32,9 @@ sealed class OmsorgsopptjeningGrunnlag {
         }
     }
 
+    val antallMånederRegel by lazy { antallMånederRegel() }
+    val omsorgsytersTilstrekkeligOmsorgsarbeidGrunnlag by lazy { forTilstrekkeligOmsorgsarbeid() }
+
     fun omsorgsmånederForOmsorgsmottakerPerOmsorgsyter(): Map<Person, Omsorgsmåneder> {
         return when (omsorgstype) {
             DomainOmsorgskategori.BARNETRYGD -> {
@@ -83,17 +86,17 @@ sealed class OmsorgsopptjeningGrunnlag {
         )
     }
 
-    fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
+    private fun forTilstrekkeligOmsorgsarbeid(): OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag {
         return OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
             omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            antallMånederRegel = antallMånederRegel()
+            antallMånederRegel = antallMånederRegel
         )
     }
 
     fun forMottarBarnetrygd(): OmsorgsyterMottarBarnetrgyd.Grunnlag {
         return OmsorgsyterMottarBarnetrgyd.Grunnlag(
             omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            antallMånederRegel = antallMånederRegel(),
+            antallMånederRegel = antallMånederRegel,
             omsorgstype = omsorgstype,
         )
     }
@@ -101,16 +104,14 @@ sealed class OmsorgsopptjeningGrunnlag {
     fun forGyldigOmsorgsarbeid(omsorgsyter: Person): OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag {
         return OmsorgsyterHarGyldigOmsorgsarbeid.Grunnlag.new(
             omsorgsytersUtbetalingsmåneder = utbetalingsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            antallMånederRegel = antallMånederRegel()
+            tilstrekkeligOmsorgsarbeidGrunnlag = omsorgsytersTilstrekkeligOmsorgsarbeidGrunnlag
         )
     }
 
     fun forSelvstendigRett(): OmsorgsyterHarIkkeSelvstendigRett.Grunnlag {
         return OmsorgsyterHarIkkeSelvstendigRett.Grunnlag.new(
             selvstendigRettMåneder = selvstendigRettMånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            antallMånederRegel = antallMånederRegel()
+            tilstrekkeligOmsorgsarbeidGrunnlag = omsorgsytersTilstrekkeligOmsorgsarbeidGrunnlag
         )
     }
 
@@ -118,9 +119,8 @@ sealed class OmsorgsopptjeningGrunnlag {
         return OmsorgsyterErMedlemIFolketrygden.Grunnlag.new(
             ikkeMedlem = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag.alleMånederUtenMedlemskap(),
             pliktigEllerFrivillig = grunnlag.omsorgsytersPersongrunnlag.medlemskapsgrunnlag.alleMånederMedMedlemskap(),
-            omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            antallMånederRegel = antallMånederRegel(),
-            landstilknytningMåneder = landstilknytningForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!
+            landstilknytningMåneder = landstilknytningForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
+            tilstrekkeligOmsorgsarbeidGrunnlag = omsorgsytersTilstrekkeligOmsorgsarbeidGrunnlag
         )
     }
 
@@ -155,14 +155,13 @@ sealed class OmsorgsopptjeningGrunnlag {
 
     fun forOmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs(): OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag {
         return OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs.Grunnlag.new(
-            omsorgsmåneder = omsorgsmånederForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
             ytelsemåneder = omsorgsytersYtelsemåneder(),
             landstilknytningmåneder = landstilknytningForOmsorgsmottakerPerOmsorgsyter()[omsorgsyter]!!,
-            antallMånederRegel = antallMånederRegel()
+            tilstrekkeligOmsorgsarbeidGrunnlag = omsorgsytersTilstrekkeligOmsorgsarbeidGrunnlag
         )
     }
 
-    abstract fun antallMånederRegel(): AntallMånederRegel
+    protected abstract fun antallMånederRegel(): AntallMånederRegel
 
     /**
      * Hvor mye omsorgsarbeid som kreves for å kunne motta omsorgsopptjening avhenger av når barnet er født på året,

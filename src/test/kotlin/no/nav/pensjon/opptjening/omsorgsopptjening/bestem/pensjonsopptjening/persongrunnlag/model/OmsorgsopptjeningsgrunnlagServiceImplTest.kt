@@ -243,7 +243,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                 assertThat(grl.omsorgsmottaker).isEqualTo(jente)
                 assertThat(grl.omsorgsAr).isEqualTo(2020)
                 assertThat(grl.omsorgstype).isEqualTo(DomainOmsorgskategori.BARNETRYGD)
-                assertThat(grl.antallMånederRegel()).isEqualTo(AntallMånederRegel.FødtIOmsorgsår)
+                assertThat(grl.antallMånederRegel).isEqualTo(AntallMånederRegel.FødtIOmsorgsår)
                 grl.forMottarBarnetrygd().also {
                     assertThat(it.omsorgsytersUtbetalingsmåneder.alle()).isEqualTo(år(2021).alleMåneder())
                     assertThat(it.omsorgsytersUtbetalingsmåneder.antall()).isEqualTo(12)
@@ -268,7 +268,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                     assertThat(it.person.fødselsdato).isEqualTo(LocalDate.of(2020, Month.DECEMBER, 1))
                     assertThat(it.alder).isEqualTo(0)
                 }
-                grl.forTilstrekkeligOmsorgsarbeid().also {
+                grl.omsorgsytersTilstrekkeligOmsorgsarbeidGrunnlag.also {
                     assertThat(it.antallMånederRegel).isEqualTo(AntallMånederRegel.FødtIOmsorgsår)
                     assertThat(it.omsorgsmåneder().alle()).isEqualTo(år(2021).alleMåneder())
                     assertThat(it.omsorgsmåneder().antall()).isEqualTo(12)
@@ -317,7 +317,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                 assertThat(grl.omsorgsmottaker).isEqualTo(gutt)
                 assertThat(grl.omsorgsAr).isEqualTo(2021)
                 assertThat(grl.omsorgstype).isEqualTo(DomainOmsorgskategori.BARNETRYGD)
-                assertThat(grl.antallMånederRegel()).isEqualTo(AntallMånederRegel.FødtUtenforOmsorgsår)
+                assertThat(grl.antallMånederRegel).isEqualTo(AntallMånederRegel.FødtUtenforOmsorgsår)
                 grl.forMottarBarnetrygd().also {
                     assertThat(it.omsorgsytersUtbetalingsmåneder.alle()).isEqualTo(
                         setOf(
@@ -352,7 +352,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                     assertThat(it.person.fødselsdato).isEqualTo(LocalDate.of(2018, Month.AUGUST, 7))
                     assertThat(it.alder).isEqualTo(3)
                 }
-                grl.forTilstrekkeligOmsorgsarbeid().also {
+                grl.omsorgsytersTilstrekkeligOmsorgsarbeidGrunnlag.also {
                     assertThat(it.antallMånederRegel).isEqualTo(AntallMånederRegel.FødtUtenforOmsorgsår)
                     assertThat(it.omsorgsmåneder().alle()).isEqualTo(
                         setOf(

@@ -65,6 +65,7 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
         override val utfall: VilkårsvurderingUtfall
     ) : ParagrafVurdering<Grunnlag>()
 
+    @ConsistentCopyVisibility
     data class Grunnlag private constructor(
         val omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder,
         val omsorgsmåneder: Omsorgsmåneder,
@@ -74,17 +75,12 @@ object OmsorgsyterHarGyldigOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHarGyldigO
         companion object {
             fun new(
                 omsorgsytersUtbetalingsmåneder: Utbetalingsmåneder,
-                omsorgsmåneder: Omsorgsmåneder,
-                antallMånederRegel: AntallMånederRegel,
+                tilstrekkeligOmsorgsarbeidGrunnlag: OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag,
             ): Grunnlag {
                 return Grunnlag(
                     omsorgsytersUtbetalingsmåneder = omsorgsytersUtbetalingsmåneder,
-                    omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
-                        omsorgsmåneder.kvalifisererForAutomatiskBehandling()
-                    } else {
-                        omsorgsmåneder.kvalifisererForManuellBehandling()
-                    },
-                    antallMånederRegel = antallMånederRegel
+                    omsorgsmåneder = tilstrekkeligOmsorgsarbeidGrunnlag.omsorgsmåneder,
+                    antallMånederRegel = tilstrekkeligOmsorgsarbeidGrunnlag.antallMånederRegel
                 )
             }
 

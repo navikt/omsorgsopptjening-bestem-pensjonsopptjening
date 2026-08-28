@@ -50,6 +50,7 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
         }
     }
 
+    @ConsistentCopyVisibility
     data class Grunnlag private constructor(
         val omsorgsmåneder: Omsorgsmåneder,
         val ytelsemåneder: Ytelsemåneder,
@@ -59,20 +60,15 @@ object OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs :
 
         companion object {
             fun new(
-                omsorgsmåneder: Omsorgsmåneder,
                 ytelsemåneder: Ytelsemåneder,
                 landstilknytningmåneder: Landstilknytningmåneder,
-                antallMånederRegel: AntallMånederRegel,
+                tilstrekkeligOmsorgsarbeidGrunnlag: OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag,
             ): Grunnlag {
                 return Grunnlag(
-                    omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
-                        omsorgsmåneder.kvalifisererForAutomatiskBehandling()
-                    } else {
-                        omsorgsmåneder.kvalifisererForManuellBehandling()
-                    },
+                    omsorgsmåneder = tilstrekkeligOmsorgsarbeidGrunnlag.omsorgsmåneder,
                     ytelsemåneder = ytelsemåneder,
                     landstilknytningmåneder = landstilknytningmåneder,
-                    antallMånederRegel = antallMånederRegel
+                    antallMånederRegel = tilstrekkeligOmsorgsarbeidGrunnlag.antallMånederRegel
                 )
             }
 
