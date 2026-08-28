@@ -18,13 +18,15 @@ class OmsorgsyterHarIkkeSelvstendigRettTest {
         OmsorgsyterHarIkkeSelvstendigRett.vilkarsVurder(
             grunnlag = OmsorgsyterHarIkkeSelvstendigRett.Grunnlag.new(
                 selvstendigRettMåneder = SelvstendigRettMåneder.none(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(
-                        YearMonth.of(2000, Month.JANUARY),
-                        YearMonth.of(2000, Month.JUNE)
-                    ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(
+                            YearMonth.of(2000, Month.JANUARY),
+                            YearMonth.of(2000, Month.JUNE)
+                        ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget.Vilkår::class.java, vurdering.utfall)
@@ -39,13 +41,15 @@ class OmsorgsyterHarIkkeSelvstendigRettTest {
                     YearMonth.of(2000, Month.JANUARY),
                     YearMonth.of(2000, Month.JUNE)
                 ).tilSelvstendigRettMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(
-                        YearMonth.of(2000, Month.JANUARY),
-                        YearMonth.of(2000, Month.JUNE)
-                    ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(
+                            YearMonth.of(2000, Month.JANUARY),
+                            YearMonth.of(2000, Month.JUNE)
+                        ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag::class.java, vurdering.utfall)
@@ -60,13 +64,15 @@ class OmsorgsyterHarIkkeSelvstendigRettTest {
                     YearMonth.of(2000, Month.JANUARY),
                     YearMonth.of(2000, Month.JULY)
                 ).tilSelvstendigRettMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(
-                        YearMonth.of(2000, Month.JANUARY),
-                        YearMonth.of(2000, Month.JUNE)
-                    ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(
+                            YearMonth.of(2000, Month.JANUARY),
+                            YearMonth.of(2000, Month.JUNE)
+                        ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Avslag::class.java, vurdering.utfall)
@@ -81,13 +87,15 @@ class OmsorgsyterHarIkkeSelvstendigRettTest {
                     juli(2000),
                     desember(2000)
                 ).tilSelvstendigRettMåneder(),
-                omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
-                    Periode(
-                        YearMonth.of(2000, Month.JANUARY),
-                        YearMonth.of(2000, Month.JUNE)
-                    ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
-                ),
-                antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                tilstrekkeligOmsorgsarbeidGrunnlag = OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag.new(
+                    omsorgsmåneder = Omsorgsmåneder.Barnetrygd(
+                        Periode(
+                            YearMonth.of(2000, Month.JANUARY),
+                            YearMonth.of(2000, Month.JUNE)
+                        ).tilOmsorgsmåneder(DomainOmsorgstype.Barnetrygd.Full)
+                    ),
+                    antallMånederRegel = AntallMånederRegel.FødtUtenforOmsorgsår
+                )
             )
         ).also { vurdering ->
             assertInstanceOf(VilkårsvurderingUtfall.Innvilget::class.java, vurdering.utfall)

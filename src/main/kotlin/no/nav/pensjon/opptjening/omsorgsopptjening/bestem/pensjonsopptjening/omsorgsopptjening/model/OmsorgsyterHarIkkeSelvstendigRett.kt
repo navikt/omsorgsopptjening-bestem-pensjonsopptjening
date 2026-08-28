@@ -12,7 +12,7 @@ object OmsorgsyterHarIkkeSelvstendigRett : ParagrafVilkår<OmsorgsyterHarIkkeSel
     }
 
     override fun <T : Vilkar<Grunnlag>> T.bestemUtfall(grunnlag: Grunnlag): VilkårsvurderingUtfall {
-        return when(grunnlag.erOppfyllt()){
+        return when (grunnlag.erOppfyllt()) {
             true -> VilkårsvurderingUtfall.Innvilget.Vilkår(emptySet())
             false -> VilkårsvurderingUtfall.Avslag.Vilkår(emptySet())
         }
@@ -33,17 +33,12 @@ object OmsorgsyterHarIkkeSelvstendigRett : ParagrafVilkår<OmsorgsyterHarIkkeSel
         companion object {
             fun new(
                 selvstendigRettMåneder: SelvstendigRettMåneder,
-                omsorgsmåneder: Omsorgsmåneder,
-                antallMånederRegel: AntallMånederRegel,
+                tilstrekkeligOmsorgsarbeidGrunnlag: OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag,
             ): Grunnlag {
                 return Grunnlag(
                     selvstendigRettMåneder = selvstendigRettMåneder,
-                    omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
-                        omsorgsmåneder.kvalifisererForAutomatiskBehandling()
-                    } else {
-                        omsorgsmåneder.kvalifisererForManuellBehandling()
-                    },
-                    antallMånederRegel = antallMånederRegel
+                    omsorgsmåneder = tilstrekkeligOmsorgsarbeidGrunnlag.omsorgsmåneder,
+                    antallMånederRegel = tilstrekkeligOmsorgsarbeidGrunnlag.antallMånederRegel
                 )
             }
 

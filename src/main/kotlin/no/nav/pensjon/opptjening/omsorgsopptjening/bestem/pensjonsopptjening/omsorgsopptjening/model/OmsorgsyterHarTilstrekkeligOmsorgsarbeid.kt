@@ -82,13 +82,17 @@ object OmsorgsyterHarTilstrekkeligOmsorgsarbeid : ParagrafVilkår<OmsorgsyterHar
     }
 
 
+    @ConsistentCopyVisibility
     data class Grunnlag private constructor(
         val omsorgsmåneder: Omsorgsmåneder,
         val antallMånederRegel: AntallMånederRegel,
     ) : ParagrafGrunnlag() {
 
         companion object {
-            fun new(omsorgsmåneder: Omsorgsmåneder, antallMånederRegel: AntallMånederRegel): Grunnlag {
+            fun new(
+                omsorgsmåneder: Omsorgsmåneder,
+                antallMånederRegel: AntallMånederRegel
+            ): Grunnlag {
                 return Grunnlag(
                     omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
                         omsorgsmåneder.kvalifisererForAutomatiskBehandling()

@@ -65,6 +65,7 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
         }
     }
 
+    @ConsistentCopyVisibility
     data class Grunnlag private constructor(
         val ikkeMedlem: Set<YearMonth>,
         val pliktigEllerFrivillig: Set<YearMonth>,
@@ -77,19 +78,14 @@ object OmsorgsyterErMedlemIFolketrygden : ParagrafVilkår<OmsorgsyterErMedlemIFo
             fun new(
                 ikkeMedlem: Set<YearMonth>,
                 pliktigEllerFrivillig: Set<YearMonth>,
-                omsorgsmåneder: Omsorgsmåneder,
-                antallMånederRegel: AntallMånederRegel,
                 landstilknytningMåneder: Landstilknytningmåneder,
+                tilstrekkeligOmsorgsarbeidGrunnlag: OmsorgsyterHarTilstrekkeligOmsorgsarbeid.Grunnlag,
             ): Grunnlag {
                 return Grunnlag(
                     ikkeMedlem = ikkeMedlem,
                     pliktigEllerFrivillig = pliktigEllerFrivillig,
-                    omsorgsmåneder = if (omsorgsmåneder.erKvalifisertForAutomatiskBehandling(antallMånederRegel)) {
-                        omsorgsmåneder.kvalifisererForAutomatiskBehandling()
-                    } else {
-                        omsorgsmåneder.kvalifisererForManuellBehandling()
-                    },
-                    antallMånederRegel = antallMånederRegel,
+                    omsorgsmåneder = tilstrekkeligOmsorgsarbeidGrunnlag.omsorgsmåneder,
+                    antallMånederRegel = tilstrekkeligOmsorgsarbeidGrunnlag.antallMånederRegel,
                     landstilknytningMåneder = landstilknytningMåneder
                 )
             }
