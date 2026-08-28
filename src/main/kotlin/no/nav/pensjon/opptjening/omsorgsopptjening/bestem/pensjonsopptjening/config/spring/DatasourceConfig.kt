@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Profile
 class DatasourceConfig {
 
     @Bean
-    @Profile("dev-gcp", "prod-gcp")
-    fun datasource(
+    @Profile("prod-gcp")
+    fun prod(
         @Value($$"${DATABASE_HOST}") dbHost: String,
         @Value($$"${DATABASE_PORT}") dbPort: String,
         @Value($$"${DATABASE_DATABASE}") dbName: String,
@@ -25,6 +25,20 @@ class DatasourceConfig {
                 jdbcUrl = "jdbc:postgresql://$dbHost:$dbPort/$dbName"
                 username = dbUsername
                 password = dbPassword
+                maximumPoolSize = 32
+                minimumIdle = 6
+            }
+        )
+    }
+
+    @Bean
+    @Profile("dev-gcp")
+    fun dev(
+        @Value($$"${DATABASE_JDBC_URL}") jdbcUrl: String,
+    ): HikariDataSource {
+        return HikariDataSource(
+            HikariConfig().apply {
+                this.jdbcUrl = jdbcUrl
                 maximumPoolSize = 32
                 minimumIdle = 6
             }
