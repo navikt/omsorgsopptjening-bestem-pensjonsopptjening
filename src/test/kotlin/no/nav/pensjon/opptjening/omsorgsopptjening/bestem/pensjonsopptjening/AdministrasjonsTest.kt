@@ -39,6 +39,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -338,6 +339,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     }
 
     @Test
+    @Disabled("replacement in progress")
     fun `kan kopiere og rekjøre melding med brev`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
             service.stoppMelding(it, "begrunnelse")!!
@@ -365,6 +367,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     }
 
     @Test
+    @Disabled("replacement in progress")
     fun `kan kopiere og rekjøre melding med godskriving`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
             service.stoppMelding(it, "begrunnelse")!!

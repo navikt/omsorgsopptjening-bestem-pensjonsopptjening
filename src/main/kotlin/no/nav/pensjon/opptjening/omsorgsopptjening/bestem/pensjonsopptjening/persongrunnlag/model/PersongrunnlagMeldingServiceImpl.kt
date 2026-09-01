@@ -143,9 +143,10 @@ internal class PersongrunnlagMeldingServiceImpl(
             meldingsId = id,
             begrunnelse = begrunnelse
         )
-        behandlingRepo.stoppBehandlingerForMelding(
-            meldingsId = id
-        )
+        //TODO replacement in progress
+//        behandlingRepo.stoppBehandlingerForMelding(
+//            meldingsId = id
+//        )
         godskrivOpptjeningService.stoppForMelding(
             meldingsId = id,
             begrunnelse = begrunnelse,
