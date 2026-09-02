@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Status
 import java.time.Instant
 import java.util.UUID
 
@@ -24,7 +25,10 @@ internal class BehandlingDb(
     val vilkårsvurdering: VilkårsvurderingDb,
     val utfall: BehandlingsutfallDb,
     val meldingId: UUID,
-)
+    val statushistorikk: List<Status>,
+){
+    val status = statushistorikk.last()
+}
 
 internal fun Behandling.toDb(): BehandlingDb {
     return BehandlingDb(
@@ -35,7 +39,8 @@ internal fun Behandling.toDb(): BehandlingDb {
         grunnlag = grunnlag().toDb(),
         vilkårsvurdering = vilkårsvurdering().toDb(),
         utfall = utfall().toDb(),
-        meldingId = meldingId()
+        meldingId = meldingId(),
+        statushistorikk = statushistorikk
     )
 }
 
@@ -50,7 +55,8 @@ internal fun BehandlingDb.toDomain(): FullførtBehandling {
         grunnlag = grunnlag.toDomain(),
         utfall = utfall.toDomain(),
         vilkårsvurdering = vilkårsvurdering.toDomain(),
-        meldingId = meldingId
+        meldingId = meldingId,
+        statushistorikk = statushistorikk
     )
 }
 

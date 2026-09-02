@@ -16,6 +16,8 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.god
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Status
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.FANT_IKKE_OPPGAVEN
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave.KanselleringsResultat.KANSELLERING_IKKE_NODVENDIG
@@ -39,7 +41,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -82,6 +83,9 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var brevService: BrevService
+
+    @Autowired
+    private lateinit var behandlingRepo: BehandlingRepo
 
     companion object {
         @JvmField
@@ -339,7 +343,28 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    @Disabled("replacement in progress")
+    fun `kan stoppe behandling som er vilkårsvurdert og prosessere på nytt`() {
+        val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
+            service.stoppMelding(it, "begrunnelse")!!
+        }
+        val nyMelding = service.rekjørStoppetMelding(stoppetMeldingId)!!
+
+        behandlingRepo.finnForMelding(stoppetMeldingId).also {
+            assertThat(it).hasSize(1)
+            assertThat(it.single().erInnvilget()).isTrue()
+            assertThat(it.single().status).isInstanceOf(Status.Stoppet::class.java)
+        }
+
+        processingService.processAndExpectResult().single()
+
+        behandlingRepo.finnForMelding(nyMelding).also {
+            assertThat(it).hasSize(1)
+            assertThat(it.single().erInnvilget()).isTrue()
+            assertThat(it.single().status).isInstanceOf(Status.Vilkårsvurdert::class.java)
+        }
+    }
+
+    @Test
     fun `kan kopiere og rekjøre melding med brev`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
             service.stoppMelding(it, "begrunnelse")!!
@@ -367,7 +392,6 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    @Disabled("replacement in progress")
     fun `kan kopiere og rekjøre melding med godskriving`() {
         val stoppetMeldingId = lagreOgProsesserMeldingSomGirBrev().let {
             service.stoppMelding(it, "begrunnelse")!!

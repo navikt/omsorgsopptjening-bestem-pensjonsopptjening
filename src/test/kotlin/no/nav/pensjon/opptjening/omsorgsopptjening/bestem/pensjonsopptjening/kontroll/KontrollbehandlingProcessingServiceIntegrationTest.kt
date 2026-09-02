@@ -34,6 +34,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.fail
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -46,6 +47,8 @@ import java.time.Month
 import java.time.YearMonth
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
+@Disabled("For removal")
+@Deprecated("Trenger ikke kontrollbehandling lenger")
 class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoKafka() {
 
     @Autowired
