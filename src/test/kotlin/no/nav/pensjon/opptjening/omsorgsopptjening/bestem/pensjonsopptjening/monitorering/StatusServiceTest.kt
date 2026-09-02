@@ -127,8 +127,8 @@ class StatusServiceTest : SpringContextTest.NoKafka() {
         mottatt: PersongrunnlagMelding.Mottatt
     ) {
         jdbcTemplate.update(
-            """insert into behandling (id, opprettet, omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag,vilkarsvurdering, utfall, kafkaMeldingId) 
-                    |values (:id, (:opprettet)::timestamptz, :omsorgs_ar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, cast (:grunnlag as json), cast (:vilkarsvurdering as json), cast (:utfall as json), :kafkaMeldingId)""".trimMargin(),
+            """insert into behandling (id, opprettet, omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag,vilkarsvurdering, utfall, kafkaMeldingId, status, statushistorikk) 
+                    |values (:id, (:opprettet)::timestamptz, :omsorgs_ar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, cast (:grunnlag as json), cast (:vilkarsvurdering as json), cast (:utfall as json), :kafkaMeldingId, :status, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to id,
@@ -141,6 +141,8 @@ class StatusServiceTest : SpringContextTest.NoKafka() {
                     "vilkarsvurdering" to "{}",
                     "utfall" to "{}",
                     "kafkaMeldingId" to mottatt.id,
+                    "status" to "Vilkårsvurdert",
+                    "statushistorikk" to """[{"type": "Vilkårsvurdert", "tidspunkt": "${now()}"}]"""
                 ),
             ),
         )

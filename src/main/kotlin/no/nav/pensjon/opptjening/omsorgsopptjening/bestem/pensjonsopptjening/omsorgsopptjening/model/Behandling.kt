@@ -1,7 +1,10 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonTypeName
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Og.Companion.og
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.DomainOmsorgskategori
+import java.time.Instant
 import java.util.UUID
 
 /**
@@ -14,6 +17,9 @@ data class Behandling(
     private val meldingId: UUID
 ) {
     val vilkarsVurdering = vilkårsvurdering()
+    val statushistorikk = listOf(Status.Vilkårsvurdert())
+    val status = statushistorikk.last()
+
     fun omsorgsår() = grunnlag.omsorgsAr
     fun omsorgsmottaker() = grunnlag.omsorgsmottaker
     fun omsorgsyter() = grunnlag.omsorgsyter
@@ -72,4 +78,31 @@ data class Behandling(
             vurderVilkår.OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn(),
         )
     }
+}
+
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type",
+)
+sealed class Status {
+
+    open fun stoppet(begrunnelse: String): Status {
+        throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til ${Stoppet::class.java.simpleName}")
+    }
+
+    @JsonTypeName("Vilkårsvurdert")
+    data class Vilkårsvurdert(
+        val tidspunkt: Instant = Instant.now(),
+    ) : Status() {
+        override fun stoppet(begrunnelse: String): Stoppet {
+            return Stoppet(begrunnelse = begrunnelse)
+        }
+    }
+
+    @JsonTypeName("Stoppet")
+    data class Stoppet(
+        val tidspunkt: Instant = Instant.now(),
+        val begrunnelse: String,
+    ) : Status()
 }

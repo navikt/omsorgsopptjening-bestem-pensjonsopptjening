@@ -85,13 +85,13 @@ internal class PersongrunnlagMeldingServiceImpl(
                                     behandlingRepo.finnForOmsorgsyterOgAr(
                                         fnr = it.omsorgsyter.fnr,
                                         ar = it.omsorgsAr
-                                    )
+                                    ).filterNot { it.erStoppet() }
                                 },
                                 finnForOmsorgsmottakerOgÅr = {
                                     behandlingRepo.finnForOmsorgsmottakerOgAr(
                                         omsorgsmottaker = it.omsorgsmottaker.fnr,
                                         ar = it.omsorgsAr
-                                    )
+                                    ).filterNot { it.erStoppet() }
                                 },
                                 finnForOmsorgsytersAndreBarnOgÅr = {
                                     behandlingRepo.finnForOmsorgsytersAndreBarn(
@@ -99,7 +99,7 @@ internal class PersongrunnlagMeldingServiceImpl(
                                         ar = it.omsorgsAr,
                                         andreBarnEnnOmsorgsmottaker = it.omsorgsyter.finnAndreBarnEnn(it.omsorgsmottaker.fnr)
                                             .map { it.ident }
-                                    )
+                                    ).filterNot { it.erStoppet() }
                                 }
                             ),
                             meldingId = melding.id
@@ -143,10 +143,13 @@ internal class PersongrunnlagMeldingServiceImpl(
             meldingsId = id,
             begrunnelse = begrunnelse
         )
-        //TODO replacement in progress
-//        behandlingRepo.stoppBehandlingerForMelding(
-//            meldingsId = id
-//        )
+
+        behandlingRepo.finnForMelding(id).forEach { fullført ->
+            fullført.stoppet(begrunnelse = begrunnelse ?: "").also {
+                behandlingRepo.updateStatus(it)
+            }
+        }
+
         godskrivOpptjeningService.stoppForMelding(
             meldingsId = id,
             begrunnelse = begrunnelse,

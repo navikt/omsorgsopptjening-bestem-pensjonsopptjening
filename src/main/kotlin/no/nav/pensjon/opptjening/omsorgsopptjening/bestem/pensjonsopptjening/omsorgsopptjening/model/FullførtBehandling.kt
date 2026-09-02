@@ -17,7 +17,10 @@ data class FullførtBehandling(
     val utfall: BehandlingUtfall,
     val vilkårsvurdering: VilkarsVurdering<*>,
     val meldingId: UUID,
+    val statushistorikk: List<Status>
 ) {
+    val status get() = statushistorikk.last()
+
     fun erInnvilget(): Boolean {
         return utfall.erInnvilget()
     }
@@ -28,6 +31,10 @@ data class FullførtBehandling(
 
     fun erAvslag(): Boolean {
         return utfall.erAvslag()
+    }
+
+    fun erStoppet(): Boolean {
+        return status is Status.Stoppet
     }
 
     fun avslåtteVilkår(): List<VilkarsVurdering<*>> {
@@ -71,14 +78,8 @@ data class FullførtBehandling(
             omsorgsAr = omsorgsAr,
         )
     }
-}
 
-data class FullførtBehandlingUtenJson(
-    val id: UUID,
-    val opprettet: Instant,
-    val omsorgsAr: Int,
-    val omsorgsyter: String,
-    val omsorgsmottaker: String,
-    val omsorgstype: DomainOmsorgskategori,
-    val meldingId: UUID,
-)
+    fun stoppet(begrunnelse: String): FullførtBehandling {
+        return copy(statushistorikk = statushistorikk + status.stoppet(begrunnelse))
+    }
+}
