@@ -1,6 +1,22 @@
 # omsorgsopptjening-bestem-pensjonsopptjening
 
-Sammenstiller grunnlagsdata for barnetrygd og hjelpestønad og avgjør om omsorgsopptjening kan godskrives automatisk.
+Sammenstiller grunnlagsdata for barnetrygd og hjelpestønad, vurderer om vilkårene for automatisk godskriving er oppfylt
+og godskriver omsorgsopptjening automatisk dersom dette er tifellet. 
+
+Flyten for omsorgsopptjening (omsorgsopptjening-start-innlesning + omsorgsopptjening-bestem-pensjonsopptjeninig) bør
+kjøres 1 gang mot slutten av året, fortrinnsvis før godskriving av nytt opptjeningsår gjøres i POPP slik at opptjeningen
+kommer med i pensjonsbeholdningen som beregnes av POPP.
+
+## Gjennomføring av flyt for omsorgsopptjening
+
+1. Følg instruksjonene i [omsorgsopptjening-start-innlesning](https://github.com/navikt/omsorgsopptjening-start-innlesning)
+2. Konfigurer unleash. Årsaken til at noen toggles er disabled er for å gjøre det mulig å "trekke tilbake" godskriving, oppgaver og brev ved behov. Scenario for foreldre som mottar barnetrygd for ulike fellesbarn krever dette.
+   1. omsorgsopptjening-bestem-pensjonsopptjening-behandling = `enabled` (prosessering av inkommende meldinger fra kafka)
+   2. omsorgsopptjening-bestem-pensjonsopptjening-godskriv = `disabled` (oversendelse av innvilget omsorgsoptjening til POPP)
+   3. omsorgsopptjening-bestem-pensjonsopptjening-brev = `disabled` (opprettelse av brev i PEN)
+   4. omsorgsopptjening-bestem-pensjonsopptjening-opprett-oppgaver = `disabled` (opprettelse av oppgaver i GOSYS)
+3. Konfigurer `GYLDIG_OPPTJENINGSAR` til å samsvare med instruksjonene fra 1.
+4. Når det ikke er flere meldinger igjen som kan prosesseres videre kan alle toggles fra 2 settes til `enabled`
 
 ## Bakgrunn
 
@@ -42,7 +58,9 @@ Dette verifiserer oppstart og wiring, ikke de eksterne integrasjonene.
 
 ## Intern arkitektur
 
-Applikasjonen er delt inn i følgende distinkte steg som opererer uavhenging av hverandre:
+Applikasjonen er delt inn i følgende flyter som eksekveres uavhenging av hverandre. Hver flyt benytter sin egen
+tabell som kilde for hvilke data som skal prosesseres. Flyt 2 er ansvarlig for å produsere data til tabellene 
+for flyt 3,4 og 5.
 
 1. Les grunnlagsdtata fra kafka og persister
 2. Behandle grunnlagsdata, herunder

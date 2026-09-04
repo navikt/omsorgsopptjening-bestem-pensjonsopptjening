@@ -1,7 +1,5 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common
 
-import tools.jackson.databind.JsonNode
-import tools.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
@@ -13,7 +11,47 @@ import com.github.tomakehurst.wiremock.matching.ContainsPattern
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest.Companion.POPP_PENSJONSPOENG_PATH
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.periode.Periode
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
 import kotlin.random.Random
+
+/**
+ * Navngitte identer for testscenarioer med familiekonstellasjoner, slik at tester kan referere til personer i
+ * scenarioet ved navn i stedet for "magiske" fnr-strenger. Body-filene ligger under
+ * src/test/resources/__files/fellesbarn/<scenario>/.
+ */
+object Fellesbarn {
+
+    /**
+     * Scenario: Far A + Mor B har tre felles barn (AB1-3), 3-5 år i 2020.
+     * Far A har i tillegg to yngre barn med Mor C (AC1, AC2), 0-1 år i 2020.
+     */
+    object ForeldreFlereFellesBarn {
+        const val FAR_A = "10038512345"
+        const val MOR_B = "22078812345"
+        const val MOR_C = "19058612345"
+        const val BARN_AB1 = "15061712345"
+        const val BARN_AB2 = "10091612345"
+        const val BARN_AB3 = "01121512345"
+        const val BARN_AC1 = "08032012345"
+        const val BARN_AC2 = "25081912345"
+    }
+
+    /**
+     * Scenario: Far A + Mor B felles barn (AB1, AB2), Far A + Mor C særkullsbarn (AC1),
+     * Mor B + Far D særkullsbarn (BD1). Barn 0-5 år i 2020. AB1 er eldre enn AC1.
+     */
+    object FellesbarnOgSaerkullsbarn {
+        const val FAR_A = "18049112345"
+        const val MOR_B = "27069312345"
+        const val MOR_C = "05108712345"
+        const val FAR_D = "12038012345"
+        const val BARN_AB1 = "23041612345"
+        const val BARN_AB2 = "14021912345"
+        const val BARN_AC1 = "14071812345"
+        const val BARN_BD1 = "30111512345"
+    }
+}
 
 /**
  * Velger body-fil basert på identen i requesten.
@@ -37,6 +75,24 @@ class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformerV2 {
             "03041212345" to "fnr_barn_12ar_2020.json",
             "01019212345" to "fodsel_1freg_0pdl.json",
             "12340378910" to "fnr_barn_17ar_2020.json",
+            // Scenario: foreldre_flere_felles_barn - Far A + Mor B har tre felles barn (AB1-3), 0-6 år i 2020. Far A har i tillegg to barn med Mor C (AC1, AC2).
+            Fellesbarn.ForeldreFlereFellesBarn.FAR_A to "fellesbarn/foreldre_flere_felles_barn/farA.json",
+            Fellesbarn.ForeldreFlereFellesBarn.MOR_B to "fellesbarn/foreldre_flere_felles_barn/morB.json",
+            Fellesbarn.ForeldreFlereFellesBarn.MOR_C to "fellesbarn/foreldre_flere_felles_barn/morC.json",
+            Fellesbarn.ForeldreFlereFellesBarn.BARN_AB1 to "fellesbarn/foreldre_flere_felles_barn/barnAB1.json",
+            Fellesbarn.ForeldreFlereFellesBarn.BARN_AB2 to "fellesbarn/foreldre_flere_felles_barn/barnAB2.json",
+            Fellesbarn.ForeldreFlereFellesBarn.BARN_AB3 to "fellesbarn/foreldre_flere_felles_barn/barnAB3.json",
+            Fellesbarn.ForeldreFlereFellesBarn.BARN_AC1 to "fellesbarn/foreldre_flere_felles_barn/barnAC1.json",
+            Fellesbarn.ForeldreFlereFellesBarn.BARN_AC2 to "fellesbarn/foreldre_flere_felles_barn/barnAC2.json",
+            // Scenario: fellesbarn_og_saerkullsbarn - Far A + Mor B felles barn (AB1), Far A + Mor C saerkullsbarn (AC1), Mor B + Far D saerkullsbarn (BD1), barn 0-5 år i 2020.
+            Fellesbarn.FellesbarnOgSaerkullsbarn.FAR_A to "fellesbarn/fellesbarn_og_saerkullsbarn/farA.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarn.MOR_B to "fellesbarn/fellesbarn_og_saerkullsbarn/morB.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarn.MOR_C to "fellesbarn/fellesbarn_og_saerkullsbarn/morC.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarn.FAR_D to "fellesbarn/fellesbarn_og_saerkullsbarn/farD.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AB1 to "fellesbarn/fellesbarn_og_saerkullsbarn/barnAB1.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AB2 to "fellesbarn/fellesbarn_og_saerkullsbarn/barnAB2.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AC1 to "fellesbarn/fellesbarn_og_saerkullsbarn/barnAC1.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_BD1 to "fellesbarn/fellesbarn_og_saerkullsbarn/barnBD1.json",
         )
     }
 

@@ -334,7 +334,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "04010012797",
                         oppgavetekst = setOf(
-                            "Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 12345678910,04010012797 har mottatt barnetrygd for ulike felles barn med fnr: 07081812345,01052012345. En av foreldrene har fått godskrevet omsorgsopptjening automatisk, eller har oppgave for manuell vurdering.",
+                            "Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 12345678910,04010012797 har mottatt barnetrygd for ulike felles barn med fnr: 07081812345,01052012345.",
                             "Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01052012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."
                         )
                     )
@@ -703,7 +703,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
     }
 
     @Test
-    fun `manuell behandling med oppgave dersom det er innvilget opptjening for fellesbarn omsorgsyter ikke mottar barnetrygd for`() {
+    fun `manuell behandling med oppgave for begge foreldre dersom det er innvilget opptjening for fellesbarn omsorgsyter ikke mottar barnetrygd for`() {
         wiremock.stubForPdlTransformer()
         wiremock.ingenUnntaksperioderForMedlemskap()
         wiremock.ingenLøpendeAlderspensjon()
@@ -738,7 +738,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
             ),
         )
 
-        persongrunnlagMeldingProcessingService.processAndExpectResult().single().let { result ->
+        val first = persongrunnlagMeldingProcessingService.processAndExpectResult().single().let { result ->
             result.alle().single().also { behandling -> assertThat(behandling.erInnvilget()).isTrue() }
         }
 
@@ -778,7 +778,23 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     assertThat(oppgave.detaljer).isEqualTo(
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "04010012797",
-                            oppgavetekst = setOf("Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 12345678910,04010012797 har mottatt barnetrygd for ulike felles barn med fnr: 07081812345,01122012345. En av foreldrene har fått godskrevet omsorgsopptjening automatisk, eller har oppgave for manuell vurdering.")
+                            oppgavetekst = setOf("Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 12345678910,04010012797 har mottatt barnetrygd for ulike felles barn med fnr: 07081812345,01122012345.")
+                        )
+                    )
+                }
+            }
+        }
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().single().let { result ->
+            result.alle().single().also { behandling ->
+                assertThat(behandling.erManuell()).isTrue()
+                assertThat(behandling.omsorgsyter).isEqualTo("12345678910")
+
+                oppgaveRepo.findForBehandling(behandling.id).single().also { oppgave ->
+                    assertThat(oppgave.detaljer).isEqualTo(
+                        OppgaveDetaljer.MottakerOgTekst(
+                            oppgavemottaker = "12345678910",
+                            oppgavetekst = setOf("Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 04010012797,12345678910 har mottatt barnetrygd for ulike felles barn med fnr: 01122012345,07081812345.")
                         )
                     )
                 }
