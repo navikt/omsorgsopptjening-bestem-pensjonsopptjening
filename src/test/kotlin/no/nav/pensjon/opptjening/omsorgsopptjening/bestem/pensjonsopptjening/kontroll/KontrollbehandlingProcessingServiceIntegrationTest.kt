@@ -352,6 +352,7 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                     rådata = Rådata(),
                     innlesingId = innlesingId,
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             )
         )!!
@@ -395,6 +396,7 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                     rådata = Rådata(),
                     innlesingId = innlesingId,
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             ),
         )
@@ -447,6 +449,7 @@ class KontrollbehandlingProcessingServiceIntegrationTest : SpringContextTest.NoK
                     rådata = Rådata(),
                     innlesingId = innlesingId,
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             )
         )!!

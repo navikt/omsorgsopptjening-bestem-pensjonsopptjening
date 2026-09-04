@@ -45,7 +45,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
-import org.springframework.test.context.TestPropertySource
 import java.time.LocalDate
 import java.time.Month.DECEMBER
 import java.time.Month.JANUARY
@@ -55,9 +54,6 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-@TestPropertySource(
-    properties = ["GYLDIG_OPPTJENINGSAR=${AdministrasjonsTest.OPPTJENINGSÅR}"]
-)
 class AdministrasjonsTest : SpringContextTest.NoKafka() {
 
     @Autowired
@@ -168,6 +164,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = OPPTJENINGSÅR,
                 )
             ),
         )
@@ -228,6 +225,7 @@ class AdministrasjonsTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = OPPTJENINGSÅR,
                 )
             ),
         )

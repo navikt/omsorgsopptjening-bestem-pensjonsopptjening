@@ -64,6 +64,7 @@ class StatusServiceTest : SpringContextTest.NoKafka() {
                 rådata = Rådata(),
                 innlesingId = InnlesingId.generate(),
                 correlationId = CorrelationId.generate(),
+                opptjeningsAr = 2020,
             ),
             opprettet = opprettet
         )

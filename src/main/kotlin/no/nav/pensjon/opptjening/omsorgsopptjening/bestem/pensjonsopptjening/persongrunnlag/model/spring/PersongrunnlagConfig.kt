@@ -10,7 +10,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.GyldigOpptjeningår
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.OmsorgsopptjeningsgrunnlagService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.OmsorgsopptjeningsgrunnlagServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
@@ -32,7 +31,6 @@ class PersongrunnlagConfig {
     @Bean
     fun persongrunnlagMeldingService(
         behandlingRepo: BehandlingRepo,
-        gyldigOpptjeningsår: GyldigOpptjeningår,
         persongrunnlagRepo: PersongrunnlagRepo,
         oppgaveService: OppgaveService,
         personOppslag: PersonOppslag,
@@ -44,7 +42,6 @@ class PersongrunnlagConfig {
     ): PersongrunnlagMeldingService {
         return PersongrunnlagMeldingServiceImpl(
             behandlingRepo = behandlingRepo,
-            gyldigOpptjeningsår = gyldigOpptjeningsår,
             persongrunnlagRepo = persongrunnlagRepo,
             oppgaveService = oppgaveService,
             godskrivOpptjeningService = godskrivOpptjeningService,

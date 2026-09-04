@@ -132,6 +132,7 @@ class PersongrunnlagRepoTest : SpringContextTest.NoKafka() {
                 rådata = Rådata(),
                 innlesingId = innlesingId,
                 correlationId = correlationId,
+                opptjeningsAr = 2020,
             )
         )
 }

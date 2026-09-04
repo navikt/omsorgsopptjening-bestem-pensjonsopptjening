@@ -33,8 +33,6 @@ spec:
       value: pensjonopptjening.omsorgsopptjening
     - name: OMSORGSOPPTJENING_CONSUMER_GROUP
       value: omsorgsopptjening-bestem-pensjonsopptjening
-    - name: GYLDIG_OPPTJENINGSAR
-      value: "2024"
     - name: JAVA_TRUSTSTORE_OPTIONS
       value: "-Djavax.net.ssl.trustStore=$(NAV_TRUSTSTORE_PATH)
               -Djavax.net.ssl.trustStorePassword=$(NAV_TRUSTSTORE_PASSWORD)"

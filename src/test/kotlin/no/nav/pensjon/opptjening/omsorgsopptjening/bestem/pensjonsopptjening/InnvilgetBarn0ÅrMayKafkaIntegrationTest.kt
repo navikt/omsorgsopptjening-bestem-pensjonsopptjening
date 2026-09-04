@@ -23,14 +23,10 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.mockingDetails
 import org.mockito.Mockito.verify
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import kotlin.test.assertEquals
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
-@TestPropertySource(
-    properties = ["GYLDIG_OPPTJENINGSAR=2020"]
-)
 class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
 
     @Autowired
@@ -79,6 +75,7 @@ class InnvilgetBarn0ÅrMayKafkaIntegrationTest : SpringContextTest.WithKafka() {
                 rådata = Rådata(),
                 innlesingId = InnlesingId.generate(),
                 correlationId = CorrelationId.generate(),
+                opptjeningsAr = 2020,
             )
         )
 

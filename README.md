@@ -15,8 +15,7 @@ kommer med i pensjonsbeholdningen som beregnes av POPP.
    2. omsorgsopptjening-bestem-pensjonsopptjening-godskriv = `disabled` (oversendelse av innvilget omsorgsoptjening til POPP)
    3. omsorgsopptjening-bestem-pensjonsopptjening-brev = `disabled` (opprettelse av brev i PEN)
    4. omsorgsopptjening-bestem-pensjonsopptjening-opprett-oppgaver = `disabled` (opprettelse av oppgaver i GOSYS)
-3. Konfigurer `GYLDIG_OPPTJENINGSAR` til å samsvare med instruksjonene fra 1.
-4. Når det ikke er flere meldinger igjen som kan prosesseres videre kan alle toggles fra 2 settes til `enabled`
+3. Når det ikke er flere meldinger igjen som kan prosesseres videre kan alle toggles fra 2 settes til `enabled`
 
 ## Bakgrunn
 
