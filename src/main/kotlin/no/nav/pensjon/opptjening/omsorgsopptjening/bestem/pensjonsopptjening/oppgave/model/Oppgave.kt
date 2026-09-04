@@ -56,7 +56,7 @@ sealed class Oppgave {
                 .map { it.first }.plus(omsorgsyter).joinToString(separator = ",")
             val omsorgsmottakere = annenForelderOgBarn
                 .map { it.second }.plus(omsorgsmottaker).joinToString(separator = ",")
-            return """Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: $omsorgsytere har mottatt barnetrygd for ulike felles barn med fnr: $omsorgsmottakere. En av foreldrene har fått godskrevet omsorgsopptjening automatisk, eller har oppgave for manuell vurdering."""
+            return """Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: $omsorgsytere har mottatt barnetrygd for ulike felles barn med fnr: $omsorgsmottakere."""
         }
     }
 

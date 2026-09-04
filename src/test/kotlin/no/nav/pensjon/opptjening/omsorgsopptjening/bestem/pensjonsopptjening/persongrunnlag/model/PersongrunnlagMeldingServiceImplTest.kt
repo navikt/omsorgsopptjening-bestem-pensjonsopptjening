@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.Fellesbarn
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.SpringContextTest
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenLøpendeAlderspensjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.ingenLøpendeUføretrgyd
@@ -16,6 +17,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.com
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.stubForPdlTransformer
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.unntaksperioderUtenMedlemskap
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.common.wiremockWithPdlTransformer
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AggregertBehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AntallMånederRegel
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
@@ -32,12 +34,14 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarBarnetrgyd
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsyterMottarIkkePensjonEllerUføretrygdIEøs
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Status
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erEnesteAvslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erEnesteUbestemt
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erInnvilget
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnAlleAvslatte
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.august
@@ -79,6 +83,9 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var persongrunnlagMeldingProcessingService: PersongrunnlagMeldingProcessingService
+
+    @Autowired
+    private lateinit var behandlingRepo: BehandlingRepo
 
     companion object {
         @JvmField
@@ -1873,6 +1880,401 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                         assertThat(it.omsorgsmottaker).isEqualTo("12340378910")
                     }
                 }
+        }
+    }
+
+    @Test
+    fun `foreldre med omsorg for hvert sitt fellesbarn gir manuell behandling for begge`() {
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2038),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB1,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList()
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                ),
+            ),
+        )
+
+        val farFørsteRunde = persongrunnlagMeldingProcessingService.processAndExpectResult().let {
+            it.single().single().also {
+                it.assertInnvilget(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB1,
+                    år = OPPTJENINGSÅR,
+                    omsorgstype = DomainOmsorgskategori.BARNETRYGD
+                )
+                assertThat(it.status).isInstanceOf(Status.Vilkårsvurdert::class.java)
+            }
+        }
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.MOR_B,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.MOR_B,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB2,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList()
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                ),
+            ),
+        )
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().also {
+            it.single().single().assertManuell(
+                omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.MOR_B,
+                omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB2,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
+            )
+        }
+
+        behandlingRepo.finn(farFørsteRunde.id).also {
+            assertThat(it.status).isInstanceOf(Status.Stoppet::class.java)
+        }
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().also {
+            it.single().single().assertManuell(
+                omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB1,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
+            )
+        }
+    }
+
+    @Test
+    fun `flere konstellasjoner med foreldre med omsorg for hvert sitt fellesbarn ender til slutt med manuell for alle`() {
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2038),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB1,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
+                                ),
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2038),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AC1,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList()
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                ),
+            ),
+        )
+
+        val farFørsteRunde = persongrunnlagMeldingProcessingService.processAndExpectResult().let {
+            it.single().alle().first().also {
+                it.assertInnvilget(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB1,
+                    år = OPPTJENINGSÅR,
+                    omsorgstype = DomainOmsorgskategori.BARNETRYGD
+                )
+                assertThat(it.status).isInstanceOf(Status.Vilkårsvurdert::class.java)
+            }
+            it.single().alle().last().also {
+                it.assertAvslag(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AC1,
+                    omsorgstype = DomainOmsorgskategori.BARNETRYGD
+                )
+                assertThat(it.status).isInstanceOf(Status.Vilkårsvurdert::class.java)
+            }
+            it.single()
+        }
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.MOR_B,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.MOR_B,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB2,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList()
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                ),
+            ),
+        )
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().also {
+            it.single().single().assertManuell(
+                omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.MOR_B,
+                omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB2,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
+            )
+        }
+
+        farFørsteRunde.alle().forEach {
+            behandlingRepo.finn(it.id).also {
+                assertThat(it.status).isInstanceOf(Status.Stoppet::class.java)
+            }
+        }
+
+        val farAndreRunde = persongrunnlagMeldingProcessingService.processAndExpectResult().let {
+            it.single().alle().first().also {
+                it.assertManuell(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB1,
+                    omsorgstype = DomainOmsorgskategori.BARNETRYGD
+                )
+                assertThat(it.status).isInstanceOf(Status.Vilkårsvurdert::class.java)
+            }
+            it.single().alle().last().also {
+                it.assertInnvilget(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AC1,
+                    omsorgstype = DomainOmsorgskategori.BARNETRYGD
+                )
+                assertThat(it.status).isInstanceOf(Status.Vilkårsvurdert::class.java)
+            }
+            it.single()
+        }
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.MOR_C,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.MOR_C,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AC2,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList()
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                ),
+            ),
+        )
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().also {
+            it.single().single().assertManuell(
+                omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.MOR_C,
+                omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AC2,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
+            )
+        }
+
+        farAndreRunde.alle().forEach {
+            behandlingRepo.finn(it.id).also {
+                assertThat(it.status).isInstanceOf(Status.Stoppet::class.java)
+            }
+        }
+
+        val farTredjeRunde = persongrunnlagMeldingProcessingService.processAndExpectResult().let {
+            it.single().alle().first().also {
+                it.assertManuell(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AB1,
+                    omsorgstype = DomainOmsorgskategori.BARNETRYGD
+                )
+                assertThat(it.status).isInstanceOf(Status.Vilkårsvurdert::class.java)
+            }
+            it.single().alle().last().also {
+                it.assertManuell(
+                    omsorgsyter = Fellesbarn.ForeldreFlereFellesBarn.FAR_A,
+                    omsorgsmottaker = Fellesbarn.ForeldreFlereFellesBarn.BARN_AC1,
+                    omsorgstype = DomainOmsorgskategori.BARNETRYGD
+                )
+                assertThat(it.status).isInstanceOf(Status.Vilkårsvurdert::class.java)
+            }
+            it.single()
+        }
+
+        behandlingRepo.finnForOmsorgsyter(Fellesbarn.ForeldreFlereFellesBarn.FAR_A).also {
+            assertThat(it).hasSize(6)
+            assertThat(it.filter { it.erStoppet() }).hasSize(4)
+            assertThat(it.filter { !it.erStoppet() }.all { it.erManuell() }).isTrue()
+        }
+        behandlingRepo.finnForOmsorgsyter(Fellesbarn.ForeldreFlereFellesBarn.MOR_B).also {
+            assertThat(it).hasSize(1)
+            assertThat(it.all { it.erManuell() }).isTrue()
+        }
+        behandlingRepo.finnForOmsorgsyter(Fellesbarn.ForeldreFlereFellesBarn.MOR_C).also {
+            assertThat(it).hasSize(1)
+            assertThat(it.all { it.erManuell() }).isTrue()
+        }
+    }
+
+    @Test
+    fun `foreldre med omsorg for hvert sitt fellesbarn innvilges begge dersom en forelder har omsorg for annet særkullbarn i tillegg`() {
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = Fellesbarn.FellesbarnOgSaerkullsbarn.MOR_B,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = Fellesbarn.FellesbarnOgSaerkullsbarn.MOR_B,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2038),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AB2,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList()
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                ),
+            ),
+        )
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().also {
+            it.single().single().assertInnvilget(
+                omsorgsyter = Fellesbarn.FellesbarnOgSaerkullsbarn.MOR_B,
+                omsorgsmottaker = Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AB2,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
+            )
+        }
+
+        repo.lagre(
+            PersongrunnlagMelding.Lest(
+                innhold = PersongrunnlagMeldingKafka(
+                    omsorgsyter = Fellesbarn.FellesbarnOgSaerkullsbarn.FAR_A,
+                    persongrunnlag = listOf(
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = Fellesbarn.FellesbarnOgSaerkullsbarn.FAR_A,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AB1,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList()
+                        ),
+                        PersongrunnlagMeldingKafka.Persongrunnlag(
+                            omsorgsyter = Fellesbarn.FellesbarnOgSaerkullsbarn.FAR_A,
+                            omsorgsperioder = listOf(
+                                PersongrunnlagMeldingKafka.Omsorgsperiode(
+                                    fom = januar(2020),
+                                    tom = desember(2020),
+                                    omsorgstype = Omsorgstype.FULL_BARNETRYGD,
+                                    omsorgsmottaker = Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AC1,
+                                    kilde = Kilde.BARNETRYGD,
+                                    utbetalt = 7234,
+                                    landstilknytning = KafkaLandstilknytning.NORGE,
+                                    omsorgsyterHarSelvstendigRett = false,
+                                ),
+                            ),
+                            hjelpestønadsperioder = emptyList()
+                        ),
+                    ),
+                    rådata = Rådata(),
+                    innlesingId = InnlesingId.generate(),
+                    correlationId = CorrelationId.generate(),
+                ),
+            ),
+        )
+
+        persongrunnlagMeldingProcessingService.processAndExpectResult().also {
+            it.single().alle().first().assertManuell(
+                omsorgsyter = Fellesbarn.FellesbarnOgSaerkullsbarn.FAR_A,
+                omsorgsmottaker = Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AB1,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
+            )
+            it.single().alle().last().assertInnvilget(
+                omsorgsyter = Fellesbarn.FellesbarnOgSaerkullsbarn.FAR_A,
+                omsorgsmottaker = Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AC1,
+                omsorgstype = DomainOmsorgskategori.BARNETRYGD
+            )
+            assertThat(it.single().aggregertUtfall).isEqualTo(AggregertBehandlingUtfall.Innvilget)
         }
     }
 

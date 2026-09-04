@@ -6,7 +6,7 @@ import java.util.UUID
 data class FullførteBehandlinger(
     private val behandlinger: List<FullførtBehandling>
 ) {
-    private val aggregertUtfall = AggregertBehandlingsutfall(behandlinger.map { it.utfall }).utfall()
+    val aggregertUtfall = AggregertBehandlingsutfall(behandlinger.map { it.utfall }).utfall()
 
     init {
         require(

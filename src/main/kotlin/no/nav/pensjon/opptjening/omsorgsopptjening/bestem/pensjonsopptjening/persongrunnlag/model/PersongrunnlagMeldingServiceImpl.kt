@@ -2,10 +2,14 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.AggregertBehandlingUtfall
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.VilkårsvurderingFactory
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.erUbestemt
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.finnVurdering
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
@@ -106,7 +110,10 @@ internal class PersongrunnlagMeldingServiceImpl(
                         )
                     )
                 }
-        )
+        ).also {
+            //TODO some might slip through due to transactional boundaries and parallel processing in multiple threads (exsisting issue)
+            prosesserOmsorgsyterForTilstøtendeFellesbarnPåNyttVedBehov(it)
+        }
     }
 
 
@@ -115,7 +122,7 @@ internal class PersongrunnlagMeldingServiceImpl(
         brevService.opprettHvisNødvendig(behandling)
     }
 
-    override fun avsluttMelding(id: UUID, melding: String): UUID? {
+    override fun avsluttMelding(id: UUID, melding: String): UUID {
         try {
             return transactionTemplate.execute {
                 persongrunnlagRepo.find(id).avsluttet(melding = melding).let {
@@ -128,6 +135,40 @@ internal class PersongrunnlagMeldingServiceImpl(
             throw RuntimeException("Kunne ikke oppdatere status")
         }
 
+    }
+
+    /**
+     * Identify scenario where two parents receive barnetrygd for separate fellesbarn and send both to manual processing.
+     * The scenario is not identifiable until the second omsorgsyter is processed, as we only know about barnetrygd for
+     * children that the omsorgsyter currently has barnetrygd for before processing begins.
+     * Whenever this scenario occur, we complete the processing of the omsorgsyter currently being processed, as its
+     * status will cause oppgave to be created. The other omsorgsyter will have its [PersongrunnlagMelding] stopped
+     * and re-processed such that its [OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering] will discover that
+     * another omsorgsyter has barnetrygd for children of which it does not receive barnetrygd for itself.
+     *
+     * @see [OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering]
+     * @see [Oppgave.annenForelderInnvilgetOmsorgsopptjeningForAnnetFellesbarn]
+     */
+    private fun prosesserOmsorgsyterForTilstøtendeFellesbarnPåNyttVedBehov(fullførteBehandlinger: FullførteBehandlinger) {
+        when (fullførteBehandlinger.aggregertUtfall) {
+            AggregertBehandlingUtfall.Manuell -> {
+                fullførteBehandlinger.alle()
+                    .filter { it.erManuell() && it.vilkårsvurdering.erUbestemt<OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering>() }
+                    .map { it.vilkårsvurdering.finnVurdering<OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn.Vurdering>() }
+                    .flatMap { it.grunnlag.behandlinger.map { it.behandlingsId } }
+                    .map { behandlingRepo.finn(it) }
+                    .filter { it.erInnvilget() && !it.erStoppet() }
+                    .map { it.meldingId }
+                    .toSet()
+                    .forEach {
+                        stoppOgOpprettKopiAvMelding(it, "Annen forelder mottar barnetrygd for fellesbarn")
+                    }
+            }
+
+            else -> {
+                //NOOP only applicable for the specific scnario
+            }
+        }
     }
 
     private fun stoppMeldingIntern(id: UUID, begrunnelse: String?): UUID {
@@ -198,7 +239,7 @@ internal class PersongrunnlagMeldingServiceImpl(
         }
     }
 
-    override fun stoppMelding(id: UUID, begrunnelse: String?): UUID? {
+    override fun stoppMelding(id: UUID, begrunnelse: String?): UUID {
         return transactionTemplate.execute {
             stoppMeldingIntern(id, begrunnelse)
         }
