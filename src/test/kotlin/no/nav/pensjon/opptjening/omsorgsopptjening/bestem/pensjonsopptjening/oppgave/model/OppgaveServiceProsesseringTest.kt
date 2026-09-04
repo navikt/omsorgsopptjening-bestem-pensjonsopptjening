@@ -29,13 +29,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
-import org.springframework.test.context.TestPropertySource
 import java.time.temporal.ChronoUnit
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
-@TestPropertySource(
-    properties = ["GYLDIG_OPPTJENINGSAR=2020"]
-)
 class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
 
     @Autowired
@@ -166,6 +162,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             ),
         )
@@ -300,6 +297,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             ),
         )
@@ -404,6 +402,7 @@ class OppgaveServiceProsesseringTest : SpringContextTest.NoKafka() {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             ),
         )

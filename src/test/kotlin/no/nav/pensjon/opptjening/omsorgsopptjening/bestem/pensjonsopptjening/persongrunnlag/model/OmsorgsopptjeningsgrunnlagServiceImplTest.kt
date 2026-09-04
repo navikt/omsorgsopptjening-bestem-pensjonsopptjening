@@ -225,6 +225,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             )
         )
@@ -528,6 +529,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             )
         ).also {
@@ -611,6 +613,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                         rådata = Rådata(),
                         innlesingId = InnlesingId.generate(),
                         correlationId = CorrelationId.generate(),
+                        opptjeningsAr = 2020,
                     )
                 )
             )
@@ -658,6 +661,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             )
         ).also {
@@ -713,6 +717,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                         rådata = Rådata(),
                         innlesingId = InnlesingId.generate(),
                         correlationId = CorrelationId.generate(),
+                        opptjeningsAr = 2020,
                     )
                 )
             )
@@ -766,6 +771,7 @@ class OmsorgsopptjeningsgrunnlagServiceImplTest {
                     rådata = Rådata(),
                     innlesingId = InnlesingId.generate(),
                     correlationId = CorrelationId.generate(),
+                    opptjeningsAr = 2020,
                 )
             )
         ).also {

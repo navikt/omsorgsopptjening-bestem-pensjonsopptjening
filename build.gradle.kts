@@ -2,7 +2,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val domeneVersion = "2.1.102"
+val domeneVersion = "2.1.103"
 val azureAdClient = "0.0.7"
 val logbackEncoderVersion = "9.0"
 val flywayCoreVersion = "12.6.0"

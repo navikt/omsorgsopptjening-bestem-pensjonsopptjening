@@ -21,6 +21,7 @@ sealed class PersongrunnlagMelding {
     val innlesingId get() = innhold.innlesingId
     val status: Status get() = statushistorikk.last()
     val feilinformasjon: List<Feilinformasjon> get() = innhold.feilinfo
+    val opptjeningsAr get() = innhold.opptjeningsAr
 
     fun harFeilinformasjon(): Boolean {
         return feilinformasjon.isNotEmpty()

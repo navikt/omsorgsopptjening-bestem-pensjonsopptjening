@@ -23,7 +23,6 @@ import java.util.UUID
 
 internal class PersongrunnlagMeldingServiceImpl(
     private val behandlingRepo: BehandlingRepo,
-    private val gyldigOpptjeningsår: GyldigOpptjeningår,
     private val persongrunnlagRepo: PersongrunnlagRepo,
     private val oppgaveService: OppgaveService,
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
@@ -78,7 +77,7 @@ internal class PersongrunnlagMeldingServiceImpl(
     private fun behandleIntern(melding: PersongrunnlagMelding.Mottatt): FullførteBehandlinger {
         return FullførteBehandlinger(
             behandlinger = omsorgsopptjeningsgrunnlagService.lagOmsorgsopptjeningsgrunnlag(melding)
-                .filter { grunnlag -> gyldigOpptjeningsår.erGyldig(grunnlag.omsorgsAr) }
+                .filter { grunnlag -> grunnlag.omsorgsAr == melding.opptjeningsAr }
                 .map { it ->
                     behandlingRepo.persist(
                         Behandling(
