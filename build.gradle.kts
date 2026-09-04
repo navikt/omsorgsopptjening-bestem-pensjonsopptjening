@@ -8,7 +8,7 @@ val logbackEncoderVersion = "9.0"
 val flywayCoreVersion = "12.6.0"
 val wiremockVersion = "4.0.0-beta.38"
 val mockitoVersion = "6.3.0"
-val unleashVersion = "9.2.6"
+val unleashVersion = "12.2.3"
 val navTokenSupportVersion = "6.0.8"
 
 plugins {

@@ -2,8 +2,9 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.un
 
 import io.getunleash.DefaultUnleash
 import io.getunleash.Unleash
-import io.getunleash.strategy.DefaultStrategy
 import io.getunleash.util.UnleashConfig
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,6 +18,7 @@ class NavUnleashConfig(
     @Value($$"${UNLEASH_SERVER_API_URL}") private val unleash_url: String,
     @Value($$"${UNLEASH_SERVER_API_TOKEN}") private val unleash_api_key: String
 ) {
+    private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     @Bean
     fun unleashConfig(): Unleash {
@@ -27,7 +29,6 @@ class NavUnleashConfig(
                 .unleashAPI("$unleash_url/api")
                 .apiKey(unleash_api_key)
                 .build(),
-            DefaultStrategy()
         )
     }
 
@@ -38,7 +39,11 @@ class NavUnleashConfig(
         return UnleashWrapper(
             unleash = unleash,
             clock = Clock.systemUTC()
-        )
+        ).also { toggle ->
+            Feature.entries.forEach {
+                log.info("""Feature ${it.toggleName} is enabled: ${toggle.isEnabled(it)}""")
+            }
+        }
     }
 
     enum class Feature(val toggleName: String) {
