@@ -132,11 +132,6 @@ class GodskrivOpptjeningRepo(
         )
     }
 
-    /**
-     * Utformet for å være mekanismen som tilrettelegger for at flere podder kan prosessere data i paralell.
-     * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
-     * annen connection (pod) så lenge transaksjonen lever.
-     */
     fun finnNesteUprosesserte(antall: Int): Locked {
         val lockId = UUID.randomUUID()
         val now = Instant.now(clock)

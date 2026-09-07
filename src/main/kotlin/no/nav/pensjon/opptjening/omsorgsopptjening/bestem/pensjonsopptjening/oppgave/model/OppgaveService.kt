@@ -20,9 +20,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.transaction.support.TransactionOperations
 import java.sql.SQLException
 import java.util.UUID
 
@@ -31,7 +31,7 @@ class OppgaveService(
     private val oppgaveKlient: OppgaveKlient,
     private val oppgaveRepo: OppgaveRepo,
     private val personOppslag: PersonOppslag,
-    private val transactionTemplate: NewTransactionTemplate
+    private val transactionTemplate: TransactionOperations
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(this::class.java)
@@ -90,11 +90,11 @@ class OppgaveService(
 
         return try {
             Resultat.Prosessert(
-                transactionTemplate.execute {
-                    låsteOppgaver.data.mapNotNull { oppgave ->
-                        Mdc.scopedMdc(oppgave.correlationId) {
-                            Mdc.scopedMdc(oppgave.innlesingId) {
-                                try {
+                låsteOppgaver.data.mapNotNull { oppgave ->
+                    Mdc.scopedMdc(oppgave.correlationId) {
+                        Mdc.scopedMdc(oppgave.innlesingId) {
+                            try {
+                                transactionTemplate.execute {
                                     personOppslag.hentAktørId(oppgave.mottaker).let { aktørId ->
                                         sakKlient.bestemSak(
                                             aktørId = aktørId
@@ -112,23 +112,25 @@ class OppgaveService(
                                             }
                                         }
                                     }
-                                } catch (ex: SQLException) {
-                                    throw ex
-                                } catch (ex: Throwable) {
-                                    log.warn("Exception ved prosessering av oppgave: ${ex::class.qualifiedName}")
-                                    secureLog.warn("Exception ved prosessering av oppgave", ex)
-                                    oppgave.retry(ex.stackTraceToString()).let {
+                                }
+                            } catch (ex: SQLException) {
+                                throw ex
+                            } catch (ex: Throwable) {
+                                log.warn("Exception ved prosessering av oppgave: ${ex::class.qualifiedName}")
+                                secureLog.warn("Exception ved prosessering av oppgave", ex)
+                                transactionTemplate.execute {
+                                    oppgave.retry(ex.stackTraceToString()).also {
                                         if (it.status is Oppgave.Status.Feilet) {
                                             log.error("Gir opp videre prosessering av oppgave")
                                         }
                                         oppgaveRepo.updateStatus(it)
-                                        null
                                     }
                                 }
+                                null
                             }
                         }
                     }
-                }!!
+                }
             )
         } finally {
             oppgaveRepo.frigi(låsteOppgaver)
@@ -230,7 +232,7 @@ class OppgaveService(
                     }
                 }
             } ?: FANT_IKKE_OPPGAVEN_I_OMSORGSOPPTJENING
-        }!!
+        }
     }
 
     fun stopp(oppgaveId: UUID, begrunnelse: String?): UUID? {

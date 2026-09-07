@@ -14,9 +14,9 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oms
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.transaction.support.TransactionOperations
 import java.time.Instant
 import java.util.UUID
 
@@ -26,7 +26,7 @@ internal class PersongrunnlagMeldingServiceImpl(
     private val persongrunnlagRepo: PersongrunnlagRepo,
     private val oppgaveService: OppgaveService,
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
-    private val transactionTemplate: NewTransactionTemplate,
+    private val transactionTemplate: TransactionOperations,
     private val brevService: BrevService,
     private val omsorgsopptjeningsgrunnlagService: OmsorgsopptjeningsgrunnlagService,
 ) : PersongrunnlagMeldingService {

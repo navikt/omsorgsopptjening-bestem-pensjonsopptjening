@@ -11,10 +11,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository.OppgaveRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.transaction.support.TransactionOperations
 
 @Configuration
 class OppgaveConfig {
@@ -45,7 +45,7 @@ class OppgaveConfig {
         oppgaveKlient: OppgaveKlient,
         oppgaveRepo: OppgaveRepo,
         personOppslag: PersonOppslag,
-        transactionTemplate: NewTransactionTemplate
+        transactionTemplate: TransactionOperations
     ): OppgaveService {
         return OppgaveService(
             sakKlient = sakKlient,

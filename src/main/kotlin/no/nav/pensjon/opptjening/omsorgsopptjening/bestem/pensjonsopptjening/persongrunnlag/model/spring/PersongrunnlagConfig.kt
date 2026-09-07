@@ -19,11 +19,11 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.per
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingServiceImpl
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.unleash.UnleashWrapper
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ytelse.YtelseOppslag
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
+import org.springframework.transaction.support.TransactionOperations
 
 @Configuration
 class PersongrunnlagConfig {
@@ -33,11 +33,9 @@ class PersongrunnlagConfig {
         behandlingRepo: BehandlingRepo,
         persongrunnlagRepo: PersongrunnlagRepo,
         oppgaveService: OppgaveService,
-        personOppslag: PersonOppslag,
         godskrivOpptjeningService: GodskrivOpptjeningService,
-        transactionTemplate: NewTransactionTemplate,
+        transactionTemplate: TransactionOperations,
         brevService: BrevService,
-        medlemskapsUnntakOppslag: MedlemskapsUnntakOppslag,
         omsorgsopptjeningsgrunnlagService: OmsorgsopptjeningsgrunnlagService,
     ): PersongrunnlagMeldingService {
         return PersongrunnlagMeldingServiceImpl(
@@ -53,7 +51,7 @@ class PersongrunnlagConfig {
 
     @Bean
     fun persongrunnlgProcessingService(
-        transactionTemplate: NewTransactionTemplate,
+        transactionTemplate: TransactionOperations,
         service: PersongrunnlagMeldingService,
     ): PersongrunnlagMeldingProcessingService {
         return PersongrunnlagMeldingProcessingServiceImpl(

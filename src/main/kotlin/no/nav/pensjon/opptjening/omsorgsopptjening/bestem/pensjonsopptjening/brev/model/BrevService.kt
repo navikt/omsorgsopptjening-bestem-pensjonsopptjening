@@ -8,12 +8,10 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.person.model.PersonOppslag
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Propagation
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionOperations
 import java.sql.SQLException
 import java.time.Year
 import java.util.UUID
@@ -21,7 +19,7 @@ import java.util.UUID
 @Component
 class BrevService(
     private val brevRepository: BrevRepository,
-    private val transactionTemplate: NewTransactionTemplate,
+    private val transactionTemplate: TransactionOperations,
     private val brevClient: BrevClient,
     private val bestemSak: BestemSakKlient,
     private val personOppslag: PersonOppslag,
@@ -32,12 +30,10 @@ class BrevService(
         private val secureLog: Logger = LoggerFactory.getLogger("secure")
     }
 
-    @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
     fun opprett(brev: Brev.Transient): Brev.Persistent {
         return brevRepository.persist(brev)
     }
 
-    @Transactional(rollbackFor = [Throwable::class], propagation = Propagation.REQUIRED)
     fun opprettHvisNødvendig(behandling: FullførtBehandling) {
         val brevopplysninger = behandling.hentBrevopplysninger(
             hentPensjonspoengForOmsorgsopptjening = hentPensjonspoeng::hentPensjonspoengForOmsorgstype,
