@@ -44,11 +44,11 @@ spec:
     pool: nav-dev
   gcp:
     sqlInstances:
-      - type: POSTGRES_17
+      - type: POSTGRES_18
         cascadingDelete: false
         diskAutoresize: true
         pointInTimeRecovery: true
-        name: omsorgsopptjening-bestem-pensjonsopptjening-db-pg17
+        name: omsorgsopptjening-bestem-pensjonsopptjening-pg18
         tier: db-f1-micro
         databases:
           - name: omsorgsopptjening-bestem-pensjonsopptjening-db
