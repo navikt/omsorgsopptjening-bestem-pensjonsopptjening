@@ -85,7 +85,7 @@ class OppgaveKlientTest {
                                 "opprettetAvEnhetsnr":"9999",
                                 "aktivDato": "${LocalDate.now().format(DateTimeFormatter.ISO_DATE)}",
                                 "fristFerdigstillelse": "${
-                                    LocalDate.now().plusDays(30).format(DateTimeFormatter.ISO_DATE)
+                                    LocalDate.now().plusMonths(12).format(DateTimeFormatter.ISO_DATE)
                                 }",
                                 "prioritet":"LAV"
                             }

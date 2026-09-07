@@ -149,7 +149,7 @@ private data class OpprettOppgaveRequest(
     val oppgavetype: String = OppgaveType.KRAV.toString()
     val opprettetAvEnhetsnr: String = "9999"
     val aktivDato: String = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-    val fristFerdigstillelse: String = LocalDate.now().plusDays(30).format(DateTimeFormatter.ISO_DATE)
+    val fristFerdigstillelse: String = LocalDate.now().plusMonths(12).format(DateTimeFormatter.ISO_DATE)
     val prioritet: String = Prioritet.LAV.toString()
 
     enum class OppgaveType {
