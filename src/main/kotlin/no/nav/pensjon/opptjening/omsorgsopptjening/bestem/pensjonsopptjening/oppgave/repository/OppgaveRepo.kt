@@ -1,7 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.*
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
+import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -11,7 +16,7 @@ import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.toJavaDuration
 
@@ -159,12 +164,6 @@ class OppgaveRepo(
             ResultSetExtractor { rs -> if (rs.next()) rs.getInt("antall") > 0 else throw RuntimeException("Could not extract resultset") }
         )!!
     }
-
-    /**
-     * Utformet for å være mekanismen som tilrettelegger for at flere podder kan prosessere data i paralell.
-     * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
-     * annen connection (pod) så lenge transaksjonen lever.
-     */
 
     fun finnNesteUprosesserte(antall: Int): Locked {
         val lockId = UUID.randomUUID()

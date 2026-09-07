@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.time.Clock
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.toJavaDuration
 
@@ -134,12 +134,6 @@ class BrevRepository(
             BrevMapper()
         )
     }
-
-    /**
-     * Utformet for å være mekanismen som tilrettelegger for at flere podder kan prosessere data i paralell.
-     * "select for update skip locked" sørger for at raden som leses av en connection (pod) ikke vil plukkes opp av en
-     * annen connection (pod) så lenge transaksjonen lever.
-     */
 
     fun finnNesteUprosesserte(antall: Int): Locked {
         val lockId = UUID.randomUUID()

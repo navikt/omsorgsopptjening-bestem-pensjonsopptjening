@@ -3,15 +3,15 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.ko
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.Resultat
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførteBehandlinger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.Mdc
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.transaction.support.TransactionOperations
 import java.sql.SQLException
 
 internal class KontrollbehandlingProcessingServiceImpl(
-    private val transactionTemplate: NewTransactionTemplate,
+    private val transactionTemplate: TransactionOperations,
     private val service: KontrollbehandlingService,
 ) : KontrollbehandlingProcessingService {
     companion object {
@@ -20,7 +20,7 @@ internal class KontrollbehandlingProcessingServiceImpl(
     }
 
     override fun process(): Resultat<List<FullførteBehandlinger>> {
-        val meldinger = transactionTemplate.execute { service.hentOgLås(10) }!!
+        val meldinger = transactionTemplate.execute { service.hentOgLås(10) }
             .also { it.rader.ifEmpty { return Resultat.FantIngenDataÅProsessere() } }
 
         return try {

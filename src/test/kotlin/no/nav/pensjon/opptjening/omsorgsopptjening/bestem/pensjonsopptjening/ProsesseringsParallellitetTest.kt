@@ -11,7 +11,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository.PersongrunnlagRepo
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.utils.NewTransactionTemplate
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.Rådata
@@ -19,7 +18,6 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Landstilknytning
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Omsorgstype
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -27,7 +25,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Month
 import java.time.YearMonth
-import java.util.UUID
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.PersongrunnlagMelding as PersongrunnlagMeldingKafka
 
 class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
@@ -43,9 +40,6 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
 
     @Autowired
     private lateinit var oppgaveRepo: OppgaveRepo
-
-    @Autowired
-    private lateinit var transactionTemplate: NewTransactionTemplate
 
     companion object {
         @JvmField
@@ -97,24 +91,16 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
             )
             persongrunnlagMeldingService.process()
 
-            transactionTemplate.execute {
-                //låser den aktuelle raden for denne transaksjonens varighet
-                assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte(5))
+            val uttrekk1 = godskrivOpptjeningRepo.finnNesteUprosesserte(5)
+            val uttrekk2 = godskrivOpptjeningRepo.finnNesteUprosesserte(5)
+            godskrivOpptjeningRepo.frigi(uttrekk1)
+            val uttrekk3 = godskrivOpptjeningRepo.finnNesteUprosesserte(5)
+            godskrivOpptjeningRepo.frigi(uttrekk2)
+            godskrivOpptjeningRepo.frigi(uttrekk3)
 
-                //opprett ny transaksjon mens den forrige fortsatt lever
-                transactionTemplate.execute {
-                    //skal ikke finne noe siden raden er låst pga "select for update skip locked"
-                    assertThat(godskrivOpptjeningRepo.finnNesteUprosesserte(5).data).isNullOrEmpty()
-                }
-                //fortsatt samme transaksjon
-                assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte(5))
-            } //rad ikke låst lenger ved transaksjon slutt
-
-
-            //ny transaksjon finner raden da den ikke lenger er låst
-            transactionTemplate.execute {
-                assertNotNull(godskrivOpptjeningRepo.finnNesteUprosesserte(5))
-            }
+            assertThat(uttrekk1.data).isNotEmpty()
+            assertThat(uttrekk2.data).isNullOrEmpty()
+            assertThat(uttrekk3.data).isNotEmpty()
         }
     }
 
@@ -153,24 +139,16 @@ class ProsesseringsParallellitetTest : SpringContextTest.NoKafka() {
                 ),
             )
 
-            transactionTemplate.execute {
-                //låser den aktuelle raden for denne transaksjonens varighet
-                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(UUID.randomUUID(), 5))
+            val uttrekk1 = persongrunnlagRepo.finnNesteMeldingerForBehandling(5)
+            val uttrekk2 = persongrunnlagRepo.finnNesteMeldingerForBehandling(5)
+            persongrunnlagRepo.frigi(uttrekk1)
+            val uttrekk3 = persongrunnlagRepo.finnNesteMeldingerForBehandling(5)
+            persongrunnlagRepo.frigi(uttrekk2)
+            persongrunnlagRepo.frigi(uttrekk3)
 
-                //opprett ny transaksjon mens den forrige fortsatt lever
-                transactionTemplate.execute {
-                    //skal ikke finne noe siden raden er låst pga "select for update skip locked"
-                    assertThat(persongrunnlagRepo.finnNesteKlarTilProsessering(UUID.randomUUID(), 5)).isNullOrEmpty()
-                }
-                //fortsatt samme transaksjon
-                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(UUID.randomUUID(), 5))
-            } //rad ikke låst lenger ved transaksjon slutt
-
-
-            //ny transaksjon finner raden da den ikke lenger er låst
-            transactionTemplate.execute {
-                assertNotNull(persongrunnlagRepo.finnNesteKlarTilProsessering(UUID.randomUUID(), 5))
-            }
+            assertThat(uttrekk1.data).isNotEmpty()
+            assertThat(uttrekk2.data).isNullOrEmpty()
+            assertThat(uttrekk3.data).isNotEmpty()
         }
     }
 
