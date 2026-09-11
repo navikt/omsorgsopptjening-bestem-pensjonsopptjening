@@ -5,20 +5,22 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val domeneVersion = "2.1.103"
 val azureAdClient = "0.0.7"
 val logbackEncoderVersion = "9.0"
-val flywayCoreVersion = "12.6.0"
+val flywayCoreVersion = "13.6.0"
 val wiremockVersion = "4.0.0-beta.38"
 val mockitoVersion = "6.3.0"
-val unleashVersion = "12.2.3"
-val navTokenSupportVersion = "6.0.8"
+val unleashVersion = "12.3.0"
+val navTokenSupportVersion = "6.0.12"
+val springRetryVersion = "2.0.13"
+val testContainersVersion = "1.21.4"
 
 plugins {
-    val kotlinVersion = "2.3.21"
+    val kotlinVersion = "2.4.20"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "4.1.0"
+    id("org.springframework.boot") version "4.1.1"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.github.ben-manes.versions") version "0.54.0"
+    id("com.github.ben-manes.versions") version "0.61.0"
 }
 
 group = "no.nav.pensjon.opptjening"
@@ -45,7 +47,7 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework:spring-aspects")
-    implementation("org.springframework.retry:spring-retry:2.0.13")
+    implementation("org.springframework.retry:spring-retry:$springRetryVersion")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("io.getunleash:unleash-client-java:$unleashVersion")
     implementation("no.nav.security:token-validation-spring:$navTokenSupportVersion")
@@ -74,7 +76,7 @@ dependencies {
     // Test
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test") // includes assertj, jsonassert, mockito
-    testImplementation("org.testcontainers:postgresql:1.21.4") // ponytail: TC 1.x jdbc:tc driver approach, same as afp-api
+    testImplementation("org.testcontainers:postgresql:$testContainersVersion") // ponytail: TC 1.x jdbc:tc driver approach, same as afp-api
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoVersion")
     testImplementation("org.wiremock:wiremock:$wiremockVersion") // aggregator: httpclient-apache5 factory + core (runtime)
@@ -116,5 +118,5 @@ tasks.withType<DependencyUpdatesTask>().configureEach {
 }
 
 fun isNonStableVersion(version: String): Boolean {
-    return listOf("BETA", "RC", "-M", "-rc-", "Alpha").any { version.uppercase().contains(it) }
+    return listOf("BETA", "RC", "-M", "-RC-", "ALPHA").any { version.uppercase().contains(it) }
 }
