@@ -5,22 +5,22 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val domeneVersion = "2.1.103"
 val azureAdClient = "0.0.7"
 val logbackEncoderVersion = "9.0"
-val flywayCoreVersion = "13.6.0"
+val flywayCoreVersion = "13.12.1"
 val wiremockVersion = "4.0.0-beta.38"
-val mockitoVersion = "6.3.0"
-val unleashVersion = "12.3.0"
-val navTokenSupportVersion = "6.0.12"
+val mockitoVersion = "6.4.0"
+val unleashVersion = "12.3.2"
+val navTokenSupportVersion = "7.0.1"
 val springRetryVersion = "2.0.13"
 val testContainersVersion = "1.21.4"
 
 plugins {
-    val kotlinVersion = "2.4.20"
+    val kotlinVersion = "2.4.21"
     id("org.jetbrains.kotlin.jvm") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
     id("org.jetbrains.kotlin.plugin.jpa") version kotlinVersion
-    id("org.springframework.boot") version "4.1.1"
+    id("org.springframework.boot") version "4.1.2"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.github.ben-manes.versions") version "0.61.0"
+    id("com.github.ben-manes.versions") version "0.67.0"
 }
 
 group = "no.nav.pensjon.opptjening"
