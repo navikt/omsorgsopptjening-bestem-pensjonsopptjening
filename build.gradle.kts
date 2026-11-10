@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val domeneVersion = "2.1.103"
 val azureAdClient = "0.0.7"
 val logbackEncoderVersion = "9.0"
-val flywayCoreVersion = "13.12.1"
+val flywayCoreVersion = "13.6.0"
 val wiremockVersion = "4.0.0-beta.38"
 val mockitoVersion = "6.4.0"
 val unleashVersion = "12.3.2"
