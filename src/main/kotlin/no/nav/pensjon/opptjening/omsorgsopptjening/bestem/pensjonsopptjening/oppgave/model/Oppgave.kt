@@ -20,43 +20,43 @@ sealed class Oppgave {
 
     companion object Oppgavetekster {
         fun flereOmsorgsytereMedLikeMyeOmsorgFødselsår(omsorgsmottaker: String): String {
-            return """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr $omsorgsmottaker i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
+            return """Flere barnetrygdmottakere. Flere brukere mottar barnetrygd for samme barn $omsorgsmottaker i fødselsåret"""
         }
 
         fun flereOmsorgsytereMedLikeMyeOmsorg(omsorgsmottaker: String, annenOmsorgsyter: String): String {
-            return """Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr $omsorgsmottaker. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr $annenOmsorgsyter mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene."""
+            return """Flere barnetrygdmottakere. Flere brukere mottar like mye barnetrygd for samme barn $omsorgsmottaker. Bruker $annenOmsorgsyter mottok også barnetrygd"""
         }
 
         fun kunneIkkeBehandlesAutomatisk(): String {
-            return """Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch."""
+            return """Kunne ikke behandle automatisk"""
         }
 
         fun perioderMedPliktigEllerFrivilligMedlemskap(omsorgsmottaker: String): String {
-            return """Vurder omsorgsopptjening manuelt. Bruker var pliktig eller frivillig medlem i utlandet i perioden hen mottok barnetrygd for barn med fnr: $omsorgsmottaker."""
+            return """Medlemskap. Bruker er pliktig eller frivillig medlem i utlandet i perioden hen mottar barnetrygd for barnet $omsorgsmottaker"""
         }
 
         fun kombinasjonAvFullOgDeltErTilstrekkelig(omsorgsmottaker: String): String {
-            return """Vurder omsorgsopptjening manuelt. Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: $omsorgsmottaker."""
+            return """Delt barnetrygd. Bruker mottar barnetrygd i minst 6 måneder, men hele eller deler er delt barnetrygd for barnet $omsorgsmottaker"""
         }
 
         fun eøsSakMottarPensjonEllerUføretrygd(omsorgsmottaker: String): String {
-            return """Vurder omsorgsopptjening manuelt. Bruker var bosatt i EØS-land i perioden hen mottok barnetrygd for barn med fnr: $omsorgsmottaker."""
+            return """Bosatt EØS-land. Bruker er bosatt i EØS-land og mottar alderspensjon eller uføretrygd i perioden hen mottar barnetrygd for barnet $omsorgsmottaker"""
         }
 
-        fun omsorgsyterErDød(omsorgsyter: String, omsorgsmottaker: String): String {
-            return """Vurder omsorgsopptjening manuelt. Omsorgsyter: $omsorgsyter er død, vurder om omsorgsopptjening for barn med fnr: $omsorgsmottaker skal godskrives annen forelder."""
+        fun omsorgsyterErDød(omsorgsmottaker: String): String {
+            return """Dødsfall. Vurder om omsorgsopptjening for barnet $omsorgsmottaker skal godskrives annen forelder"""
         }
 
         fun annenForelderInnvilgetOmsorgsopptjeningForAnnetFellesbarn(
-            omsorgsyter: String,
             omsorgsmottaker: String,
             annenForelderOgBarn: Set<Pair<String, String>>
         ): String {
-            val omsorgsytere = annenForelderOgBarn
-                .map { it.first }.plus(omsorgsyter).joinToString(separator = ",")
+            val andreOmsorgsytere = annenForelderOgBarn
+                .map { it.first }.joinToString(separator = ",")
             val omsorgsmottakere = annenForelderOgBarn
                 .map { it.second }.plus(omsorgsmottaker).joinToString(separator = ",")
-            return """Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: $omsorgsytere har mottatt barnetrygd for ulike felles barn med fnr: $omsorgsmottakere."""
+
+            return """Ulike felles barn. Foreldrene mottar barnetrygd for disse barna $omsorgsmottakere. Den andre forelderen $andreOmsorgsytere har egen oppgave."""
         }
     }
 

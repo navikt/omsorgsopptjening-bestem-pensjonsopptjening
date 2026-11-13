@@ -1059,7 +1059,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                 listOf(
                     Oppgaveopplysninger.Generell(
                         oppgavemottaker = "12345678910",
-                        oppgaveTekst = "Vurder omsorgsopptjening manuelt. Bruker var bosatt i EØS-land i perioden hen mottok barnetrygd for barn med fnr: 07081812345."
+                        oppgaveTekst = "Bosatt EØS-land. Bruker er bosatt i EØS-land og mottar alderspensjon eller uføretrygd i perioden hen mottar barnetrygd for barnet 07081812345"
                     )
                 ),
                 behandling.hentOppgaveopplysninger()
@@ -1214,7 +1214,7 @@ class PersongrunnlagMeldingServiceImplTest : SpringContextTest.NoKafka() {
                 listOf(
                     Oppgaveopplysninger.Generell(
                         oppgavemottaker = "12345678910",
-                        oppgaveTekst = """Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01122012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."""
+                        oppgaveTekst = """Flere barnetrygdmottakere. Flere brukere mottar barnetrygd for samme barn 01122012345 i fødselsåret"""
                     )
                 ),
                 behandling.hentOppgaveopplysninger()

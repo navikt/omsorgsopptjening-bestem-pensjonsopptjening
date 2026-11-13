@@ -25,7 +25,7 @@ object OmsorgsyterHarIkkeDødsdato : ParagrafVilkår<OmsorgsyterHarIkkeDødsdato
         override fun hentOppgaveopplysninger(behandling: FullførtBehandling): Oppgaveopplysninger {
             return Oppgaveopplysninger.Generell(
                 oppgavemottaker = behandling.omsorgsyter,
-                oppgaveTekst = Oppgave.omsorgsyterErDød(behandling.omsorgsyter, behandling.omsorgsmottaker)
+                oppgaveTekst = Oppgave.omsorgsyterErDød(behandling.omsorgsmottaker)
             )
         }
     }

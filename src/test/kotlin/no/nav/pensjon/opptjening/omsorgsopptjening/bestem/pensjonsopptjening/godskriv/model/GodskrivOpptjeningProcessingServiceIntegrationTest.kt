@@ -312,7 +312,7 @@ class GodskrivOpptjeningProcessingServiceIntegrationTest : SpringContextTest.NoK
                     assertEquals(
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = behandling.omsorgsyter,
-                            oppgavetekst = setOf("""Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch.""")
+                            oppgavetekst = setOf("""Kunne ikke behandle automatisk""")
                         ),
                         oppgave.detaljer
                     )

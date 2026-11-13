@@ -166,7 +166,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 ).isEqualTo(
                     OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "04010012797",
-                        oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 12345678910 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.""")
+                        oppgavetekst = setOf("""Flere barnetrygdmottakere. Flere brukere mottar like mye barnetrygd for samme barn 07081812345. Bruker 12345678910 mottok også barnetrygd""")
                     )
                 )
             }
@@ -245,7 +245,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 ).isEqualTo(
                     OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "12345678910",
-                        oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.""")
+                        oppgavetekst = setOf("""Flere barnetrygdmottakere. Flere brukere mottar like mye barnetrygd for samme barn 07081812345. Bruker 04010012797 mottok også barnetrygd""")
                     )
                 )
             }
@@ -334,8 +334,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "04010012797",
                         oppgavetekst = setOf(
-                            "Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 12345678910,04010012797 har mottatt barnetrygd for ulike felles barn med fnr: 07081812345,01052012345.",
-                            "Godskr. omsorgspoeng, flere mottakere: Flere personer som har mottatt barnetrygd samme år for barnet med fnr 01052012345 i barnets fødselsår. Vurder hvem som skal ha omsorgspoengene."
+                            "Flere barnetrygdmottakere. Flere brukere mottar barnetrygd for samme barn 01052012345 i fødselsåret",
+                            "Ulike felles barn. Foreldrene mottar barnetrygd for disse barna 07081812345,01052012345. Den andre forelderen 12345678910 har egen oppgave."
                         )
                     )
                 )
@@ -406,8 +406,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = "12345678910",
                         oppgavetekst = setOf(
-                            "Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.",
-                            "Vurder omsorgsopptjening manuelt. Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: 07081812345."
+                            "Delt barnetrygd. Bruker mottar barnetrygd i minst 6 måneder, men hele eller deler er delt barnetrygd for barnet 07081812345",
+                            "Flere barnetrygdmottakere. Flere brukere mottar like mye barnetrygd for samme barn 07081812345. Bruker 04010012797 mottok også barnetrygd"
                         )
                     )
                 )
@@ -550,7 +550,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     ).isEqualTo(
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "12345678910",
-                            oppgavetekst = setOf("""Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 07081812345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.""")
+                            oppgavetekst = setOf("""Flere barnetrygdmottakere. Flere brukere mottar like mye barnetrygd for samme barn 07081812345. Bruker 04010012797 mottok også barnetrygd""")
                         )
                     )
                 }
@@ -611,7 +611,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     assertThat(oppgave.detaljer).isEqualTo(
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "12345678910",
-                            oppgavetekst = setOf("Vurder omsorgsopptjening manuelt. Bruker var pliktig eller frivillig medlem i utlandet i perioden hen mottok barnetrygd for barn med fnr: 07081812345.")
+                            oppgavetekst = setOf("Medlemskap. Bruker er pliktig eller frivillig medlem i utlandet i perioden hen mottar barnetrygd for barnet 07081812345")
                         )
                     )
                 }
@@ -697,8 +697,8 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "12345678910",
                             oppgavetekst = setOf(
-                                "Godskr. omsorgspoeng, flere mottakere: Flere personer har mottatt barnetrygd samme år for barnet under 6 år med fnr 03041212345. Den bruker som oppgaven gjelder mottok barnetrygd i minst seks måneder, og hadde barnetrygd i desember måned. Bruker med fnr 04010012797 mottok også barnetrygd for 6 måneder i samme år. Vurder hvem som skal ha omsorgspoengene.",
-                                "Vurder omsorgsopptjening manuelt. Bruker mottok barnetrygd i minst 6 måneder, men hele eller deler av perioden var delt barnetrygd for barn med fnr: 03041212345."
+                                "Delt barnetrygd. Bruker mottar barnetrygd i minst 6 måneder, men hele eller deler er delt barnetrygd for barnet 03041212345",
+                                "Flere barnetrygdmottakere. Flere brukere mottar like mye barnetrygd for samme barn 03041212345. Bruker 04010012797 mottok også barnetrygd"
                             )
                         )
                     )
@@ -785,7 +785,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     assertThat(oppgave.detaljer).isEqualTo(
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "04010012797",
-                            oppgavetekst = setOf("Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 12345678910,04010012797 har mottatt barnetrygd for ulike felles barn med fnr: 07081812345,01122012345.")
+                            oppgavetekst = setOf("Ulike felles barn. Foreldrene mottar barnetrygd for disse barna 07081812345,01122012345. Den andre forelderen 12345678910 har egen oppgave.")
                         )
                     )
                 }
@@ -801,7 +801,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                     assertThat(oppgave.detaljer).isEqualTo(
                         OppgaveDetaljer.MottakerOgTekst(
                             oppgavemottaker = "12345678910",
-                            oppgavetekst = setOf("Vurder omsorgsopptjening manuelt for foreldre. Foreldre med fnr: 04010012797,12345678910 har mottatt barnetrygd for ulike felles barn med fnr: 01122012345,07081812345.")
+                            oppgavetekst = setOf("Ulike felles barn. Foreldrene mottar barnetrygd for disse barna 01122012345,07081812345. Den andre forelderen 04010012797 har egen oppgave.")
                         )
                     )
                 }
@@ -862,10 +862,10 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                 assertThat(it.mottaker).isEqualTo("12345678910")
                 assertThat(it.oppgavetekst).containsAll(
                     setOf(
-                        "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for barnetrygdperiodene tilhørende et av barna.",
-                        "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av feil i datagrunnlaget.",
-                        "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna.",
-                        "Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for 12345678910 på grunn av at det ikke eksisterer et gjeldende fnr for barnetrygdmottaker med ident: 12345678910."
+                        "Teknisk. Kunne ikke behandle automatisk. Motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna",
+                        "Teknisk. Kunne ikke behandle automatisk på grunn av feil i datagrunnlaget",
+                        "Teknisk. Kunne ikke behandle automatisk. Motstridende opplysninger for barnetrygdperiodene tilhørende et av barna",
+                        "Teknisk. Kunne ikke behandle automatisk. Det mangler gjeldende fødselsnummer for barnetrygdmottaker med ident 12345678910"
                     )
                 )
             }
