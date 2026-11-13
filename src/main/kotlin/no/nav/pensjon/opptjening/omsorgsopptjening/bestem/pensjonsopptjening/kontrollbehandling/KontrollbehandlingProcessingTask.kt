@@ -37,6 +37,8 @@ class KontrollbehandlingProcessingTask(
                                 timeLock.open()
                             }
                         }
+                    } else {
+                        timeLock.lock()
                     }
                 } catch (interrupted: InterruptedException) {
                     Thread.currentThread().interrupt() // let while-condition exit the loop on shutdownNow
