@@ -37,7 +37,6 @@ object OmsorgsopptjeningIkkeInnvilgetAnnetFellesbarn :
             return Oppgaveopplysninger.Generell(
                 oppgavemottaker = behandling.omsorgsyter,
                 oppgaveTekst = Oppgave.annenForelderInnvilgetOmsorgsopptjeningForAnnetFellesbarn(
-                    omsorgsyter = behandling.omsorgsyter,
                     omsorgsmottaker = behandling.omsorgsmottaker,
                     annenForelderOgBarn = grunnlag.finnManuelle().map { it.omsorgsyter to it.omsorgsmottaker }.toSet()
                 )

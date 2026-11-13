@@ -3,23 +3,23 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.pe
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.Feilinformasjon
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.domene.kafka.messages.domene.IdentRolle
 
-fun List<Feilinformasjon>.oppgavetekster(omsorgsyter: String): Set<String> {
+fun List<Feilinformasjon>.oppgavetekster(): Set<String> {
     return map {
         when (it) {
             is Feilinformasjon.OverlappendeBarnetrygdperioder -> {
-                """Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av motstridende opplysninger for barnetrygdperiodene tilhørende et av barna."""
+                """Teknisk. Kunne ikke behandle automatisk. Motstridende opplysninger for barnetrygdperiodene tilhørende et av barna"""
             }
 
             is Feilinformasjon.OverlappendeHjelpestønadperioder -> {
-                """Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna."""
+                """Teknisk. Kunne ikke behandle automatisk. Motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna"""
             }
 
             is Feilinformasjon.UgyldigIdent -> {
-                """Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av at det ikke eksisterer et gjeldende fnr for ${rolle(it)} med ident: ${it.ident}."""
+                """Teknisk. Kunne ikke behandle automatisk. Det mangler gjeldende fødselsnummer for ${rolle(it)} med ident ${it.ident}"""
             }
 
             is Feilinformasjon.FeilIDataGrunnlag -> {
-                """Vurder omsorgsopptjening manuelt. Kunne ikke behandle godskriving av omsorgsopptjening automatisk for $omsorgsyter på grunn av feil i datagrunnlaget."""
+                """Teknisk. Kunne ikke behandle automatisk på grunn av feil i datagrunnlaget"""
             }
         }
     }.toSet()

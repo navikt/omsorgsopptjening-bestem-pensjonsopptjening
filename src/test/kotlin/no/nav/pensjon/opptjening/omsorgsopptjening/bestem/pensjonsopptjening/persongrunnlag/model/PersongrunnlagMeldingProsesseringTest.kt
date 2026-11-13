@@ -373,7 +373,7 @@ class PersongrunnlagMeldingProsesseringTest : SpringContextTest.NoKafka() {
             assertEquals(
                 OppgaveDetaljer.MottakerOgTekst(
                     oppgavemottaker = "12345678910",
-                    oppgavetekst = setOf("""Godskriving omsorgspoeng: Manuell behandling. Godskrivingen kunne ikke behandles av batch.""")
+                    oppgavetekst = setOf("""Kunne ikke behandle automatisk""")
                 ),
                 oppgave.detaljer
             )

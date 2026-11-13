@@ -77,7 +77,7 @@ sealed class PersongrunnlagMelding {
                 Oppgave.Transient(
                     detaljer = OppgaveDetaljer.MottakerOgTekst(
                         oppgavemottaker = innhold.omsorgsyter,
-                        oppgavetekst = feilinformasjon.oppgavetekster(innhold.omsorgsyter)
+                        oppgavetekst = feilinformasjon.oppgavetekster()
                     ),
                     behandlingId = null,
                     meldingId = id
