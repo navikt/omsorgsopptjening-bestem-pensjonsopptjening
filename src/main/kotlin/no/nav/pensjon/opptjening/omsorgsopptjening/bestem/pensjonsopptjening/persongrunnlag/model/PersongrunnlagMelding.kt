@@ -94,7 +94,6 @@ sealed class PersongrunnlagMelding {
         property = "type",
     )
     sealed class Status {
-
         open fun ferdig(): Ferdig {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Ferdig")
         }
@@ -113,7 +112,8 @@ sealed class PersongrunnlagMelding {
 
         @JsonTypeName("Klar")
         data class Klar(
-            val tidspunkt: Instant = now()
+            val tidspunkt: Instant = now(),
+            val utfortAv: String? = null,
         ) : Status() {
             override fun ferdig(): Ferdig {
                 return Ferdig()
@@ -135,6 +135,7 @@ sealed class PersongrunnlagMelding {
         @JsonTypeName("Ferdig")
         data class Ferdig(
             val tidspunkt: Instant = now(),
+            val utfortAv: String? = null,
 
             ) : Status() {
             override fun avsluttet(melding: String): Avsluttet {
@@ -149,7 +150,8 @@ sealed class PersongrunnlagMelding {
         @JsonTypeName("Avsluttet")
         data class Avsluttet(
             val tidspunkt: Instant = now(),
-            val melding: String
+            val melding: String,
+            val utfortAv: String? = null,
         ) : Status() {
             override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)
@@ -160,6 +162,7 @@ sealed class PersongrunnlagMelding {
         data class Stoppet(
             val tidspunkt: Instant = now(),
             val begrunnelse: String? = null,
+            val utfortAv: String? = null,
         ) : Status() {
             override fun avsluttet(melding: String): Avsluttet {
                 return Avsluttet(melding = melding)
@@ -173,6 +176,7 @@ sealed class PersongrunnlagMelding {
             val maxAntallForsøk: Int = 3,
             val karanteneTil: Instant = tidspunkt.plus(5, ChronoUnit.HOURS),
             val melding: String,
+            val utfortAv: String? = null,
         ) : Status() {
             override fun ferdig(): Ferdig {
                 return Ferdig()
@@ -210,12 +214,14 @@ sealed class PersongrunnlagMelding {
 
         // TODO: riktig måte å håndtere dette på? Inngår ikke i mormal flyt, er bare her for å ta vare på info
         data class Kopiert(
-            val kopiertFra: UUID
+            val kopiertFra: UUID,
+            val utfortAv: String? = null,
         ) : Status()
 
         @JsonTypeName("Feilet")
         data class Feilet(
             val tidspunkt: Instant = now(),
+            val utfortAv: String? = null,
         ) : Status() {
             override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)

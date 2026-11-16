@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtfortAvProvider
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -23,7 +24,8 @@ import kotlin.time.toJavaDuration
 @Component
 class OppgaveRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
-    private val clock: Clock = Clock.systemUTC()
+    private val utfortAvProvider: UtfortAvProvider,
+    private val clock: Clock = Clock.systemUTC(),
 ) {
     private fun Oppgave.Status.databaseName(): String {
         return when (this) {
@@ -44,6 +46,7 @@ class OppgaveRepo(
     }
 
     fun persist(oppgave: Oppgave.Transient): Oppgave.Persistent {
+        val utfortAv = utfortAvProvider.current()?.verdi
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into oppgave (behandlingId, meldingId, detaljer, status, karantene_til, statushistorikk) 
@@ -53,7 +56,7 @@ class OppgaveRepo(
                     "behandlingId" to oppgave.behandlingId,
                     "meldingId" to oppgave.meldingId,
                     "detaljer" to serialize(oppgave.detaljer),
-                    "statushistorikk" to oppgave.statushistorikk.serializeList(),
+                    "statushistorikk" to oppgave.statushistorikk.medSisteUtfortAv(utfortAv).serializeList(),
                     "status" to oppgave.status.databaseName(),
                     "karantene_til" to oppgave.status.karanteneTilString(),
                 ),
@@ -64,6 +67,7 @@ class OppgaveRepo(
     }
 
     fun updateStatus(oppgave: Oppgave.Persistent) {
+        val utfortAv = utfortAvProvider.current()?.verdi
         jdbcTemplate.update(
             """update oppgave
                 | set status = :status,
@@ -74,7 +78,7 @@ class OppgaveRepo(
                 mapOf<String, Any?>(
                     "id" to oppgave.id,
                     "status" to serialize(oppgave.status),
-                    "statushistorikk" to oppgave.statushistorikk.serializeList(),
+                    "statushistorikk" to oppgave.statushistorikk.medSisteUtfortAv(utfortAv).serializeList(),
                     "status" to oppgave.status.databaseName(),
                     "karantene_til" to oppgave.status.karanteneTilString(),
                 ),
@@ -278,4 +282,20 @@ class OppgaveRepo(
     }
 
     data class Locked(val lockId: UUID, val data: List<Oppgave.Persistent>)
+
+    private fun List<Oppgave.Status>.medSisteUtfortAv(utfortAv: String?): List<Oppgave.Status> {
+        if (isEmpty()) return this
+        return dropLast(1) + last().withUtfortAv(utfortAv)
+    }
+
+    private fun Oppgave.Status.withUtfortAv(utfortAv: String?): Oppgave.Status {
+        return when (this) {
+            is Oppgave.Status.Feilet -> copy(utfortAv = utfortAv)
+            is Oppgave.Status.Ferdig -> copy(utfortAv = utfortAv)
+            is Oppgave.Status.Kansellert -> copy(utfortAv = utfortAv)
+            is Oppgave.Status.Klar -> copy(utfortAv = utfortAv)
+            is Oppgave.Status.Retry -> copy(utfortAv = utfortAv)
+            is Oppgave.Status.Stoppet -> copy(utfortAv = utfortAv)
+        }
+    }
 }

@@ -86,7 +86,6 @@ data class Behandling(
     property = "type",
 )
 sealed class Status {
-
     open fun stoppet(begrunnelse: String): Status {
         throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til ${Stoppet::class.java.simpleName}")
     }
@@ -94,6 +93,7 @@ sealed class Status {
     @JsonTypeName("Vilkårsvurdert")
     data class Vilkårsvurdert(
         val tidspunkt: Instant = Instant.now(),
+        val utfortAv: String? = null,
     ) : Status() {
         override fun stoppet(begrunnelse: String): Stoppet {
             return Stoppet(begrunnelse = begrunnelse)
@@ -104,5 +104,6 @@ sealed class Status {
     data class Stoppet(
         val tidspunkt: Instant = Instant.now(),
         val begrunnelse: String,
+        val utfortAv: String? = null,
     ) : Status()
 }

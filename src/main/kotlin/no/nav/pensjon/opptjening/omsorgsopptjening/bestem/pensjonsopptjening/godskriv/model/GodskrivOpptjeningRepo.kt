@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtfortAvProvider
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
@@ -20,7 +21,8 @@ import kotlin.time.toJavaDuration
 @Component
 class GodskrivOpptjeningRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
-    private val clock: Clock = Clock.systemUTC()
+    private val utfortAvProvider: UtfortAvProvider,
+    private val clock: Clock = Clock.systemUTC(),
 ) {
     private fun GodskrivOpptjening.Status.databaseName(): String {
         return when (this) {
@@ -40,6 +42,7 @@ class GodskrivOpptjeningRepo(
     }
 
     fun persist(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening.Persistent {
+        val utfortAv = utfortAvProvider.current()?.verdi
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into godskriv_opptjening (behandlingId,status, karantene_til, statushistorikk)
@@ -47,7 +50,7 @@ class GodskrivOpptjeningRepo(
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to godskrivOpptjening.behandlingId,
-                    "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
+                    "statushistorikk" to godskrivOpptjening.statushistorikk.medSisteUtfortAv(utfortAv).serializeList(),
                     "status" to godskrivOpptjening.status.databaseName(),
                     "karantene_til" to godskrivOpptjening.status.karanteneTilString(),
                 ),
@@ -58,6 +61,7 @@ class GodskrivOpptjeningRepo(
     }
 
     fun updateStatus(godskrivOpptjening: GodskrivOpptjening.Persistent) {
+        val utfortAv = utfortAvProvider.current()?.verdi
         jdbcTemplate.update(
             """update godskriv_opptjening
                 | set status = :status,
@@ -68,7 +72,7 @@ class GodskrivOpptjeningRepo(
                 mapOf<String, Any?>(
                     "id" to godskrivOpptjening.id,
                     "status" to serialize(godskrivOpptjening.status),
-                    "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
+                    "statushistorikk" to godskrivOpptjening.statushistorikk.medSisteUtfortAv(utfortAv).serializeList(),
                     "status" to godskrivOpptjening.status.databaseName(),
                     "karantene_til" to godskrivOpptjening.status.karanteneTilString(),
                 ),
@@ -241,4 +245,19 @@ class GodskrivOpptjeningRepo(
     }
 
     data class Locked(var lockId: UUID, val data: List<GodskrivOpptjening.Persistent>)
+
+    private fun List<GodskrivOpptjening.Status>.medSisteUtfortAv(utfortAv: String?): List<GodskrivOpptjening.Status> {
+        if (isEmpty()) return this
+        return dropLast(1) + last().withUtfortAv(utfortAv)
+    }
+
+    private fun GodskrivOpptjening.Status.withUtfortAv(utfortAv: String?): GodskrivOpptjening.Status {
+        return when (this) {
+            is GodskrivOpptjening.Status.Feilet -> copy(utfortAv = utfortAv)
+            is GodskrivOpptjening.Status.Ferdig -> copy(utfortAv = utfortAv)
+            is GodskrivOpptjening.Status.Klar -> copy(utfortAv = utfortAv)
+            is GodskrivOpptjening.Status.Retry -> copy(utfortAv = utfortAv)
+            is GodskrivOpptjening.Status.Stoppet -> copy(utfortAv = utfortAv)
+        }
+    }
 }

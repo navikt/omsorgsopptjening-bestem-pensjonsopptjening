@@ -31,6 +31,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.web.context.request.RequestContextHolder
 import java.io.Serializable
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -64,6 +65,7 @@ sealed class SpringContextTest {
 
     @BeforeEach
     protected open fun beforeEach() {
+        RequestContextHolder.resetRequestAttributes()
         dataSource.connection.use { conn ->
             conn.createStatement().execute(
                 """

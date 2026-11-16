@@ -12,6 +12,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE
 import org.springframework.http.MediaType.TEXT_PLAIN
 import org.springframework.http.MediaType.TEXT_PLAIN_VALUE
@@ -29,6 +30,7 @@ class AdminWebApi(
     private val brevService: BrevService,
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
     private val kontrollbehandlingService: KontrollbehandlingService,
+    private val navIdentProvider: NavIdentProvider,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(AdminWebApi::class.java)
@@ -40,6 +42,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") meldingerString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/rekjor-flere")
 
         val meldinger = try {
             parseUUIDListe(meldingerString)
@@ -71,6 +74,8 @@ class AdminWebApi(
         @RequestParam("uuidliste") meldingerString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/stopp-flere")
+
         val meldinger = try {
             parseUUIDListe(meldingerString)
         } catch (ex: Throwable) {
@@ -101,6 +106,8 @@ class AdminWebApi(
         @RequestParam("uuidliste") meldingerString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/avslutt-flere")
+
         val meldinger = try {
             parseUUIDListe(meldingerString)
         } catch (ex: Throwable) {
@@ -135,6 +142,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/restart-oppgaver")
 
         val oppgaver = try {
             parseUUIDListe(oppgaverString)
@@ -165,6 +173,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/restart-brev")
 
         val brev = try {
             parseUUIDListe(oppgaverString)
@@ -200,6 +209,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/stopp-brev")
 
         val brev = try {
             parseUUIDListe(oppgaverString)
@@ -240,6 +250,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/stopp-godskriving")
 
         val uuider = try {
             parseUUIDListe(oppgaverString)
@@ -279,6 +290,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/stopp-oppgave")
 
         val uuider = try {
             parseUUIDListe(oppgaverString)
@@ -318,6 +330,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/restart-godskriving")
 
         val uuider = try {
             parseUUIDListe(oppgaverString)
@@ -357,6 +370,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/hent-oppgavestatus")
 
         val uuids = try {
             parseUUIDListe(oppgaverString)
@@ -398,6 +412,8 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/kanseller-oppgaver")
+
         val uuids = try {
             parseUUIDListe(oppgaverString)
         } catch (ex: Throwable) {
@@ -434,6 +450,8 @@ class AdminWebApi(
         @RequestParam("begrunnelse") begrunnelse: String,
         @RequestParam("ar") ar: Int
     ): ResponseEntity<String> {
+        if (manglerNavIdentIRequestContext()) return forbiddenNavIdent("/bestem/kontrollbehandling")
+
         val uuid = try {
             parseUUIDListe(oppgaverString).single()
         } catch (ex: Throwable) {
@@ -456,5 +474,16 @@ class AdminWebApi(
             .map { it.replace("[^0-9a-f-]".toRegex(), "") }
             .filter { it.isNotEmpty() }
             .map { UUID.fromString(it.trim()) }
+    }
+
+    private fun manglerNavIdentIRequestContext(): Boolean {
+        return !navIdentProvider.harRequestContext() || navIdentProvider.getNavIdent().isNullOrBlank()
+    }
+
+    private fun forbiddenNavIdent(endpoint: String): ResponseEntity<String> {
+        secureLog.warn("Mangler NAV-ident i request context for endpoint {}", endpoint)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .contentType(TEXT_PLAIN)
+            .body("Mangler NAV-ident i token")
     }
 }

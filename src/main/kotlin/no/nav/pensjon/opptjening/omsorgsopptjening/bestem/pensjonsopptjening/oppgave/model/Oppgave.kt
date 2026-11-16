@@ -108,7 +108,6 @@ sealed class Oppgave {
         property = "type",
     )
     sealed class Status {
-
         open fun ferdig(oppgaveId: String): Ferdig {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Ferdig")
         }
@@ -132,7 +131,8 @@ sealed class Oppgave {
 
         @JsonTypeName("Klar")
         data class Klar(
-            val tidspunkt: Instant = Instant.now()
+            val tidspunkt: Instant = Instant.now(),
+            val utfortAv: String? = null,
         ) : Status() {
             override fun ferdig(oppgaveId: String): Ferdig {
                 return Ferdig(oppgaveId = oppgaveId)
@@ -160,6 +160,7 @@ sealed class Oppgave {
         data class Ferdig(
             val tidspunkt: Instant = Instant.now(),
             val oppgaveId: String,
+            val utfortAv: String? = null,
         ) : Status() {
             override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)
@@ -174,6 +175,7 @@ sealed class Oppgave {
         data class Stoppet(
             val tidspunkt: Instant = Instant.now(),
             val begrunnelse: String? = null,
+            val utfortAv: String? = null,
         ) : Status()
 
         @JsonTypeName("Kansellert")
@@ -181,6 +183,7 @@ sealed class Oppgave {
             val tidspunkt: Instant = Instant.now(),
             val begrunnelse: String,
             val kanselleringsResultat: KanselleringsResultat,
+            val utfortAv: String? = null,
         ) : Status()
 
         @JsonTypeName("Retry")
@@ -190,6 +193,7 @@ sealed class Oppgave {
             val maxAntallForsøk: Int = 3,
             val karanteneTil: Instant = tidspunkt.plus(5, ChronoUnit.HOURS),
             val melding: String,
+            val utfortAv: String? = null,
         ) : Status() {
             override fun ferdig(oppgaveId: String): Ferdig {
                 return Ferdig(oppgaveId = oppgaveId)
@@ -233,6 +237,7 @@ sealed class Oppgave {
         @JsonTypeName("Feilet")
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
+            val utfortAv: String? = null,
         ) : Status() {
             override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)

@@ -78,7 +78,6 @@ sealed class GodskrivOpptjening {
         property = "type",
     )
     sealed class Status {
-
         open fun ferdig(): Ferdig {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Ferdig")
         }
@@ -97,7 +96,8 @@ sealed class GodskrivOpptjening {
 
         @JsonTypeName("Klar")
         data class Klar(
-            val tidspunkt: Instant = Instant.now()
+            val tidspunkt: Instant = Instant.now(),
+            val utfortAv: String? = null,
         ) : Status() {
             override fun ferdig(): Ferdig {
                 return Ferdig()
@@ -115,6 +115,7 @@ sealed class GodskrivOpptjening {
         @JsonTypeName("Ferdig")
         data class Ferdig(
             val tidspunkt: Instant = Instant.now(),
+            val utfortAv: String? = null,
         ) : Status() {
             override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)
@@ -125,6 +126,7 @@ sealed class GodskrivOpptjening {
         data class Stoppet(
             val tidspunkt: Instant = Instant.now(),
             val begrunnelse: String? = null,
+            val utfortAv: String? = null,
         ) : Status() {
             override fun klar(): Status {
                 return Klar()
@@ -138,6 +140,7 @@ sealed class GodskrivOpptjening {
             val maxAntallForsøk: Int = 3,
             val karanteneTil: Instant = tidspunkt.plus(5, ChronoUnit.HOURS),
             val melding: String,
+            val utfortAv: String? = null,
         ) : Status() {
             override fun ferdig(): Ferdig {
                 return Ferdig()
@@ -175,6 +178,7 @@ sealed class GodskrivOpptjening {
         @JsonTypeName("Feilet")
         data class Feilet(
             val tidspunkt: Instant = Instant.now(),
+            val utfortAv: String? = null,
         ) : Status() {
             override fun stoppet(begrunnelse: String?): Stoppet {
                 return Stoppet(begrunnelse = begrunnelse)

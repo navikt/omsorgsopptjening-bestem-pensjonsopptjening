@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.spring
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtfortAvProvider
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.DatasourceReadinessCheck
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.config.TimeLock
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingProcessingService
@@ -54,9 +55,11 @@ class KontrollConfig {
     @Bean
     fun kontrollRepo(
         jdbcTemplate: NamedParameterJdbcTemplate,
+        utfortAvProvider: UtfortAvProvider,
     ): KontrollbehandlingRepo {
         return KontrollbehandlingRepo(
             jdbcTemplate = jdbcTemplate,
+            utfortAvProvider = utfortAvProvider,
             clock = Clock.systemUTC(),
         )
     }
