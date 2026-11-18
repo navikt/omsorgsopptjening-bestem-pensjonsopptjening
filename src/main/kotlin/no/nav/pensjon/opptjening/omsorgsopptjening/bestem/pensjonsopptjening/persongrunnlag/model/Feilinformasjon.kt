@@ -15,7 +15,7 @@ fun List<Feilinformasjon>.oppgavetekster(): Set<String> {
             }
 
             is Feilinformasjon.UgyldigIdent -> {
-                """Teknisk. Kunne ikke behandle automatisk. Det mangler gjeldende fødselsnummer for ${rolle(it)} med ident ${it.ident}"""
+                """Teknisk. Kunne ikke behandle automatisk. Det mangler gjeldende fødselsnummer for en av barnetrygdmottakerne eller et av barna, ${rolle(it)} med ident ${it.ident}"""
             }
 
             is Feilinformasjon.FeilIDataGrunnlag -> {
