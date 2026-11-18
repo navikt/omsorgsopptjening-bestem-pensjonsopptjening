@@ -865,7 +865,7 @@ class OppgaveopprettelseTest : SpringContextTest.NoKafka() {
                         "Teknisk. Kunne ikke behandle automatisk. Motstridende opplysninger for hjelpestønadsperiodene tilhørende et av barna",
                         "Teknisk. Kunne ikke behandle automatisk på grunn av feil i datagrunnlaget",
                         "Teknisk. Kunne ikke behandle automatisk. Motstridende opplysninger for barnetrygdperiodene tilhørende et av barna",
-                        "Teknisk. Kunne ikke behandle automatisk. Det mangler gjeldende fødselsnummer for barnetrygdmottaker med ident 12345678910"
+                        "Teknisk. Kunne ikke behandle automatisk. Det mangler gjeldende fødselsnummer for en av barnetrygdmottakerne eller et av barna, barnetrygdmottaker med ident 12345678910"
                     )
                 )
             }
