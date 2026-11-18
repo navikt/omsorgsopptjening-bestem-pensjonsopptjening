@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtfortAvProvider
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Status
@@ -15,10 +16,12 @@ import java.sql.ResultSet
 import java.util.UUID
 
 class BehandlingRepo(
-    private val jdbcTemplate: NamedParameterJdbcTemplate
+    private val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val utfortAvProvider: UtfortAvProvider,
 ) {
 
     fun persist(behandling: Behandling): FullførtBehandling {
+        val utfortAv = utfortAvProvider.current()?.verdi
         return behandling.toDb().let { obj ->
             val keyHolder = GeneratedKeyHolder()
             jdbcTemplate.update(
@@ -34,7 +37,7 @@ class BehandlingRepo(
                         "utfall" to obj.utfall.mapToJson(),
                         "kafkaMeldingId" to obj.meldingId,
                         "status" to obj.status.databaseName(),
-                        "statushistorikk" to obj.statushistorikk.serializeList()
+                        "statushistorikk" to obj.statushistorikk.medSisteUtfortAv(utfortAv).serializeList()
                     ),
                 ),
                 keyHolder
@@ -44,6 +47,7 @@ class BehandlingRepo(
     }
 
     fun updateStatus(behandling: FullførtBehandling) {
+        val utfortAv = utfortAvProvider.current()?.verdi
         jdbcTemplate.update(
             """update behandling
                 | set status = :status,
@@ -53,7 +57,7 @@ class BehandlingRepo(
                 mapOf<String, Any?>(
                     "id" to behandling.id,
                     "status" to behandling.status.databaseName(),
-                    "statushistorikk" to behandling.statushistorikk.serializeList(),
+                    "statushistorikk" to behandling.statushistorikk.medSisteUtfortAv(utfortAv).serializeList(),
                 ),
             ),
         )
@@ -151,5 +155,17 @@ private fun Status.databaseName(): String {
     return when (this) {
         is Status.Vilkårsvurdert -> "Vilkårsvurdert"
         is Status.Stoppet -> "Stoppet"
+    }
+}
+
+private fun List<Status>.medSisteUtfortAv(utfortAv: String?): List<Status> {
+    if (isEmpty()) return this
+    return dropLast(1) + last().withUtfortAv(utfortAv)
+}
+
+private fun Status.withUtfortAv(utfortAv: String?): Status {
+    return when (this) {
+        is Status.Stoppet -> copy(utfortAv = utfortAv)
+        is Status.Vilkårsvurdert -> copy(utfortAv = utfortAv)
     }
 }

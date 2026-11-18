@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtfortAvProvider
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Brevopplysninger
@@ -26,6 +27,7 @@ import kotlin.time.toJavaDuration
 
 class KontrollbehandlingRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val utfortAvProvider: UtfortAvProvider,
     private val clock: Clock,
 ) {
 
@@ -46,7 +48,7 @@ class KontrollbehandlingRepo(
     }
 
     fun bestillKontroll(innlesingId: InnlesingId, referanse: String, år: Int) {
-        val status = KontrollbehandlingStatus.Klar()
+        val status = KontrollbehandlingStatus.Klar().withUtfortAv(utfortAvProvider.current()?.verdi)
         jdbcTemplate.update(
             """
                 with original as (
@@ -69,6 +71,7 @@ class KontrollbehandlingRepo(
     }
 
     fun updateStatus(kontrollRad: Kontrollbehandling) {
+        val utfortAv = utfortAvProvider.current()?.verdi
         jdbcTemplate.update(
             """update kontrollmelding set status = :status, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
             MapSqlParameterSource(
@@ -76,7 +79,7 @@ class KontrollbehandlingRepo(
                     "id" to kontrollRad.kontrollId,
                     "status" to kontrollRad.status.databaseName(),
                     "karanteneTil" to kontrollRad.status.karanteneTilString(),
-                    "statushistorikk" to kontrollRad.statushistorikk.serializeList()
+                    "statushistorikk" to kontrollRad.statushistorikk.medSisteUtfortAv(utfortAv).serializeList()
                 ),
             ),
         )
@@ -318,4 +321,18 @@ class KontrollbehandlingRepo(
     }
 
     data class Locked(val lockId: UUID, val rader: List<Kontrollbehandling>)
+
+    private fun List<KontrollbehandlingStatus>.medSisteUtfortAv(utfortAv: String?): List<KontrollbehandlingStatus> {
+        if (isEmpty()) return this
+        return dropLast(1) + last().withUtfortAv(utfortAv)
+    }
+
+    private fun KontrollbehandlingStatus.withUtfortAv(utfortAv: String?): KontrollbehandlingStatus {
+        return when (this) {
+            is KontrollbehandlingStatus.Feilet -> copy(utfortAv = utfortAv)
+            is KontrollbehandlingStatus.Ferdig -> copy(utfortAv = utfortAv)
+            is KontrollbehandlingStatus.Klar -> copy(utfortAv = utfortAv)
+            is KontrollbehandlingStatus.Retry -> copy(utfortAv = utfortAv)
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtfortAvProvider
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -21,7 +22,8 @@ import kotlin.time.toJavaDuration
 @Component
 class BrevRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
-    private val clock: Clock = Clock.systemUTC()
+    private val utfortAvProvider: UtfortAvProvider,
+    private val clock: Clock = Clock.systemUTC(),
 ) {
 
     private fun Brev.Status.databaseName(): String {
@@ -42,6 +44,7 @@ class BrevRepository(
     }
 
     fun persist(brev: Brev.Transient): Brev.Persistent {
+        val utfortAv = utfortAvProvider.current()?.verdi
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into brev (behandlingId, årsak, status, karantene_til, statushistorikk) 
@@ -50,7 +53,7 @@ class BrevRepository(
                 mapOf<String, Any?>(
                     "behandlingId" to brev.behandlingId,
                     "arsak" to brev.årsak.toDb(),
-                    "statushistorikk" to brev.statushistorikk.serializeList(),
+                    "statushistorikk" to brev.statushistorikk.medSisteUtfortAv(utfortAv).serializeList(),
                     "status" to brev.status.databaseName(),
                     "karantene_til" to brev.status.karanteneTilString(),
                 ),
@@ -62,6 +65,7 @@ class BrevRepository(
     }
 
     fun updateStatus(brev: Brev.Persistent) {
+        val utfortAv = utfortAvProvider.current()?.verdi
         jdbcTemplate.update(
             """update brev set 
                 | statushistorikk = to_jsonb(:statushistorikk::jsonb),
@@ -71,7 +75,7 @@ class BrevRepository(
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to brev.id,
-                    "statushistorikk" to brev.statushistorikk.serializeList(),
+                    "statushistorikk" to brev.statushistorikk.medSisteUtfortAv(utfortAv).serializeList(),
                     "status" to brev.status.databaseName(),
                     "karantene_til" to brev.status.karanteneTilString(),
                 ),
@@ -259,4 +263,19 @@ class BrevRepository(
     }
 
     data class Locked(val lockId: UUID, val data: List<Brev.Persistent>)
+
+    private fun List<Brev.Status>.medSisteUtfortAv(utfortAv: String?): List<Brev.Status> {
+        if (isEmpty()) return this
+        return dropLast(1) + last().withUtfortAv(utfortAv)
+    }
+
+    private fun Brev.Status.withUtfortAv(utfortAv: String?): Brev.Status {
+        return when (this) {
+            is Brev.Status.Feilet -> copy(utfortAv = utfortAv)
+            is Brev.Status.Ferdig -> copy(utfortAv = utfortAv)
+            is Brev.Status.Klar -> copy(utfortAv = utfortAv)
+            is Brev.Status.Retry -> copy(utfortAv = utfortAv)
+            is Brev.Status.Stoppet -> copy(utfortAv = utfortAv)
+        }
+    }
 }

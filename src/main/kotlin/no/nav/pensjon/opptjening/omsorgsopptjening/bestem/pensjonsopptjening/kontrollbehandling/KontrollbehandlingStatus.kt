@@ -12,7 +12,6 @@ import java.time.temporal.ChronoUnit
     property = "type",
 )
 sealed class KontrollbehandlingStatus {
-
     open fun ferdig(): Ferdig {
         throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Ferdig")
     }
@@ -23,7 +22,8 @@ sealed class KontrollbehandlingStatus {
 
     @JsonTypeName("Klar")
     data class Klar(
-        val tidspunkt: Instant = now()
+        val tidspunkt: Instant = now(),
+        val utfortAv: String? = null,
     ) : KontrollbehandlingStatus() {
         override fun ferdig(): Ferdig {
             return Ferdig()
@@ -36,7 +36,8 @@ sealed class KontrollbehandlingStatus {
 
     @JsonTypeName("Ferdig")
     data class Ferdig(
-        val tidspunkt: Instant = now()
+        val tidspunkt: Instant = now(),
+        val utfortAv: String? = null,
     ) : KontrollbehandlingStatus()
 
     @JsonTypeName("Retry")
@@ -46,6 +47,7 @@ sealed class KontrollbehandlingStatus {
         val maxAntallForsøk: Int = 3,
         val karanteneTil: Instant = tidspunkt.plus(5, ChronoUnit.HOURS),
         val melding: String,
+        val utfortAv: String? = null,
     ) : KontrollbehandlingStatus() {
         override fun ferdig(): Ferdig {
             return Ferdig()
@@ -75,5 +77,6 @@ sealed class KontrollbehandlingStatus {
     @JsonTypeName("Feilet")
     data class Feilet(
         val tidspunkt: Instant = now(),
+        val utfortAv: String? = null,
     ) : KontrollbehandlingStatus()
 }

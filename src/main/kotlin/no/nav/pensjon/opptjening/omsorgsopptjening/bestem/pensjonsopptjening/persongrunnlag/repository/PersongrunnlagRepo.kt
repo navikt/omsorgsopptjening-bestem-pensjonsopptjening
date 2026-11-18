@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtfortAvProvider
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
@@ -23,7 +24,8 @@ import kotlin.time.toJavaDuration
 @Component
 class PersongrunnlagRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
-    private val clock: Clock = Clock.systemUTC()
+    private val utfortAvProvider: UtfortAvProvider,
+    private val clock: Clock = Clock.systemUTC(),
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -51,6 +53,7 @@ class PersongrunnlagRepo(
      * @return Id til rad som ble lagret i databasen - null dersom raden eksisterte fra før (duplikat)
      */
     fun lagre(melding: PersongrunnlagMelding.Lest): UUID? {
+        val utfortAv = utfortAvProvider.current()?.verdi
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             //language=postgres-psql
@@ -67,7 +70,7 @@ class PersongrunnlagRepo(
                     "opprettet" to melding.opprettet.toString(),
                     "status" to "Klar",
                     "karanteneTil" to null,
-                    "statushistorikk" to melding.statushistorikk.serializeList(),
+                    "statushistorikk" to melding.statushistorikk.medSisteUtfortAv(utfortAv).serializeList(),
                 ),
             ),
             keyHolder
@@ -77,6 +80,7 @@ class PersongrunnlagRepo(
     }
 
     fun lagre(meldinger: List<PersongrunnlagMelding.Lest>) {
+        val utfortAv = utfortAvProvider.current()?.verdi
         jdbcTemplate.batchUpdate(
             //language=postgres-psql
             """insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, status, karantene_til) 
@@ -93,7 +97,7 @@ class PersongrunnlagRepo(
                         "opprettet" to it.opprettet.toString(),
                         "status" to "Klar",
                         "karanteneTil" to null,
-                        "statushistorikk" to it.statushistorikk.serializeList(),
+                        "statushistorikk" to it.statushistorikk.medSisteUtfortAv(utfortAv).serializeList(),
                     ),
                 )
             }.toTypedArray()
@@ -101,6 +105,7 @@ class PersongrunnlagRepo(
     }
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
+        val utfortAv = utfortAvProvider.current()?.verdi
         jdbcTemplate.update(
             """update melding set status = :status, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
             MapSqlParameterSource(
@@ -108,7 +113,7 @@ class PersongrunnlagRepo(
                     "id" to melding.id,
                     "status" to melding.status.databaseName(),
                     "karanteneTil" to melding.status.karanteneTilString(),
-                    "statushistorikk" to melding.statushistorikk.serializeList()
+                    "statushistorikk" to melding.statushistorikk.medSisteUtfortAv(utfortAv).serializeList()
                 ),
             ),
         )
@@ -282,5 +287,22 @@ class PersongrunnlagRepo(
     }
 
     data class Locked(val lockId: UUID, val data: List<PersongrunnlagMelding.Mottatt>)
+
+    private fun List<PersongrunnlagMelding.Status>.medSisteUtfortAv(utfortAv: String?): List<PersongrunnlagMelding.Status> {
+        if (isEmpty()) return this
+        return dropLast(1) + last().withUtfortAv(utfortAv)
+    }
+
+    private fun PersongrunnlagMelding.Status.withUtfortAv(utfortAv: String?): PersongrunnlagMelding.Status {
+        return when (this) {
+            is PersongrunnlagMelding.Status.Avsluttet -> copy(utfortAv = utfortAv)
+            is PersongrunnlagMelding.Status.Feilet -> copy(utfortAv = utfortAv)
+            is PersongrunnlagMelding.Status.Ferdig -> copy(utfortAv = utfortAv)
+            is PersongrunnlagMelding.Status.Klar -> copy(utfortAv = utfortAv)
+            is PersongrunnlagMelding.Status.Kopiert -> copy(utfortAv = utfortAv)
+            is PersongrunnlagMelding.Status.Retry -> copy(utfortAv = utfortAv)
+            is PersongrunnlagMelding.Status.Stoppet -> copy(utfortAv = utfortAv)
+        }
+    }
 
 }
