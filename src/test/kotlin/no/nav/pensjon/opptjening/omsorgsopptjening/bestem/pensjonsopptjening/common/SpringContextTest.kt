@@ -67,6 +67,7 @@ sealed class SpringContextTest {
         dataSource.connection.use { conn ->
             conn.createStatement().execute(
                 """
+                DELETE FROM ENDRINGSLOGG;
                 DELETE FROM BREV;
                 DELETE FROM GODSKRIV_OPPTJENING;
                 DELETE FROM OPPGAVE;
