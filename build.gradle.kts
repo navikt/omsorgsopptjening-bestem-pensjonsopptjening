@@ -76,6 +76,7 @@ dependencies {
     // Test
     testImplementation(kotlin("test"))
     testImplementation("org.springframework.boot:spring-boot-starter-test") // includes assertj, jsonassert, mockito
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.testcontainers:postgresql:$testContainersVersion") // ponytail: TC 1.x jdbc:tc driver approach, same as afp-api
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoVersion")

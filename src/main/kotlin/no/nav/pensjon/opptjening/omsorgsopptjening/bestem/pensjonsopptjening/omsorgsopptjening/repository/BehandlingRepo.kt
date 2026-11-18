@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.EndringshistorikkInnslagFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Status
@@ -15,14 +16,16 @@ import java.sql.ResultSet
 import java.util.UUID
 
 class BehandlingRepo(
-    private val jdbcTemplate: NamedParameterJdbcTemplate
+    private val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val endringshistorikkInnslagFactory: EndringshistorikkInnslagFactory,
 ) {
 
     fun persist(behandling: Behandling): FullførtBehandling {
         return behandling.toDb().let { obj ->
+            val endringsinnslag = endringshistorikkInnslagFactory.create()
             val keyHolder = GeneratedKeyHolder()
             jdbcTemplate.update(
-                """insert into behandling (omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag, vilkarsvurdering, utfall, kafkaMeldingId, status, statushistorikk) values (:omsorgsar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, to_jsonb(:grunnlag::jsonb), to_jsonb(:vilkarsvurdering::jsonb), to_jsonb(:utfall::jsonb), :kafkaMeldingId, :status, to_jsonb(:statushistorikk::jsonb))""",
+                """insert into behandling (omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag, vilkarsvurdering, utfall, kafkaMeldingId, status, statushistorikk, endringshistorikk) values (:omsorgsar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, to_jsonb(:grunnlag::jsonb), to_jsonb(:vilkarsvurdering::jsonb), to_jsonb(:utfall::jsonb), :kafkaMeldingId, :status, to_jsonb(:statushistorikk::jsonb), to_jsonb(:endringshistorikk::jsonb))""",
                 MapSqlParameterSource(
                     mapOf(
                         "omsorgsar" to obj.omsorgsAr,
@@ -34,7 +37,8 @@ class BehandlingRepo(
                         "utfall" to obj.utfall.mapToJson(),
                         "kafkaMeldingId" to obj.meldingId,
                         "status" to obj.status.databaseName(),
-                        "statushistorikk" to obj.statushistorikk.serializeList()
+                        "statushistorikk" to obj.statushistorikk.serializeList(),
+                        "endringshistorikk" to endringsinnslag.serializeSomListe(),
                     ),
                 ),
                 keyHolder
@@ -44,16 +48,24 @@ class BehandlingRepo(
     }
 
     fun updateStatus(behandling: FullførtBehandling) {
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = behandling.status.endringsbegrunnelse(),
+            ),
+        )
+
         jdbcTemplate.update(
             """update behandling
                 | set status = :status,
-                | statushistorikk = to_jsonb(:statushistorikk::jsonb)
+                | statushistorikk = to_jsonb(:statushistorikk::jsonb),
+                | endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb
                 | where id = :id""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to behandling.id,
                     "status" to behandling.status.databaseName(),
                     "statushistorikk" to behandling.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                 ),
             ),
         )
@@ -126,6 +138,14 @@ class BehandlingRepo(
             ),
             BehandlingRowMapper()
         ).toDomain()
+    }
+
+}
+
+private fun Status.endringsbegrunnelse(): String? {
+    return when (this) {
+        is Status.Stoppet -> this.begrunnelse
+        else -> null
     }
 }
 

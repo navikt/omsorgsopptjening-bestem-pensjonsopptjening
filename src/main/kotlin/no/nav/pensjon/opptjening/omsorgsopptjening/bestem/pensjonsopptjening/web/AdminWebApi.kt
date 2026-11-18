@@ -8,6 +8,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.opp
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult.FantIkkeOppgavenLokalt
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveService.OppgaveInfoResult.FantIkkeOppgavenRemote
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingService
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.UtfortAvProvider
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.Logger
@@ -29,6 +30,7 @@ class AdminWebApi(
     private val brevService: BrevService,
     private val godskrivOpptjeningService: GodskrivOpptjeningService,
     private val kontrollbehandlingService: KontrollbehandlingService,
+    private val utfortAvProvider: UtfortAvProvider,
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(AdminWebApi::class.java)
@@ -40,6 +42,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") meldingerString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
 
         val meldinger = try {
             parseUUIDListe(meldingerString)
@@ -71,6 +74,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") meldingerString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
         val meldinger = try {
             parseUUIDListe(meldingerString)
         } catch (ex: Throwable) {
@@ -101,6 +105,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") meldingerString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
         val meldinger = try {
             parseUUIDListe(meldingerString)
         } catch (ex: Throwable) {
@@ -135,6 +140,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
 
         val oppgaver = try {
             parseUUIDListe(oppgaverString)
@@ -165,6 +171,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
 
         val brev = try {
             parseUUIDListe(oppgaverString)
@@ -200,6 +207,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
 
         val brev = try {
             parseUUIDListe(oppgaverString)
@@ -240,6 +248,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
 
         val uuider = try {
             parseUUIDListe(oppgaverString)
@@ -279,6 +288,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
 
         val uuider = try {
             parseUUIDListe(oppgaverString)
@@ -318,6 +328,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
 
         val uuider = try {
             parseUUIDListe(oppgaverString)
@@ -357,6 +368,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
 
         val uuids = try {
             parseUUIDListe(oppgaverString)
@@ -398,6 +410,7 @@ class AdminWebApi(
         @RequestParam("uuidliste") oppgaverString: String,
         @RequestParam("begrunnelse") begrunnelse: String? = null
     ): ResponseEntity<String> {
+        requireInternBruker()
         val uuids = try {
             parseUUIDListe(oppgaverString)
         } catch (ex: Throwable) {
@@ -434,6 +447,7 @@ class AdminWebApi(
         @RequestParam("begrunnelse") begrunnelse: String,
         @RequestParam("ar") ar: Int
     ): ResponseEntity<String> {
+        requireInternBruker()
         val uuid = try {
             parseUUIDListe(oppgaverString).single()
         } catch (ex: Throwable) {
@@ -456,5 +470,9 @@ class AdminWebApi(
             .map { it.replace("[^0-9a-f-]".toRegex(), "") }
             .filter { it.isNotEmpty() }
             .map { UUID.fromString(it.trim()) }
+    }
+
+    private fun requireInternBruker() {
+        utfortAvProvider.requireInternBruker()
     }
 }

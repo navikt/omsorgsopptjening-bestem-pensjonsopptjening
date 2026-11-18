@@ -8,6 +8,7 @@ import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kon
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingService
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingServiceImpl
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.EndringshistorikkInnslagFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.HentPensjonspoengClient
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.OmsorgsopptjeningsgrunnlagService
@@ -54,9 +55,11 @@ class KontrollConfig {
     @Bean
     fun kontrollRepo(
         jdbcTemplate: NamedParameterJdbcTemplate,
+        endringshistorikkInnslagFactory: EndringshistorikkInnslagFactory,
     ): KontrollbehandlingRepo {
         return KontrollbehandlingRepo(
             jdbcTemplate = jdbcTemplate,
+            endringshistorikkInnslagFactory = endringshistorikkInnslagFactory,
             clock = Clock.systemUTC(),
         )
     }
