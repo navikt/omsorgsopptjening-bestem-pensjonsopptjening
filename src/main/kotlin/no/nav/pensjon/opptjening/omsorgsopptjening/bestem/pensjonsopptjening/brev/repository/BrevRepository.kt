@@ -44,7 +44,7 @@ class BrevRepository(
     }
 
     fun persist(brev: Brev.Transient): Brev.Persistent {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
+        val endringsinnslag = endringshistorikkInnslagFactory.create()
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into brev (behandlingId, årsak, status, karantene_til, statushistorikk, endringshistorikk) 
@@ -66,7 +66,7 @@ class BrevRepository(
     }
 
     fun updateStatus(brev: Brev.Persistent) {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
             EndringshistorikkInnslagFactory.Input(
                 begrunnelse = brev.status.endringsbegrunnelse(),
             ),
@@ -236,13 +236,6 @@ class BrevRepository(
         }.toString()
     }
 
-    private fun Brev.Status.endringsbegrunnelse(): String? {
-        return when (this) {
-            is Brev.Status.Stoppet -> this.begrunnelse
-            else -> null
-        }
-    }
-
     private enum class BrevÅrsakDb {
         OMSORGSYTER_INGEN_PENSJONSPOENG_FORRIGE_ÅR,
         OMSORGSYTER_IKKE_FORELDER_AV_OMSORGSMOTTAKER,
@@ -279,4 +272,11 @@ class BrevRepository(
 
     data class Locked(val lockId: UUID, val data: List<Brev.Persistent>)
 
+}
+
+private fun Brev.Status.endringsbegrunnelse(): String? {
+    return when (this) {
+        is Brev.Status.Stoppet -> this.begrunnelse
+        else -> null
+    }
 }

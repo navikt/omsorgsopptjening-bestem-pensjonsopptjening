@@ -70,7 +70,7 @@ class PersongrunnlagRepo(
                     "status" to "Klar",
                     "karanteneTil" to null,
                     "statushistorikk" to melding.statushistorikk.serializeList(),
-                    "endringshistorikk" to opprettEndringshistorikkVedLagring(),
+                    "endringshistorikk" to endringshistorikkInnslagFactory.create().serializeSomListe(),
                 ),
             ),
             keyHolder
@@ -99,7 +99,7 @@ class PersongrunnlagRepo(
                         "status" to "Klar",
                         "karanteneTil" to null,
                         "statushistorikk" to it.statushistorikk.serializeList(),
-                        "endringshistorikk" to opprettEndringshistorikkVedLagring(),
+                        "endringshistorikk" to endringshistorikkInnslagFactory.create().serializeSomListe(),
                     ),
                 )
             }.toTypedArray()
@@ -107,7 +107,7 @@ class PersongrunnlagRepo(
     }
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
             EndringshistorikkInnslagFactory.Input(
                 begrunnelse = melding.status.endringsbegrunnelse(),
             ),
@@ -295,17 +295,12 @@ class PersongrunnlagRepo(
 
     data class Locked(val lockId: UUID, val data: List<PersongrunnlagMelding.Mottatt>)
 
-    private fun opprettEndringshistorikkVedLagring(): String {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
-        return endringsinnslag.serializeSomListe()
-    }
+}
 
-    private fun PersongrunnlagMelding.Status.endringsbegrunnelse(): String? {
-        return when (this) {
-            is PersongrunnlagMelding.Status.Stoppet -> this.begrunnelse
-            is PersongrunnlagMelding.Status.Avsluttet -> this.melding
-            else -> null
-        }
+private fun PersongrunnlagMelding.Status.endringsbegrunnelse(): String? {
+    return when (this) {
+        is PersongrunnlagMelding.Status.Stoppet -> this.begrunnelse
+        is PersongrunnlagMelding.Status.Avsluttet -> this.melding
+        else -> null
     }
-
 }

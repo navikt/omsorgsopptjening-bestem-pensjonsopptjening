@@ -50,7 +50,7 @@ class KontrollbehandlingRepo(
 
     fun bestillKontroll(innlesingId: InnlesingId, referanse: String, år: Int) {
         val status = KontrollbehandlingStatus.Klar()
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
             EndringshistorikkInnslagFactory.Input(
                 begrunnelse = referanse,
             ),
@@ -78,7 +78,11 @@ class KontrollbehandlingRepo(
     }
 
     fun updateStatus(kontrollRad: Kontrollbehandling) {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = kontrollRad.referanse,
+            ),
+        )
         jdbcTemplate.update(
             """update kontrollmelding set status = :status, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb), endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb where id = :id""",
             MapSqlParameterSource(
@@ -198,7 +202,7 @@ class KontrollbehandlingRepo(
 
     fun persist(kontrollRad: Kontrollbehandling, behandling: Behandling): FullførtBehandling {
         return behandling.toDb().let { obj ->
-            val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
+            val endringsinnslag = endringshistorikkInnslagFactory.create()
             val keyHolder = GeneratedKeyHolder()
             jdbcTemplate.update(
                 """insert into kontrollbehandling (omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag, vilkarsvurdering, utfall, kafkaMeldingId, referanse, endringshistorikk) values (:omsorgsar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, to_jsonb(:grunnlag::jsonb), to_jsonb(:vilkarsvurdering::jsonb), to_jsonb(:utfall::jsonb), :kafkaMeldingId, :referanse, to_jsonb(:endringshistorikk::jsonb))""",
@@ -223,7 +227,7 @@ class KontrollbehandlingRepo(
     }
 
     fun oppdaterMedGodskriv(fullførtBehandling: FullførtBehandling, godskrivOpptjening: GodskrivOpptjening.Transient) {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
             EndringshistorikkInnslagFactory.Input(
                 begrunnelse = fullførtBehandling.status.endringsbegrunnelse(),
             ),
@@ -244,7 +248,7 @@ class KontrollbehandlingRepo(
         fullførtBehandling: FullførtBehandling,
         brevopplysninger: Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker
     ) {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
             EndringshistorikkInnslagFactory.Input(
                 begrunnelse = fullførtBehandling.status.endringsbegrunnelse(),
             ),
@@ -262,7 +266,7 @@ class KontrollbehandlingRepo(
     }
 
     fun oppdaterMedOppgave(fullførtBehandling: FullførtBehandling, oppgaveopplysninger: List<Oppgaveopplysninger>) {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
             EndringshistorikkInnslagFactory.Input(
                 begrunnelse = fullførtBehandling.status.endringsbegrunnelse(),
             ),

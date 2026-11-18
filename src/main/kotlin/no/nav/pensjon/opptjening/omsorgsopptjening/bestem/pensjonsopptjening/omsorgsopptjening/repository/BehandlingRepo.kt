@@ -22,7 +22,7 @@ class BehandlingRepo(
 
     fun persist(behandling: Behandling): FullførtBehandling {
         return behandling.toDb().let { obj ->
-            val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
+            val endringsinnslag = endringshistorikkInnslagFactory.create()
             val keyHolder = GeneratedKeyHolder()
             jdbcTemplate.update(
                 """insert into behandling (omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag, vilkarsvurdering, utfall, kafkaMeldingId, status, statushistorikk, endringshistorikk) values (:omsorgsar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, to_jsonb(:grunnlag::jsonb), to_jsonb(:vilkarsvurdering::jsonb), to_jsonb(:utfall::jsonb), :kafkaMeldingId, :status, to_jsonb(:statushistorikk::jsonb), to_jsonb(:endringshistorikk::jsonb))""",
@@ -48,7 +48,7 @@ class BehandlingRepo(
     }
 
     fun updateStatus(behandling: FullførtBehandling) {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
             EndringshistorikkInnslagFactory.Input(
                 begrunnelse = behandling.status.endringsbegrunnelse(),
             ),

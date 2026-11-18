@@ -46,7 +46,7 @@ class OppgaveRepo(
     }
 
     fun persist(oppgave: Oppgave.Transient): Oppgave.Persistent {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
+        val endringsinnslag = endringshistorikkInnslagFactory.create()
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into oppgave (behandlingId, meldingId, detaljer, status, karantene_til, statushistorikk, endringshistorikk) 
@@ -68,7 +68,7 @@ class OppgaveRepo(
     }
 
     fun updateStatus(oppgave: Oppgave.Persistent) {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
             EndringshistorikkInnslagFactory.Input(
                 begrunnelse = oppgave.status.endringsbegrunnelse(),
             ),
@@ -90,14 +90,6 @@ class OppgaveRepo(
                 ),
             ),
         )
-    }
-
-    private fun Oppgave.Status.endringsbegrunnelse(): String? {
-        return when (this) {
-            is Oppgave.Status.Stoppet -> this.begrunnelse
-            is Oppgave.Status.Kansellert -> this.begrunnelse
-            else -> null
-        }
     }
 
     fun find(id: UUID): Oppgave.Persistent {
@@ -200,13 +192,15 @@ class OppgaveRepo(
         )
     }
 
-    fun frigiGamleLåser() : Int {
+    fun frigiGamleLåser(): Int {
         val oneHourAgo = Instant.now(clock).minus(1.hours.toJavaDuration()).toString()
-        return jdbcTemplate.update("""update oppgave set lockId = null, lockTime = null 
+        return jdbcTemplate.update(
+            """update oppgave set lockId = null, lockTime = null 
             |where lockId is not null and lockTime < :oneHourAgo::timestamptz""".trimMargin(),
-            mapOf<String,Any> (
+            mapOf<String, Any>(
                 "oneHourAgo" to oneHourAgo
-            ))
+            )
+        )
     }
 
 
@@ -297,4 +291,12 @@ class OppgaveRepo(
 
     data class Locked(val lockId: UUID, val data: List<Oppgave.Persistent>)
 
+}
+
+private fun Oppgave.Status.endringsbegrunnelse(): String? {
+    return when (this) {
+        is Oppgave.Status.Stoppet -> this.begrunnelse
+        is Oppgave.Status.Kansellert -> this.begrunnelse
+        else -> null
+    }
 }

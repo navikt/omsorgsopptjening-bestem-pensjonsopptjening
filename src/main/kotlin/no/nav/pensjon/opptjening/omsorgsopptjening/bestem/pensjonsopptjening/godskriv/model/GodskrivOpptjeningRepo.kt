@@ -41,7 +41,7 @@ class GodskrivOpptjeningRepo(
     }
 
     fun persist(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening.Persistent {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
+        val endringsinnslag = endringshistorikkInnslagFactory.create()
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             """insert into godskriv_opptjening (behandlingId,status, karantene_til, statushistorikk, endringshistorikk)
@@ -61,7 +61,7 @@ class GodskrivOpptjeningRepo(
     }
 
     fun updateStatus(godskrivOpptjening: GodskrivOpptjening.Persistent) {
-        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
             EndringshistorikkInnslagFactory.Input(
                 begrunnelse = godskrivOpptjening.status.endringsbegrunnelse(),
             ),
@@ -83,13 +83,6 @@ class GodskrivOpptjeningRepo(
                 ),
             ),
         )
-    }
-
-    private fun GodskrivOpptjening.Status.endringsbegrunnelse(): String? {
-        return when (this) {
-            is GodskrivOpptjening.Status.Stoppet -> this.begrunnelse
-            else -> null
-        }
     }
 
     fun find(id: UUID): GodskrivOpptjening.Persistent {
@@ -258,4 +251,11 @@ class GodskrivOpptjeningRepo(
 
     data class Locked(var lockId: UUID, val data: List<GodskrivOpptjening.Persistent>)
 
+}
+
+private fun GodskrivOpptjening.Status.endringsbegrunnelse(): String? {
+    return when (this) {
+        is GodskrivOpptjening.Status.Stoppet -> this.begrunnelse
+        else -> null
+    }
 }

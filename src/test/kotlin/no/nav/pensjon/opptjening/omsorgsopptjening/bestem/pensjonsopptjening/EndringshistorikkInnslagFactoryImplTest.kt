@@ -30,7 +30,7 @@ class EndringshistorikkInnslagFactoryImplTest {
             clock = FAST_CLOCK,
         )
 
-        val innslag = sut.createInnslag(EndringshistorikkInnslagFactory.Input("Manuell korrigering"))
+        val innslag = sut.create(EndringshistorikkInnslagFactory.Input("Manuell korrigering"))
 
         assertThat(innslag.utfortAv).isEqualTo("Z123456")
         assertThat(innslag.tidspunkt).isEqualTo(FAST_INSTANT)
@@ -49,7 +49,7 @@ class EndringshistorikkInnslagFactoryImplTest {
             clock = FAST_CLOCK,
         )
 
-        val innslag = sut.createInnslag()
+        val innslag = sut.create()
 
         assertThat(innslag.utfortAv).isEqualTo("dev-gcp:team-pen:omsorgsopptjening-bestem-pensjonsopptjening")
         assertThat(innslag.tidspunkt).isEqualTo(FAST_INSTANT)

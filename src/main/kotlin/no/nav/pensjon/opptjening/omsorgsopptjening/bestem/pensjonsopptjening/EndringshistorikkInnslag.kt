@@ -25,7 +25,7 @@ interface EndringshistorikkInnslagFactory {
         val begrunnelse: String? = null,
     )
 
-    fun createInnslag(input: Input = Input()): EndringshistorikkInnslag
+    fun create(input: Input = Input()): EndringshistorikkInnslag
 }
 
 @Component
@@ -35,7 +35,7 @@ class EndringshistorikkInnslagFactoryImpl(
     private val clock: Clock = Clock.systemUTC(),
 ) : EndringshistorikkInnslagFactory {
 
-    override fun createInnslag(input: EndringshistorikkInnslagFactory.Input): EndringshistorikkInnslag {
+    override fun create(input: EndringshistorikkInnslagFactory.Input): EndringshistorikkInnslag {
         val attributes = getRequestAttributes()
         val path = attributes?.matchingPath()
         val method = attributes?.request?.method
