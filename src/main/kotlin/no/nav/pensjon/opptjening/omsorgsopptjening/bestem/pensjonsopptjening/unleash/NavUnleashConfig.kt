@@ -51,7 +51,6 @@ class NavUnleashConfig(
         GODSKRIV("omsorgsopptjening-bestem-pensjonsopptjening-godskriv"),
         BEHANDLING("omsorgsopptjening-bestem-pensjonsopptjening-behandling"),
         BREV("omsorgsopptjening-bestem-pensjonsopptjening-brev"),
-        KONTROLL("omsorgsopptjening-bestem-pensjonsopptjening-kontroll")
     }
 }
 
