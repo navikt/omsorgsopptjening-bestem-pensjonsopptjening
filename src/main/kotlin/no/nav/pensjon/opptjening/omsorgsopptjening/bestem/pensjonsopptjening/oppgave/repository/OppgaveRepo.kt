@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.EndringshistorikkInnslagFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.Oppgave
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
@@ -23,7 +24,8 @@ import kotlin.time.toJavaDuration
 @Component
 class OppgaveRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
-    private val clock: Clock = Clock.systemUTC()
+    private val endringshistorikkInnslagFactory: EndringshistorikkInnslagFactory,
+    private val clock: Clock = Clock.systemUTC(),
 ) {
     private fun Oppgave.Status.databaseName(): String {
         return when (this) {
@@ -44,16 +46,18 @@ class OppgaveRepo(
     }
 
     fun persist(oppgave: Oppgave.Transient): Oppgave.Persistent {
+        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into oppgave (behandlingId, meldingId, detaljer, status, karantene_til, statushistorikk) 
-                |values (:behandlingId, :meldingId, to_jsonb(:detaljer::jsonb), :status, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
+            """insert into oppgave (behandlingId, meldingId, detaljer, status, karantene_til, statushistorikk, endringshistorikk) 
+                |values (:behandlingId, :meldingId, to_jsonb(:detaljer::jsonb), :status, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb), to_jsonb(:endringshistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to oppgave.behandlingId,
                     "meldingId" to oppgave.meldingId,
                     "detaljer" to serialize(oppgave.detaljer),
                     "statushistorikk" to oppgave.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                     "status" to oppgave.status.databaseName(),
                     "karantene_til" to oppgave.status.karanteneTilString(),
                 ),
@@ -64,22 +68,36 @@ class OppgaveRepo(
     }
 
     fun updateStatus(oppgave: Oppgave.Persistent) {
+        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = oppgave.status.endringsbegrunnelse(),
+            ),
+        )
         jdbcTemplate.update(
             """update oppgave
                 | set status = :status,
                 | karantene_til = :karantene_til::timestamptz,
-                | statushistorikk = to_jsonb(:statushistorikk::jsonb) 
+                | statushistorikk = to_jsonb(:statushistorikk::jsonb),
+                | endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb 
                 | where id = :id""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to oppgave.id,
-                    "status" to serialize(oppgave.status),
                     "statushistorikk" to oppgave.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                     "status" to oppgave.status.databaseName(),
                     "karantene_til" to oppgave.status.karanteneTilString(),
                 ),
             ),
         )
+    }
+
+    private fun Oppgave.Status.endringsbegrunnelse(): String? {
+        return when (this) {
+            is Oppgave.Status.Stoppet -> this.begrunnelse
+            is Oppgave.Status.Kansellert -> this.begrunnelse
+            else -> null
+        }
     }
 
     fun find(id: UUID): Oppgave.Persistent {
@@ -278,4 +296,5 @@ class OppgaveRepo(
     }
 
     data class Locked(val lockId: UUID, val data: List<Oppgave.Persistent>)
+
 }

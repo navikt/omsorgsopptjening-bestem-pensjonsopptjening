@@ -1,10 +1,12 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.EndringshistorikkInnslagFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjening
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Behandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Brevopplysninger
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.FullførtBehandling
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Oppgaveopplysninger
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.Status
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRowMapper
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.toDb
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.toDomain
@@ -26,6 +28,7 @@ import kotlin.time.toJavaDuration
 
 class KontrollbehandlingRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
+    private val endringshistorikkInnslagFactory: EndringshistorikkInnslagFactory,
     private val clock: Clock,
 ) {
 
@@ -47,20 +50,26 @@ class KontrollbehandlingRepo(
 
     fun bestillKontroll(innlesingId: InnlesingId, referanse: String, år: Int) {
         val status = KontrollbehandlingStatus.Klar()
+        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = referanse,
+            ),
+        )
         jdbcTemplate.update(
             """
                 with original as (
                     select m.id from melding m                   
                     where m.innlesing_id = :innlesingid                                         
                 )
-                insert into kontrollmelding (status, statushistorikk, referanse, kafkameldingid, omsorgs_ar)
-                select :status, to_jsonb(:statushistorikk::jsonb), :referanse, id, :omsorgs_ar from original                                       
+                insert into kontrollmelding (status, statushistorikk, endringshistorikk, referanse, kafkameldingid, omsorgs_ar)
+                select :status, to_jsonb(:statushistorikk::jsonb), to_jsonb(:endringshistorikk::jsonb), :referanse, id, :omsorgs_ar from original                                       
             """.trimIndent(),
             MapSqlParameterSource(
                 mapOf(
                     "innlesingid" to innlesingId.toString(),
                     "status" to status.databaseName(),
                     "statushistorikk" to listOf(status).serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                     "referanse" to referanse,
                     "omsorgs_ar" to år,
                 )
@@ -69,14 +78,16 @@ class KontrollbehandlingRepo(
     }
 
     fun updateStatus(kontrollRad: Kontrollbehandling) {
+        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
         jdbcTemplate.update(
-            """update kontrollmelding set status = :status, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
+            """update kontrollmelding set status = :status, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb), endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to kontrollRad.kontrollId,
                     "status" to kontrollRad.status.databaseName(),
                     "karanteneTil" to kontrollRad.status.karanteneTilString(),
-                    "statushistorikk" to kontrollRad.statushistorikk.serializeList()
+                    "statushistorikk" to kontrollRad.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                 ),
             ),
         )
@@ -187,9 +198,10 @@ class KontrollbehandlingRepo(
 
     fun persist(kontrollRad: Kontrollbehandling, behandling: Behandling): FullførtBehandling {
         return behandling.toDb().let { obj ->
+            val endringsinnslag = endringshistorikkInnslagFactory.createInnslag()
             val keyHolder = GeneratedKeyHolder()
             jdbcTemplate.update(
-                """insert into kontrollbehandling (omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag, vilkarsvurdering, utfall, kafkaMeldingId, referanse) values (:omsorgsar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, to_jsonb(:grunnlag::jsonb), to_jsonb(:vilkarsvurdering::jsonb), to_jsonb(:utfall::jsonb), :kafkaMeldingId, :referanse)""",
+                """insert into kontrollbehandling (omsorgs_ar, omsorgsyter, omsorgsmottaker, omsorgstype, grunnlag, vilkarsvurdering, utfall, kafkaMeldingId, referanse, endringshistorikk) values (:omsorgsar, :omsorgsyter, :omsorgsmottaker, :omsorgstype, to_jsonb(:grunnlag::jsonb), to_jsonb(:vilkarsvurdering::jsonb), to_jsonb(:utfall::jsonb), :kafkaMeldingId, :referanse, to_jsonb(:endringshistorikk::jsonb))""",
                 MapSqlParameterSource(
                     mapOf(
                         "omsorgsar" to obj.omsorgsAr,
@@ -201,6 +213,7 @@ class KontrollbehandlingRepo(
                         "utfall" to obj.utfall.mapToJson(),
                         "kafkaMeldingId" to obj.meldingId,
                         "referanse" to kontrollRad.referanse,
+                        "endringshistorikk" to endringsinnslag.serializeSomListe(),
                     ),
                 ),
                 keyHolder
@@ -210,12 +223,18 @@ class KontrollbehandlingRepo(
     }
 
     fun oppdaterMedGodskriv(fullførtBehandling: FullførtBehandling, godskrivOpptjening: GodskrivOpptjening.Transient) {
+        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = fullførtBehandling.status.endringsbegrunnelse(),
+            ),
+        )
         jdbcTemplate.update(
-            """update kontrollbehandling set godskriv = to_jsonb(:godskriv::jsonb) where id = :id""",
+            """update kontrollbehandling set godskriv = to_jsonb(:godskriv::jsonb), endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb where id = :id""",
             MapSqlParameterSource(
                 mapOf(
                     "id" to fullførtBehandling.id,
-                    "godskriv" to serialize(godskrivOpptjening)
+                    "godskriv" to serialize(godskrivOpptjening),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                 )
             )
         )
@@ -225,24 +244,36 @@ class KontrollbehandlingRepo(
         fullførtBehandling: FullførtBehandling,
         brevopplysninger: Brevopplysninger.InfobrevOmsorgsyterForHjelpestønadsmottaker
     ) {
+        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = fullførtBehandling.status.endringsbegrunnelse(),
+            ),
+        )
         jdbcTemplate.update(
-            """update kontrollbehandling set brev = to_jsonb(:brev::jsonb) where id = :id""",
+            """update kontrollbehandling set brev = to_jsonb(:brev::jsonb), endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb where id = :id""",
             MapSqlParameterSource(
                 mapOf(
                     "id" to fullførtBehandling.id,
-                    "brev" to serialize(brevopplysninger)
+                    "brev" to serialize(brevopplysninger),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                 )
             )
         )
     }
 
     fun oppdaterMedOppgave(fullførtBehandling: FullførtBehandling, oppgaveopplysninger: List<Oppgaveopplysninger>) {
+        val endringsinnslag = endringshistorikkInnslagFactory.createInnslag(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = fullførtBehandling.status.endringsbegrunnelse(),
+            ),
+        )
         jdbcTemplate.update(
-            """update kontrollbehandling set oppgave = to_jsonb(:oppgave::jsonb) where id = :id""",
+            """update kontrollbehandling set oppgave = to_jsonb(:oppgave::jsonb), endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb where id = :id""",
             MapSqlParameterSource(
                 mapOf(
                     "id" to fullførtBehandling.id,
-                    "oppgave" to serialize(oppgaveopplysninger)
+                    "oppgave" to serialize(oppgaveopplysninger),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                 )
             )
         )
@@ -318,4 +349,12 @@ class KontrollbehandlingRepo(
     }
 
     data class Locked(val lockId: UUID, val rader: List<Kontrollbehandling>)
+
+}
+
+private fun Status.endringsbegrunnelse(): String? {
+    return when (this) {
+        is Status.Stoppet -> this.begrunnelse
+        else -> null
+    }
 }
