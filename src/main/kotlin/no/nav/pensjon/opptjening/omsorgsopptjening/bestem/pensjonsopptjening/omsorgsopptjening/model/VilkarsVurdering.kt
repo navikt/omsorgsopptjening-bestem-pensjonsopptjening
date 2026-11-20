@@ -33,7 +33,7 @@ fun VilkarsVurdering<*>.erInnvilget(): Boolean {
 
 @JvmName("reifiedErUbestemt")
 inline fun <reified T : ParagrafVurdering<*>> VilkarsVurdering<*>.erUbestemt(): Boolean {
-    return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { erUbestemt() }.single()
+    return UnwrapOgEllerVisitor.unwrap(this).filterIsInstance<T>().map { it.erUbestemt() }.single()
 }
 
 fun VilkarsVurdering<*>.erUbestemt(): Boolean {
