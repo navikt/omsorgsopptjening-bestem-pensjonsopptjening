@@ -51,6 +51,14 @@ object Fellesbarn {
         const val BARN_AC1 = "14071812345"
         const val BARN_BD1 = "30111512345"
     }
+
+    object FellesbarnOgSaerkullsbarnHosMor {
+        const val FAR_A = "11048012345"
+        const val MOR_B = "21068212345"
+        const val FAR_C = "17037912345"
+        const val BARN_AB1 = "12041712345"
+        const val BARN_BC1 = "09091912345"
+    }
 }
 
 /**
@@ -93,6 +101,11 @@ class PdlIdentToBodyFileTransformer : ResponseDefinitionTransformerV2 {
             Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AB2 to "fellesbarn/fellesbarn_og_saerkullsbarn/barnAB2.json",
             Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_AC1 to "fellesbarn/fellesbarn_og_saerkullsbarn/barnAC1.json",
             Fellesbarn.FellesbarnOgSaerkullsbarn.BARN_BD1 to "fellesbarn/fellesbarn_og_saerkullsbarn/barnBD1.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarnHosMor.FAR_A to "fellesbarn/fellesbarn_og_saerkullsbarn_hos_mor/farA.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarnHosMor.MOR_B to "fellesbarn/fellesbarn_og_saerkullsbarn_hos_mor/morB.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarnHosMor.FAR_C to "fellesbarn/fellesbarn_og_saerkullsbarn_hos_mor/farC.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarnHosMor.BARN_AB1 to "fellesbarn/fellesbarn_og_saerkullsbarn_hos_mor/barnAB1.json",
+            Fellesbarn.FellesbarnOgSaerkullsbarnHosMor.BARN_BC1 to "fellesbarn/fellesbarn_og_saerkullsbarn_hos_mor/barnBC1.json",
         )
     }
 
