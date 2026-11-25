@@ -11,6 +11,10 @@ management:
     prometheus:
       enabled: true
 
+info:
+  app:
+    version: ${APP_VERSION:unknown}
+
 no.nav.security.jwt:
   issuer:
     azure:

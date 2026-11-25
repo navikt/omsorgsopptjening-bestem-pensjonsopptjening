@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.EndringshistorikkInnslagFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.Brev
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.model.BrevÅrsak
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
@@ -21,7 +22,8 @@ import kotlin.time.toJavaDuration
 @Component
 class BrevRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
-    private val clock: Clock = Clock.systemUTC()
+    private val endringshistorikkInnslagFactory: EndringshistorikkInnslagFactory,
+    private val clock: Clock = Clock.systemUTC(),
 ) {
 
     private fun Brev.Status.databaseName(): String {
@@ -42,15 +44,17 @@ class BrevRepository(
     }
 
     fun persist(brev: Brev.Transient): Brev.Persistent {
+        val endringsinnslag = endringshistorikkInnslagFactory.create()
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into brev (behandlingId, årsak, status, karantene_til, statushistorikk) 
-                |values (:behandlingId, :arsak, :status, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
+            """insert into brev (behandlingId, årsak, status, karantene_til, statushistorikk, endringshistorikk) 
+                |values (:behandlingId, :arsak, :status, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb), to_jsonb(:endringshistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to brev.behandlingId,
                     "arsak" to brev.årsak.toDb(),
                     "statushistorikk" to brev.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                     "status" to brev.status.databaseName(),
                     "karantene_til" to brev.status.karanteneTilString(),
                 ),
@@ -62,16 +66,24 @@ class BrevRepository(
     }
 
     fun updateStatus(brev: Brev.Persistent) {
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = brev.status.endringsbegrunnelse(),
+            ),
+        )
+
         jdbcTemplate.update(
             """update brev set 
                 | statushistorikk = to_jsonb(:statushistorikk::jsonb),
                 | status = :status,
+                | endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb,
                 | karantene_til = :karantene_til::timestamptz
                 | where id = :id""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to brev.id,
                     "statushistorikk" to brev.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                     "status" to brev.status.databaseName(),
                     "karantene_til" to brev.status.karanteneTilString(),
                 ),
@@ -151,13 +163,15 @@ class BrevRepository(
         )
     }
 
-    fun frigiGamleLåser() : Int {
+    fun frigiGamleLåser(): Int {
         val oneHourAgo = Instant.now(clock).minus(1.hours.toJavaDuration()).toString()
-        return jdbcTemplate.update("""update brev set lockId = null, lockTime = null 
+        return jdbcTemplate.update(
+            """update brev set lockId = null, lockTime = null 
             |where lockId is not null and lockTime < :oneHourAgo::timestamptz""".trimMargin(),
-            mapOf<String,Any> (
+            mapOf<String, Any>(
                 "oneHourAgo" to oneHourAgo
-            ))
+            )
+        )
     }
 
     fun finnNesteUprosesserteKlar(lockId: UUID, antall: Int): List<UUID> {
@@ -259,4 +273,12 @@ class BrevRepository(
     }
 
     data class Locked(val lockId: UUID, val data: List<Brev.Persistent>)
+
+}
+
+private fun Brev.Status.endringsbegrunnelse(): String? {
+    return when (this) {
+        is Brev.Status.Stoppet -> this.begrunnelse
+        else -> null
+    }
 }
