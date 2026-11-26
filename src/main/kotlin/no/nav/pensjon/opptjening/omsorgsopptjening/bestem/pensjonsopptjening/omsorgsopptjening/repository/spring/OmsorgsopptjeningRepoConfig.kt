@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.spring
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.EndringshistorikkInnslagFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.omsorgsopptjening.repository.BehandlingRepo
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -10,8 +11,12 @@ class OmsorgsopptjeningRepoConfig {
 
     @Bean
     fun behandlingRepo(
-        jdbcTemplate: NamedParameterJdbcTemplate
+        jdbcTemplate: NamedParameterJdbcTemplate,
+        endringshistorikkInnslagFactory: EndringshistorikkInnslagFactory,
     ): BehandlingRepo {
-        return BehandlingRepo(jdbcTemplate = jdbcTemplate)
+        return BehandlingRepo(
+            jdbcTemplate = jdbcTemplate,
+            endringshistorikkInnslagFactory = endringshistorikkInnslagFactory,
+        )
     }
 }

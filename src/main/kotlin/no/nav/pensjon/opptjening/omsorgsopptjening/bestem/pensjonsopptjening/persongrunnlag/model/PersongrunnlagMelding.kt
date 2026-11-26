@@ -31,11 +31,15 @@ sealed class PersongrunnlagMelding {
         override val innhold: PersongrunnlagMeldingKafka,
         override val opprettet: Instant = now(),
         val kopiertFra: Mottatt? = null,
+        val kopiertBegrunnelse: String? = null,
     ) : PersongrunnlagMelding() {
         override val statushistorikk: List<Status> =
             when (kopiertFra) {
                 null -> listOf(Status.Klar())
-                else -> listOf(Status.Kopiert(kopiertFra.id), Status.Klar())
+                else -> listOf(
+                    Status.Kopiert(kopiertFra = kopiertFra.id, begrunnelse = kopiertBegrunnelse),
+                    Status.Klar(begrunnelse = kopiertBegrunnelse),
+                )
             }
         override val id: UUID? = null
     }
@@ -113,7 +117,8 @@ sealed class PersongrunnlagMelding {
 
         @JsonTypeName("Klar")
         data class Klar(
-            val tidspunkt: Instant = now()
+            val tidspunkt: Instant = now(),
+            val begrunnelse: String? = null,
         ) : Status() {
             override fun ferdig(): Ferdig {
                 return Ferdig()
@@ -210,7 +215,8 @@ sealed class PersongrunnlagMelding {
 
         // TODO: riktig måte å håndtere dette på? Inngår ikke i mormal flyt, er bare her for å ta vare på info
         data class Kopiert(
-            val kopiertFra: UUID
+            val kopiertFra: UUID,
+            val begrunnelse: String? = null,
         ) : Status()
 
         @JsonTypeName("Feilet")

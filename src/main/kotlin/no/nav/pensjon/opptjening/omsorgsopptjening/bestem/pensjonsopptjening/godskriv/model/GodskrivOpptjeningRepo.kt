@@ -1,9 +1,9 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.EndringshistorikkInnslagFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.CorrelationId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.InnlesingId
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
-import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.serializeList
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
@@ -20,7 +20,8 @@ import kotlin.time.toJavaDuration
 @Component
 class GodskrivOpptjeningRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
-    private val clock: Clock = Clock.systemUTC()
+    private val endringshistorikkInnslagFactory: EndringshistorikkInnslagFactory,
+    private val clock: Clock = Clock.systemUTC(),
 ) {
     private fun GodskrivOpptjening.Status.databaseName(): String {
         return when (this) {
@@ -40,14 +41,16 @@ class GodskrivOpptjeningRepo(
     }
 
     fun persist(godskrivOpptjening: GodskrivOpptjening.Transient): GodskrivOpptjening.Persistent {
+        val endringsinnslag = endringshistorikkInnslagFactory.create()
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
-            """insert into godskriv_opptjening (behandlingId,status, karantene_til, statushistorikk)
-                |values (:behandlingId,:status, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb))""".trimMargin(),
+            """insert into godskriv_opptjening (behandlingId,status, karantene_til, statushistorikk, endringshistorikk)
+                |values (:behandlingId,:status, :karantene_til::timestamptz, to_jsonb(:statushistorikk::jsonb), to_jsonb(:endringshistorikk::jsonb))""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "behandlingId" to godskrivOpptjening.behandlingId,
                     "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                     "status" to godskrivOpptjening.status.databaseName(),
                     "karantene_til" to godskrivOpptjening.status.karanteneTilString(),
                 ),
@@ -58,17 +61,23 @@ class GodskrivOpptjeningRepo(
     }
 
     fun updateStatus(godskrivOpptjening: GodskrivOpptjening.Persistent) {
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = godskrivOpptjening.status.endringsbegrunnelse(),
+            ),
+        )
         jdbcTemplate.update(
             """update godskriv_opptjening
                 | set status = :status,
                 | karantene_til =:karantene_til::timestamptz,
-                | statushistorikk = to_jsonb(:statushistorikk::jsonb)
+                | statushistorikk = to_jsonb(:statushistorikk::jsonb),
+                | endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb
                 | where id = :id""".trimMargin(),
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to godskrivOpptjening.id,
-                    "status" to serialize(godskrivOpptjening.status),
                     "statushistorikk" to godskrivOpptjening.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                     "status" to godskrivOpptjening.status.databaseName(),
                     "karantene_til" to godskrivOpptjening.status.karanteneTilString(),
                 ),
@@ -241,4 +250,13 @@ class GodskrivOpptjeningRepo(
     }
 
     data class Locked(var lockId: UUID, val data: List<GodskrivOpptjening.Persistent>)
+
+}
+
+private fun GodskrivOpptjening.Status.endringsbegrunnelse(): String? {
+    return when (this) {
+        is GodskrivOpptjening.Status.Klar -> this.begrunnelse
+        is GodskrivOpptjening.Status.Stoppet -> this.begrunnelse
+        else -> null
+    }
 }

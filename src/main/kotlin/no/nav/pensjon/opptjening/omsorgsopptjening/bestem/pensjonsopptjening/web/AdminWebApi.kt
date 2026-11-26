@@ -143,8 +143,8 @@ class AdminWebApi(
             val responsStrenger =
                 oppgaver.map { id ->
                     try {
-                        val nyId = oppgaveService.restart(id)
-                        val status = nyId?.let { "Restartet" } ?: { "Fant ikke oppgaven" }
+                        val nyId = oppgaveService.restart(id, begrunnelse)
+                        val status = nyId?.let { "Restartet" } ?: "Fant ikke oppgaven"
                         "$id $status"
                     } catch (ex: Throwable) {
                         "$id: Feilet, ${ex::class.simpleName}"
@@ -173,7 +173,7 @@ class AdminWebApi(
             val responsStrenger =
                 brev.map { id ->
                     try {
-                        val retId = brevService.restart(id)
+                        val retId = brevService.restart(id, begrunnelse)
                         if (retId == null) {
                             "$id: Fant ikke brevet"
                         } else {
@@ -326,7 +326,7 @@ class AdminWebApi(
             val responsStrenger =
                 uuider.map { id ->
                     try {
-                        val retId = godskrivOpptjeningService.restart(id)
+                        val retId = godskrivOpptjeningService.restart(id, begrunnelse)
                         if (retId == null) {
                             "$id: Fant ikke godskrivingen"
                         } else {

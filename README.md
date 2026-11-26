@@ -191,6 +191,10 @@ https://omsorgsopptjening-bestem-pensjonsopptjening.intern.dev.nav.no/
 
 Dette tillater å gjøre vedlikeholdsoperasjoner i databasen.
 
+Tilgangspolicy: Admin-endepunkt er kun for AAD-brukere i konfigurert gruppe i NAIS-manifestet
+(`azure.application.allowAllUsers: false` + `claims.groups`). Systemtoken uten gruppetilhørighet
+har ikke tilgang.
+
 Grensesnittet har selv dokumentert de ulike operasjonene, men basisoperasjonene og statusene er som følger:
 * Å stoppe en melding vil avbryte videre prosessering og markere både meldingen og alle underementer som Stoppet. 
 * Stoppet er en status for videre manuell håndtering. En stoppet melding vil ikke behandles verken som feilet/uferdig
@@ -201,7 +205,5 @@ Grensesnittet har selv dokumentert de ulike operasjonene, men basisoperasjonene 
 * Avslutting av en melding brukes når en melding har feilet permanent, og man ikke ønsker å gjøre noe videre med  
   meldingen. En avsluttet melding behandles likt som en ferdig melding.
 * Avslutting av en melding vil ikke oppdatere underliggende elementer
-
-
 
 

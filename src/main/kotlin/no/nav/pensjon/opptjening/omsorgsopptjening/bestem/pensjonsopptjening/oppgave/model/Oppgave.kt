@@ -93,8 +93,8 @@ sealed class Oppgave {
             return copy(statushistorikk = statushistorikk + status.retry(melding))
         }
 
-        fun restart(): Persistent {
-            return copy(statushistorikk = statushistorikk + status.klar())
+        fun restart(begrunnelse: String? = null): Persistent {
+            return copy(statushistorikk = statushistorikk + status.klar(begrunnelse))
         }
 
         fun kansellert(begrunnelse: String, kanselleringsResultat: KanselleringsResultat): Persistent {
@@ -121,7 +121,7 @@ sealed class Oppgave {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Retry")
         }
 
-        open fun klar(): Status {
+        open fun klar(begrunnelse: String?): Status {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Klar")
         }
 
@@ -132,7 +132,8 @@ sealed class Oppgave {
 
         @JsonTypeName("Klar")
         data class Klar(
-            val tidspunkt: Instant = Instant.now()
+            val tidspunkt: Instant = Instant.now(),
+            val begrunnelse: String? = null,
         ) : Status() {
             override fun ferdig(oppgaveId: String): Ferdig {
                 return Ferdig(oppgaveId = oppgaveId)
@@ -146,8 +147,8 @@ sealed class Oppgave {
                 return Stoppet(begrunnelse = begrunnelse)
             }
 
-            override fun klar(): Status {
-                return Klar()
+            override fun klar(begrunnelse: String?): Status {
+                return Klar(begrunnelse = begrunnelse)
             }
 
             override fun kansellert(begrunnelse: String, kanselleringsResultat: KanselleringsResultat): Status {
@@ -219,8 +220,8 @@ sealed class Oppgave {
                 return Stoppet(begrunnelse = begrunnelse)
             }
 
-            override fun klar(): Status {
-                return Klar()
+            override fun klar(begrunnelse: String?): Status {
+                return Klar(begrunnelse = begrunnelse)
             }
 
             override fun kansellert(begrunnelse: String, kanselleringsResultat: KanselleringsResultat): Status {
@@ -238,8 +239,8 @@ sealed class Oppgave {
                 return Stoppet(begrunnelse = begrunnelse)
             }
 
-            override fun klar(): Status {
-                return Klar()
+            override fun klar(begrunnelse: String?): Status {
+                return Klar(begrunnelse = begrunnelse)
             }
         }
     }

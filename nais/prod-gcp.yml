@@ -68,6 +68,8 @@ spec:
       autoLogin: true
     application:
       enabled: true
+      # Policy: Admin-endepunkt er kun for AAD-brukere i gruppen under.
+      # Systemtoken uten gruppetilhørighet har ikke tilgang.
       allowAllUsers: false
       claims:
         groups:

@@ -128,10 +128,10 @@ class BrevService(
         }
     }
 
-    fun restart(brevId: UUID): UUID? {
+    fun restart(brevId: UUID, begrunnelse: String? = null): UUID? {
         return transactionTemplate.execute {
             brevRepository.find(brevId).let {
-                it.restart()
+                it.restart(begrunnelse)
             }.let {
                 brevRepository.updateStatus(it)
                 brevId

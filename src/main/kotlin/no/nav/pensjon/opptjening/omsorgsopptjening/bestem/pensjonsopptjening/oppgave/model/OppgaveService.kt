@@ -144,9 +144,9 @@ class OppgaveService(
         }
     }
 
-    fun restart(oppgaveId: UUID): UUID? {
+    fun restart(oppgaveId: UUID, begrunnelse: String? = null): UUID? {
         return transactionTemplate.execute {
-            oppgaveRepo.tryFind(oppgaveId)?.restart()?.let { oppgave ->
+            oppgaveRepo.tryFind(oppgaveId)?.restart(begrunnelse)?.let { oppgave ->
                 oppgaveRepo.updateStatus(oppgave)
                 oppgave.id
             }

@@ -1,5 +1,6 @@
 package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.repository
 
+import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.EndringshistorikkInnslagFactory
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMelding
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserialize
 import no.nav.pensjon.opptjening.omsorgsopptjening.felles.deserializeList
@@ -23,7 +24,8 @@ import kotlin.time.toJavaDuration
 @Component
 class PersongrunnlagRepo(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
-    private val clock: Clock = Clock.systemUTC()
+    private val endringshistorikkInnslagFactory: EndringshistorikkInnslagFactory,
+    private val clock: Clock = Clock.systemUTC(),
 ) {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -54,8 +56,8 @@ class PersongrunnlagRepo(
         val keyHolder = GeneratedKeyHolder()
         jdbcTemplate.update(
             //language=postgres-psql
-            """insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, status, karantene_til) 
-              |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:statushistorikk::jsonb), :status, :karanteneTil::timestamptz) 
+            """insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, endringshistorikk, status, karantene_til) 
+              |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:statushistorikk::jsonb), to_jsonb(:endringshistorikk::jsonb), :status, :karanteneTil::timestamptz) 
               |on conflict (correlation_id, innlesing_id) where status <> 'Stoppet' do nothing 
               |returning id
             """.trimMargin(),
@@ -68,6 +70,9 @@ class PersongrunnlagRepo(
                     "status" to "Klar",
                     "karanteneTil" to null,
                     "statushistorikk" to melding.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringshistorikkInnslagFactory.create(
+                        EndringshistorikkInnslagFactory.Input(begrunnelse = melding.status.endringsbegrunnelse()),
+                    ).serializeSomListe(),
                 ),
             ),
             keyHolder
@@ -77,10 +82,12 @@ class PersongrunnlagRepo(
     }
 
     fun lagre(meldinger: List<PersongrunnlagMelding.Lest>) {
+
+
         jdbcTemplate.batchUpdate(
             //language=postgres-psql
-            """insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, status, karantene_til) 
-              |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:statushistorikk::jsonb), :status, :karanteneTil::timestamptz) 
+            """insert into melding (melding, correlation_id, innlesing_id, opprettet, statushistorikk, endringshistorikk, status, karantene_til) 
+              |values (to_jsonb(:melding::jsonb), :correlation_id, :innlesing_id, :opprettet::timestamptz, to_jsonb(:statushistorikk::jsonb), to_jsonb(:endringshistorikk::jsonb), :status, :karanteneTil::timestamptz) 
               |on conflict (correlation_id, innlesing_id) where status <> 'Stoppet' do nothing 
               |returning id
             """.trimMargin(),
@@ -94,6 +101,11 @@ class PersongrunnlagRepo(
                         "status" to "Klar",
                         "karanteneTil" to null,
                         "statushistorikk" to it.statushistorikk.serializeList(),
+                        "endringshistorikk" to endringshistorikkInnslagFactory.create(
+                            EndringshistorikkInnslagFactory.Input(
+                                begrunnelse = it.status.endringsbegrunnelse(),
+                            ),
+                        ).serializeSomListe(),
                     ),
                 )
             }.toTypedArray()
@@ -101,14 +113,20 @@ class PersongrunnlagRepo(
     }
 
     fun updateStatus(melding: PersongrunnlagMelding.Mottatt) {
+        val endringsinnslag = endringshistorikkInnslagFactory.create(
+            EndringshistorikkInnslagFactory.Input(
+                begrunnelse = melding.status.endringsbegrunnelse(),
+            ),
+        )
         jdbcTemplate.update(
-            """update melding set status = :status, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb) where id = :id""",
+            """update melding set status = :status, karantene_til = :karanteneTil::timestamptz, statushistorikk = to_jsonb(:statushistorikk::jsonb), endringshistorikk = coalesce(endringshistorikk, '[]'::jsonb) || :endringshistorikk::jsonb where id = :id""",
             MapSqlParameterSource(
                 mapOf<String, Any?>(
                     "id" to melding.id,
                     "status" to melding.status.databaseName(),
                     "karanteneTil" to melding.status.karanteneTilString(),
-                    "statushistorikk" to melding.statushistorikk.serializeList()
+                    "statushistorikk" to melding.statushistorikk.serializeList(),
+                    "endringshistorikk" to endringsinnslag.serializeSomListe(),
                 ),
             ),
         )
@@ -283,4 +301,14 @@ class PersongrunnlagRepo(
 
     data class Locked(val lockId: UUID, val data: List<PersongrunnlagMelding.Mottatt>)
 
+}
+
+private fun PersongrunnlagMelding.Status.endringsbegrunnelse(): String? {
+    return when (this) {
+        is PersongrunnlagMelding.Status.Klar -> this.begrunnelse
+        is PersongrunnlagMelding.Status.Stoppet -> this.begrunnelse
+        is PersongrunnlagMelding.Status.Avsluttet -> this.melding
+        is PersongrunnlagMelding.Status.Kopiert -> this.begrunnelse
+        else -> null
+    }
 }
