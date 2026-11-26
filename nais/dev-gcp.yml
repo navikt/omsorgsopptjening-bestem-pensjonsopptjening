@@ -9,8 +9,6 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev-gcp
-    - name: APP_VERSION
-      value: "{{ image }}"
     - name: PDL_URL
       value: https://pdl-api.dev-fss-pub.nais.io/graphql
     - name: PDL_API_ID

@@ -43,7 +43,7 @@ interface EndringshistorikkInnslagFactory {
 
 @Component
 class EndringshistorikkInnslagFactoryImpl(
-    @Value($$"${APP_VERSION:unknown}") private val appVersion: String = "unknown",
+    @Value($$"${NAIS_APP_IMAGE:unknown}") private val appVersion: String = "unknown",
     private val clock: Clock = Clock.systemUTC(),
     private val tokenValidationContextHolder: TokenValidationContextHolder,
 ) : EndringshistorikkInnslagFactory {
