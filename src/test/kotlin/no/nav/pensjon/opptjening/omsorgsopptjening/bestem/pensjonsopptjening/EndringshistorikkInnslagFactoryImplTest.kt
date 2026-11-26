@@ -104,7 +104,7 @@ class EndringshistorikkInnslagFactoryImplTest {
     }
 
     @Test
-    fun `bruker azp som utfortAv naar NAVident mangler`() {
+    fun `bruker azp_name som utfortAv naar NAVident mangler`() {
         val request = MockHttpServletRequest("POST", "/api/omsorgsopptjening/123")
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/omsorgsopptjening/{id}")
         RequestContextHolder.setRequestAttributes(ServletRequestAttributes(request))
@@ -112,6 +112,7 @@ class EndringshistorikkInnslagFactoryImplTest {
         whenever(tokenValidationContext.getClaims("azure")).thenReturn(
             JwtTokenClaims(
                 JWTClaimsSet.Builder()
+                    .claim("azp_name", "lesbart-klientnavn")
                     .claim("azp", "4cc7037f-bdcf-48cf-9f4f-4f66e07eb66e")
                     .claim("appid", "e35e9f9c-25de-4a77-bf7f-a2bd95f084f5")
                     .build()
@@ -125,8 +126,9 @@ class EndringshistorikkInnslagFactoryImplTest {
 
         val innslag = sut.create()
 
-        assertThat(innslag.utfortAv).isEqualTo("4cc7037f-bdcf-48cf-9f4f-4f66e07eb66e")
+        assertThat(innslag.utfortAv).isEqualTo("lesbart-klientnavn")
         assertThat(innslag.tokenInfo?.navIdent).isNull()
+        assertThat(innslag.tokenInfo?.azpName).isEqualTo("lesbart-klientnavn")
         assertThat(innslag.tokenInfo?.azp).isEqualTo("4cc7037f-bdcf-48cf-9f4f-4f66e07eb66e")
         assertThat(innslag.tokenInfo?.appId).isEqualTo("e35e9f9c-25de-4a77-bf7f-a2bd95f084f5")
     }

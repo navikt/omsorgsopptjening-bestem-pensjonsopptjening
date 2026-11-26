@@ -24,13 +24,15 @@ data class EndringshistorikkInnslag(
 
 // Prioritering for utfortAv:
 // 1) NAVident (kun i brukerflyter: login/OBO; ingen ekstra NAIS-config),
-// 2) azp (forventes i Entra v2-token for både bruker- og M2M-flyt; ingen ekstra NAIS-config),
-// 3) appid (legacy/fallback, kan forekomme avhengig av token/flyt; normalt ingen ekstra NAIS-config),
-// 4) sub (forventes i gyldige access token; ingen ekstra NAIS-config) som siste fallback.
+// 2) azp_name (default claim; ingen ekstra NAIS-config),
+// 3) azp (forventes i Entra v2-token for både bruker- og M2M-flyt; ingen ekstra NAIS-config),
+// 4) appid (legacy/fallback, kan forekomme avhengig av token/flyt; normalt ingen ekstra NAIS-config),
+// 5) sub (forventes i gyldige access token; ingen ekstra NAIS-config) som siste fallback.
 //
-// azp brukes som stabil, unik identifikator for sporbarhet/autorisasjon.
-// azp_name (default claim; ingen ekstra NAIS-config) lagres i tillegg for lesbarhet, men brukes ikke som
-// primær identifikator fordi claimen ikke er garantert unik og kan endres over tid.
+// azp_name brukes for lesbarhet i utfortAv nar NAVident mangler.
+// azp/appid/sub beholdes som fallback for robusthet i tokenvarianter.
+// azp ligger fortsatt i tokenInfo og kan brukes for unik/stabil identifikator ved behov.
+// Merk at azp_name ikke er garantert unik og kan endres over tid.
 //
 // Referanser:
 // - https://doc.nav.cloud.nais.io/auth/entra-id/reference/ (azp, azp_name, NAVident)
@@ -44,7 +46,7 @@ data class TokenInfo(
     val oid: String? = null,
     val navIdent: String? = null,
 ) {
-    fun finnUtfortAv(): String? = sequenceOf(navIdent, azp, appId, subject).firstOrNull { !it.isNullOrBlank() }
+    fun finnUtfortAv(): String? = sequenceOf(navIdent, azpName, azp, appId, subject).firstOrNull { !it.isNullOrBlank() }
 }
 
 interface EndringshistorikkInnslagFactory {
