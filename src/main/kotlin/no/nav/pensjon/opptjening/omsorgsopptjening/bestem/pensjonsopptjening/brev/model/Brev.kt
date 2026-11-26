@@ -50,8 +50,8 @@ sealed class Brev {
             return copy(statushistorikk = statushistorikk + status.stoppet(begrunnelse))
         }
 
-        fun restart(): Persistent {
-            return copy(statushistorikk = statushistorikk + status.restart())
+        fun restart(begrunnelse: String? = null): Persistent {
+            return copy(statushistorikk = statushistorikk + status.restart(begrunnelse))
         }
     }
 
@@ -75,14 +75,15 @@ sealed class Brev {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
         }
 
-        open fun restart(): Status {
+        open fun restart(begrunnelse: String?): Status {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
         }
 
 
         @JsonTypeName("Klar")
         data class Klar(
-            val tidspunkt: Instant = Instant.now()
+            val tidspunkt: Instant = Instant.now(),
+            val begrunnelse: String? = null,
         ) : Status() {
             override fun ferdig(journalpost: Journalpost): Ferdig {
                 return Ferdig(journalpost = journalpost.id)
@@ -96,8 +97,8 @@ sealed class Brev {
                 return Stoppet(begrunnelse = begrunnelse)
             }
 
-            override fun restart() : Status {
-                return Klar()
+            override fun restart(begrunnelse: String?) : Status {
+                return Klar(begrunnelse = begrunnelse)
             }
         }
 
@@ -106,8 +107,8 @@ sealed class Brev {
             val tidspunkt: Instant = Instant.now(),
             val journalpost: String,
         ) : Status() {
-            override fun restart() : Status {
-                return Klar()
+            override fun restart(begrunnelse: String?) : Status {
+                return Klar(begrunnelse = begrunnelse)
             }
         }
 
@@ -116,8 +117,8 @@ sealed class Brev {
             val tidspunkt: Instant = Instant.now(),
             val begrunnelse: String? = null,
         ) : Status() {
-            override fun restart() : Status {
-                return Klar()
+            override fun restart(begrunnelse: String?) : Status {
+                return Klar(begrunnelse = begrunnelse)
             }
         }
 
@@ -158,8 +159,8 @@ sealed class Brev {
                 return Stoppet(begrunnelse = begrunnelse)
             }
 
-            override fun restart() : Status {
-                return Klar()
+            override fun restart(begrunnelse: String?) : Status {
+                return Klar(begrunnelse = begrunnelse)
             }
         }
 
@@ -171,8 +172,8 @@ sealed class Brev {
                 return Stoppet(begrunnelse = begrunnelse)
             }
 
-            override fun restart() : Status {
-                return Klar()
+            override fun restart(begrunnelse: String?) : Status {
+                return Klar(begrunnelse = begrunnelse)
             }
 
         }

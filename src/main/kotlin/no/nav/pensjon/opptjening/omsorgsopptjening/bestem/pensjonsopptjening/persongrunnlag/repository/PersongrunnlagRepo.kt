@@ -70,7 +70,9 @@ class PersongrunnlagRepo(
                     "status" to "Klar",
                     "karanteneTil" to null,
                     "statushistorikk" to melding.statushistorikk.serializeList(),
-                    "endringshistorikk" to endringshistorikkInnslagFactory.create().serializeSomListe(),
+                    "endringshistorikk" to endringshistorikkInnslagFactory.create(
+                        EndringshistorikkInnslagFactory.Input(begrunnelse = melding.status.endringsbegrunnelse()),
+                    ).serializeSomListe(),
                 ),
             ),
             keyHolder
@@ -99,7 +101,11 @@ class PersongrunnlagRepo(
                         "status" to "Klar",
                         "karanteneTil" to null,
                         "statushistorikk" to it.statushistorikk.serializeList(),
-                        "endringshistorikk" to endringshistorikkInnslagFactory.create().serializeSomListe(),
+                        "endringshistorikk" to endringshistorikkInnslagFactory.create(
+                            EndringshistorikkInnslagFactory.Input(
+                                begrunnelse = it.status.endringsbegrunnelse(),
+                            ),
+                        ).serializeSomListe(),
                     ),
                 )
             }.toTypedArray()
@@ -299,8 +305,10 @@ class PersongrunnlagRepo(
 
 private fun PersongrunnlagMelding.Status.endringsbegrunnelse(): String? {
     return when (this) {
+        is PersongrunnlagMelding.Status.Klar -> this.begrunnelse
         is PersongrunnlagMelding.Status.Stoppet -> this.begrunnelse
         is PersongrunnlagMelding.Status.Avsluttet -> this.melding
+        is PersongrunnlagMelding.Status.Kopiert -> this.begrunnelse
         else -> null
     }
 }

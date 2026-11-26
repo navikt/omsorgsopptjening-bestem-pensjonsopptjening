@@ -278,6 +278,7 @@ class BrevRepository(
 
 private fun Brev.Status.endringsbegrunnelse(): String? {
     return when (this) {
+        is Brev.Status.Klar -> this.begrunnelse
         is Brev.Status.Stoppet -> this.begrunnelse
         else -> null
     }

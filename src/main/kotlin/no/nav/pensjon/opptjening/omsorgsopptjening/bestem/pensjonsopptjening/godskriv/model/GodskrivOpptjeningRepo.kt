@@ -255,6 +255,7 @@ class GodskrivOpptjeningRepo(
 
 private fun GodskrivOpptjening.Status.endringsbegrunnelse(): String? {
     return when (this) {
+        is GodskrivOpptjening.Status.Klar -> this.begrunnelse
         is GodskrivOpptjening.Status.Stoppet -> this.begrunnelse
         else -> null
     }

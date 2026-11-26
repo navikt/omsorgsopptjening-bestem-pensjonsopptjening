@@ -295,6 +295,7 @@ class OppgaveRepo(
 
 private fun Oppgave.Status.endringsbegrunnelse(): String? {
     return when (this) {
+        is Oppgave.Status.Klar -> this.begrunnelse
         is Oppgave.Status.Stoppet -> this.begrunnelse
         is Oppgave.Status.Kansellert -> this.begrunnelse
         else -> null

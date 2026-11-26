@@ -48,11 +48,11 @@ sealed class GodskrivOpptjening {
             return copy(statushistorikk = statushistorikk + status.stoppet(begrunnelse))
         }
 
-        fun klar(): Persistent {
+        fun klar(begrunnelse: String? = null): Persistent {
             return if (status is Status.Klar) {
                 this
             } else {
-                return copy(statushistorikk = statushistorikk + status.klar())
+                copy(statushistorikk = statushistorikk + status.klar(begrunnelse))
             }
         }
 
@@ -91,13 +91,14 @@ sealed class GodskrivOpptjening {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Stoppet")
         }
 
-        open fun klar(): Status {
+        open fun klar(begrunnelse: String?): Status {
             throw IllegalArgumentException("Kan ikke gå fra status:${this::class.java} til Klar")
         }
 
         @JsonTypeName("Klar")
         data class Klar(
-            val tidspunkt: Instant = Instant.now()
+            val tidspunkt: Instant = Instant.now(),
+            val begrunnelse: String? = null,
         ) : Status() {
             override fun ferdig(): Ferdig {
                 return Ferdig()
@@ -126,8 +127,8 @@ sealed class GodskrivOpptjening {
             val tidspunkt: Instant = Instant.now(),
             val begrunnelse: String? = null,
         ) : Status() {
-            override fun klar(): Status {
-                return Klar()
+            override fun klar(begrunnelse: String?): Status {
+                return Klar(begrunnelse = begrunnelse)
             }
         }
 
@@ -143,8 +144,8 @@ sealed class GodskrivOpptjening {
                 return Ferdig()
             }
 
-            override fun klar(): Status {
-                return Klar()
+            override fun klar(begrunnelse: String?): Status {
+                return Klar(begrunnelse = begrunnelse)
             }
 
             override fun retry(melding: String): Status {
@@ -180,8 +181,8 @@ sealed class GodskrivOpptjening {
                 return Stoppet(begrunnelse = begrunnelse)
             }
 
-            override fun klar(): Status {
-                return Klar()
+            override fun klar(begrunnelse: String?): Status {
+                return Klar(begrunnelse = begrunnelse)
             }
         }
     }

@@ -64,9 +64,9 @@ internal class GodskrivOpptjeningServiceImpl(
         }
     }
 
-    override fun restart(id: UUID): UUID? {
+    override fun restart(id: UUID, begrunnelse: String?): UUID? {
         log.info("Stopper godkjenning: $id")
-        return godskrivOpptjeningRepo.tryFind(id)?.klar()?.let {
+        return godskrivOpptjeningRepo.tryFind(id)?.klar(begrunnelse)?.let {
             godskrivOpptjeningRepo.updateStatus(it)
             id
         }

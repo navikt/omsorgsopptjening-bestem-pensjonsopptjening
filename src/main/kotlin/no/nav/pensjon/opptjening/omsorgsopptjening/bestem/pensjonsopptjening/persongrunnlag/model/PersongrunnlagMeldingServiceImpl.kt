@@ -197,7 +197,7 @@ internal class PersongrunnlagMeldingServiceImpl(
         return id
     }
 
-    private fun opprettKopiAvStoppetMelding(meldingId: UUID): UUID? {
+    private fun opprettKopiAvStoppetMelding(meldingId: UUID, begrunnelse: String? = null): UUID? {
         log.info("Oppretter kopi av melding: $meldingId")
         val gammelMelding = persongrunnlagRepo.tryFind(meldingId)
         when (val status = gammelMelding?.status) {
@@ -214,6 +214,7 @@ internal class PersongrunnlagMeldingServiceImpl(
                 innhold = it.innhold,
                 opprettet = Instant.now(),
                 kopiertFra = it,
+                kopiertBegrunnelse = begrunnelse,
             )
         }.let {
             return persongrunnlagRepo.lagre(it)
@@ -230,7 +231,7 @@ internal class PersongrunnlagMeldingServiceImpl(
         try {
             return transactionTemplate.execute {
                 stoppMeldingIntern(meldingId, begrunnelse)
-                opprettKopiAvStoppetMelding(meldingId)
+                opprettKopiAvStoppetMelding(meldingId, begrunnelse)
             }
         } catch (ex: Throwable) {
             secureLog.warn("Fikk feil ved stopp og opprettelse av  melding", ex)
@@ -248,4 +249,3 @@ internal class PersongrunnlagMeldingServiceImpl(
         return persongrunnlagRepo.frigi(locked)
     }
 }
-
