@@ -44,13 +44,14 @@ interface EndringshistorikkInnslagFactory {
 @Component
 class EndringshistorikkInnslagFactoryImpl(
     @Value($$"${NAIS_APP_IMAGE:unknown}") private val appVersion: String = "unknown",
+    @Value($$"${NAIS_APP_NAME:SYSTEM}") private val naisAppName: String = "SYSTEM",
     private val clock: Clock = Clock.systemUTC(),
     private val tokenValidationContextHolder: TokenValidationContextHolder,
 ) : EndringshistorikkInnslagFactory {
 
     override fun create(input: EndringshistorikkInnslagFactory.Input): EndringshistorikkInnslag {
         val attributes = getRequestAttributes() ?: return EndringshistorikkInnslag(
-            utfortAv = SYSTEM_VERDI,
+            utfortAv = naisAppName,
             tidspunkt = Instant.now(clock),
             begrunnelse = input.begrunnelse,
             appVersjon = appVersion,
@@ -98,7 +99,6 @@ class EndringshistorikkInnslagFactoryImpl(
         this.request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE) as? String
 
     private companion object {
-        const val SYSTEM_VERDI = "SYSTEM"
         const val UKJENT_VERDI = "UKJENT"
         const val AZURE_ISSUER = "azure"
         const val ISSUER_CLAIM = "iss"

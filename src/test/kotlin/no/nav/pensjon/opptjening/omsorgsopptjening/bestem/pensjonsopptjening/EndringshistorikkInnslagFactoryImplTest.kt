@@ -89,6 +89,19 @@ class EndringshistorikkInnslagFactoryImplTest {
     }
 
     @Test
+    fun `bruker NAIS_APP_NAME som utfortAv for tjenestekall uten request-context`() {
+        val sut = EndringshistorikkInnslagFactoryImpl(
+            naisAppName = "omsorgsopptjening-bestem-pensjonsopptjening",
+            clock = FAST_CLOCK,
+            tokenValidationContextHolder = tokenValidationContextHolder,
+        )
+
+        val innslag = sut.create()
+
+        assertThat(innslag.utfortAv).isEqualTo("omsorgsopptjening-bestem-pensjonsopptjening")
+    }
+
+    @Test
     fun `bruker appid som utfortAv naar NAVident mangler`() {
         val request = MockHttpServletRequest("POST", "/api/omsorgsopptjening/123")
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/omsorgsopptjening/{id}")
