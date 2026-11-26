@@ -39,6 +39,7 @@ class EndringshistorikkInnslagFactoryImplTest {
                     .claim("sub", "subject")
                     .claim("iss", "issuer")
                     .claim("azp", "azp-verdi")
+                    .claim("azp_name", "lesbart-klientnavn")
                     .claim("appid", "appid-verdi")
                     .claim("oid", "oid-verdi")
                     .build()
@@ -63,6 +64,7 @@ class EndringshistorikkInnslagFactoryImplTest {
                 issuer = "issuer",
                 subject = "subject",
                 azp = "azp-verdi",
+                azpName = "lesbart-klientnavn",
                 appId = "appid-verdi",
                 oid = "oid-verdi",
                 navIdent = "Z123456",
@@ -102,7 +104,7 @@ class EndringshistorikkInnslagFactoryImplTest {
     }
 
     @Test
-    fun `bruker appid som utfortAv naar NAVident mangler`() {
+    fun `bruker azp som utfortAv naar NAVident mangler`() {
         val request = MockHttpServletRequest("POST", "/api/omsorgsopptjening/123")
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/omsorgsopptjening/{id}")
         RequestContextHolder.setRequestAttributes(ServletRequestAttributes(request))
@@ -110,8 +112,8 @@ class EndringshistorikkInnslagFactoryImplTest {
         whenever(tokenValidationContext.getClaims("azure")).thenReturn(
             JwtTokenClaims(
                 JWTClaimsSet.Builder()
+                    .claim("azp", "4cc7037f-bdcf-48cf-9f4f-4f66e07eb66e")
                     .claim("appid", "e35e9f9c-25de-4a77-bf7f-a2bd95f084f5")
-                    .claim("azp", "dev-gcp:team-pen:omsorgsopptjening-bestem-pensjonsopptjening")
                     .build()
             )
         )
@@ -123,13 +125,41 @@ class EndringshistorikkInnslagFactoryImplTest {
 
         val innslag = sut.create()
 
-        assertThat(innslag.utfortAv).isEqualTo("e35e9f9c-25de-4a77-bf7f-a2bd95f084f5")
+        assertThat(innslag.utfortAv).isEqualTo("4cc7037f-bdcf-48cf-9f4f-4f66e07eb66e")
         assertThat(innslag.tokenInfo?.navIdent).isNull()
+        assertThat(innslag.tokenInfo?.azp).isEqualTo("4cc7037f-bdcf-48cf-9f4f-4f66e07eb66e")
         assertThat(innslag.tokenInfo?.appId).isEqualTo("e35e9f9c-25de-4a77-bf7f-a2bd95f084f5")
     }
 
     @Test
-    fun `bruker sub som utfortAv naar NAVident appid og azp mangler eller er blanke`() {
+    fun `bruker appid som utfortAv naar NAVident og azp mangler eller er blanke`() {
+        val request = MockHttpServletRequest("POST", "/api/omsorgsopptjening/123")
+        request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/omsorgsopptjening/{id}")
+        RequestContextHolder.setRequestAttributes(ServletRequestAttributes(request))
+        whenever(tokenValidationContextHolder.getTokenValidationContext()).thenReturn(tokenValidationContext)
+        whenever(tokenValidationContext.getClaims("azure")).thenReturn(
+            JwtTokenClaims(
+                JWTClaimsSet.Builder()
+                    .claim("NAVident", "")
+                    .claim("appid", "service-app-id")
+                    .claim("azp", "")
+                    .claim("sub", "service-subject")
+                    .build()
+            )
+        )
+
+        val sut = EndringshistorikkInnslagFactoryImpl(
+            clock = FAST_CLOCK,
+            tokenValidationContextHolder = tokenValidationContextHolder,
+        )
+
+        val innslag = sut.create()
+
+        assertThat(innslag.utfortAv).isEqualTo("service-app-id")
+    }
+
+    @Test
+    fun `bruker sub som utfortAv naar NAVident azp og appid mangler eller er blanke`() {
         val request = MockHttpServletRequest("POST", "/api/omsorgsopptjening/123")
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/omsorgsopptjening/{id}")
         RequestContextHolder.setRequestAttributes(ServletRequestAttributes(request))
@@ -156,7 +186,7 @@ class EndringshistorikkInnslagFactoryImplTest {
     }
 
     @Test
-    fun `bruker UKJENT naar NAVident appid azp og sub mangler eller er blanke`() {
+    fun `bruker UKJENT naar NAVident azp appid og sub mangler eller er blanke`() {
         val request = MockHttpServletRequest("POST", "/api/omsorgsopptjening/123")
         request.setAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE, "/api/omsorgsopptjening/{id}")
         RequestContextHolder.setRequestAttributes(ServletRequestAttributes(request))

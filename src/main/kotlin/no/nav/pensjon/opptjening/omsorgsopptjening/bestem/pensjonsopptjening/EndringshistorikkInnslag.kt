@@ -22,15 +22,29 @@ data class EndringshistorikkInnslag(
     fun serializeSomListe(): String = listOf(this).serializeList()
 }
 
+// Prioritering for utfortAv:
+// 1) NAVident (kun i brukerflyter: login/OBO; ingen ekstra NAIS-config),
+// 2) azp (forventes i Entra v2-token for både bruker- og M2M-flyt; ingen ekstra NAIS-config),
+// 3) appid (legacy/fallback, kan forekomme avhengig av token/flyt; normalt ingen ekstra NAIS-config),
+// 4) sub (forventes i gyldige access token; ingen ekstra NAIS-config) som siste fallback.
+//
+// azp brukes som stabil, unik identifikator for sporbarhet/autorisasjon.
+// azp_name (default claim; ingen ekstra NAIS-config) lagres i tillegg for lesbarhet, men brukes ikke som
+// primær identifikator fordi claimen ikke er garantert unik og kan endres over tid.
+//
+// Referanser:
+// - https://doc.nav.cloud.nais.io/auth/entra-id/reference/ (azp, azp_name, NAVident)
+// - https://doc.nais.io/workloads/application/reference/spec/ (azure.application.claims.extra er deprecated/ignorert)
 data class TokenInfo(
     val issuer: String? = null,
     val subject: String? = null,
     val azp: String? = null,
+    val azpName: String? = null,
     val appId: String? = null,
     val oid: String? = null,
     val navIdent: String? = null,
 ) {
-    fun finnUtfortAv(): String? = sequenceOf(navIdent, appId, azp, subject).firstOrNull { !it.isNullOrBlank() }
+    fun finnUtfortAv(): String? = sequenceOf(navIdent, azp, appId, subject).firstOrNull { !it.isNullOrBlank() }
 }
 
 interface EndringshistorikkInnslagFactory {
@@ -85,6 +99,7 @@ class EndringshistorikkInnslagFactoryImpl(
             issuer = claims.getStringClaim(ISSUER_CLAIM),
             subject = claims.getStringClaim(SUBJECT_CLAIM),
             azp = claims.getStringClaim(AZP_CLAIM),
+            azpName = claims.getStringClaim(AZP_NAME_CLAIM),
             appId = claims.getStringClaim(APP_ID_CLAIM),
             oid = claims.getStringClaim(OID_CLAIM),
             navIdent = claims.getStringClaim(NAV_IDENT_CLAIM),
@@ -104,6 +119,7 @@ class EndringshistorikkInnslagFactoryImpl(
         const val ISSUER_CLAIM = "iss"
         const val SUBJECT_CLAIM = "sub"
         const val AZP_CLAIM = "azp"
+        const val AZP_NAME_CLAIM = "azp_name"
         const val APP_ID_CLAIM = "appid"
         const val OID_CLAIM = "oid"
         const val NAV_IDENT_CLAIM = "NAVident"
