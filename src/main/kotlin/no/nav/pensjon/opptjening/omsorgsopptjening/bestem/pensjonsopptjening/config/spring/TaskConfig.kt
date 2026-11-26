@@ -2,7 +2,6 @@ package no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.co
 
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.brev.model.BrevProcessingTask
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.godskriv.model.GodskrivOpptjeningProcessingTask
-import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.kontrollbehandling.KontrollbehandlingProcessingTask
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.oppgave.model.OppgaveProcessingTask
 import no.nav.pensjon.opptjening.omsorgsopptjening.bestem.pensjonsopptjening.persongrunnlag.model.PersongrunnlagMeldingProcessingTask
 import org.springframework.context.annotation.Bean
@@ -20,7 +19,6 @@ class TaskConfig {
         oppgaveProcessingTask: OppgaveProcessingTask,
         brevProcessingTask: BrevProcessingTask,
         persongrunnlagMeldingProcessingTask: PersongrunnlagMeldingProcessingTask,
-        kontrollbehandlingProcessingTask: KontrollbehandlingProcessingTask,
         godskrivOpptjeningProcessingTask: GodskrivOpptjeningProcessingTask
     ): ExecutorService {
         val daemonFactory = Executors.defaultThreadFactory().let { base ->
@@ -30,7 +28,6 @@ class TaskConfig {
             repeat(1) { executor.submit(oppgaveProcessingTask) }
             repeat(1) { executor.submit(brevProcessingTask) }
             repeat(8) { executor.submit(persongrunnlagMeldingProcessingTask) }
-            repeat(0) { executor.submit(kontrollbehandlingProcessingTask) }
             repeat(1) { executor.submit(godskrivOpptjeningProcessingTask) }
         }
     }
